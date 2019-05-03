@@ -2,12 +2,12 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package dtable
+package etable
 
 import (
 	"testing"
 
-	"github.com/emer/dtable/etensor"
+	"github.com/emer/etable/etensor"
 )
 
 func TestAdd4DCol(t *testing.T) {

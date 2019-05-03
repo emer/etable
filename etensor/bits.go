@@ -5,10 +5,13 @@
 package etensor
 
 import (
+	"log"
+
 	"github.com/apache/arrow/go/arrow"
-	"github.com/emer/dtable/bitslice"
+	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/kit"
+	"gonum.org/v1/gonum/mat"
 )
 
 // BoolType not in arrow..
@@ -199,4 +202,25 @@ func (tsr *Bits) SetNumRows(rows int) {
 	nln := rows * inln
 	tsr.Shape.Shp[0] = rows
 	tsr.Values.SetLen(nln)
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Not supported for Bits -- do not call!
+func (tsr *Bits) Dims() (r, c int) {
+	log.Println("etensor Dims gonum Matrix call made on Bits Tensor -- not supported")
+	return 0, 0
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Not supported for Bits -- do not call!
+func (tsr *Bits) At(i, j int) float64 {
+	log.Println("etensor At gonum Matrix call made on Bits Tensor -- not supported")
+	return 0
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// Not supported for Bits -- do not call!
+func (tsr *Bits) T() mat.Matrix {
+	log.Println("etensor T gonum Matrix call made on Bits Tensor -- not supported")
+	return mat.Transpose{tsr}
 }

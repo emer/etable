@@ -2,18 +2,18 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package dtable
+package etable
 
 import (
 	"fmt"
 
-	"github.com/emer/dtable/etensor"
+	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 )
 
-// dtable.Table is the DataTable structure, containing columns of etensor tensors.
+// etable.Table is the emer DataTable structure, containing columns of etensor tensors.
 // All tensors MUST have RowMajor stride layout!
 type Table struct {
 	Cols       []etensor.Tensor `view:"no-inline" desc:"columns of data, as etensor.Tensor tensors"`
@@ -58,7 +58,7 @@ func (dt *Table) Schema() Schema {
 func (dt *Table) ColNameIndex(name string) (int, error) {
 	i, ok := dt.ColNameMap[name]
 	if !ok {
-		return 0, fmt.Errorf("dtable.Table ColNameIndex: column named: %v not found", name)
+		return 0, fmt.Errorf("etable.Table ColNameIndex: column named: %v not found", name)
 	}
 	return i, nil
 }

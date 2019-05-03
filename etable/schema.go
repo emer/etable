@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package dtable
+package etable
 
-import "github.com/emer/dtable/etensor"
+import "github.com/emer/etable/etensor"
 
 // Column specifies everything about a column -- can be used for constructing tables
 type Column struct {

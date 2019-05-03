@@ -2,7 +2,7 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package dtable
+package etable
 
 import (
 	"encoding/csv"
@@ -14,7 +14,7 @@ import (
 	"strings"
 
 	"github.com/apache/arrow/go/arrow"
-	"github.com/emer/dtable/etensor"
+	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 )
 
@@ -115,7 +115,7 @@ func SchemaFromHeaders(hdrs []string) (Schema, error) {
 	if hdrs[0] == "_H:" {
 		return SchemaFromEmerHeaders(hdrs)
 	}
-	return nil, fmt.Errorf("dtable.SchemaFromHeaders: only emergent header format currently supported")
+	return nil, fmt.Errorf("etable.SchemaFromHeaders: only emergent header format currently supported")
 }
 
 // SchemaFromEmerHeaders attempts to configure a Table Schema based on emergent DataTable headers

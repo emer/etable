@@ -9,15 +9,17 @@ package etensor
 import (
 	"errors"
 	"fmt"
+	"log"
 	"strconv"
 
 	"github.com/apache/arrow/go/arrow"
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
-	"github.com/emer/dtable/bitslice"
+	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/kit"
+	"gonum.org/v1/gonum/mat"
 )
 
 // Int64 is an n-dim array of int64s.
@@ -190,17 +192,18 @@ func (tsr *Int64) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Int64) SubSlice(subdim int, offs []int) (*Int64, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Int64) SubSpace(subdim int, offs []int) (*Int64, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Int64{}
@@ -224,7 +227,7 @@ func (tsr *Int64) SubSlice(subdim int, offs []int) (*Int64, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -296,6 +299,40 @@ func (tsr *Int64) FromArrow(arw *tensor.Int64, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int64) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int64) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Int64) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Uint64 is an n-dim array of uint64s.
@@ -468,17 +505,18 @@ func (tsr *Uint64) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Uint64) SubSlice(subdim int, offs []int) (*Uint64, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Uint64) SubSpace(subdim int, offs []int) (*Uint64, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Uint64{}
@@ -502,7 +540,7 @@ func (tsr *Uint64) SubSlice(subdim int, offs []int) (*Uint64, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -574,6 +612,40 @@ func (tsr *Uint64) FromArrow(arw *tensor.Uint64, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint64) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint64) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Uint64) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Float64 is an n-dim array of float64s.
@@ -746,17 +818,18 @@ func (tsr *Float64) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Float64) SubSlice(subdim int, offs []int) (*Float64, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Float64) SubSpace(subdim int, offs []int) (*Float64, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Float64{}
@@ -780,7 +853,7 @@ func (tsr *Float64) SubSlice(subdim int, offs []int) (*Float64, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -852,6 +925,40 @@ func (tsr *Float64) FromArrow(arw *tensor.Float64, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Float64) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Float64) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Float64) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Int32 is an n-dim array of int32s.
@@ -1024,17 +1131,18 @@ func (tsr *Int32) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Int32) SubSlice(subdim int, offs []int) (*Int32, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Int32) SubSpace(subdim int, offs []int) (*Int32, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Int32{}
@@ -1058,7 +1166,7 @@ func (tsr *Int32) SubSlice(subdim int, offs []int) (*Int32, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -1130,6 +1238,40 @@ func (tsr *Int32) FromArrow(arw *tensor.Int32, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int32) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int32) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Int32) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Uint32 is an n-dim array of uint32s.
@@ -1302,17 +1444,18 @@ func (tsr *Uint32) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Uint32) SubSlice(subdim int, offs []int) (*Uint32, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Uint32) SubSpace(subdim int, offs []int) (*Uint32, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Uint32{}
@@ -1336,7 +1479,7 @@ func (tsr *Uint32) SubSlice(subdim int, offs []int) (*Uint32, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -1408,6 +1551,40 @@ func (tsr *Uint32) FromArrow(arw *tensor.Uint32, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint32) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint32) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Uint32) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Float32 is an n-dim array of float32s.
@@ -1580,17 +1757,18 @@ func (tsr *Float32) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Float32) SubSlice(subdim int, offs []int) (*Float32, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Float32) SubSpace(subdim int, offs []int) (*Float32, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Float32{}
@@ -1614,7 +1792,7 @@ func (tsr *Float32) SubSlice(subdim int, offs []int) (*Float32, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -1686,6 +1864,40 @@ func (tsr *Float32) FromArrow(arw *tensor.Float32, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Float32) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Float32) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Float32) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Int16 is an n-dim array of int16s.
@@ -1858,17 +2070,18 @@ func (tsr *Int16) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Int16) SubSlice(subdim int, offs []int) (*Int16, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Int16) SubSpace(subdim int, offs []int) (*Int16, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Int16{}
@@ -1892,7 +2105,7 @@ func (tsr *Int16) SubSlice(subdim int, offs []int) (*Int16, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -1964,6 +2177,40 @@ func (tsr *Int16) FromArrow(arw *tensor.Int16, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int16) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int16) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Int16) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Uint16 is an n-dim array of uint16s.
@@ -2136,17 +2383,18 @@ func (tsr *Uint16) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Uint16) SubSlice(subdim int, offs []int) (*Uint16, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Uint16) SubSpace(subdim int, offs []int) (*Uint16, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Uint16{}
@@ -2170,7 +2418,7 @@ func (tsr *Uint16) SubSlice(subdim int, offs []int) (*Uint16, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -2242,6 +2490,40 @@ func (tsr *Uint16) FromArrow(arw *tensor.Uint16, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint16) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint16) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Uint16) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Int8 is an n-dim array of int8s.
@@ -2414,17 +2696,18 @@ func (tsr *Int8) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Int8) SubSlice(subdim int, offs []int) (*Int8, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Int8) SubSpace(subdim int, offs []int) (*Int8, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Int8{}
@@ -2448,7 +2731,7 @@ func (tsr *Int8) SubSlice(subdim int, offs []int) (*Int8, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -2520,6 +2803,40 @@ func (tsr *Int8) FromArrow(arw *tensor.Int8, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int8) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Int8) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Int8) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // Uint8 is an n-dim array of uint8s.
@@ -2692,17 +3009,18 @@ func (tsr *Uint8) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-func (tsr *Uint8) SubSlice(subdim int, offs []int) (*Uint8, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *Uint8) SubSpace(subdim int, offs []int) (*Uint8, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Uint8{}
@@ -2726,7 +3044,7 @@ func (tsr *Uint8) SubSlice(subdim int, offs []int) (*Uint8, error) {
 		stsr.Values = tsr.Values[stoff : stoff+sln]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // Label satisfies the gi.Labeler interface for a summary description of the tensor
@@ -2798,6 +3116,40 @@ func (tsr *Uint8) FromArrow(arw *tensor.Uint8, cpy bool) {
 	// nln := arw.Data().NullN()
 	// if nln > 0 {
 	// }
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint8) Dims() (r, c int) {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0, 0
+	}
+	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
+func (tsr *Uint8) At(i, j int) float64 {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	} else if nd == 2 {
+		return tsr.FloatVal([]int{i, j})
+	} else {
+		ix := make([]int, nd)
+		ix[nd-2] = i
+		ix[nd-1] = j
+		return tsr.FloatVal(ix)
+	}
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// It performs an implicit transpose by returning the receiver inside a Transpose.
+func (tsr *Uint8) T() mat.Matrix {
+	return mat.Transpose{tsr}
 }
 
 // New returns a new Tensor of given type, using our Type specifier which is

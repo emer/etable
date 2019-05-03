@@ -9,7 +9,7 @@ import (
 	"github.com/goki/ki/kit"
 )
 
-// Type is a logical type -- the subset supported by dtable.
+// Type is a logical type -- the subset supported by etable.
 // This is copied directly from arrow.Type
 // They can be expressed as either a primitive physical type
 // (bytes or bits of some fixed size), a nested type consisting of other data types,

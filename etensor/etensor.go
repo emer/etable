@@ -4,12 +4,26 @@
 
 package etensor
 
-import "github.com/apache/arrow/go/arrow"
+import (
+	"github.com/apache/arrow/go/arrow"
+	"gonum.org/v1/gonum/mat"
+)
 
 //go:generate tmpl -i -data=numeric.tmpldata numeric.gen.go.tmpl
 
-// Tensor is the general interface for n-dimensional tensors
+// Tensor is the general interface for n-dimensional tensors.
+//
+// Tensor is automatically a gonum/mat.Matrix, implementing the Dims(), At(), and T() methods
+// which automatically operate on the inner-most two dimensions, assuming default row-major
+// layout. Error messages will be logged if applied to a Tensor with less than 2 dimensions,
+// and care should be taken when using with > 2 dimensions (e.g., will only affect the first
+// 2D subspace within a higher-dimensional space -- typically you'll want to call SubSpace
+// to get a 2D subspace of the higher-dimensional Tensor (SubSpace is not part of interface
+// as it returns the specific type, but is defined for all Tensor types).
+//
 type Tensor interface {
+	mat.Matrix
+
 	// Len returns the number of elements in the tensor (product of shape dimensions).
 	Len() int
 

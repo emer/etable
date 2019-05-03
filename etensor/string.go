@@ -6,11 +6,13 @@ package etensor
 
 import (
 	"errors"
+	"log"
 	"strconv"
 
 	"github.com/apache/arrow/go/arrow"
-	"github.com/emer/dtable/bitslice"
+	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
+	"gonum.org/v1/gonum/mat"
 )
 
 // etensor.String is a tensor of strings backed by a []string slice
@@ -215,18 +217,18 @@ func (tsr *String) SetNumRows(rows int) {
 	}
 }
 
-// SubSlice returns a new tensor as a sub-slice of the current one, incorporating the given number
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
 // of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
 // subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subslice to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both).
-// Use Clone() method to separate the two.
-// todo: not getting nulls yet.
-func (tsr *String) SubSlice(subdim int, offs []int) (*String, error) {
+// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
+// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
+// are supported).  Use Clone() method to separate the two.
+func (tsr *String) SubSpace(subdim int, offs []int) (*String, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &String{}
@@ -248,5 +250,26 @@ func (tsr *String) SubSlice(subdim int, offs []int) (*String, error) {
 		stsr.Values = tsr.Values[stoff:]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
+}
+
+// Dims is the gonum/mat.Matrix interface method for returning the dimensionality of the
+// 2D Matrix.  Not supported for String -- do not call!
+func (tsr *String) Dims() (r, c int) {
+	log.Println("etensor Dims gonum Matrix call made on String Tensor -- not supported")
+	return 0, 0
+}
+
+// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// row, column index.  Not supported for String -- do not call!
+func (tsr *String) At(i, j int) float64 {
+	log.Println("etensor At gonum Matrix call made on String Tensor -- not supported")
+	return 0
+}
+
+// T is the gonum/mat.Matrix transpose method.
+// Not supported for String -- do not call!
+func (tsr *String) T() mat.Matrix {
+	log.Println("etensor T gonum Matrix call made on String Tensor -- not supported")
+	return mat.Transpose{tsr}
 }
