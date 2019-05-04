@@ -10,8 +10,6 @@ import (
 	"testing"
 
 	"github.com/emer/etable/etensor"
-
-	"github.com/apache/arrow/go/arrow"
 )
 
 func TestEmerHeaders(t *testing.T) {
@@ -78,13 +76,13 @@ func TestReadEmerDat(t *testing.T) {
 		if len(sc) != 3 {
 			t.Errorf("EmerHeaders: len != 3\n")
 		}
-		if sc[0].DataType().ID() != arrow.STRING {
+		if sc[0].DataType() != etensor.STRING {
 			t.Errorf("EmerHeaders: sc[0] != STRING\n")
 		}
-		if sc[1].DataType().ID() != arrow.FLOAT32 {
+		if sc[1].DataType() != etensor.FLOAT32 {
 			t.Errorf("EmerHeaders: sc[1] != FLOAT32\n")
 		}
-		if sc[2].DataType().ID() != arrow.FLOAT32 {
+		if sc[2].DataType() != etensor.FLOAT32 {
 			t.Errorf("EmerHeaders: sc[2] != FLOAT32\n")
 		}
 		if sc[1].Dim(0) != 6 {

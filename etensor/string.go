@@ -107,13 +107,22 @@ func (tsr *String) SetFloat1D(off int, val float64) {
 	tsr.Values[off] = Float64ToString(val)
 }
 
+func (tsr *String) Floats1D() []float64 {
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = StringToFloat64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *String) StringVal1D(off int) string      { return tsr.Values[off] }
 func (tsr *String) SetString1D(off int, val string) { tsr.Values[off] = val }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *String) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *String) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -123,10 +132,10 @@ func (tsr *String) AggFloat(fun func(val float64, agg float64) float64, ini floa
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *String) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *String) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -137,13 +146,21 @@ func (tsr *String) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *String) UpdtFloat(fun func(val float64) float64) {
+func (tsr *String) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := StringToFloat64(tsr.Values[j])
 		tsr.Values[j] = Float64ToString(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to ""
+func (tsr *String) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = ""
 	}
 }
 

@@ -83,6 +83,20 @@ func (tsr *Int64) SetString(i []int, val string) {
 func (tsr *Int64) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Int64) SetFloat1D(off int, val float64) { tsr.Values[off] = int64(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Int64) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Int64) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Int64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -90,10 +104,10 @@ func (tsr *Int64) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Int64) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Int64) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -103,10 +117,10 @@ func (tsr *Int64) AggFloat(fun func(val float64, agg float64) float64, ini float
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Int64) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Int64) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -117,13 +131,21 @@ func (tsr *Int64) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int64) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Int64) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = int64(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Int64) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -396,6 +418,20 @@ func (tsr *Uint64) SetString(i []int, val string) {
 func (tsr *Uint64) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Uint64) SetFloat1D(off int, val float64) { tsr.Values[off] = uint64(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Uint64) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Uint64) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Uint64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -403,10 +439,10 @@ func (tsr *Uint64) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Uint64) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Uint64) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -416,10 +452,10 @@ func (tsr *Uint64) AggFloat(fun func(val float64, agg float64) float64, ini floa
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Uint64) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Uint64) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -430,13 +466,21 @@ func (tsr *Uint64) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint64) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Uint64) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = uint64(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Uint64) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -709,6 +753,20 @@ func (tsr *Float64) SetString(i []int, val string) {
 func (tsr *Float64) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Float64) SetFloat1D(off int, val float64) { tsr.Values[off] = float64(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Float64) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Float64) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Float64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -716,10 +774,10 @@ func (tsr *Float64) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Float64) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Float64) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -729,10 +787,10 @@ func (tsr *Float64) AggFloat(fun func(val float64, agg float64) float64, ini flo
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Float64) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Float64) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -743,13 +801,21 @@ func (tsr *Float64) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Float64) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Float64) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = float64(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Float64) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -1022,6 +1088,20 @@ func (tsr *Int32) SetString(i []int, val string) {
 func (tsr *Int32) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Int32) SetFloat1D(off int, val float64) { tsr.Values[off] = int32(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Int32) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Int32) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Int32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1029,10 +1109,10 @@ func (tsr *Int32) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Int32) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Int32) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -1042,10 +1122,10 @@ func (tsr *Int32) AggFloat(fun func(val float64, agg float64) float64, ini float
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Int32) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Int32) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -1056,13 +1136,21 @@ func (tsr *Int32) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int32) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Int32) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = int32(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Int32) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -1335,6 +1423,20 @@ func (tsr *Uint32) SetString(i []int, val string) {
 func (tsr *Uint32) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Uint32) SetFloat1D(off int, val float64) { tsr.Values[off] = uint32(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Uint32) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Uint32) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Uint32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1342,10 +1444,10 @@ func (tsr *Uint32) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Uint32) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Uint32) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -1355,10 +1457,10 @@ func (tsr *Uint32) AggFloat(fun func(val float64, agg float64) float64, ini floa
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Uint32) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Uint32) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -1369,13 +1471,21 @@ func (tsr *Uint32) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint32) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Uint32) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = uint32(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Uint32) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -1648,6 +1758,20 @@ func (tsr *Float32) SetString(i []int, val string) {
 func (tsr *Float32) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Float32) SetFloat1D(off int, val float64) { tsr.Values[off] = float32(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Float32) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Float32) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Float32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1655,10 +1779,10 @@ func (tsr *Float32) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Float32) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Float32) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -1668,10 +1792,10 @@ func (tsr *Float32) AggFloat(fun func(val float64, agg float64) float64, ini flo
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Float32) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Float32) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -1682,13 +1806,21 @@ func (tsr *Float32) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Float32) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Float32) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = float32(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Float32) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -1961,6 +2093,20 @@ func (tsr *Int16) SetString(i []int, val string) {
 func (tsr *Int16) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Int16) SetFloat1D(off int, val float64) { tsr.Values[off] = int16(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Int16) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Int16) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Int16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1968,10 +2114,10 @@ func (tsr *Int16) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Int16) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Int16) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -1981,10 +2127,10 @@ func (tsr *Int16) AggFloat(fun func(val float64, agg float64) float64, ini float
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Int16) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Int16) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -1995,13 +2141,21 @@ func (tsr *Int16) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int16) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Int16) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = int16(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Int16) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -2274,6 +2428,20 @@ func (tsr *Uint16) SetString(i []int, val string) {
 func (tsr *Uint16) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Uint16) SetFloat1D(off int, val float64) { tsr.Values[off] = uint16(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Uint16) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Uint16) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Uint16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2281,10 +2449,10 @@ func (tsr *Uint16) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Uint16) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Uint16) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -2294,10 +2462,10 @@ func (tsr *Uint16) AggFloat(fun func(val float64, agg float64) float64, ini floa
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Uint16) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Uint16) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -2308,13 +2476,21 @@ func (tsr *Uint16) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint16) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Uint16) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = uint16(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Uint16) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -2587,6 +2763,20 @@ func (tsr *Int8) SetString(i []int, val string) {
 func (tsr *Int8) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Int8) SetFloat1D(off int, val float64) { tsr.Values[off] = int8(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Int8) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Int8) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Int8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2594,10 +2784,10 @@ func (tsr *Int8) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Int8) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Int8) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -2607,10 +2797,10 @@ func (tsr *Int8) AggFloat(fun func(val float64, agg float64) float64, ini float6
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Int8) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Int8) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -2621,13 +2811,21 @@ func (tsr *Int8) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int8) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Int8) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = int8(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Int8) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 
@@ -2900,6 +3098,20 @@ func (tsr *Uint8) SetString(i []int, val string) {
 func (tsr *Uint8) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
 func (tsr *Uint8) SetFloat1D(off int, val float64) { tsr.Values[off] = uint8(val) }
 
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// For Float64 tensor type, this directly returns its underlying Values
+// which are writable as well -- for all others this is a new slice (read only).
+// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+func (tsr *Uint8) Floats1D() []float64 {
+	// todo: condition on Float64!
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = float64(tsr.Values[j])
+	}
+	return res
+}
+
 func (tsr *Uint8) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
 func (tsr *Uint8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2907,10 +3119,10 @@ func (tsr *Uint8) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Uint8) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Uint8) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -2920,10 +3132,10 @@ func (tsr *Uint8) AggFloat(fun func(val float64, agg float64) float64, ini float
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Uint8) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Uint8) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -2934,13 +3146,21 @@ func (tsr *Uint8) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint8) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Uint8) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := float64(tsr.Values[j])
 		tsr.Values[j] = uint8(fun(val))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Uint8) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
 	}
 }
 

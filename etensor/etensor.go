@@ -86,25 +86,34 @@ type Tensor interface {
 	// SetFloat1D sets the value of given 1-dimensional index (0-Len()-1) as a float64
 	SetFloat1D(off int, val float64)
 
+	// Floats1D returns a flat []float64 slice of all elements in the tensor
+	// For Float64 tensor type, this directly returns its underlying Values
+	// which are writable as well -- for all others this is a new slice (read only).
+	// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
+	Floats1D() []float64
+
 	// StringVal1D returns the value of given 1-dimensional index (0-Len()-1) as a string
 	StringVal1D(off int) string
 
 	// SetString1D sets the value of given 1-dimensional index (0-Len()-1) as a string
 	SetString1D(off int, val string)
 
-	// AggFloat applies given aggregation function to each element in the tensor, using float64
+	// AggFunc applies given aggregation function to each element in the tensor, using float64
 	// conversions of the values.  init is the initial value for the agg variable.  returns final
 	// aggregate value
-	AggFloat(fun func(val float64, agg float64) float64, init float64) float64
+	AggFunc(fun func(val float64, agg float64) float64, init float64) float64
 
-	// EvalFloat applies given function to each element in the tensor, using float64
+	// EvalFunc applies given function to each element in the tensor, using float64
 	// conversions of the values, and puts the results into given float64 slice, which is
 	// ensured to be of the proper length
-	EvalFloat(fun func(val float64) float64, res *[]float64)
+	EvalFunc(fun func(val float64) float64, res *[]float64)
 
-	// UpdtFloat applies given function to each element in the tensor, using float64
+	// SetFunc applies given function to each element in the tensor, using float64
 	// conversions of the values, and writes the results back into the same tensor values
-	UpdtFloat(fun func(val float64) float64)
+	SetFunc(fun func(val float64) float64)
+
+	// SetZero is simple convenience function initialize all values to 0
+	SetZero()
 
 	// CloneTensor clones this tensor returning a Tensor interface.
 	// There is a type-specific Clone() method as well for each tensor.

@@ -109,6 +109,15 @@ func (tsr *Bits) SetFloat1D(off int, val float64) {
 	tsr.Values.Set(off, Float64ToBool(val))
 }
 
+func (tsr *Bits) Floats1D() []float64 {
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = BoolToFloat64(tsr.Values.Index(j))
+	}
+	return res
+}
+
 func (tsr *Bits) StringVal1D(off int) string {
 	return kit.ToString(tsr.Values.Index(off))
 }
@@ -119,10 +128,10 @@ func (tsr *Bits) SetString1D(off int, val string) {
 	}
 }
 
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Bits) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Bits) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -132,10 +141,10 @@ func (tsr *Bits) AggFloat(fun func(val float64, agg float64) float64, ini float6
 	return ag
 }
 
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Bits) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Bits) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
@@ -146,13 +155,21 @@ func (tsr *Bits) EvalFloat(fun func(val float64) float64, res *[]float64) {
 	}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Bits) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Bits) SetFunc(fun func(val float64) float64) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		val := BoolToFloat64(tsr.Values.Index(j))
 		tsr.Values.Set(j, Float64ToBool(fun(val)))
+	}
+}
+
+// SetZero is simple convenience function initialize all values to 0
+func (tsr *Bits) SetZero() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values.Set(j, false)
 	}
 }
 
