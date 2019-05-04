@@ -59,7 +59,13 @@ const (
 	// STRING is a UTF8 variable-length string
 	STRING Type = Type(arrow.STRING)
 
-	TypeN = STRING + 1
+	// COMPLEX64 is composed of 4 bytes for the real part and 4 for the imaginary parts
+	COMPLEX64 Type = STRING + 1
+
+	// COMPLEX64 is composed of 4 bytes for the real part and 4 for the imaginary parts
+	COMPLEX128 Type = COMPLEX64 + 1
+
+	TypeN = COMPLEX128 + 1
 )
 
 //go:generate stringer -type=Type

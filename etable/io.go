@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/apache/arrow/go/arrow"
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 )
@@ -127,7 +126,7 @@ func SchemaFromEmerHeaders(hdrs []string) (Schema, error) {
 		if hd == "" {
 			continue
 		}
-		var typ arrow.Type
+		var typ etensor.Type
 		typ, hd = EmerColType(hd)
 		dimst := strings.Index(hd, "]<")
 		if dimst > 0 {
@@ -148,40 +147,40 @@ func SchemaFromEmerHeaders(hdrs []string) (Schema, error) {
 	return sc, nil
 }
 
-var EmerHdrCharToType = map[byte]arrow.Type{
-	'$': arrow.STRING,
-	'%': arrow.FLOAT32,
-	'#': arrow.FLOAT64,
-	'|': arrow.INT64,
-	'@': arrow.UINT8,
-	'&': arrow.STRING,
-	'^': arrow.BOOL,
+var EmerHdrCharToType = map[byte]etensor.Type{
+	'$': etensor.STRING,
+	'%': etensor.FLOAT32,
+	'#': etensor.FLOAT64,
+	'|': etensor.INT64,
+	'@': etensor.UINT8,
+	'&': etensor.STRING,
+	'^': etensor.BOOl,
 }
 
-var EmerHdrTypeToChar map[arrow.Type]byte
+var EmerHdrTypeToChar map[etensor.Type]byte
 
 func init() {
-	EmerHdrTypeToChar = make(map[arrow.Type]byte)
+	EmerHdrTypeToChar = make(map[etensor.Type]byte)
 	for k, v := range EmerHdrCharToType {
 		if k != '&' {
 			EmerHdrTypeToChar[v] = k
 		}
 	}
-	EmerHdrTypeToChar[arrow.INT8] = '@'
-	EmerHdrTypeToChar[arrow.INT16] = '|'
-	EmerHdrTypeToChar[arrow.UINT16] = '|'
-	EmerHdrTypeToChar[arrow.INT32] = '|'
-	EmerHdrTypeToChar[arrow.UINT32] = '|'
-	EmerHdrTypeToChar[arrow.UINT64] = '|'
+	EmerHdrTypeToChar[etensor.INT8] = '@'
+	EmerHdrTypeToChar[etensor.INT16] = '|'
+	EmerHdrTypeToChar[etensor.UINT16] = '|'
+	EmerHdrTypeToChar[etensor.INT32] = '|'
+	EmerHdrTypeToChar[etensor.UINT32] = '|'
+	EmerHdrTypeToChar[etensor.UINT64] = '|'
 }
 
 // EmerColType parses the column header for type information using the emergent naming convention
-func EmerColType(nm string) (arrow.Type, string) {
+func EmerColType(nm string) (etensor.Type, string) {
 	typ, ok := EmerHdrCharToType[nm[0]]
 	if ok {
 		nm = nm[1:]
 	} else {
-		typ = arrow.STRING // most general, default
+		typ = etensor.STRING // most general, default
 	}
 	return typ, nm
 }
@@ -285,7 +284,7 @@ func (dt *Table) EmerHeaders() []string {
 	for i := range dt.Cols {
 		tsr := dt.Cols[i]
 		nm := dt.ColNames[i]
-		nm = string([]byte{EmerHdrTypeToChar[tsr.DataType().ID()]}) + nm
+		nm = string([]byte{EmerHdrTypeToChar[tsr.DataType()]}) + nm
 		if tsr.NumDims() == 1 {
 			hdrs = append(hdrs, nm)
 		} else {

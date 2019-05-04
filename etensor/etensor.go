@@ -5,7 +5,6 @@
 package etensor
 
 import (
-	"github.com/apache/arrow/go/arrow"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -28,7 +27,7 @@ type Tensor interface {
 	Len() int
 
 	// DataType returns the type of data, using arrow.DataType (ID() is the arrow.Type enum value)
-	DataType() arrow.DataType
+	DataType() Type
 
 	// Shapes returns the size in each dimension of the tensor. (Shape is the full Shape struct)
 	Shapes() []int

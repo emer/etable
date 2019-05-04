@@ -51,7 +51,7 @@ func NewBitsShape(shape *Shape) *Bits {
 	return bt
 }
 
-func (tsr *Bits) DataType() arrow.DataType { return &BoolType{} }
+func (tsr *Bits) DataType() Type { return BOOl }
 
 // Value returns value at given tensor index
 func (tsr *Bits) Value(i []int) bool { j := int(tsr.Offset(i)); return tsr.Values.Index(j) }

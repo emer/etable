@@ -9,7 +9,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/apache/arrow/go/arrow"
 	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
 	"gonum.org/v1/gonum/mat"
@@ -42,7 +41,7 @@ func NewStringShape(shape *Shape) *String {
 	return bt
 }
 
-func (tsr *String) DataType() arrow.DataType { return &arrow.StringType{} }
+func (tsr *String) DataType() Type { return STRING }
 
 // Value returns value at given tensor index
 func (tsr *String) Value(i []int) string {
