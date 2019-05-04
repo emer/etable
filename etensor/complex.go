@@ -152,10 +152,10 @@ func (tsr *Complex64) SetFloat1DImag(off int, val float64) {
 }
 
 // todo:
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Complex64) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Complex64) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	//ln := tsr.Len()
 	//ag := ini
 	//for j := 0; j < ln; j++ {
@@ -167,10 +167,10 @@ func (tsr *Complex64) AggFloat(fun func(val float64, agg float64) float64, ini f
 }
 
 // todo:
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Complex64) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Complex64) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	//ln := tsr.Len()
 	//if len(*res) != ln {
 	//	*res = make([]float64, ln)
@@ -182,9 +182,9 @@ func (tsr *Complex64) EvalFloat(fun func(val float64) float64, res *[]float64) {
 }
 
 // todo:
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Complex64) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Complex64) SetFunc(fun func(val float64) float64) {
 	//ln := tsr.Len()
 	//for j := 0; j < ln; j++ {
 	//	val := float64(tsr.Values[j])
@@ -466,10 +466,10 @@ func (tsr *Complex128) SetFloat1DImag(off int, val float64) {
 }
 
 // todo:
-// AggFloat applies given aggregation function to each element in the tensor, using float64
+// AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Complex128) AggFloat(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Complex128) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
 	//ln := tsr.Len()
 	//ag := ini
 	//for j := 0; j < ln; j++ {
@@ -481,10 +481,10 @@ func (tsr *Complex128) AggFloat(fun func(val float64, agg float64) float64, ini 
 }
 
 // todo:
-// EvalFloat applies given function to each element in the tensor, using float64
+// EvalFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Complex128) EvalFloat(fun func(val float64) float64, res *[]float64) {
+func (tsr *Complex128) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	//ln := tsr.Len()
 	//if len(*res) != ln {
 	//	*res = make([]float64, ln)
@@ -495,9 +495,9 @@ func (tsr *Complex128) EvalFloat(fun func(val float64) float64, res *[]float64) 
 	//}
 }
 
-// UpdtFloat applies given function to each element in the tensor, using float64
+// SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Complex128) UpdtFloat(fun func(val float64) float64) {
+func (tsr *Complex128) SetFunc(fun func(val float64) float64) {
 	//ln := tsr.Len()
 	//for j := 0; j < ln; j++ {
 	//	val := float64(tsr.Values[j])

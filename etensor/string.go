@@ -156,8 +156,8 @@ func (tsr *String) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to ""
-func (tsr *String) SetZero() {
+// SetZeros is simple convenience function initialize all values to ""
+func (tsr *String) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = ""

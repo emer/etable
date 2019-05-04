@@ -112,8 +112,8 @@ type Tensor interface {
 	// conversions of the values, and writes the results back into the same tensor values
 	SetFunc(fun func(val float64) float64)
 
-	// SetZero is simple convenience function initialize all values to 0
-	SetZero()
+	// SetZeros is simple convenience function initialize all values to 0
+	SetZeros()
 
 	// CloneTensor clones this tensor returning a Tensor interface.
 	// There is a type-specific Clone() method as well for each tensor.

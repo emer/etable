@@ -141,8 +141,8 @@ func (tsr *Int64) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Int64) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Int64) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -476,8 +476,8 @@ func (tsr *Uint64) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Uint64) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Uint64) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -811,8 +811,8 @@ func (tsr *Float64) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Float64) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Float64) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -1146,8 +1146,8 @@ func (tsr *Int32) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Int32) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Int32) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -1481,8 +1481,8 @@ func (tsr *Uint32) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Uint32) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Uint32) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -1816,8 +1816,8 @@ func (tsr *Float32) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Float32) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Float32) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -2151,8 +2151,8 @@ func (tsr *Int16) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Int16) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Int16) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -2486,8 +2486,8 @@ func (tsr *Uint16) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Uint16) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Uint16) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -2821,8 +2821,8 @@ func (tsr *Int8) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Int8) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Int8) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0
@@ -3156,8 +3156,8 @@ func (tsr *Uint8) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Uint8) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Uint8) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values[j] = 0

@@ -165,8 +165,8 @@ func (tsr *Bits) SetFunc(fun func(val float64) float64) {
 	}
 }
 
-// SetZero is simple convenience function initialize all values to 0
-func (tsr *Bits) SetZero() {
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Bits) SetZeros() {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
 		tsr.Values.Set(j, false)
