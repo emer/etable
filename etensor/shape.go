@@ -105,28 +105,63 @@ func (sh *Shape) Len() int {
 	return int(o)
 }
 
-func (sh *Shape) Shapes() []int      { return sh.Shp }
-func (sh *Shape) Strides() []int     { return sh.Strd }
-func (sh *Shape) Shape64() []int64   { return IntTo64(sh.Shp) }
+// Shapes returns the slice of dimension sizes.
+// This is *not* a copy -- modifications will change the shape.
+func (sh *Shape) Shapes() []int { return sh.Shp }
+
+// Strides returns the slice of strides
+// This is *not* a copy -- modifications will change the shape.
+func (sh *Shape) Strides() []int { return sh.Strd }
+
+// Shape64 returns a slice of int64 containing the dimensions sizes.
+// This is a copy -- modifications will not change shape.
+func (sh *Shape) Shape64() []int64 { return IntTo64(sh.Shp) }
+
+// Strides64 returns a slice of int64 containing strides
+// This is a copy -- modifications will not change shape.
 func (sh *Shape) Strides64() []int64 { return IntTo64(sh.Strd) }
 
-func (sh *Shape) DimNames() []string   { return sh.Nms }
-func (sh *Shape) NumDims() int         { return len(sh.Shp) }
-func (sh *Shape) DimName(i int) string { return sh.Nms[i] }
-func (sh *Shape) Dim(i int) int        { return sh.Shp[i] }
+// DimNames returns slice of dimension names
+// This is *not* a copy -- modifications will change the shape.
+func (sh *Shape) DimNames() []string { return sh.Nms }
 
+// NumDims returns the total number of dimensions.
+func (sh *Shape) NumDims() int { return len(sh.Shp) }
+
+// Dim returns the size of given dimension.
+func (sh *Shape) Dim(i int) int { return sh.Shp[i] }
+
+// DimName returns the name of given dimension.
+func (sh *Shape) DimName(i int) string { return sh.Nms[i] }
+
+// IsContiguous returns true if shape is either row or column major
 func (sh *Shape) IsContiguous() bool {
 	return sh.IsRowMajor() || sh.IsColMajor()
 }
 
+// IsRowMajor returns true if shape is row-major organized:  first dimension is row, i.e.,
+// outer-most storage dimension
 func (sh *Shape) IsRowMajor() bool {
 	strides := RowMajorStrides(sh.Shp)
 	return EqualInts(strides, sh.Strd)
 }
 
+// IsColMajor returns true if shape is column-major organized: first dimension is column, i.e.,
+// inner-most storage dimension
 func (sh *Shape) IsColMajor() bool {
 	strides := ColMajorStrides(sh.Shp)
 	return EqualInts(strides, sh.Strd)
+}
+
+// IsEqual returns true if this shape is same as other (does not compare names)
+func (sh *Shape) IsEqual(oth *Shape) bool {
+	if !EqualInts(sh.Shp, oth.Shp) {
+		return false
+	}
+	if !EqualInts(sh.Strd, oth.Strd) {
+		return false
+	}
+	return true
 }
 
 // RowCellSize returns the size of the outer-most Row shape dimension, and the size of all the
