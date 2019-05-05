@@ -265,11 +265,11 @@ func (tsr *Complex64) SetNumRows(rows int) {
 // The new tensor points to the values of the this tensor (i.e., modifications will affect both).
 // Use Clone() method to separate the two.
 // todo: not getting nulls yet.
-func (tsr *Complex64) SubSlice(subdim int, offs []int) (*Complex64, error) {
+func (tsr *Complex64) SubSpace(subdim int, offs []int) (*Complex64, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Complex64{}
@@ -291,7 +291,7 @@ func (tsr *Complex64) SubSlice(subdim int, offs []int) (*Complex64, error) {
 		stsr.Values = tsr.Values[stoff:]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
@@ -328,6 +328,21 @@ func (tsr *Complex64) Dims() (r, c int) {
 //func (tsr *Complex64) H() mat.Matrix {
 //	return mat.Transpose{tsr}
 //}
+
+// SetZeros is simple convenience function initialize all values to 0
+func (tsr *Complex64) SetZeros() {
+	ln := tsr.Len()
+	for j := 0; j < ln; j++ {
+		tsr.Values[j] = 0
+	}
+}
+
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// but for Complex types this doesn't make sense and a zero length slice is returned
+func (tsr *Complex64) Floats1D() []float64 {
+	res := make([]float64, 0)
+	return res
+}
 
 // etensor.Complex128 is a tensor of complex128 backed by a []complex128 slice
 type Complex128 struct {
@@ -578,11 +593,11 @@ func (tsr *Complex128) SetNumRows(rows int) {
 // The new tensor points to the values of the this tensor (i.e., modifications will affect both).
 // Use Clone() method to separate the two.
 // todo: not getting nulls yet.
-func (tsr *Complex128) SubSlice(subdim int, offs []int) (*Complex128, error) {
+func (tsr *Complex128) SubSpace(subdim int, offs []int) (*Complex128, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
-		return nil, errors.New("SubSlice number of sub dimensions was >= NumDims -- must be less")
+		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
 	}
 	if tsr.IsRowMajor() {
 		stsr := &Complex128{}
@@ -604,7 +619,7 @@ func (tsr *Complex128) SubSlice(subdim int, offs []int) (*Complex128, error) {
 		stsr.Values = tsr.Values[stoff:]
 		return stsr, nil
 	}
-	return nil, errors.New("SubSlice only valid for RowMajor or ColMajor tensors")
+	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
 // At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
@@ -641,3 +656,10 @@ func (tsr *Complex128) Dims() (r, c int) {
 //func (tsr *Complex128) H() mat.Matrix {
 //	return mat.Transpose{tsr}
 //}
+
+// Floats1D returns a flat []float64 slice of all elements in the tensor
+// but for Complex types this doesn't make sense and a zero length slice is returned
+func (tsr *Complex128) Floats1D() []float64 {
+	res := make([]float64, 0)
+	return res
+}
