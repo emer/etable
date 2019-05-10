@@ -98,6 +98,9 @@ func AddShapes(shape1, shape2 *Shape) *Shape {
 // Len returns the total length of elements in the tensor (i.e., the product of
 // the shape sizes)
 func (sh *Shape) Len() int {
+	if len(sh.Shp) == 0 {
+		return 0
+	}
 	o := int(1)
 	for _, v := range sh.Shp {
 		o *= v
