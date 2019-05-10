@@ -28,7 +28,7 @@ func (pp *PlotParams) Defaults() {
 // ColParams are parameters for plotting one column of data
 type ColParams struct {
 	On        bool       `desc:"plot this column"`
-	Column    string     `desc:"name of column we're plotting"`
+	Col       string     `desc:"name of column we're plotting"`
 	Range     Range      `desc:"effective range of data to plot -- either end can be fixed"`
 	FullRange minmax.F64 `desc:"full actual range of data"`
 	ColorName string     `desc:"if non-empty, color is set by this name"`
@@ -58,5 +58,5 @@ func (cp *ColParams) Label() string {
 	if cp.Lbl != "" {
 		return cp.Lbl
 	}
-	return cp.Column
+	return cp.Col
 }

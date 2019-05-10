@@ -6,11 +6,14 @@ package eplot
 
 import (
 	"fmt"
+	"log"
 
 	"github.com/emer/etable/etable"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
+	"github.com/goki/gi/oswin/key"
 	"github.com/goki/gi/svg"
+	"github.com/goki/gide/gide"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 	"gonum.org/v1/plot"
@@ -21,10 +24,12 @@ import (
 // Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
 type Plot2D struct {
 	gi.Layout
-	Table  *etable.Table `desc:"the table that we're plotting"`
-	Params PlotParams    `desc:"the overall plot parameters"`
-	Cols   []*ColParams  `desc:"the parameters for each column of the table"`
-	GPlot  *plot.Plot    `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
+	Table    *etable.Table `desc:"the table that we're plotting"`
+	Params   PlotParams    `desc:"the overall plot parameters"`
+	Cols     []*ColParams  `desc:"the parameters for each column of the table"`
+	GPlot    *plot.Plot    `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
+	SVGFile  gi.FileName   `desc:"current svg file"`
+	DataFile gi.FileName   `desc:"current csv data file"`
 }
 
 var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)
@@ -36,22 +41,87 @@ func (pl *Plot2D) Defaults() {
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) {
 	pl.Defaults()
-	pl.Table = tab
+	if pl.Table != tab {
+		pl.Table = tab
+		pl.Cols = nil
+	}
 	pl.Config()
 }
 
-// // SetVar sets the variable to view and updates the display
-// func (pl *Plot2D) SetVar(vr string) {
-// 	pl.Var = vr
-// 	pl.Update("")
-// }
+// ColParamsTry returns the current column parameters by name (to access by index, just use Cols directly)
+// Try version returns error message if not found.
+func (pl *Plot2D) ColParamsTry(colNm string) (*ColParams, error) {
+	for _, cp := range pl.Cols {
+		if cp.Col == colNm {
+			return cp, nil
+		}
+	}
+	return nil, fmt.Errorf("eplot plot: %v column named: %v not found", pl.Name, colNm)
+}
 
-// func (pl *Plot2D) HasLayers() bool {
-// 	if pl.Net == nil || pl.Net.NLayers() == 0 {
-// 		return false
-// 	}
-// 	return true
-// }
+// ColParams returns the current column parameters by name (to access by index, just use Cols directly)
+// returns nil if not found
+func (pl *Plot2D) ColParams(colNm string) *ColParams {
+	cp, _ := pl.ColParamsTry(colNm)
+	return cp
+}
+
+// SetColParams sets main parameters for one column
+func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, fixMax bool, max float64) {
+	cp, err := pl.ColParamsTry(colNm)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	cp.On = on
+	cp.Range.FixMin = fixMin
+	if fixMin {
+		cp.Range.Min = min
+	}
+	cp.Range.FixMax = fixMax
+	if fixMax {
+		cp.Range.Max = max
+	}
+}
+
+// todo: this is not saving a usable svg file for some reason.
+
+// SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
+func (pl *Plot2D) SaveSVG(fname gi.FileName) {
+	pl.Update()
+	pl.GPlot.Save(5, 5, string(fname))
+	pl.SVGFile = fname
+}
+
+// SaveData saves the Table data to a csv (comma-separated values) file
+func (pl *Plot2D) SaveData(fname gi.FileName) {
+	pl.Table.SaveCSV(fname, ',', true)
+	pl.DataFile = fname
+}
+
+// YLabel returns the Y-axis label
+func (pl *Plot2D) YLabel() string {
+	if pl.Params.YAxisLabel != "" {
+		return pl.Params.YAxisLabel
+	}
+	for _, cp := range pl.Cols {
+		if cp.On {
+			return cp.Label()
+		}
+	}
+	return "Y"
+}
+
+// XLabel returns the X-axis label
+func (pl *Plot2D) XLabel() string {
+	if pl.Params.XAxisLabel != "" {
+		return pl.Params.XAxisLabel
+	}
+	if pl.Params.XAxisCol != "" {
+		return pl.Params.XAxisCol
+	}
+	return "X"
+}
 
 // Update updates the display based on current state of table
 func (pl *Plot2D) Update() {
@@ -62,17 +132,19 @@ func (pl *Plot2D) Update() {
 		pl.Config()
 	}
 
+	pl.ColsUpdate()
+
 	plt, _ := plot.New() // todo: not clear how to re-use
 	plt.Title.Text = pl.Params.Title
-	plt.X.Label.Text = "Epoch"
-	plt.Y.Label.Text = "Y"
+	plt.X.Label.Text = pl.XLabel()
+	plt.Y.Label.Text = pl.YLabel()
 
 	for _, cp := range pl.Cols {
+		cp.Update()
 		if !cp.On {
 			continue
 		}
-		cp.Update()
-		xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Column)
+		xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Col)
 		l, _ := plotter.NewLine(xy)
 		l.LineStyle.Width = vg.Points(pl.Params.LineWidth)
 		l.LineStyle.Color = cp.Color
@@ -80,11 +152,11 @@ func (pl *Plot2D) Update() {
 		plt.Legend.Add(cp.Label(), l)
 	}
 	plt.Legend.Top = true
+	pl.UpdateSig()
 
 	pl.GPlot = plt
 	sv := pl.Plot()
 	PlotViewSVG(plt, sv, 5, 5, 2) // todo: compute height etc
-	pl.UpdateSig()
 }
 
 // Config configures the overall view widget
@@ -139,15 +211,31 @@ func (pl *Plot2D) ColsListUpdate() {
 		pl.Cols = nil
 		return
 	}
-	npc := len(PlotColorNames)
 	nc := pl.Table.NumCols()
+	if nc == len(pl.Cols) {
+		return
+	}
+	npc := len(PlotColorNames)
 	pl.Cols = make([]*ColParams, nc)
 	for ci := range pl.Table.Cols {
 		cn := pl.Table.ColNames[ci]
-		cp := &ColParams{Column: cn, ColorName: PlotColorNames[ci%npc]}
+		cp := &ColParams{Col: cn, ColorName: PlotColorNames[ci%npc]}
 		cp.Defaults()
 		pl.Cols[ci] = cp
 	}
+}
+
+// ColsUpdate updates the display toggles for all the cols
+func (pl *Plot2D) ColsUpdate() {
+	vl := pl.ColsLay()
+	updt := vl.UpdateStart()
+	for i, cli := range *vl.Children() {
+		cp := pl.Cols[i]
+		cl := cli.(*gi.Layout)
+		cb := cl.Child(0).(*gi.CheckBox)
+		cb.SetChecked(cp.On)
+	}
+	vl.UpdateEnd(updt)
 }
 
 // ColsConfig configures the column gui buttons
@@ -164,7 +252,7 @@ func (pl *Plot2D) ColsConfig() {
 	}
 	config := kit.TypeAndNameList{}
 	for _, cn := range pl.Cols {
-		config.Add(gi.KiT_Layout, cn.Column)
+		config.Add(gi.KiT_Layout, cn.Col)
 	}
 	mods, updt := vl.ConfigChildren(config, false)
 	if !mods {
@@ -196,7 +284,7 @@ func (pl *Plot2D) ColsConfig() {
 		})
 
 		ca := cl.Child(1).(*gi.Action)
-		ca.SetText(cp.Column)
+		ca.SetText(cp.Col)
 		ca.Data = i
 		ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 			pll := recv.Embed(KiT_Plot2D).(*Plot2D)
@@ -238,7 +326,7 @@ func (pl *Plot2D) ToolbarConfig() {
 			fmt.Printf("this will select select mode\n")
 		})
 	tbar.AddSeparator("ctrl")
-	tbar.AddAction(gi.ActOpts{Label: "Init", Icon: "update", Tooltip: "fully redraw display"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Update", Icon: "update", Tooltip: "update fully redraws display, reflecting any new settings etc"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			pl.Config()
 			pl.Update()
@@ -247,12 +335,66 @@ func (pl *Plot2D) ToolbarConfig() {
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.StructViewDialog(pl.Viewport, &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
 		})
-	// todo: colorbar
+	tbar.AddSeparator("ctrl")
+	tbar.AddAction(gi.ActOpts{Label: "Save SVG...", Icon: "file-save", Tooltip: "save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl, "SaveSVG", pl.Viewport)
+		})
+	tbar.AddAction(gi.ActOpts{Label: "Save Data...", Icon: "file-save", Tooltip: "save table data to a csv comma-separated-values file"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl, "SaveData", pl.Viewport)
+		})
+
 }
 
 var Plot2DProps = ki.Props{
 	"max-width":  -1,
 	"max-height": -1,
+	"ToolBar": ki.PropSlice{
+		{"Update", ki.Props{
+			"shortcut": "Command+U",
+			"desc":     "update graph plot",
+			"icon":     "update",
+		}},
+		// {"ViewFile", ki.Props{
+		// 	"label": "Open...",
+		// 	"icon":  "file-open",
+		// 	"desc":  "open a file in current active text view",
+		// 	"shortcut-func": giv.ShortcutFunc(func(gei interface{}, act *gi.Action) key.Chord {
+		// 		return key.Chord(gide.ChordForFun(gide.KeyFunFileOpen).String())
+		// 	}),
+		// 	"Args": ki.PropSlice{
+		// 		{"File Name", ki.Props{
+		// 			"default-field": "ActiveFilename",
+		// 		}},
+		// 	},
+		// }},
+		{"SaveSVG", ki.Props{
+			"label": "Save SVG...",
+			"desc":  "save plot to an SVG file",
+			"icon":  "file-save",
+			"shortcut-func": giv.ShortcutFunc(func(gei interface{}, act *gi.Action) key.Chord {
+				return key.Chord(gide.ChordForFun(gide.KeyFunBufSaveAs).String())
+			}),
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{
+					"default-field": "SVGFile",
+					"ext":           ".svg",
+				}},
+			},
+		}},
+		{"SaveData", ki.Props{
+			"label": "Save Data...",
+			"icon":  "file-save",
+			"desc":  "save table data to a csv comma-separated-values file",
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{
+					"default-field": "DataFile",
+					"ext":           ".csv",
+				}},
+			},
+		}},
+	},
 }
 
 // these are the plot color names to use in order for successive lines -- feel free to choose your own!
