@@ -339,6 +339,7 @@ func (pl *Plot2D) ToolbarConfig() {
 		return
 	}
 
+	tbar.SetStretchMaxWidth()
 	tbar.AddAction(gi.ActOpts{Icon: "pan", Tooltip: "return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			fmt.Printf("this will select pan mode\n")

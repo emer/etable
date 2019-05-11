@@ -6,6 +6,7 @@ package eplot
 
 import (
 	"bytes"
+	"image"
 	"log"
 	"os"
 
@@ -21,9 +22,13 @@ import (
 func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 	updt := svge.UpdateStart()
 	defer svge.UpdateEnd(updt)
-	svge.SetFullReRender()
 
 	sz := svge.BBox.Size()
+
+	if sz == image.ZP {
+		return
+	}
+
 	w := (float64(sz.X) * 72.0) / (scale * 96.0)
 	h := (float64(sz.Y) * 72.0) / (scale * 96.0)
 
