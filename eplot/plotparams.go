@@ -39,6 +39,8 @@ type ColParams struct {
 	Color     gi.Color   `desc:"color to use in plotting the line"`
 	NTicks    int        `desc:"desired number of ticks"`
 	Lbl       string     `desc:"if non-empty, this is an alternative label to use in plotting"`
+	TensorIdx int        `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot"`
+	ErrCol    string     `desc:"specifies a column containing error bars for this column"`
 }
 
 // Defaults sets defaults if nil vals present

@@ -15,7 +15,8 @@ import (
 // data table to plot in a gonum plot, satisfying the plotter.XYer interface
 type TableXY struct {
 	Table      *etable.Table `desc:"the data table to plot from"`
-	XCol, YCol int           `desc:"the indexes of the 1D tensor columns to use for the X and Y data, respectively"`
+	XCol, YCol int           `desc:"the indexes of the tensor columns to use for the X and Y data, respectively"`
+	XIdx, YIdx int           `desc:"the indexes of the element within each tensor cell if cells are n-dimensional, respectively"`
 }
 
 // NewTableXY returns a new XY plot view onto the given etable.Table, from given column indexes.
@@ -55,6 +56,7 @@ func (txy *TableXY) Validate() error {
 		txy.YCol = 0
 		return errors.New("eplot.TableXY YCol index invalid -- reset to 0")
 	}
+	// todo: validate Idx's
 	return nil
 }
 
@@ -71,5 +73,6 @@ func (txy *TableXY) XY(row int) (x, y float64) {
 	if txy.Table == nil {
 		return 0, 0
 	}
+	// todo: idxs
 	return txy.Table.Cols[txy.XCol].FloatVal1D(row), txy.Table.Cols[txy.YCol].FloatVal1D(row)
 }
