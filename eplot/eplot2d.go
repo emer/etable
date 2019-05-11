@@ -7,6 +7,7 @@ package eplot
 import (
 	"fmt"
 	"log"
+	"math"
 
 	"github.com/emer/etable/etable"
 	"github.com/goki/gi/gi"
@@ -84,12 +85,11 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 	}
 }
 
-// todo: this is not saving a usable svg file for some reason.
-
 // SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
 func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 	pl.Update()
-	pl.GPlot.Save(5, 5, string(fname))
+	sv := pl.SVGPlot()
+	SaveSVGView(string(fname), pl.GPlot, sv, 2)
 	pl.SVGFile = fname
 }
 
@@ -118,6 +118,10 @@ func (pl *Plot2D) XLabel() string {
 		return pl.Params.XAxisLabel
 	}
 	if pl.Params.XAxisCol != "" {
+		cp := pl.ColParams(pl.Params.XAxisCol)
+		if cp != nil {
+			return cp.Label()
+		}
 		return pl.Params.XAxisCol
 	}
 	return "X"
@@ -131,18 +135,35 @@ func (pl *Plot2D) Update() {
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.NumCols() {
 		pl.Config()
 	}
+	pl.GenPlot() // just need to redraw svg, not full thing.
+}
 
-	pl.ColsUpdate()
-
-	plt, _ := plot.New() // todo: not clear how to re-use
+// GenPlot generates the plot
+func (pl *Plot2D) GenPlot() {
+	plt, _ := plot.New() // todo: not clear how to re-use, due to newtablexynames
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
+	plt.BackgroundColor = nil
 
 	for _, cp := range pl.Cols {
 		cp.Update()
+		if cp.Col == pl.Params.XAxisCol {
+			if cp.Range.FixMin {
+				plt.X.Min = math.Min(plt.X.Min, cp.Range.Min)
+			}
+			if cp.Range.FixMax {
+				plt.X.Max = math.Max(plt.X.Max, cp.Range.Max)
+			}
+		}
 		if !cp.On {
 			continue
+		}
+		if cp.Range.FixMin {
+			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
+		}
+		if cp.Range.FixMax {
+			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
 		}
 		xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Col)
 		l, _ := plotter.NewLine(xy)
@@ -152,18 +173,17 @@ func (pl *Plot2D) Update() {
 		plt.Legend.Add(cp.Label(), l)
 	}
 	plt.Legend.Top = true
-	pl.UpdateSig()
 
 	pl.GPlot = plt
-	sv := pl.Plot()
-	PlotViewSVG(plt, sv, 5, 5, 2) // todo: compute height etc
+	sv := pl.SVGPlot()
+	PlotViewSVG(plt, sv, pl.Params.Scale)
 }
 
 // Config configures the overall view widget
 func (pl *Plot2D) Config() {
 	pl.Lay = gi.LayoutVert
 	pl.Defaults()
-	// pl.SetProp("spacing", gi.StdDialogVSpaceUnits)
+	pl.SetProp("spacing", gi.StdDialogVSpaceUnits)
 	config := kit.TypeAndNameList{}
 	config.Add(gi.KiT_ToolBar, "tbar")
 	config.Add(gi.KiT_Layout, "plot")
@@ -176,6 +196,7 @@ func (pl *Plot2D) Config() {
 	play.Lay = gi.LayoutHoriz
 	play.SetProp("max-width", -1)
 	play.SetProp("max-height", -1)
+	play.SetProp("spacing", gi.StdDialogVSpaceUnits)
 
 	vncfg := kit.TypeAndNameList{}
 	vncfg.Add(gi.KiT_Frame, "cols")
@@ -197,7 +218,7 @@ func (pl *Plot2D) PlotLay() *gi.Layout {
 	return pl.ChildByName("plot", 1).(*gi.Layout)
 }
 
-func (pl *Plot2D) Plot() *svg.Editor {
+func (pl *Plot2D) SVGPlot() *svg.Editor {
 	return pl.PlotLay().ChildByName("plot", 1).(*svg.Editor)
 }
 
@@ -217,25 +238,29 @@ func (pl *Plot2D) ColsListUpdate() {
 	}
 	npc := len(PlotColorNames)
 	pl.Cols = make([]*ColParams, nc)
+	clri := 0
 	for ci := range pl.Table.Cols {
 		cn := pl.Table.ColNames[ci]
-		cp := &ColParams{Col: cn, ColorName: PlotColorNames[ci%npc]}
+		inc := 1
+		if cn == pl.Params.XAxisCol { // re-use xaxis color
+			inc = 0
+		}
+		cp := &ColParams{Col: cn, ColorName: PlotColorNames[clri%npc]}
 		cp.Defaults()
 		pl.Cols[ci] = cp
+		clri += inc
 	}
 }
 
 // ColsUpdate updates the display toggles for all the cols
 func (pl *Plot2D) ColsUpdate() {
 	vl := pl.ColsLay()
-	updt := vl.UpdateStart()
 	for i, cli := range *vl.Children() {
 		cp := pl.Cols[i]
 		cl := cli.(*gi.Layout)
 		cb := cl.Child(0).(*gi.CheckBox)
 		cb.SetChecked(cp.On)
 	}
-	vl.UpdateEnd(updt)
 }
 
 // ColsConfig configures the column gui buttons
@@ -299,12 +324,11 @@ func (pl *Plot2D) ColsConfig() {
 
 // PlotConfig configures the PlotView
 func (pl *Plot2D) PlotConfig() {
-	sv := pl.Plot()
+	sv := pl.SVGPlot()
 	sv.InitScale()
+
 	sv.Fill = true
 	sv.SetProp("background-color", "white")
-	// sv.SetProp("width", units.NewValue(float32(width/2), units.Px))
-	// sv.SetProp("height", units.NewValue(float32(height-100), units.Px))
 	sv.SetStretchMaxWidth()
 	sv.SetStretchMaxHeight()
 }
@@ -314,8 +338,6 @@ func (pl *Plot2D) ToolbarConfig() {
 	if len(tbar.Kids) != 0 {
 		return
 	}
-
-	//	todo: add save button!
 
 	tbar.AddAction(gi.ActOpts{Icon: "pan", Tooltip: "return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
@@ -347,9 +369,17 @@ func (pl *Plot2D) ToolbarConfig() {
 
 }
 
+func (pl *Plot2D) Style2D() {
+	pl.Layout.Style2D()
+	pl.GenPlot()
+	pl.ColsUpdate()
+}
+
 var Plot2DProps = ki.Props{
 	"max-width":  -1,
 	"max-height": -1,
+	// "width":      units.NewEm(5), // this gives the entire plot the scrollbars
+	// "height":     units.NewEm(5),
 	"ToolBar": ki.PropSlice{
 		{"Update", ki.Props{
 			"shortcut": "Command+U",
