@@ -57,7 +57,7 @@ func (pl *Plot2D) ColParamsTry(colNm string) (*ColParams, error) {
 			return cp, nil
 		}
 	}
-	return nil, fmt.Errorf("eplot plot: %v column named: %v not found", pl.Name, colNm)
+	return nil, fmt.Errorf("eplot plot: %v column named: %v not found", pl.Nm, colNm)
 }
 
 // ColParams returns the current column parameters by name (to access by index, just use Cols directly)
