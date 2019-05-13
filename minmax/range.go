@@ -2,15 +2,13 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package eplot
-
-import "github.com/emer/etable/minmax"
+package minmax
 
 // Range represents a range of values for plotting, where the min or max can optionally be fixed
 type Range struct {
-	minmax.F64 `desc:"Min and Max range values"`
-	FixMin     bool `desc:"fix the minimum end of the range"`
-	FixMax     bool `desc:"fix the maximum end of the range"`
+	F64    `desc:"Min and Max range values"`
+	FixMin bool `desc:"fix the minimum end of the range"`
+	FixMax bool `desc:"fix the maximum end of the range"`
 }
 
 // SetMin sets a fixed min value

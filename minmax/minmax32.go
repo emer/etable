@@ -4,11 +4,29 @@
 
 package minmax
 
+import "math"
+
 // F64 represents a min / max range for float32 values.
 // Supports clipping, renormalizing, etc
 type F32 struct {
 	Min float32
 	Max float32
+}
+
+// Set sets the min and max values
+func (mr *F32) Set(min, max float32) {
+	mr.Min, mr.Max = min, max
+}
+
+// SetInfinity sets the Min to +MaxFloat, Max to -MaxFloat -- suitable for
+// iteratively calling Fit*InRange
+func (mr *F32) SetInfinity() {
+	mr.Min, mr.Max = math.MaxFloat32, -math.MaxFloat32
+}
+
+// IsValid returns true if Min <= Max
+func (mr *F32) IsValid() bool {
+	return mr.Min <= mr.Max
 }
 
 // InRange tests whether value is within the range (>= Min and <= Max)
