@@ -245,7 +245,7 @@ func (pl *Plot2D) ColsListUpdate() {
 		if cn == pl.Params.XAxisCol { // re-use xaxis color
 			inc = 0
 		}
-		cp := &ColParams{Col: cn, ColorName: PlotColorNames[clri%npc]}
+		cp := &ColParams{Col: cn, ColorName: gi.ColorName(PlotColorNames[clri%npc])}
 		cp.Defaults()
 		pl.Cols[ci] = cp
 		clri += inc

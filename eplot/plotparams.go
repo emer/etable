@@ -35,7 +35,7 @@ type ColParams struct {
 	Col       string       `desc:"name of column we're plotting"`
 	Range     minmax.Range `desc:"effective range of data to plot -- either end can be fixed"`
 	FullRange minmax.F64   `desc:"full actual range of data -- only valid if specifically computed"`
-	ColorName string       `desc:"if non-empty, color is set by this name"`
+	ColorName gi.ColorName `desc:"if non-empty, color is set by this name"`
 	Color     gi.Color     `desc:"color to use in plotting the line"`
 	NTicks    int          `desc:"desired number of ticks"`
 	Lbl       string       `desc:"if non-empty, this is an alternative label to use in plotting"`
@@ -53,7 +53,7 @@ func (cp *ColParams) Defaults() {
 // Update updates e.g., color from color name
 func (cp *ColParams) Update() {
 	if cp.ColorName != "" {
-		clr, err := gi.ColorFromString(cp.ColorName, nil)
+		clr, err := gi.ColorFromString(string(cp.ColorName), nil)
 		if err == nil {
 			cp.Color = clr
 		}
