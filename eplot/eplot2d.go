@@ -35,6 +35,11 @@ type Plot2D struct {
 
 var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)
 
+// AddNewPlot2D adds a new Plot2D to given parent node, with given name.
+func AddNewPlot2D(parent ki.Ki, name string) *Plot2D {
+	return parent.AddNewChild(KiT_Plot2D, name).(*Plot2D)
+}
+
 func (pl *Plot2D) Defaults() {
 	pl.Params.Defaults()
 }
