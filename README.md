@@ -2,6 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/emer/etable)](https://goreportcard.com/report/github.com/emer/etable)
 [![GoDoc](https://godoc.org/github.com/emer/etable?status.svg)](https://godoc.org/github.com/emer/etable)
+[![Travis](https://travis-ci.com/emer/etable.svg?branch=master)](https://travis-ci.com/emer/etable)
 
  **etable** provides a DataTable / DataFrame structure in Go (golang), similar to [pandas](https://pandas.pydata.org/) and [xarray](http://xarray.pydata.org/en/stable/) in Python, and [Apache Arrow Table](https://github.com/apache/arrow/tree/master/go/arrow/array/table.go), using `etensor` n-dimensional columns aligned by common outermost row dimension.
 
@@ -15,4 +16,5 @@ The following packages are included:
 
 * `etable` is our Go version of `DataTable` from C++ emergent, which is widely useful for holding input patterns to present to the network, and logs of output from the network, among many other uses.  A `etable.Table` is a collection of `etensor.Tensor` columns, that are all aligned along the outer-most *row* dimension.  Index-based indirection is supported via optional args, but we do not take on the burden of ensuring full updating of the indexes across all operations, which greatly simplifies things.  The `etable.Table` should interoperate with the under-development gonum `DataFrame` structure among others.  The use of this data structure is always optional and orthogonal to the core network algorithm code -- in Python the `pandas` library has a suitable `DataFrame` structure that can be used instead.
 
+* `eplot` provides an interactive 2D plotting GUI in [GoGi](https://github.com/goki/gi) for Table data, using the [gonum plot](https://github.com/gonum/plot) plotting package.  You can select which columns to plot and specify various basic plot parameters.
 
