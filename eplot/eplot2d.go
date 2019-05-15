@@ -215,6 +215,18 @@ func (pl *Plot2D) Config() {
 	pl.UpdateEnd(updt)
 }
 
+// IsConfiged returns true if widget is fully configured
+func (pl *Plot2D) IsConfiged() bool {
+	if len(pl.Kids) == 0 {
+		return false
+	}
+	ppl := pl.PlotLay()
+	if len(ppl.Kids) == 0 {
+		return false
+	}
+	return true
+}
+
 func (pl *Plot2D) Toolbar() *gi.ToolBar {
 	return pl.ChildByName("tbar", 0).(*gi.ToolBar)
 }
@@ -377,6 +389,9 @@ func (pl *Plot2D) ToolbarConfig() {
 
 func (pl *Plot2D) Style2D() {
 	pl.Layout.Style2D()
+	if !pl.IsConfiged() {
+		return
+	}
 	pl.GenPlot()
 	pl.ColsUpdate()
 }
