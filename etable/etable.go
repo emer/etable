@@ -16,10 +16,11 @@ import (
 // etable.Table is the emer DataTable structure, containing columns of etensor tensors.
 // All tensors MUST have RowMajor stride layout!
 type Table struct {
-	Cols       []etensor.Tensor `view:"no-inline" desc:"columns of data, as etensor.Tensor tensors"`
-	ColNames   []string         `desc:"the names of the columns"`
-	Rows       int              `inactive:"+" desc:"number of rows, which is enforced to be the size of the outer-most dimension of the column tensors"`
-	ColNameMap map[string]int   `view:"-" desc:"the map of column names to column numbers"`
+	Cols       []etensor.Tensor  `view:"no-inline" desc:"columns of data, as etensor.Tensor tensors"`
+	ColNames   []string          `desc:"the names of the columns"`
+	Rows       int               `inactive:"+" desc:"number of rows, which is enforced to be the size of the outer-most dimension of the column tensors"`
+	ColNameMap map[string]int    `view:"-" desc:"the map of column names to column numbers"`
+	MetaData   map[string]string `desc:"misc meta data for the table.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc is a key used to provide a description of the column contents, which is shown as tooltip in the etview.View"`
 }
 
 var KiT_Table = kit.Types.AddType(&Table{}, TableProps)
