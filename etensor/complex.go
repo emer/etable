@@ -13,6 +13,7 @@ import (
 	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/kit"
+	"gonum.org/v1/gonum/mat"
 )
 
 // etensor.Complex64 is a tensor of complex64 backed by a []complex64 slice
@@ -322,12 +323,20 @@ func (tsr *Complex64) Dims() (r, c int) {
 	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
 }
 
-// Todo: this needs to be implemented - but not sure how now
+// Todo:
 // H is the gonum/mat.Matrix transpose method.
 // It performs an implicit transpose by returning the receiver inside a Transpose.
 //func (tsr *Complex64) H() mat.Matrix {
 //	return mat.Transpose{tsr}
 //}
+
+// T is the gonum/mat.Matrix transpose method.
+// Not supported for Complex -- call H() when implemented
+// Could do transpose on real portion
+func (tsr *Complex64) T() mat.Matrix {
+	log.Println("etensor T gonum Matrix call made on Complex Tensor -- call H() when implemented")
+	return nil
+}
 
 // SetZeros is simple convenience function initialize all values to 0
 func (tsr *Complex64) SetZeros() {
@@ -650,16 +659,28 @@ func (tsr *Complex128) Dims() (r, c int) {
 	return tsr.Dim(nd - 2), tsr.Dim(nd - 1)
 }
 
-// Todo: this needs to be implemented - but not sure how now
+// Todo:
 // H is the gonum/mat.Matrix transpose method.
 // It performs an implicit transpose by returning the receiver inside a Transpose.
 //func (tsr *Complex128) H() mat.Matrix {
 //	return mat.Transpose{tsr}
 //}
 
+// T is the gonum/mat.Matrix transpose method.
+// Not supported for Complex -- call H() when implemented
+// Could do transpose on real portion
+func (tsr *Complex128) T() mat.Matrix {
+	log.Println("etensor T gonum Matrix call made on Complex Tensor -- call H() when implemented")
+	return nil
+}
+
 // Floats1D returns a flat []float64 slice of all elements in the tensor
-// but for Complex types this doesn't make sense and a zero length slice is returned
+// for Complex types the slice is composed of the real portion of the complex only
 func (tsr *Complex128) Floats1D() []float64 {
-	res := make([]float64, 0)
+	ln := tsr.Len()
+	res := make([]float64, ln)
+	for j := 0; j < ln; j++ {
+		res[j] = tsr.FloatVal([]int{j})
+	}
 	return res
 }
