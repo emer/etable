@@ -12,13 +12,15 @@ import "fmt"
 // This is fully compatible with (and largely taken from) apache/arrow tensors.
 // except that we use plain int instead of int64, because on all relevant platforms
 // int is *already* 64 and using plain int is much easier.
-// Per C / Go / Python conventions (and unlike emergent) indexes are ordered from
+// Per C / Go / Python conventions (and unlike emergent) by default indexes are ordered from
 // outer to inner left-to-right, so the inner-most is right-most.
 // This is called Row-Major order, and is the default.
 // It is also possible to use Column-Major order, which is used in R, Julia, and MATLAB,
-// and emergent, where the inner-most index is first and outer-most last.
-// In principle, you can organize memory independent of the conceptual order of indexes
-// but for efficiency it is best to organize memory in the way that indexes are accessed.
+// and emergent, where the inner-most index is first and outer-most last.  In either
+// case, the internal memory is always organized with the inner-most dimension contiguous
+// in memory -- thus there is no underlying difference between the different indexing
+// systems in terms of underlying memory -- just in the order of indexes used to access
+// this memory.
 type Shape struct {
 	Shp  []int
 	Strd []int
@@ -142,15 +144,30 @@ func (sh *Shape) IsContiguous() bool {
 	return sh.IsRowMajor() || sh.IsColMajor()
 }
 
-// IsRowMajor returns true if shape is row-major organized:  first dimension is row, i.e.,
-// outer-most storage dimension
+// todo: cache rowmajor vs. colmajor as flags?  much faster, and this is frequently
+// accessed
+
+// IsRowMajor returns true if shape is row-major organized:
+// first dimension is the row or outer-most storage dimension.
+// Values *along a row* are contiguous, as you increment along
+// the minor, inner-most (column) dimension.
+// Importantly: ColMajor and RowMajor both have the *same*
+// actual memory storage arrangement, with values along a row
+// (across columns) contiguous in memory -- the only difference
+// is in the order of the indexes used to access this memory.
 func (sh *Shape) IsRowMajor() bool {
 	strides := RowMajorStrides(sh.Shp)
 	return EqualInts(strides, sh.Strd)
 }
 
-// IsColMajor returns true if shape is column-major organized: first dimension is column, i.e.,
-// inner-most storage dimension
+// IsColMajor returns true if shape is column-major organized:
+// first dimension is column, i.e., inner-most storage dimension.
+// Values *along a row* are contiguous, as you increment along
+// the major inner-most (column) dimension.
+// Importantly: ColMajor and RowMajor both have the *same*
+// actual memory storage arrangement, with values along a row
+// (across columns) contiguous in memory -- the only difference
+// is in the order of the indexes used to access this memory.
 func (sh *Shape) IsColMajor() bool {
 	strides := ColMajorStrides(sh.Shp)
 	return EqualInts(strides, sh.Strd)

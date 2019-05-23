@@ -41,7 +41,8 @@ func NewStringShape(shape *Shape) *String {
 	return bt
 }
 
-func (tsr *String) DataType() Type { return STRING }
+func (tsr *String) ShapeObj() *Shape { return &tsr.Shape }
+func (tsr *String) DataType() Type   { return STRING }
 
 // Value returns value at given tensor index
 func (tsr *String) Value(i []int) string {
@@ -118,6 +119,13 @@ func (tsr *String) Floats1D() []float64 {
 
 func (tsr *String) StringVal1D(off int) string      { return tsr.Values[off] }
 func (tsr *String) SetString1D(off int, val string) { tsr.Values[off] = val }
+
+// Range is not applicable to String tensor
+func (tsr *String) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	return
+}
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
@@ -233,14 +241,18 @@ func (tsr *String) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *String) SubSpace(subdim int, offs []int) (*String, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *String) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {

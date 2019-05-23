@@ -8,6 +8,7 @@ import (
 	"errors"
 	"strconv"
 	"log"
+	"math"
 
 	"github.com/apache/arrow/go/arrow"
 	"github.com/apache/arrow/go/arrow/array"
@@ -49,6 +50,7 @@ func New{{.Name}}Shape(shape *Shape) *{{.Name}} {
 	return tsr
 }
 
+func (tsr *{{.Name}}) ShapeObj() *Shape { return &tsr.Shape }
 func (tsr *{{.Name}}) DataType() Type { return {{.DataType}} }
 func (tsr *{{.Name}}) Value(i []int)  {{or .Type}} { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *{{.Name}}) Value1D(i int)  {{or .Type}} { return tsr.Values[i] }
@@ -88,10 +90,9 @@ func (tsr *{{.Name}}) SetFloat1D(off int, val float64)  { tsr.Values[off] = {{or
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *{{.Name}}) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -101,6 +102,29 @@ func (tsr *{{.Name}}) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = {{or .Type}}(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *{{.Name}}) 	Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -214,14 +238,18 @@ func (tsr *{{.Name}}) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both), 
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *{{.Name}}) SubSpace(subdim int, offs []int) (*{{.Name}}, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *{{.Name}}) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
