@@ -20,7 +20,7 @@ type Table struct {
 	ColNames   []string          `desc:"the names of the columns"`
 	Rows       int               `inactive:"+" desc:"number of rows, which is enforced to be the size of the outer-most dimension of the column tensors"`
 	ColNameMap map[string]int    `view:"-" desc:"the map of column names to column numbers"`
-	MetaData   map[string]string `desc:"misc meta data for the table.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc is a key used to provide a description of the column contents, which is shown as tooltip in the etview.View"`
+	MetaData   map[string]string `desc:"misc meta data for the table.  Name is key for name of table. For Column-specific data, we look for ColName: prefix, specifically ColName:desc is a key used to provide a description of the column contents, which is shown as tooltip in the etview.View"`
 }
 
 var KiT_Table = kit.Types.AddType(&Table{}, TableProps)
@@ -38,6 +38,53 @@ func (dt *Table) NumCols() int {
 // Col returns the tensor at given column index
 func (dt *Table) Col(i int) etensor.Tensor {
 	return dt.Cols[i]
+}
+
+// RowCell returns the tensor SubSpace for given column, row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns nil if column is a 1-dimensional
+// tensor or there is any error from the etensor.Tensor.SubSpace call.
+func (dt *Table) RowCell(col, row int) etensor.Tensor {
+	ct := dt.Cols[col]
+	if ct.NumDims() == 1 {
+		return nil
+	}
+	cell, _ := ct.SubSpace(ct.NumDims()-1, []int{row})
+	return cell
+}
+
+// RowCellByName returns the tensor SubSpace for given column (by name), row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns nil on any error -- see Try version for
+// error returns.
+func (dt *Table) RowCellByName(colNm string, row int) etensor.Tensor {
+	ct := dt.ColByName(colNm)
+	if ct == nil {
+		return nil
+	}
+	if ct.NumDims() == 1 {
+		return nil
+	}
+	cell, _ := ct.SubSpace(ct.NumDims()-1, []int{row})
+	return cell
+}
+
+// RowCellByNameTry returns the tensor SubSpace for given column (by name), row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns an error if column is a 1-dimensional
+// tensor or any error from the etensor.Tensor.SubSpace call.
+func (dt *Table) RowCellByNameTry(colNm string, row int) (etensor.Tensor, error) {
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return nil, err
+	}
+	if ct.NumDims() == 1 {
+		return nil, fmt.Errorf("etable.Table: RowCell called on column named: %v which is 1-dimensional", colNm)
+	}
+	return ct.SubSpace(ct.NumDims()-1, []int{row})
 }
 
 // Schema returns the Schema (column properties) for this table

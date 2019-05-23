@@ -8,14 +8,11 @@ import (
 	"fmt"
 	"image"
 	"reflect"
-	"strings"
 
 	"github.com/chewxy/math32"
-	"github.com/emer/etable/etable"
+	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
-	"github.com/goki/gi/oswin"
-	"github.com/goki/gi/oswin/cursor"
 	"github.com/goki/gi/units"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
@@ -26,10 +23,9 @@ import (
 // using a tabular rows-and-columns interface
 type TensorView struct {
 	giv.SliceViewBase
-	Table    *etable.Table `desc:"the table that we're a view of"`
-	NCols    int           `inactive:"+" desc:"number of columns in table (as of last update)"`
-	SortIdx  int           `desc:"current sort index"`
-	SortDesc bool          `desc:"whether current sort order is descending"`
+	Tensor etensor.Tensor `desc:"the tensor that we're a view of"`
+	OddCol bool           `desc:"even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddCol = false = organize vertically along row dimension, true = organize horizontally across column dimension"`
+	NCols  int            `inactive:"+" desc:"number of columns in table (as of last update)"`
 }
 
 var KiT_TensorView = kit.Types.AddType(&TensorView{}, TensorViewProps)
@@ -42,21 +38,18 @@ func AddNewTensorView(parent ki.Ki, name string) *TensorView {
 // check for interface impl
 var _ giv.SliceViewer = (*TensorView)(nil)
 
-// SetTable sets the source table that we are viewing
-func (tv *TensorView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
+// SetTensor sets the source tensor that we are viewing
+func (tv *TensorView) SetTensor(tsr etensor.Tensor, tmpSave giv.ValueView) {
 	updt := false
-	if et == nil {
+	if tsr == nil {
 		return
 	}
-	if tv.Table != et {
+	if tv.Tensor != tsr {
 		if !tv.IsInactive() {
 			tv.SelectedIdx = -1
 		}
 		tv.StartIdx = 0
-		tv.SortIdx = -1
-		tv.SortDesc = false
-		tv.Table = et
-		tv.Slice = et.Cols // it is a slice..
+		tv.Tensor = tsr
 		updt = tv.UpdateStart()
 		tv.ResetSelectedIdxs()
 		tv.SelectMode = false
@@ -110,12 +103,9 @@ func (tv *TensorView) Config() {
 	}
 }
 
-func (tv *TensorView) SliceValueSize() (reflect.Value, int) {
-	svnp := kit.NonPtrValue(reflect.ValueOf(tv.Slice)) // note: svnp not used..
-	sz := tv.Table.Rows
-	tv.SliceSize = sz
-	tv.NCols = tv.Table.NumCols()
-	return svnp, sz
+func (tv *TensorView) UpdtSliceSize() int {
+	tv.SliceSize, tv.NCols = etensor.Prjn2DShape(tv.Tensor, !tv.OddCol)
+	return tv.SliceSize
 }
 
 // SliceFrame returns the outer frame widget, which contains all the header,
@@ -152,7 +142,7 @@ func (tv *TensorView) ToolBar() *gi.ToolBar {
 
 // RowWidgetNs returns number of widgets per row and offset for index label
 func (tv *TensorView) RowWidgetNs() (nWidgPerRow, idxOff int) {
-	nWidgPerRow = 1 + tv.Table.NumCols()
+	nWidgPerRow = 1 + tv.NCols
 	if !tv.IsInactive() {
 		nWidgPerRow += 2
 	}
@@ -167,11 +157,11 @@ func (tv *TensorView) RowWidgetNs() (nWidgPerRow, idxOff int) {
 // ConfigSliceGrid configures the SliceGrid for the current slice
 // this is only called by global Config and updates are guarded by that
 func (tv *TensorView) ConfigSliceGrid() {
-	if tv.Table == nil {
+	if tv.Tensor == nil {
 		return
 	}
 
-	_, sz := tv.SliceValueSize()
+	sz := tv.UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
@@ -221,8 +211,8 @@ func (tv *TensorView) ConfigSliceGrid() {
 		hcfg.Add(gi.KiT_Label, "head-idx")
 	}
 	for fli := 0; fli < tv.NCols; fli++ {
-		labnm := fmt.Sprintf("head-%v", tv.Table.ColNames[fli])
-		hcfg.Add(gi.KiT_Action, labnm)
+		labnm := fmt.Sprintf("head-%03d", fli)
+		hcfg.Add(gi.KiT_Label, labnm)
 	}
 	if !tv.IsInactive() {
 		hcfg.Add(gi.KiT_Label, "head-add")
@@ -248,40 +238,17 @@ func (tv *TensorView) ConfigSliceGrid() {
 	}
 
 	for fli := 0; fli < tv.NCols; fli++ {
-		col := tv.Table.Cols[fli]
-		colnm := tv.Table.ColNames[fli]
-		hdr := sgh.Child(idxOff + fli).(*gi.Action)
+		colnm := fmt.Sprintf("X:%03d", fli) // todo: deal with embedded dims
+		hdr := sgh.Child(idxOff + fli).(*gi.Label)
 		hdr.SetText(colnm)
-		if fli == tv.SortIdx {
-			if tv.SortDesc {
-				hdr.SetIcon("wedge-down")
-			} else {
-				hdr.SetIcon("wedge-up")
-			}
-		}
-		hdr.Data = fli
-		hdr.Tooltip = "(click to sort / toggle sort direction by this column)"
-		if dsc, has := tv.Table.MetaData[colnm+":desc"]; has {
-			hdr.Tooltip += ": " + dsc
-		}
-		hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-			tvv := recv.Embed(KiT_TensorView).(*TensorView)
-			act := send.(*gi.Action)
-			fldIdx := act.Data.(int)
-			tvv.SortSliceAction(fldIdx)
-		})
+		// no metadata on tensors by themselves
+		// if dsc, has := tv.Tensor.MetaData[colnm+":desc"]; has {
+		// 	hdr.Tooltip += ": " + dsc
+		// }
 
-		var vv giv.ValueView
-		if col.NumDims() == 1 {
-			fval := 1.0
-			vv = giv.ToValueView(&fval, "")
-			vv.SetStandaloneValue(reflect.ValueOf(&fval))
-		} else {
-			// todo: subspace tensor rep..
-			fval := 1.0
-			vv = giv.ToValueView(&fval, "")
-			vv.SetStandaloneValue(reflect.ValueOf(&fval))
-		}
+		fval := 1.0
+		vv := giv.ToValueView(&fval, "")
+		vv.SetStandaloneValue(reflect.ValueOf(&fval))
 		vtyp := vv.WidgetType()
 		valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
 		cidx := idxOff + fli
@@ -309,11 +276,6 @@ func (tv *TensorView) ConfigSliceGrid() {
 		delact.SetIcon("minus")
 	}
 
-	// if tv.SortIdx >= 0 {
-	// 	rawIdx := tv.VisFields[tv.SortIdx].Index
-	// 	kit.StructSliceSort(tv.Slice, rawIdx, !tv.SortDesc)
-	// }
-
 	tv.ConfigScroll()
 }
 
@@ -321,11 +283,11 @@ func (tv *TensorView) ConfigSliceGrid() {
 // returns true if UpdateSliceGrid should be called after this
 func (tv *TensorView) LayoutSliceGrid() bool {
 	sg := tv.SliceGrid()
-	if tv.Table == nil {
+	if tv.Tensor == nil {
 		sg.DeleteChildren(true)
 		return false
 	}
-	_, sz := tv.SliceValueSize()
+	sz := tv.UpdtSliceSize()
 	if sz == 0 {
 		sg.DeleteChildren(true)
 		return false
@@ -385,10 +347,10 @@ func (tv *TensorView) LayoutHeader() {
 
 // UpdateSliceGrid updates grid display -- robust to any time calling
 func (tv *TensorView) UpdateSliceGrid() {
-	if tv.Table == nil {
+	if tv.Tensor == nil {
 		return
 	}
-	_, sz := tv.SliceValueSize()
+	sz := tv.UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
@@ -455,19 +417,14 @@ func (tv *TensorView) UpdateSliceGrid() {
 		}
 
 		for fli := 0; fli < tv.NCols; fli++ {
-			col := tv.Table.Cols[fli]
-			// colnm := tv.Table.ColNames[fli]
-
-			// todo: add all the tensor stuff
+			fval := etensor.Prjn2DVal(tv.Tensor, !tv.OddCol, i, fli)
 			vvi := i*tv.NCols + fli
 			var vv giv.ValueView
 			if tv.Values[vvi] == nil {
-				fval := col.FloatVal1D(si)
 				vv = giv.ToValueView(&fval, "")
 				vv.SetStandaloneValue(reflect.ValueOf(&fval))
 				tv.Values[vvi] = vv
 			} else {
-				fval := col.FloatVal1D(si)
 				vv = tv.Values[vvi]
 				vv.SetStandaloneValue(reflect.ValueOf(&fval))
 			}
@@ -602,54 +559,9 @@ func (tv *TensorView) SliceDeleteAt(idx int, doupdt bool) {
 	tv.ViewSig.Emit(tv.This(), 0, nil)
 }
 
-// SortSliceAction sorts the slice for given field index -- toggles ascending
-// vs. descending if already sorting on this dimension
-func (tv *TensorView) SortSliceAction(fldIdx int) {
-	oswin.TheApp.Cursor(tv.Viewport.Win.OSWin).Push(cursor.Wait)
-	defer oswin.TheApp.Cursor(tv.Viewport.Win.OSWin).Pop()
-
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
-
-	updt := tv.UpdateStart()
-	sgh := tv.SliceHeader()
-	sgh.SetFullReRender()
-	idxOff := 1
-	if !tv.ShowIndex {
-		idxOff = 0
-	}
-
-	ascending := true
-
-	for fli := 0; fli < tv.NCols; fli++ {
-		hdr := sgh.Child(idxOff + fli).(*gi.Action)
-		if fli == fldIdx {
-			if tv.SortIdx == fli {
-				tv.SortDesc = !tv.SortDesc
-				ascending = !tv.SortDesc
-			} else {
-				tv.SortDesc = false
-			}
-			if ascending {
-				hdr.SetIcon("wedge-up")
-			} else {
-				hdr.SetIcon("wedge-down")
-			}
-		} else {
-			hdr.SetIcon("none")
-		}
-	}
-
-	tv.SortIdx = fldIdx
-
-	// kit.StructSliceSort(tv.Slice, rawIdx, !tv.SortDesc)
-	tv.UpdateSliceGrid()
-	tv.UpdateEnd(updt)
-}
-
 // ConfigToolbar configures the toolbar actions
 func (tv *TensorView) ConfigToolbar() {
-	if tv.Table == nil || tv.IsInactive() {
+	if tv.Tensor == nil || tv.IsInactive() {
 		return
 	}
 	if tv.ToolbarSlice == tv.Slice {
@@ -674,43 +586,6 @@ func (tv *TensorView) ConfigToolbar() {
 		giv.ToolBarView(tv.Slice, tv.Viewport, tb)
 	}
 	tv.ToolbarSlice = tv.Slice
-}
-
-// SortFieldName returns the name of the field being sorted, along with :up or
-// :down depending on descending
-func (tv *TensorView) SortFieldName() string {
-	if tv.SortIdx >= 0 && tv.SortIdx < tv.NCols {
-		nm := tv.Table.ColNames[tv.SortIdx]
-		if tv.SortDesc {
-			nm += ":down"
-		} else {
-			nm += ":up"
-		}
-		return nm
-	}
-	return ""
-}
-
-// SetSortField sets sorting to happen on given field and direction -- see
-// SortFieldName for details
-func (tv *TensorView) SetSortFieldName(nm string) {
-	if nm == "" {
-		return
-	}
-	spnm := strings.Split(nm, ":")
-	for fli := 0; fli < tv.NCols; fli++ {
-		colnm := tv.Table.ColNames[fli]
-		if colnm == spnm[0] {
-			tv.SortIdx = fli
-		}
-	}
-	if len(spnm) == 2 {
-		if spnm[1] == "down" {
-			tv.SortDesc = true
-		} else {
-			tv.SortDesc = false
-		}
-	}
 }
 
 func (tv *TensorView) Layout2D(parBBox image.Rectangle, iter int) bool {

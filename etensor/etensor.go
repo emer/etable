@@ -29,6 +29,9 @@ type Tensor interface {
 	// DataType returns the type of data, using arrow.DataType (ID() is the arrow.Type enum value)
 	DataType() Type
 
+	// ShapeObj returns a pointer to the shape object that fully parameterizes the tensor shape
+	ShapeObj() *Shape
+
 	// Shapes returns the size in each dimension of the tensor. (Shape is the full Shape struct)
 	Shapes() []int
 
@@ -54,7 +57,25 @@ type Tensor interface {
 	DimName(i int) string
 
 	IsContiguous() bool
+
+	// IsRowMajor returns true if shape is row-major organized:
+	// first dimension is the row or outer-most storage dimension.
+	// Values *along a row* are contiguous, as you increment along
+	// the minor, inner-most (column) dimension.
+	// Importantly: ColMajor and RowMajor both have the *same*
+	// actual memory storage arrangement, with values along a row
+	// (across columns) contiguous in memory -- the only difference
+	// is in the order of the indexes used to access this memory.
 	IsRowMajor() bool
+
+	// IsColMajor returns true if shape is column-major organized:
+	// first dimension is column, i.e., inner-most storage dimension.
+	// Values *along a row* are contiguous, as you increment along
+	// the major inner-most (column) dimension.
+	// Importantly: ColMajor and RowMajor both have the *same*
+	// actual memory storage arrangement, with values along a row
+	// (across columns) contiguous in memory -- the only difference
+	// is in the order of the indexes used to access this memory.
 	IsColMajor() bool
 
 	// RowCellSize returns the size of the outer-most Row shape dimension, and the size of all the
@@ -97,6 +118,24 @@ type Tensor interface {
 
 	// SetString1D sets the value of given 1-dimensional index (0-Len()-1) as a string
 	SetString1D(off int, val string)
+
+	// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+	// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+	// row or column major layouts.
+	// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+	//   and the first in ColMajor).
+	// * offs are offsets for the outer dimensions (len = NDims - subdim)
+	//   for the subspace to return.
+	// The new tensor points to the values of the this tensor (i.e., modifications
+	// will affect both), as its Values slice is a view onto the original (which
+	// is why only inner-most contiguous supsaces are supported).
+	// Use Clone() method to separate the two.
+	SubSpace(subdim int, offs []int) (Tensor, error)
+
+	// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+	// This is needed for display and is thus in the core api in optimized form
+	// Other math operations can be done using gonum/floats package.
+	Range() (min, max float64, minIdx, maxIdx int)
 
 	// AggFunc applies given aggregation function to each element in the tensor, using float64
 	// conversions of the values.  init is the initial value for the agg variable.  returns final

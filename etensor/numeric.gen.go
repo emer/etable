@@ -10,6 +10,7 @@ import (
 	"errors"
 	"fmt"
 	"log"
+	"math"
 	"strconv"
 
 	"github.com/apache/arrow/go/arrow"
@@ -50,6 +51,7 @@ func NewInt64Shape(shape *Shape) *Int64 {
 	return tsr
 }
 
+func (tsr *Int64) ShapeObj() *Shape       { return &tsr.Shape }
 func (tsr *Int64) DataType() Type         { return INT64 }
 func (tsr *Int64) Value(i []int) int64    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Int64) Value1D(i int) int64    { return tsr.Values[i] }
@@ -89,10 +91,9 @@ func (tsr *Int64) SetFloat1D(off int, val float64) { tsr.Values[off] = int64(val
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Int64) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -102,6 +103,29 @@ func (tsr *Int64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int64(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Int64) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -214,14 +238,18 @@ func (tsr *Int64) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Int64) SubSpace(subdim int, offs []int) (*Int64, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int64) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -385,6 +413,7 @@ func NewUint64Shape(shape *Shape) *Uint64 {
 	return tsr
 }
 
+func (tsr *Uint64) ShapeObj() *Shape        { return &tsr.Shape }
 func (tsr *Uint64) DataType() Type          { return UINT64 }
 func (tsr *Uint64) Value(i []int) uint64    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Uint64) Value1D(i int) uint64    { return tsr.Values[i] }
@@ -424,10 +453,9 @@ func (tsr *Uint64) SetFloat1D(off int, val float64) { tsr.Values[off] = uint64(v
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Uint64) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -437,6 +465,29 @@ func (tsr *Uint64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint64(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Uint64) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -549,14 +600,18 @@ func (tsr *Uint64) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Uint64) SubSpace(subdim int, offs []int) (*Uint64, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint64) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -720,6 +775,7 @@ func NewFloat64Shape(shape *Shape) *Float64 {
 	return tsr
 }
 
+func (tsr *Float64) ShapeObj() *Shape         { return &tsr.Shape }
 func (tsr *Float64) DataType() Type           { return FLOAT64 }
 func (tsr *Float64) Value(i []int) float64    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Float64) Value1D(i int) float64    { return tsr.Values[i] }
@@ -759,10 +815,9 @@ func (tsr *Float64) SetFloat1D(off int, val float64) { tsr.Values[off] = float64
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Float64) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -772,6 +827,29 @@ func (tsr *Float64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = float64(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Float64) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -884,14 +962,18 @@ func (tsr *Float64) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Float64) SubSpace(subdim int, offs []int) (*Float64, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Float64) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -1055,6 +1137,7 @@ func NewInt32Shape(shape *Shape) *Int32 {
 	return tsr
 }
 
+func (tsr *Int32) ShapeObj() *Shape       { return &tsr.Shape }
 func (tsr *Int32) DataType() Type         { return INT32 }
 func (tsr *Int32) Value(i []int) int32    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Int32) Value1D(i int) int32    { return tsr.Values[i] }
@@ -1094,10 +1177,9 @@ func (tsr *Int32) SetFloat1D(off int, val float64) { tsr.Values[off] = int32(val
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Int32) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -1107,6 +1189,29 @@ func (tsr *Int32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int32(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Int32) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -1219,14 +1324,18 @@ func (tsr *Int32) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Int32) SubSpace(subdim int, offs []int) (*Int32, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int32) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -1390,6 +1499,7 @@ func NewUint32Shape(shape *Shape) *Uint32 {
 	return tsr
 }
 
+func (tsr *Uint32) ShapeObj() *Shape        { return &tsr.Shape }
 func (tsr *Uint32) DataType() Type          { return UINT32 }
 func (tsr *Uint32) Value(i []int) uint32    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Uint32) Value1D(i int) uint32    { return tsr.Values[i] }
@@ -1429,10 +1539,9 @@ func (tsr *Uint32) SetFloat1D(off int, val float64) { tsr.Values[off] = uint32(v
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Uint32) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -1442,6 +1551,29 @@ func (tsr *Uint32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint32(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Uint32) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -1554,14 +1686,18 @@ func (tsr *Uint32) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Uint32) SubSpace(subdim int, offs []int) (*Uint32, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint32) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -1725,6 +1861,7 @@ func NewFloat32Shape(shape *Shape) *Float32 {
 	return tsr
 }
 
+func (tsr *Float32) ShapeObj() *Shape         { return &tsr.Shape }
 func (tsr *Float32) DataType() Type           { return FLOAT32 }
 func (tsr *Float32) Value(i []int) float32    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Float32) Value1D(i int) float32    { return tsr.Values[i] }
@@ -1764,10 +1901,9 @@ func (tsr *Float32) SetFloat1D(off int, val float64) { tsr.Values[off] = float32
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Float32) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -1777,6 +1913,29 @@ func (tsr *Float32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = float32(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Float32) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -1889,14 +2048,18 @@ func (tsr *Float32) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Float32) SubSpace(subdim int, offs []int) (*Float32, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Float32) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -2060,6 +2223,7 @@ func NewInt16Shape(shape *Shape) *Int16 {
 	return tsr
 }
 
+func (tsr *Int16) ShapeObj() *Shape       { return &tsr.Shape }
 func (tsr *Int16) DataType() Type         { return INT16 }
 func (tsr *Int16) Value(i []int) int16    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Int16) Value1D(i int) int16    { return tsr.Values[i] }
@@ -2099,10 +2263,9 @@ func (tsr *Int16) SetFloat1D(off int, val float64) { tsr.Values[off] = int16(val
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Int16) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -2112,6 +2275,29 @@ func (tsr *Int16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int16(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Int16) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -2224,14 +2410,18 @@ func (tsr *Int16) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Int16) SubSpace(subdim int, offs []int) (*Int16, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int16) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -2395,6 +2585,7 @@ func NewUint16Shape(shape *Shape) *Uint16 {
 	return tsr
 }
 
+func (tsr *Uint16) ShapeObj() *Shape        { return &tsr.Shape }
 func (tsr *Uint16) DataType() Type          { return UINT16 }
 func (tsr *Uint16) Value(i []int) uint16    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Uint16) Value1D(i int) uint16    { return tsr.Values[i] }
@@ -2434,10 +2625,9 @@ func (tsr *Uint16) SetFloat1D(off int, val float64) { tsr.Values[off] = uint16(v
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Uint16) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -2447,6 +2637,29 @@ func (tsr *Uint16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint16(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Uint16) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -2559,14 +2772,18 @@ func (tsr *Uint16) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Uint16) SubSpace(subdim int, offs []int) (*Uint16, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint16) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -2730,6 +2947,7 @@ func NewInt8Shape(shape *Shape) *Int8 {
 	return tsr
 }
 
+func (tsr *Int8) ShapeObj() *Shape      { return &tsr.Shape }
 func (tsr *Int8) DataType() Type        { return INT8 }
 func (tsr *Int8) Value(i []int) int8    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Int8) Value1D(i int) int8    { return tsr.Values[i] }
@@ -2769,10 +2987,9 @@ func (tsr *Int8) SetFloat1D(off int, val float64) { tsr.Values[off] = int8(val) 
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Int8) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -2782,6 +2999,29 @@ func (tsr *Int8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int8(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Int8) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -2894,14 +3134,18 @@ func (tsr *Int8) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Int8) SubSpace(subdim int, offs []int) (*Int8, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int8) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -3065,6 +3309,7 @@ func NewUint8Shape(shape *Shape) *Uint8 {
 	return tsr
 }
 
+func (tsr *Uint8) ShapeObj() *Shape       { return &tsr.Shape }
 func (tsr *Uint8) DataType() Type         { return UINT8 }
 func (tsr *Uint8) Value(i []int) uint8    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Uint8) Value1D(i int) uint8    { return tsr.Values[i] }
@@ -3104,10 +3349,9 @@ func (tsr *Uint8) SetFloat1D(off int, val float64) { tsr.Values[off] = uint8(val
 // This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc
 func (tsr *Uint8) Floats1D() []float64 {
 	// todo: condition on Float64!
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = float64(tsr.Values[j])
+	res := make([]float64, tsr.Len())
+	for j, vl := range tsr.Values {
+		res[j] = float64(vl)
 	}
 	return res
 }
@@ -3117,6 +3361,29 @@ func (tsr *Uint8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint8(fv)
 	}
+}
+
+// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
+// This is needed for display and is thus in the core api in optimized form
+// Other math operations can be done using gonum/floats package.
+func (tsr *Uint8) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	for j, vl := range tsr.Values {
+		fv := float64(vl)
+		if math.IsNaN(fv) {
+			continue
+		}
+		if fv < min || minIdx < 0 {
+			min = fv
+			minIdx = j
+		}
+		if fv > max || maxIdx < 0 {
+			max = fv
+			maxIdx = j
+		}
+	}
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
@@ -3229,14 +3496,18 @@ func (tsr *Uint8) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the given number
-// of dimensions (0 < subdim < NumDims of this tensor).  Only valid for row or column major layouts.
-// subdim are the inner, contiguous dimensions (i.e., the final dims in RowMajor and the first ones in ColMajor).
-// offs are offsets for the outer dimensions (len = NDims - subdim) for the subspace to return.
-// The new tensor points to the values of the this tensor (i.e., modifications will affect both),
-// as its Values slice is a view onto the original (which is why only inner-most contiguous supsaces
-// are supported).  Use Clone() method to separate the two.
-func (tsr *Uint8) SubSpace(subdim int, offs []int) (*Uint8, error) {
+// SubSpace returns a new tensor as a subspace of the current one, incorporating the
+// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
+// row or column major layouts.
+// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
+//   and the first in ColMajor).
+// * offs are offsets for the outer dimensions (len = NDims - subdim)
+//   for the subspace to return.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint8) SubSpace(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {

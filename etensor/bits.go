@@ -5,6 +5,7 @@
 package etensor
 
 import (
+	"errors"
 	"log"
 
 	"github.com/apache/arrow/go/arrow"
@@ -51,7 +52,8 @@ func NewBitsShape(shape *Shape) *Bits {
 	return bt
 }
 
-func (tsr *Bits) DataType() Type { return BOOl }
+func (tsr *Bits) ShapeObj() *Shape { return &tsr.Shape }
+func (tsr *Bits) DataType() Type   { return BOOl }
 
 // Value returns value at given tensor index
 func (tsr *Bits) Value(i []int) bool { j := int(tsr.Offset(i)); return tsr.Values.Index(j) }
@@ -126,6 +128,18 @@ func (tsr *Bits) SetString1D(off int, val string) {
 	if bv, ok := kit.ToBool(val); ok {
 		tsr.Values.Set(off, bv)
 	}
+}
+
+// SubSpace is not applicable to Bits tensor
+func (tsr *Bits) SubSpace(subdim int, offs []int) (Tensor, error) {
+	return nil, errors.New("etensor.Bits does not support SubSpace")
+}
+
+// Range is not applicable to Bits tensor
+func (tsr *Bits) Range() (min, max float64, minIdx, maxIdx int) {
+	minIdx = -1
+	maxIdx = -1
+	return
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64

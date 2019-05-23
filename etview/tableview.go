@@ -12,6 +12,7 @@ import (
 
 	"github.com/chewxy/math32"
 	"github.com/emer/etable/etable"
+	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin"
@@ -55,7 +56,6 @@ func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
 		tv.SortIdx = -1
 		tv.SortDesc = false
 		tv.Table = et
-		tv.Slice = et.Cols // it is a slice..
 		updt = tv.UpdateStart()
 		tv.ResetSelectedIdxs()
 		tv.SelectMode = false
@@ -109,12 +109,10 @@ func (tv *TableView) Config() {
 	}
 }
 
-func (tv *TableView) SliceValueSize() (reflect.Value, int) {
-	svnp := kit.NonPtrValue(reflect.ValueOf(tv.Slice)) // note: svnp not used..
-	sz := tv.Table.Rows
-	tv.SliceSize = sz
+func (tv *TableView) UpdtSliceSize() int {
+	tv.SliceSize = tv.Table.Rows
 	tv.NCols = tv.Table.NumCols()
-	return svnp, sz
+	return tv.SliceSize
 }
 
 // SliceFrame returns the outer frame widget, which contains all the header,
@@ -151,7 +149,7 @@ func (tv *TableView) ToolBar() *gi.ToolBar {
 
 // RowWidgetNs returns number of widgets per row and offset for index label
 func (tv *TableView) RowWidgetNs() (nWidgPerRow, idxOff int) {
-	nWidgPerRow = 1 + tv.Table.NumCols()
+	nWidgPerRow = 1 + tv.NCols
 	if !tv.IsInactive() {
 		nWidgPerRow += 2
 	}
@@ -170,7 +168,7 @@ func (tv *TableView) ConfigSliceGrid() {
 		return
 	}
 
-	_, sz := tv.SliceValueSize()
+	sz := tv.UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
@@ -213,6 +211,7 @@ func (tv *TableView) ConfigSliceGrid() {
 	sgf.SetStretchMaxHeight() // for this to work, ALL layers above need it too
 	sgf.SetStretchMaxWidth()  // for this to work, ALL layers above need it too
 	sgf.SetProp("columns", nWidgPerRow)
+	sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
 
 	// Configure Header
 	hcfg := kit.TypeAndNameList{}
@@ -271,15 +270,21 @@ func (tv *TableView) ConfigSliceGrid() {
 		})
 
 		var vv giv.ValueView
-		if col.NumDims() == 1 {
-			fval := 1.0
-			vv = giv.ToValueView(&fval, "")
-			vv.SetStandaloneValue(reflect.ValueOf(&fval))
+		if stsr, isstr := col.(*etensor.String); isstr {
+			vv = giv.ToValueView(&stsr.Values[0], "")
+			vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[0]))
 		} else {
-			// todo: subspace tensor rep..
-			fval := 1.0
-			vv = giv.ToValueView(&fval, "")
-			vv.SetStandaloneValue(reflect.ValueOf(&fval))
+			if col.NumDims() == 1 {
+				fval := 1.0
+				vv = giv.ToValueView(&fval, "")
+				vv.SetStandaloneValue(reflect.ValueOf(&fval))
+			} else {
+				cell := tv.Table.RowCell(fli, 0)
+				tvv := &TensorGridValueView{}
+				tvv.Init(tvv)
+				vv = tvv
+				vv.SetStandaloneValue(reflect.ValueOf(cell))
+			}
 		}
 		vtyp := vv.WidgetType()
 		valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
@@ -324,7 +329,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		sg.DeleteChildren(true)
 		return false
 	}
-	_, sz := tv.SliceValueSize()
+	sz := tv.UpdtSliceSize()
 	if sz == 0 {
 		sg.DeleteChildren(true)
 		return false
@@ -387,7 +392,7 @@ func (tv *TableView) UpdateSliceGrid() {
 	if tv.Table == nil {
 		return
 	}
-	_, sz := tv.SliceValueSize()
+	sz := tv.UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
@@ -457,18 +462,39 @@ func (tv *TableView) UpdateSliceGrid() {
 			col := tv.Table.Cols[fli]
 			// colnm := tv.Table.ColNames[fli]
 
-			// todo: add all the tensor stuff
 			vvi := i*tv.NCols + fli
 			var vv giv.ValueView
 			if tv.Values[vvi] == nil {
-				fval := col.FloatVal1D(si)
-				vv = giv.ToValueView(&fval, "")
-				vv.SetStandaloneValue(reflect.ValueOf(&fval))
+				if stsr, isstr := col.(*etensor.String); isstr {
+					vv = giv.ToValueView(&stsr.Values[i], "")
+					vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[i]))
+				} else {
+					if col.NumDims() == 1 {
+						fval := col.FloatVal1D(si)
+						vv = giv.ToValueView(&fval, "")
+						vv.SetStandaloneValue(reflect.ValueOf(&fval))
+					} else {
+						cell := tv.Table.RowCell(fli, 0)
+						tvv := &TensorGridValueView{}
+						tvv.Init(tvv)
+						vv = tvv
+						vv.SetStandaloneValue(reflect.ValueOf(cell))
+					}
+				}
 				tv.Values[vvi] = vv
 			} else {
-				fval := col.FloatVal1D(si)
 				vv = tv.Values[vvi]
-				vv.SetStandaloneValue(reflect.ValueOf(&fval))
+				if stsr, isstr := col.(*etensor.String); isstr {
+					vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[si]))
+				} else {
+					if col.NumDims() == 1 {
+						fval := col.FloatVal1D(si)
+						vv.SetStandaloneValue(reflect.ValueOf(&fval))
+					} else {
+						cell := tv.Table.RowCell(fli, si)
+						vv.SetStandaloneValue(reflect.ValueOf(cell))
+					}
+				}
 			}
 
 			vtyp := vv.WidgetType()
