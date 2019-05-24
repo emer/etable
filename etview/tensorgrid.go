@@ -48,7 +48,7 @@ func (td *TensorDisp) Defaults() {
 		td.Range.SetMax(1)
 	}
 	if td.GridMinSize.Val == 0 {
-		td.GridMinSize.Set(2, units.Px)
+		td.GridMinSize.Set(4, units.Px)
 	}
 	if td.GridMaxSize.Val == 0 {
 		td.GridMaxSize.Set(2, units.Em)
@@ -56,6 +56,12 @@ func (td *TensorDisp) Defaults() {
 	if td.TotPrefSize.Val == 0 {
 		td.TotPrefSize.Set(20, units.Em)
 	}
+}
+
+func (td *TensorDisp) ToDots(uc *units.Context) {
+	td.GridMinSize.ToDots(uc)
+	td.GridMaxSize.ToDots(uc)
+	td.TotPrefSize.ToDots(uc)
 }
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
@@ -145,18 +151,18 @@ func (tg *TensorGrid) ConnectEvents2D() {
 func (tg *TensorGrid) Style2D() {
 	tg.WidgetBase.Style2D()
 	tg.Disp.Defaults()
-	tg.Disp.GridMinSize.ToDots(&tg.Sty.UnContext)
-	tg.Disp.GridMaxSize.ToDots(&tg.Sty.UnContext)
-	tg.Disp.TotPrefSize.ToDots(&tg.Sty.UnContext)
+	tg.Disp.ToDots(&tg.Sty.UnContext)
 }
 
 func (tg *TensorGrid) Size2D(iter int) {
 	if iter > 0 {
 		return // already updated in previous iter, don't redo!
 	} else {
+		// todo: image
+
 		tg.InitLayout2D()
 		rows, cols := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
-
+		tg.Disp.ToDots(&tg.Sty.UnContext)
 		max := float32(ints.MaxInt(rows, cols))
 		gsz := tg.Disp.TotPrefSize.Dots / max
 		gsz = math32.Max(gsz, tg.Disp.GridMinSize.Dots)

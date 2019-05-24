@@ -146,8 +146,11 @@ func (vv *TensorValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 		tynm += " " + olbl
 	}
 	desc, _ := vv.Tag("desc")
-	dlg := TensorViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave}, recv, dlgFunc)
-	dlg.SetInactiveState(vv.This().(giv.ValueView).IsInactive())
+	_, inact := vv.Tag("inactive")
+	if vv.This().(giv.ValueView).IsInactive() {
+		inact = true
+	}
+	TensorViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
@@ -177,7 +180,7 @@ func (vv *TableValueView) UpdateWidget() {
 		opv := kit.OnePtrUnderlyingValue(vv.Value)
 		et := opv.Interface().(*etable.Table)
 		if et != nil {
-			if nm, has := et.MetaData["Name"]; has {
+			if nm, has := et.MetaData["name"]; has {
 				ac.SetText(nm)
 			} else {
 				ac.SetText("etable.Table")
@@ -216,7 +219,13 @@ func (vv *TableValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Rec
 	if olbl != "" {
 		tynm += " " + olbl
 	}
-	desc, _ := vv.Tag("desc")
-	dlg := TableViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave}, recv, dlgFunc)
-	dlg.SetInactiveState(vv.This().(giv.ValueView).IsInactive())
+	desc := et.MetaData["desc"]
+	if td, has := vv.Tag("desc"); has {
+		desc += " " + td
+	}
+	_, inact := et.MetaData["read-only"]
+	if vv.This().(giv.ValueView).IsInactive() {
+		inact = true
+	}
+	TableViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
 }

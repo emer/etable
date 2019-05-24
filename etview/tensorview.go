@@ -593,7 +593,7 @@ func (tv *TensorView) SliceDeleteAt(idx int, doupdt bool) {
 
 // ConfigToolbar configures the toolbar actions
 func (tv *TensorView) ConfigToolbar() {
-	if tv.Tensor == nil || tv.IsInactive() {
+	if tv.Tensor == nil {
 		return
 	}
 	if tv.ToolbarSlice == tv.Tensor {
@@ -602,17 +602,25 @@ func (tv *TensorView) ConfigToolbar() {
 	tb := tv.ToolBar()
 	if len(*tb.Children()) == 0 {
 		tb.SetStretchMaxWidth()
-		if !tv.NoAdd {
-			tb.AddAction(gi.ActOpts{Label: "Add", Icon: "plus"},
-				tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					tvv := recv.Embed(KiT_TensorView).(*TensorView)
-					tvv.SliceNewAt(-1)
-				})
-		}
+		tb.AddAction(gi.ActOpts{Label: "Updt", Icon: "update"},
+			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TensorView).(*TensorView)
+				tvv.Update()
+			})
+		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear"},
+			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TensorView).(*TensorView)
+				giv.StructViewDialog(tv.Viewport, &tvv.TsrLay, giv.DlgOpts{Title: "TensorView Display Options", Ok: true, Cancel: true},
+					tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+						tvvv := recv.Embed(KiT_TensorView).(*TensorView)
+						tvvv.UpdateSliceGrid()
+					})
+			})
 	}
+	nCustom := 2
 	sz := len(*tb.Children())
-	if sz > 1 {
-		for i := sz - 1; i >= 1; i-- {
+	if sz > nCustom {
+		for i := sz - 1; i >= nCustom; i-- {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}

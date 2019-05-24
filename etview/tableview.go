@@ -778,7 +778,7 @@ func (tv *TableView) TensorDispAction(fldIdx int) {
 
 // ConfigToolbar configures the toolbar actions
 func (tv *TableView) ConfigToolbar() {
-	if tv.Table == nil || tv.IsInactive() {
+	if tv.Table == nil {
 		return
 	}
 	if tv.ToolbarSlice == tv.Table {
