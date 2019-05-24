@@ -130,7 +130,11 @@ type Tensor interface {
 	// will affect both), as its Values slice is a view onto the original (which
 	// is why only inner-most contiguous supsaces are supported).
 	// Use Clone() method to separate the two.
-	SubSpace(subdim int, offs []int) (Tensor, error)
+	SubSpace(subdim int, offs []int) Tensor
+
+	// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+	// do not match the tensor Shape.
+	SubSpaceTry(subdim int, offs []int) (Tensor, error)
 
 	// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 	// This is needed for display and is thus in the core api in optimized form

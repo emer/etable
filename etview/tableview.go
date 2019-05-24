@@ -272,14 +272,14 @@ func (tv *TableView) ConfigSliceGrid() {
 		var vv giv.ValueView
 		if stsr, isstr := col.(*etensor.String); isstr {
 			vv = giv.ToValueView(&stsr.Values[0], "")
-			vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[0]))
+			vv.SetSliceValue(reflect.ValueOf(&stsr.Values[0]), stsr.Values, 0, tv.TmpSave)
 		} else {
 			if col.NumDims() == 1 {
 				fval := 1.0
 				vv = giv.ToValueView(&fval, "")
 				vv.SetStandaloneValue(reflect.ValueOf(&fval))
 			} else {
-				cell := tv.Table.RowCell(fli, 0)
+				cell := tv.Table.CellTensor(fli, 0)
 				tvv := &TensorGridValueView{}
 				tvv.Init(tvv)
 				vv = tvv
@@ -467,14 +467,14 @@ func (tv *TableView) UpdateSliceGrid() {
 			if tv.Values[vvi] == nil {
 				if stsr, isstr := col.(*etensor.String); isstr {
 					vv = giv.ToValueView(&stsr.Values[i], "")
-					vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[i]))
+					vv.SetSliceValue(reflect.ValueOf(&stsr.Values[si]), stsr.Values, si, tv.TmpSave)
 				} else {
 					if col.NumDims() == 1 {
 						fval := col.FloatVal1D(si)
 						vv = giv.ToValueView(&fval, "")
 						vv.SetStandaloneValue(reflect.ValueOf(&fval))
 					} else {
-						cell := tv.Table.RowCell(fli, 0)
+						cell := tv.Table.CellTensor(fli, 0)
 						tvv := &TensorGridValueView{}
 						tvv.Init(tvv)
 						vv = tvv
@@ -491,7 +491,7 @@ func (tv *TableView) UpdateSliceGrid() {
 						fval := col.FloatVal1D(si)
 						vv.SetStandaloneValue(reflect.ValueOf(&fval))
 					} else {
-						cell := tv.Table.RowCell(fli, si)
+						cell := tv.Table.CellTensor(fli, si)
 						vv.SetStandaloneValue(reflect.ValueOf(cell))
 					}
 				}

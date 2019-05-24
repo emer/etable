@@ -6,6 +6,7 @@ package etable
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
@@ -38,69 +39,6 @@ func (dt *Table) NumCols() int {
 // Col returns the tensor at given column index
 func (dt *Table) Col(i int) etensor.Tensor {
 	return dt.Cols[i]
-}
-
-// RowCell returns the tensor SubSpace for given column, row index
-// for columns that have higher-dimensional tensors so each row is
-// represented by an n-1 dimensional tensor, with the outer dimension
-// being the row number.  Returns nil if column is a 1-dimensional
-// tensor or there is any error from the etensor.Tensor.SubSpace call.
-func (dt *Table) RowCell(col, row int) etensor.Tensor {
-	ct := dt.Cols[col]
-	if ct.NumDims() == 1 {
-		return nil
-	}
-	cell, _ := ct.SubSpace(ct.NumDims()-1, []int{row})
-	return cell
-}
-
-// RowCellByName returns the tensor SubSpace for given column (by name), row index
-// for columns that have higher-dimensional tensors so each row is
-// represented by an n-1 dimensional tensor, with the outer dimension
-// being the row number.  Returns nil on any error -- see Try version for
-// error returns.
-func (dt *Table) RowCellByName(colNm string, row int) etensor.Tensor {
-	ct := dt.ColByName(colNm)
-	if ct == nil {
-		return nil
-	}
-	if ct.NumDims() == 1 {
-		return nil
-	}
-	cell, _ := ct.SubSpace(ct.NumDims()-1, []int{row})
-	return cell
-}
-
-// RowCellByNameTry returns the tensor SubSpace for given column (by name), row index
-// for columns that have higher-dimensional tensors so each row is
-// represented by an n-1 dimensional tensor, with the outer dimension
-// being the row number.  Returns an error if column is a 1-dimensional
-// tensor or any error from the etensor.Tensor.SubSpace call.
-func (dt *Table) RowCellByNameTry(colNm string, row int) (etensor.Tensor, error) {
-	ct, err := dt.ColByNameTry(colNm)
-	if err != nil {
-		return nil, err
-	}
-	if ct.NumDims() == 1 {
-		return nil, fmt.Errorf("etable.Table: RowCell called on column named: %v which is 1-dimensional", colNm)
-	}
-	return ct.SubSpace(ct.NumDims()-1, []int{row})
-}
-
-// Schema returns the Schema (column properties) for this table
-func (dt *Table) Schema() Schema {
-	nc := dt.NumCols()
-	sc := make(Schema, nc)
-	for i := range dt.Cols {
-		cl := &sc[i]
-		tsr := dt.Cols[i]
-		cl.Name = dt.ColNames[i]
-		//cl.Type = etensor.Type(tsr.DataType().ID())
-		cl.Type = etensor.Type(tsr.DataType())
-		cl.CellShape = tsr.Shapes()[1:]
-		cl.DimNames = tsr.DimNames()[1:]
-	}
-	return sc
 }
 
 // ColNameIndex returns the index of the given column name, along with an error if not found
@@ -205,6 +143,147 @@ func New(sc Schema, rows int) *Table {
 	dt := &Table{}
 	dt.SetFromSchema(sc, rows)
 	return dt
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//  Cell convenience access methods
+
+// CellFloat returns the float64 value of cell at given column, row index
+// for columns that have 1-dimensional tensors.
+// Returns NaN if column is not a 1-dimensional tensor.
+func (dt *Table) CellFloat(col, row int) float64 {
+	ct := dt.Cols[col]
+	if ct.NumDims() != 1 {
+		return math.NaN()
+	}
+	return ct.FloatVal1D(row)
+}
+
+// CellFloatByName returns the float64 value of cell at given column (by name), row index
+// for columns that have 1-dimensional tensors.
+// Returns NaN if column is not a 1-dimensional tensor or col name not found.
+func (dt *Table) CellFloatByName(colNm string, row int) float64 {
+	ct := dt.ColByName(colNm)
+	if ct == nil {
+		return math.NaN()
+	}
+	if ct.NumDims() != 1 {
+		return math.NaN()
+	}
+	return ct.FloatVal1D(row)
+}
+
+// CellFloatByNameTry returns the float64 value of cell at given column (by name), row index
+// for columns that have 1-dimensional tensors.
+// Returns an error if column not found, or column is not a 1-dimensional tensor.
+func (dt *Table) CellFloatByNameTry(colNm string, row int) (float64, error) {
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return math.NaN(), err
+	}
+	if ct.NumDims() != 1 {
+		return math.NaN(), fmt.Errorf("etable.Table: CellFloatByNameTry called on column named: %v which is not 1-dimensional", colNm)
+	}
+	return ct.FloatVal1D(row), nil
+}
+
+// CellString returns the string value of cell at given column, row index
+// for columns that have 1-dimensional tensors.
+// Returns NaN if column is not a 1-dimensional tensor.
+func (dt *Table) CellString(col, row int) string {
+	ct := dt.Cols[col]
+	if ct.NumDims() != 1 {
+		return ""
+	}
+	return ct.StringVal1D(row)
+}
+
+// CellStringByName returns the string value of cell at given column (by name), row index
+// for columns that have 1-dimensional tensors.
+func (dt *Table) CellStringByName(colNm string, row int) string {
+	ct := dt.ColByName(colNm)
+	if ct == nil {
+		return ""
+	}
+	if ct.NumDims() != 1 {
+		return ""
+	}
+	return ct.StringVal1D(row)
+}
+
+// CellStringByNameTry returns the string value of cell at given column (by name), row index
+// for columns that have 1-dimensional tensors.
+// Returns an error if column not found, or column is not a 1-dimensional tensor.
+func (dt *Table) CellStringByNameTry(colNm string, row int) (string, error) {
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return "", err
+	}
+	if ct.NumDims() != 1 {
+		return "", fmt.Errorf("etable.Table: CellStringByNameTry called on column named: %v which is not 1-dimensional", colNm)
+	}
+	return ct.StringVal1D(row), nil
+}
+
+// CellTensor returns the tensor SubSpace for given column, row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns nil if column is a 1-dimensional
+// tensor or there is any error from the etensor.Tensor.SubSpace call.
+func (dt *Table) CellTensor(col, row int) etensor.Tensor {
+	ct := dt.Cols[col]
+	if ct.NumDims() == 1 {
+		return nil
+	}
+	return ct.SubSpace(ct.NumDims()-1, []int{row})
+}
+
+// CellTensorByName returns the tensor SubSpace for given column (by name), row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns nil on any error -- see Try version for
+// error returns.
+func (dt *Table) CellTensorByName(colNm string, row int) etensor.Tensor {
+	ct := dt.ColByName(colNm)
+	if ct == nil {
+		return nil
+	}
+	if ct.NumDims() == 1 {
+		return nil
+	}
+	return ct.SubSpace(ct.NumDims()-1, []int{row})
+}
+
+// CellTensorByNameTry returns the tensor SubSpace for given column (by name), row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns an error if column is a 1-dimensional
+// tensor or any error from the etensor.Tensor.SubSpace call.
+func (dt *Table) CellTensorByNameTry(colNm string, row int) (etensor.Tensor, error) {
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return nil, err
+	}
+	if ct.NumDims() == 1 {
+		return nil, fmt.Errorf("etable.Table: CellTensorByNameTry called on column named: %v which is 1-dimensional", colNm)
+	}
+	return ct.SubSpaceTry(ct.NumDims()-1, []int{row})
+}
+
+// Schema returns the Schema (column properties) for this table
+func (dt *Table) Schema() Schema {
+	nc := dt.NumCols()
+	sc := make(Schema, nc)
+	for i := range dt.Cols {
+		cl := &sc[i]
+		tsr := dt.Cols[i]
+		cl.Name = dt.ColNames[i]
+		//cl.Type = etensor.Type(tsr.DataType().ID())
+		cl.Type = etensor.Type(tsr.DataType())
+		cl.CellShape = tsr.Shapes()[1:]
+		cl.DimNames = tsr.DimNames()[1:]
+	}
+	return sc
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

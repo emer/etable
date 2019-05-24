@@ -249,7 +249,14 @@ func (tsr *Int64) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int64) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Int64) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Int64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -611,7 +618,14 @@ func (tsr *Uint64) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint64) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Uint64) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Uint64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -973,7 +987,14 @@ func (tsr *Float64) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Float64) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Float64) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Float64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -1335,7 +1356,14 @@ func (tsr *Int32) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int32) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Int32) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Int32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -1697,7 +1725,14 @@ func (tsr *Uint32) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint32) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Uint32) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Uint32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -2059,7 +2094,14 @@ func (tsr *Float32) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Float32) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Float32) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Float32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -2421,7 +2463,14 @@ func (tsr *Int16) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int16) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Int16) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Int16) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -2783,7 +2832,14 @@ func (tsr *Uint16) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint16) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Uint16) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Uint16) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -3145,7 +3201,14 @@ func (tsr *Int8) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int8) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Int8) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Int8) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {
@@ -3507,7 +3570,14 @@ func (tsr *Uint8) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint8) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Uint8) SubSpace(subdim int, offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(subdim, offs)
+	return ss
+}
+
+// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
+// do not match the tensor Shape.
+func (tsr *Uint8) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := nd - subdim
 	if od <= 0 {

@@ -131,7 +131,12 @@ func (tsr *Bits) SetString1D(off int, val string) {
 }
 
 // SubSpace is not applicable to Bits tensor
-func (tsr *Bits) SubSpace(subdim int, offs []int) (Tensor, error) {
+func (tsr *Bits) SubSpace(subdim int, offs []int) Tensor {
+	return nil
+}
+
+// SubSpaceTry is not applicable to Bits tensor
+func (tsr *Bits) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 	return nil, errors.New("etensor.Bits does not support SubSpace")
 }
 
