@@ -27,6 +27,8 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	if opts.Inactive {
 		sv.SetInactive()
 	}
+	sv.NoAdd = opts.NoAdd
+	sv.NoDelete = opts.NoDelete
 	sv.SetTensor(tsr, opts.TmpSave)
 
 	if recv != nil && dlgFunc != nil {
@@ -55,6 +57,8 @@ func TableViewDialog(avp *gi.Viewport2D, et *etable.Table, opts giv.DlgOpts, rec
 	if opts.Inactive {
 		sv.SetInactive()
 	}
+	sv.NoAdd = opts.NoAdd
+	sv.NoDelete = opts.NoDelete
 	sv.SetTable(et, opts.TmpSave)
 
 	if recv != nil && dlgFunc != nil {

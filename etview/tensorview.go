@@ -13,6 +13,7 @@ import (
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
+	"github.com/goki/gi/oswin/mimedata"
 	"github.com/goki/gi/units"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
@@ -24,7 +25,7 @@ import (
 type TensorView struct {
 	giv.SliceViewBase
 	Tensor etensor.Tensor `desc:"the tensor that we're a view of"`
-	OddCol bool           `desc:"even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddCol = false = organize vertically along row dimension, true = organize horizontally across column dimension"`
+	TsrLay TensorLayout   `desc:"layout config of the tensor"`
 	NCols  int            `inactive:"+" desc:"number of columns in table (as of last update)"`
 }
 
@@ -104,7 +105,7 @@ func (tv *TensorView) Config() {
 }
 
 func (tv *TensorView) UpdtSliceSize() int {
-	tv.SliceSize, tv.NCols = etensor.Prjn2DShape(tv.Tensor, !tv.OddCol)
+	tv.SliceSize, tv.NCols = etensor.Prjn2DShape(tv.Tensor, tv.TsrLay.OddRow)
 	return tv.SliceSize
 }
 
@@ -144,7 +145,12 @@ func (tv *TensorView) ToolBar() *gi.ToolBar {
 func (tv *TensorView) RowWidgetNs() (nWidgPerRow, idxOff int) {
 	nWidgPerRow = 1 + tv.NCols
 	if !tv.IsInactive() {
-		nWidgPerRow += 2
+		if !tv.NoAdd {
+			nWidgPerRow += 1
+		}
+		if !tv.NoDelete {
+			nWidgPerRow += 1
+		}
 	}
 	idxOff = 1
 	if !tv.ShowIndex {
@@ -258,22 +264,27 @@ func (tv *TensorView) ConfigSliceGrid() {
 	}
 
 	if !tv.IsInactive() {
-		lbl := sgh.Child(tv.NCols + idxOff).(*gi.Label)
-		lbl.Text = "+"
-		lbl.Tooltip = "insert row"
-		lbl = sgh.Child(tv.NCols + idxOff + 1).(*gi.Label)
-		lbl.Text = "-"
-		lbl.Tooltip = "delete row"
-
-		addnm := fmt.Sprintf("add-%v", itxt)
-		delnm := fmt.Sprintf("del-%v", itxt)
-		addact := gi.Action{}
-		delact := gi.Action{}
-		sgf.SetChild(&addact, idxOff+tv.NCols, addnm)
-		sgf.SetChild(&delact, idxOff+1+tv.NCols, delnm)
-
-		addact.SetIcon("plus")
-		delact.SetIcon("minus")
+		cidx := tv.NCols + idxOff
+		if !tv.NoAdd {
+			lbl := sgh.Child(cidx).(*gi.Label)
+			lbl.Text = "+"
+			lbl.Tooltip = "insert row"
+			addnm := fmt.Sprintf("add-%v", itxt)
+			addact := gi.Action{}
+			sgf.SetChild(&addact, cidx, addnm)
+			addact.SetIcon("plus")
+			cidx++
+		}
+		if !tv.NoDelete {
+			lbl := sgh.Child(cidx).(*gi.Label)
+			lbl.Text = "-"
+			lbl.Tooltip = "delete row"
+			delnm := fmt.Sprintf("del-%v", itxt)
+			delact := gi.Action{}
+			sgf.SetChild(&delact, cidx, delnm)
+			delact.SetIcon("minus")
+			cidx++
+		}
 	}
 
 	tv.ConfigScroll()
@@ -321,24 +332,25 @@ func (tv *TensorView) LayoutSliceGrid() bool {
 
 // LayoutHeader updates the header layout based on field widths
 func (tv *TensorView) LayoutHeader() {
-	_, idxOff := tv.RowWidgetNs()
+	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nfld := tv.NCols + idxOff
 	sgh := tv.SliceHeader()
 	sgf := tv.SliceGrid()
+	spc := sgf.Spacing.Dots
 	if len(sgf.Kids) >= nfld {
 		sumwd := float32(0)
 		for fli := 0; fli < nfld; fli++ {
 			lbl := sgh.Child(fli).(gi.Node2D).AsWidget()
 			wd := sgf.GridData[gi.Col][fli].AllocSize
-			lbl.SetMinPrefWidth(units.NewValue(wd-sgf.Spacing.Dots, units.Dot))
-			sumwd += wd
+			lbl.SetMinPrefWidth(units.NewValue(wd+spc, units.Dot))
+			sumwd += wd + spc
 		}
 		if !tv.IsInactive() {
-			for fli := nfld; fli < nfld+2; fli++ {
+			for fli := nfld; fli < nWidgPerRow; fli++ {
 				lbl := sgh.Child(fli).(gi.Node2D).AsWidget()
 				wd := sgf.GridData[gi.Col][fli].AllocSize
-				lbl.SetMinPrefWidth(units.NewValue(wd-sgf.Spacing.Dots, units.Dot))
-				sumwd += wd
+				lbl.SetMinPrefWidth(units.NewValue(wd+spc, units.Dot))
+				sumwd += wd + spc
 			}
 		}
 		sgh.SetMinPrefWidth(units.NewValue(sumwd, units.Dot))
@@ -386,6 +398,9 @@ func (tv *TensorView) UpdateSliceGrid() {
 	for i := 0; i < tv.DispRows; i++ {
 		ridx := i * nWidgPerRow
 		si := tv.StartIdx + i // slice idx
+		if !tv.TsrLay.TopZero {
+			si = (tv.SliceSize - 1) - si
+		}
 		issel := tv.IdxIsSelected(si)
 
 		itxt := fmt.Sprintf("%05d", i)
@@ -417,13 +432,15 @@ func (tv *TensorView) UpdateSliceGrid() {
 		}
 
 		for fli := 0; fli < tv.NCols; fli++ {
-			fval := etensor.Prjn2DVal(tv.Tensor, !tv.OddCol, i, fli)
+			fval := etensor.Prjn2DVal(tv.Tensor, tv.TsrLay.OddRow, si, fli)
 			vvi := i*tv.NCols + fli
 			var vv giv.ValueView
 			if tv.Values[vvi] == nil {
 				vv = giv.ToValueView(&fval, "")
 				vv.SetStandaloneValue(reflect.ValueOf(&fval))
 				tv.Values[vvi] = vv
+				vv.SetProp("tv-row", i)
+				vv.SetProp("tv-col", fli)
 			} else {
 				vv = tv.Values[vvi]
 				vv.SetStandaloneValue(reflect.ValueOf(&fval))
@@ -463,43 +480,58 @@ func (tv *TensorView) UpdateSliceGrid() {
 					widg.AsNode2D().SetInactive()
 				} else {
 					vvb := vv.AsValueViewBase()
-					vvb.ViewSig.ConnectOnly(tv.This(), // todo: do we need this?
-						func(recv, send ki.Ki, sig int64, data interface{}) {
-							tvv, _ := recv.Embed(KiT_TensorView).(*TensorView)
-							tvv.SetChanged()
-						})
+					vvb.ViewSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+						tvv, _ := recv.Embed(KiT_TensorView).(*TensorView)
+						tvv.SetChanged()
+						vvv := send.(giv.ValueView).AsValueViewBase()
+						row := vvv.Prop("tv-row").(int)
+						col := vvv.Prop("tv-col").(int)
+						npv := kit.NonPtrValue(vvv.Value)
+						fv, ok := kit.ToFloat(npv.Interface())
+						if ok {
+							etensor.Prjn2DSet(tv.Tensor, tv.TsrLay.OddRow, tvv.StartIdx+row, col, fv)
+							tvv.ViewSig.Emit(tvv.This(), 0, nil)
+						}
+					})
 				}
 			}
 		}
 
 		if !tv.IsInactive() {
-			cidx := ridx + 1 + tv.NCols
-			if sg.Kids[cidx] == nil {
-				addnm := fmt.Sprintf("add-%v", itxt)
-				delnm := fmt.Sprintf("del-%v", itxt)
-				addact := gi.Action{}
-				delact := gi.Action{}
-				sg.SetChild(&addact, cidx, addnm)
-				sg.SetChild(&delact, cidx+1, delnm)
-
-				addact.SetIcon("plus")
-				addact.Tooltip = "insert a new element at this index"
-				addact.Data = i
-				addact.Sty.Template = "ViewView.AddAction"
-				addact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					act := send.(*gi.Action)
-					tvv := recv.Embed(KiT_TensorView).(*TensorView)
-					tvv.SliceNewAtRow(act.Data.(int) + 1)
-				})
-				delact.SetIcon("minus")
-				delact.Tooltip = "delete this element"
-				delact.Data = i
-				delact.Sty.Template = "View.DelAction"
-				delact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					act := send.(*gi.Action)
-					tvv := recv.Embed(KiT_TensorView).(*TensorView)
-					tvv.SliceDeleteAtRow(act.Data.(int), true)
-				})
+			cidx := ridx + tv.NCols + idxOff
+			if !tv.NoAdd {
+				if sg.Kids[cidx] == nil {
+					addnm := fmt.Sprintf("add-%v", itxt)
+					addact := gi.Action{}
+					sg.SetChild(&addact, cidx, addnm)
+					addact.SetIcon("plus")
+					addact.Tooltip = "insert a new element at this index"
+					addact.Data = i
+					addact.Sty.Template = "etview.TensorView.AddAction"
+					addact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+						act := send.(*gi.Action)
+						tvv := recv.Embed(KiT_TableView).(*TableView)
+						tvv.SliceNewAtRow(act.Data.(int) + 1)
+					})
+				}
+				cidx++
+			}
+			if !tv.NoDelete {
+				if sg.Kids[cidx] == nil {
+					delnm := fmt.Sprintf("del-%v", itxt)
+					delact := gi.Action{}
+					sg.SetChild(&delact, cidx, delnm)
+					delact.SetIcon("minus")
+					delact.Tooltip = "delete this element"
+					delact.Data = i
+					delact.Sty.Template = "etview.TensorView.DelAction"
+					delact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+						act := send.(*gi.Action)
+						tvv := recv.Embed(KiT_TableView).(*TableView)
+						tvv.SliceDeleteAtRow(act.Data.(int), true)
+					})
+				}
+				cidx++
 			}
 		}
 	}
@@ -564,17 +596,19 @@ func (tv *TensorView) ConfigToolbar() {
 	if tv.Tensor == nil || tv.IsInactive() {
 		return
 	}
-	if tv.ToolbarSlice == tv.Slice {
+	if tv.ToolbarSlice == tv.Tensor {
 		return
 	}
 	tb := tv.ToolBar()
 	if len(*tb.Children()) == 0 {
 		tb.SetStretchMaxWidth()
-		tb.AddAction(gi.ActOpts{Label: "Add", Icon: "plus"},
-			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TensorView).(*TensorView)
-				tvv.SliceNewAt(-1)
-			})
+		if !tv.NoAdd {
+			tb.AddAction(gi.ActOpts{Label: "Add", Icon: "plus"},
+				tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+					tvv := recv.Embed(KiT_TensorView).(*TensorView)
+					tvv.SliceNewAt(-1)
+				})
+		}
 	}
 	sz := len(*tb.Children())
 	if sz > 1 {
@@ -585,7 +619,7 @@ func (tv *TensorView) ConfigToolbar() {
 	if giv.HasToolBarView(tv.Slice) {
 		giv.ToolBarView(tv.Slice, tv.Viewport, tb)
 	}
-	tv.ToolbarSlice = tv.Slice
+	tv.ToolbarSlice = tv.Tensor
 }
 
 func (tv *TensorView) Layout2D(parBBox image.Rectangle, iter int) bool {
@@ -675,6 +709,24 @@ func (tv *TensorView) SelectRowWidgets(row int, sel bool) {
 			widg.UpdateSig()
 		}
 	}
+}
+
+// CopySelToMime copies selected rows to mime data
+func (tv *TensorView) CopySelToMime() mimedata.Mimes {
+	return nil
+}
+
+// PasteAssign assigns mime data (only the first one!) to this idx
+func (tv *TensorView) PasteAssign(md mimedata.Mimes, idx int) {
+	// todo
+}
+
+// PasteAtIdx inserts object(s) from mime data at (before) given slice index
+func (tv *TensorView) PasteAtIdx(md mimedata.Mimes, idx int) {
+	// todo
+}
+
+func (tv *TensorView) ItemCtxtMenu(idx int) {
 }
 
 // // SelectFieldVal sets SelField and SelVal and attempts to find corresponding

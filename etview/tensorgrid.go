@@ -107,7 +107,17 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
 
 // OpenTensorView pulls up a TensorView of our tensor
 func (tg *TensorGrid) OpenTensorView() {
-	TensorViewDialog(tg.Viewport, tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: ""}, nil, nil)
+	dlg := TensorViewDialog(tg.Viewport, tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
+	tvk := dlg.Frame().ChildByType(KiT_TensorView, true, 2)
+	if tvk != nil {
+		tv := tvk.(*TensorView)
+		tv.TsrLay = tg.Disp.TensorLayout
+		tv.SetInactiveState(tg.IsInactive())
+		tv.ViewSig.Connect(tg.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+			tgg, _ := recv.Embed(KiT_TensorGrid).(*TensorGrid)
+			tgg.UpdateSig()
+		})
+	}
 }
 
 // MouseEvent handles button MouseEvent
@@ -118,7 +128,7 @@ func (tg *TensorGrid) MouseEvent() {
 		if me.Button == mouse.Left {
 			switch me.Action {
 			case mouse.DoubleClick:
-				giv.StructViewDialog(tgv.Viewport, &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options"}, nil, nil)
+				giv.StructViewDialog(tgv.Viewport, &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
 			case mouse.Press:
 				me.SetProcessed()
 				tgv.OpenTensorView()

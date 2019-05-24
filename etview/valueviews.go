@@ -143,7 +143,7 @@ func (vv *TensorValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 	tynm := "etensor.Tensor"
 	olbl := vv.OwnerLabel()
 	if olbl != "" {
-		tynm += ": " + olbl
+		tynm += " " + olbl
 	}
 	desc, _ := vv.Tag("desc")
 	dlg := TensorViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave}, recv, dlgFunc)
@@ -214,7 +214,7 @@ func (vv *TableValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Rec
 	tynm := "etable.Table"
 	olbl := vv.OwnerLabel()
 	if olbl != "" {
-		tynm += ": " + olbl
+		tynm += " " + olbl
 	}
 	desc, _ := vv.Tag("desc")
 	dlg := TableViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave}, recv, dlgFunc)
