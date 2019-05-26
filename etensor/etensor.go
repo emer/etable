@@ -78,14 +78,35 @@ type Tensor interface {
 	// is in the order of the indexes used to access this memory.
 	IsColMajor() bool
 
-	// RowCellSize returns the size of the outer-most Row shape dimension, and the size of all the
-	// remaining inner dimensions (the "cell" size) -- e.g., for Tensors that are columns in a
-	// data table. Only valid for RowMajor organization.
+	// RowCellSize returns the size of the outer-most Row shape dimension,
+	// and the size of all the remaining inner dimensions (the "cell" size)
+	// e.g., for Tensors that are columns in a data table.
+	// Only valid for RowMajor organization.
 	RowCellSize() (rows, cells int)
 
-	// Offset returns the flat 1D array / slice index into an element at the given n-dimensional index.
-	// No checking is done on the length or size of the index values relative to the shape of the tensor.
+	// Offset returns the flat 1D array / slice index into an element
+	// at the given n-dimensional index.
+	// No checking is done on the length or size of the index values
+	// relative to the shape of the tensor.
 	Offset(i []int) int
+
+	// IsNull returns true if the given index has been flagged as a Null
+	// (undefined, not present) value
+	IsNull(i []int) bool
+
+	// IsNull1D returns true if the given 1-dimensional index has been flagged as a Null
+	// (undefined, not present) value
+	IsNull1D(i int) bool
+
+	// SetNull sets whether given index has a null value or not.
+	// All values are assumed valid (non-Null) until marked otherwise, and calling
+	// this method creates a Null bitslice map if one has not already been set yet.
+	SetNull(i []int, nul bool)
+
+	// SetNull1D sets whether given 1-dimensional index has a null value or not.
+	// All values are assumed valid (non-Null) until marked otherwise, and calling
+	// this method creates a Null bitslice map if one has not already been set yet.
+	SetNull1D(i int, nul bool)
 
 	// Generic accessor routines support Float (float64) or String, either full dimensional or 1D
 
@@ -102,10 +123,10 @@ type Tensor interface {
 	SetString(i []int, val string)
 
 	// FloatVal1D returns the value of given 1-dimensional index (0-Len()-1) as a float64
-	FloatVal1D(off int) float64
+	FloatVal1D(i int) float64
 
 	// SetFloat1D sets the value of given 1-dimensional index (0-Len()-1) as a float64
-	SetFloat1D(off int, val float64)
+	SetFloat1D(i int, val float64)
 
 	// Floats1D returns a flat []float64 slice of all elements in the tensor
 	// For Float64 tensor type, this directly returns its underlying Values
@@ -114,10 +135,10 @@ type Tensor interface {
 	Floats1D() []float64
 
 	// StringVal1D returns the value of given 1-dimensional index (0-Len()-1) as a string
-	StringVal1D(off int) string
+	StringVal1D(i int) string
 
 	// SetString1D sets the value of given 1-dimensional index (0-Len()-1) as a string
-	SetString1D(off int, val string)
+	SetString1D(i int, val string)
 
 	// SubSpace returns a new tensor as a subspace of the current one, incorporating the
 	// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
@@ -144,7 +165,7 @@ type Tensor interface {
 	// AggFunc applies given aggregation function to each element in the tensor, using float64
 	// conversions of the values.  init is the initial value for the agg variable.  returns final
 	// aggregate value
-	AggFunc(fun func(val float64, agg float64) float64, init float64) float64
+	AggFunc(ini float64, fun func(val float64, agg float64) float64) float64
 
 	// EvalFunc applies given function to each element in the tensor, using float64
 	// conversions of the values, and puts the results into given float64 slice, which is
@@ -158,9 +179,22 @@ type Tensor interface {
 	// SetZeros is simple convenience function initialize all values to 0
 	SetZeros()
 
-	// CloneTensor clones this tensor returning a Tensor interface.
-	// There is a type-specific Clone() method as well for each tensor.
-	CloneTensor() Tensor
+	// Clone clones this tensor, creating a duplicate copy of itself with its
+	// own separate memory representation of all the values, and returns
+	// that as a Tensor (which can be converted into the known type as needed).
+	Clone() Tensor
+
+	// CopyFrom copies all avail values from other tensor into this tensor, with an
+	// optimized implementation if the other tensor is of the same type, and
+	// otherwise it goes through appropriate standard type.
+	CopyFrom(from Tensor)
+
+	// CopyCellsFrom copies given range of values from other tensor into this tensor,
+	// using flat 1D indexes: to = starting index in this Tensor to start copying into,
+	// start = starting index on from Tensor to start copying from, and n = number of
+	// values to copy.  Uses an optimized implementation if the other tensor is
+	// of the same type, and otherwise it goes through appropriate standard type.
+	CopyCellsFrom(from Tensor, to, start, n int)
 
 	// SetShape sets the shape parameters of the tensor, and resizes backing storage appropriately.
 	// existing RowMajor or ColMajor stride preference will be used if strides is nil, and
@@ -176,5 +210,5 @@ type Tensor interface {
 	SetNumRows(rows int)
 }
 
-// Check impl
+// Check for interface implementation
 var _ Tensor = (*Float32)(nil)

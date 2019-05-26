@@ -9,9 +9,9 @@ import (
 
 var _ = errors.New("dummy error")
 
-const _Type_name = "NULLBOOlUINT8INT8UINT16INT16UINT32INT32UINT64INT64FLOAT16FLOAT32FLOAT64STRING"
+const _Type_name = "NULLBOOlUINT8INT8UINT16INT16UINT32INT32UINT64INT64FLOAT16FLOAT32FLOAT64STRINGCOMPLEX64COMPLEX128"
 
-var _Type_index = [...]uint8{0, 4, 8, 13, 17, 23, 28, 34, 39, 45, 50, 57, 64, 71, 77}
+var _Type_index = [...]uint8{0, 4, 8, 13, 17, 23, 28, 34, 39, 45, 50, 57, 64, 71, 77, 86, 96}
 
 func (i Type) String() string {
 	if i < 0 || i >= Type(len(_Type_index)-1) {

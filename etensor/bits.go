@@ -63,9 +63,11 @@ func (tsr *Bits) Value1D(i int) bool { return tsr.Values.Index(i) }
 
 func (tsr *Bits) Set(i []int, val bool) { j := int(tsr.Offset(i)); tsr.Values.Set(j, val) }
 
-func (tsr *Bits) IsNull(i []int) bool { return false }
-
+// Null not supported for bits
+func (tsr *Bits) IsNull(i []int) bool       { return false }
+func (tsr *Bits) IsNull1D(i int) bool       { return false }
 func (tsr *Bits) SetNull(i []int, nul bool) {}
+func (tsr *Bits) SetNull1D(i int, nul bool) {}
 
 func Float64ToBool(val float64) bool {
 	bv := true
@@ -150,7 +152,7 @@ func (tsr *Bits) Range() (min, max float64, minIdx, maxIdx int) {
 // AggFunc applies given aggregation function to each element in the tensor, using float64
 // conversions of the values.  init is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *Bits) AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
+func (tsr *Bits) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
@@ -192,18 +194,45 @@ func (tsr *Bits) SetZeros() {
 	}
 }
 
-// Clone creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *Bits) Clone() *Bits {
+// Clone clones this tensor, creating a duplicate copy of itself with its
+// own separate memory representation of all the values, and returns
+// that as a Tensor (which can be converted into the known type as needed).
+func (tsr *Bits) Clone() Tensor {
 	csr := NewBitsShape(&tsr.Shape)
 	csr.Values = tsr.Values.Clone()
 	return csr
 }
 
-// CloneTensor creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *Bits) CloneTensor() Tensor {
-	return tsr.Clone()
+// CopyFrom copies all avail values from other tensor into this tensor, with an
+// optimized implementation if the other tensor is of the same type, and
+// otherwise it goes through appropriate standard type.
+// Copies Null state as well if present.
+func (tsr *Bits) CopyFrom(frm Tensor) {
+	if fsm, ok := frm.(*Bits); ok {
+		copy(tsr.Values, fsm.Values)
+		return
+	}
+	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	for i := 0; i < sz; i++ {
+		tsr.Values.Set(i, Float64ToBool(frm.FloatVal1D(i)))
+	}
+}
+
+// CopyCellsFrom copies given range of values from other tensor into this tensor,
+// using flat 1D indexes: to = starting index in this Tensor to start copying into,
+// start = starting index on from Tensor to start copying from, and n = number of
+// values to copy.  Uses an optimized implementation if the other tensor is
+// of the same type, and otherwise it goes through appropriate standard type.
+func (tsr *Bits) CopyCellsFrom(frm Tensor, to, start, n int) {
+	if fsm, ok := frm.(*Bits); ok {
+		for i := 0; i < n; i++ {
+			tsr.Values.Set(to+i, fsm.Values.Index(start+i))
+		}
+		return
+	}
+	for i := 0; i < n; i++ {
+		tsr.Values.Set(to+i, Float64ToBool(frm.FloatVal1D(start+i)))
+	}
 }
 
 // SetShape sets the shape params, resizing backing storage appropriately

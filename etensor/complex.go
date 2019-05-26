@@ -69,12 +69,27 @@ func (tsr *Complex64) IsNull(i []int) bool {
 	j := tsr.Offset(i)
 	return tsr.Nulls.Index(j)
 }
+
+func (tsr *Complex64) IsNull1D(i int) bool {
+	if tsr.Nulls == nil {
+		return false
+	}
+	return tsr.Nulls.Index(i)
+}
+
 func (tsr *Complex64) SetNull(i []int, nul bool) {
 	if tsr.Nulls == nil {
 		tsr.Nulls = bitslice.Make(tsr.Len(), 0)
 	}
 	j := tsr.Offset(i)
 	tsr.Nulls.Set(j, nul)
+}
+
+func (tsr *Complex64) SetNull1D(i int, nul bool) {
+	if tsr.Nulls == nil {
+		tsr.Nulls = bitslice.Make(tsr.Len(), 0)
+	}
+	tsr.Nulls.Set(i, nul)
 }
 
 // FloatVal returns the real part of a Complex64 - see FloatValImag for getting imaginary part
@@ -193,23 +208,64 @@ func (tsr *Complex64) SetFunc(fun func(val float64) float64) {
 	//}
 }
 
-// Clone creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *Complex64) Clone() *Complex64 {
-	csr := NewComplex64Shape(&tsr.Shape)
-	copy(csr.Values, tsr.Values)
-	if tsr.Nulls != nil {
-		csr.Nulls = tsr.Nulls.Clone()
-	}
-	return csr
-}
+// Clone clones this tensor, creating a duplicate copy of itself with its
+// own separate memory representation of all the values, and returns
+// that as a Tensor (which can be converted into the known type as needed).
+// func (tsr *Complex64) Clone() Tensor {
+// 	csr := NewComplex64Shape(&tsr.Shape)
+// 	copy(csr.Values, tsr.Values)
+// 	if tsr.Nulls != nil {
+// 		csr.Nulls = tsr.Nulls.Clone()
+// 	}
+// 	return csr
+// }
 
-// CloneTensor creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *Complex64) CloneTensor() Tensor {
-	return nil
-	//return tsr.Clone()
-}
+// CopyFrom copies all avail values from other tensor into this tensor, with an
+// optimized implementation if the other tensor is of the same type, and
+// otherwise it goes through appropriate standard type.
+// Copies Null state as well if present.
+// func (tsr *Complex64) CopyFrom(frm Tensor) {
+// 	if fsm, ok := frm.(*Complex64); ok {
+// 		copy(tsr.Values, fsm.Values)
+// 		if fsm.Nulls != nil {
+// 			if tsr.Nulls == nil {
+// 				tsr.Nulls = bitslice.Make(tsr.Len(), 0)
+// 			}
+// 			copy(tsr.Nulls, fsm.Nulls)
+// 		}
+// 		return
+// 	}
+// 	sz := ints.MinInt(len(tsr.Values), frm.Len())
+// 	for i := 0; i < sz; i++ {
+// 		tsr.Values[i] = complex64(frm.FloatVal1D(i), 0)
+// 		if frm.IsNull1D(i) {
+// 			tsr.SetNull1D(i, true)
+// 		}
+// 	}
+// }
+//
+// CopyCellsFrom copies given range of values from other tensor into this tensor,
+// using flat 1D indexes: to = starting index in this Tensor to start copying into,
+// start = starting index on from Tensor to start copying from, and n = number of
+// values to copy.  Uses an optimized implementation if the other tensor is
+// of the same type, and otherwise it goes through appropriate standard type.
+// func (tsr *Complex64) CopyCellsFrom(frm Tensor, to, start, n int) {
+// 	if fsm, ok := frm.(*Complex64); ok {
+// 		for i := 0; i < n; i++ {
+// 			tsr.Values[to+i] = fsm.Values[start+i]
+// 			if fsm.IsNull1D(start + i) {
+// 				tsr.SetNull1D(to+i, true)
+// 			}
+// 		}
+// 		return
+// 	}
+// 	for i := 0; i < n; i++ {
+// 		tsr.Values[to+i] = complex64(frm.FloatVal1D(start+i), 0)
+// 		if frm.IsNull1D(start + i) {
+// 			tsr.SetNull1D(to+i, true)
+// 		}
+// 	}
+// }
 
 // SetShape sets the shape params, resizing backing storage appropriately
 func (tsr *Complex64) SetShape(shape, strides []int, names []string) {
@@ -297,18 +353,18 @@ func (tsr *Complex64) SubSpace(subdim int, offs []int) (*Complex64, error) {
 
 // At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
 // row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
-func (tsr *Complex64) At(i, j int) complex64 {
+func (tsr *Complex64) At(i, j int) float64 {
 	nd := tsr.NumDims()
 	if nd < 2 {
 		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
 		return 0
 	} else if nd == 2 {
-		return tsr.Value([]int{i, j})
+		return float64(real(tsr.Value([]int{i, j})))
 	} else {
 		ix := make([]int, nd)
 		ix[nd-2] = i
 		ix[nd-1] = j
-		return tsr.Value(ix)
+		return float64(real(tsr.Value(ix)))
 	}
 }
 
@@ -406,12 +462,24 @@ func (tsr *Complex128) IsNull(i []int) bool {
 	j := tsr.Offset(i)
 	return tsr.Nulls.Index(j)
 }
+func (tsr *Complex128) IsNull1D(i int) bool {
+	if tsr.Nulls == nil {
+		return false
+	}
+	return tsr.Nulls.Index(i)
+}
 func (tsr *Complex128) SetNull(i []int, nul bool) {
 	if tsr.Nulls == nil {
 		tsr.Nulls = bitslice.Make(tsr.Len(), 0)
 	}
 	j := tsr.Offset(i)
 	tsr.Nulls.Set(j, nul)
+}
+func (tsr *Complex128) SetNull1D(i int, nul bool) {
+	if tsr.Nulls == nil {
+		tsr.Nulls = bitslice.Make(tsr.Len(), 0)
+	}
+	tsr.Nulls.Set(i, nul)
 }
 
 // FloatVal returns the real part of a Complex128 - see FloatValImag for getting imaginary part
@@ -529,23 +597,17 @@ func (tsr *Complex128) SetFunc(fun func(val float64) float64) {
 	//}
 }
 
-// Clone creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *Complex128) Clone() *Complex128 {
-	csr := NewComplex128Shape(&tsr.Shape)
-	copy(csr.Values, tsr.Values)
-	if tsr.Nulls != nil {
-		csr.Nulls = tsr.Nulls.Clone()
-	}
-	return csr
-}
-
-// CloneTensor creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *Complex128) CloneTensor() Tensor {
-	return nil
-	//return tsr.Clone()
-}
+// Clone clones this tensor, creating a duplicate copy of itself with its
+// own separate memory representation of all the values, and returns
+// that as a Tensor (which can be converted into the known type as needed).
+// func (tsr *Complex128) Clone() Tensor {
+// 	csr := NewComplex128Shape(&tsr.Shape)
+// 	copy(csr.Values, tsr.Values)
+// 	if tsr.Nulls != nil {
+// 		csr.Nulls = tsr.Nulls.Clone()
+// 	}
+// 	return csr
+// }
 
 // SetShape sets the shape params, resizing backing storage appropriately
 func (tsr *Complex128) SetShape(shape, strides []int, names []string) {
@@ -633,18 +695,18 @@ func (tsr *Complex128) SubSpace(subdim int, offs []int) (*Complex128, error) {
 
 // At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
 // row, column index.  Assumes Row-major ordering and logs an error if NumDims < 2.
-func (tsr *Complex128) At(i, j int) complex128 {
+func (tsr *Complex128) At(i, j int) float64 {
 	nd := tsr.NumDims()
 	if nd < 2 {
 		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
 		return 0
 	} else if nd == 2 {
-		return tsr.Value([]int{i, j})
+		return real(tsr.Value([]int{i, j}))
 	} else {
 		ix := make([]int, nd)
 		ix[nd-2] = i
 		ix[nd-1] = j
-		return tsr.Value(ix)
+		return real(tsr.Value(ix))
 	}
 }
 

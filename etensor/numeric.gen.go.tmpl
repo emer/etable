@@ -55,6 +55,9 @@ func (tsr *{{.Name}}) DataType() Type { return {{.DataType}} }
 func (tsr *{{.Name}}) Value(i []int)  {{or .Type}} { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *{{.Name}}) Value1D(i int)  {{or .Type}} { return tsr.Values[i] }
 func (tsr *{{.Name}}) Set(i []int, val {{or .Type}})  { j := tsr.Offset(i); tsr.Values[j] = val }
+
+// IsNull returns true if the given index has been flagged as a Null
+// (undefined, not present) value
 func (tsr *{{.Name}}) IsNull(i []int) bool {
 	if tsr.Nulls == nil {
 		return false
@@ -62,12 +65,35 @@ func (tsr *{{.Name}}) IsNull(i []int) bool {
 	j := tsr.Offset(i)
 	return tsr.Nulls.Index(j)
 }
+
+// IsNull1D returns true if the given 1-dimensional index has been flagged as a Null
+// (undefined, not present) value
+func (tsr *{{.Name}}) IsNull1D(i int) bool {
+	if tsr.Nulls == nil {
+		return false
+	}
+	return tsr.Nulls.Index(i)
+}
+
+// SetNull sets whether given index has a null value or not.
+// All values are assumed valid (non-Null) until marked otherwise, and calling
+// this method creates a Null bitslice map if one has not already been set yet.
 func (tsr *{{.Name}}) SetNull(i []int, nul bool) {
 	if tsr.Nulls == nil {
 		tsr.Nulls = bitslice.Make(tsr.Len(), 0)
 	}
 	j := tsr.Offset(i)
 	tsr.Nulls.Set(j, nul)
+}
+
+// SetNull1D sets whether given 1-dimensional index has a null value or not.
+// All values are assumed valid (non-Null) until marked otherwise, and calling
+// this method creates a Null bitslice map if one has not already been set yet.
+func (tsr *{{.Name}}) SetNull1D(i int, nul bool) {
+	if tsr.Nulls == nil {
+		tsr.Nulls = bitslice.Make(tsr.Len(), 0)
+	}
+	tsr.Nulls.Set(i, nul)
 }
 
 func (tsr *{{.Name}}) FloatVal(i []int) float64 { j := tsr.Offset(i); return float64(tsr.Values[j]) }
@@ -128,14 +154,12 @@ func (tsr *{{.Name}}) 	Range() (min, max float64, minIdx, maxIdx int) {
 }
 
 // AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  init is the initial value for the agg variable.  returns final
+// conversions of the values.  ini is the initial value for the agg variable.  returns final
 // aggregate value
-func (tsr *{{.Name}}) 	AggFunc(fun func(val float64, agg float64) float64, ini float64) float64 {
-	ln := tsr.Len()
+func (tsr *{{.Name}}) 	AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
 	ag := ini
-	for j := 0; j < ln; j++ {
-		val := float64(tsr.Values[j])
-		ag = fun(val, ag)
+	for _, vl := range tsr.Values {
+		ag = fun(float64(vl), ag)
 	}
 	return ag
 }
@@ -149,33 +173,30 @@ func (tsr *{{.Name}}) EvalFunc(fun func(val float64) float64, res *[]float64) {
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
-	for j := 0; j < ln; j++ {
-		val := float64(tsr.Values[j])
-		(*res)[j] = fun(val)
+	for j, vl := range tsr.Values {
+		(*res)[j] = fun(float64(vl))
 	}
 }
 
 // SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
 func (tsr *{{.Name}}) 	SetFunc(fun func(val float64) float64) {
-	ln := tsr.Len()
-	for j := 0; j < ln; j++ {
-		val := float64(tsr.Values[j])
-		tsr.Values[j] = {{or .Type}}(fun(val))
+	for j, vl := range tsr.Values {
+		tsr.Values[j] = {{or .Type}}(fun(float64(vl)))
 	}
 }
 
 // SetZeros is simple convenience function initialize all values to 0
 func (tsr *{{.Name}}) 	SetZeros() {
-	ln := tsr.Len()
-	for j := 0; j < ln; j++ {
+	for j := range tsr.Values {
 		tsr.Values[j] = 0
 	}
 }
 
-// Clone creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *{{.Name}}) Clone() *{{.Name}} {
+// Clone clones this tensor, creating a duplicate copy of itself with its
+// own separate memory representation of all the values, and returns
+// that as a Tensor (which can be converted into the known type as needed).
+func (tsr *{{.Name}}) Clone() Tensor {
 	csr := New{{.Name}}Shape(&tsr.Shape)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
@@ -184,10 +205,51 @@ func (tsr *{{.Name}}) Clone() *{{.Name}} {
 	return csr
 }
 
-// CloneTensor creates a new tensor that is a copy of the existing tensor, with its own
-// separate memory -- changes to the clone will not affect the source.
-func (tsr *{{.Name}}) CloneTensor() Tensor {
-	return tsr.Clone()
+// CopyFrom copies all avail values from other tensor into this tensor, with an
+// optimized implementation if the other tensor is of the same type, and
+// otherwise it goes through appropriate standard type.
+// Copies Null state as well if present.
+func (tsr *{{.Name}}) CopyFrom(frm Tensor) {
+	if fsm, ok := frm.(*{{.Name}}); ok {
+		copy(tsr.Values, fsm.Values)
+		if fsm.Nulls != nil {
+			if tsr.Nulls == nil {
+				tsr.Nulls = bitslice.Make(tsr.Len(), 0)
+			}
+			copy(tsr.Nulls, fsm.Nulls)
+		}
+		return
+	}
+	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	for i := 0; i< sz; i++ {
+		tsr.Values[i] = {{or .Type}}(frm.FloatVal1D(i))
+		if frm.IsNull1D(i) {
+			tsr.SetNull1D(i, true)
+		}
+	}
+}
+
+// CopyCellsFrom copies given range of values from other tensor into this tensor,
+// using flat 1D indexes: to = starting index in this Tensor to start copying into,
+// start = starting index on from Tensor to start copying from, and n = number of
+// values to copy.  Uses an optimized implementation if the other tensor is
+// of the same type, and otherwise it goes through appropriate standard type.
+func (tsr *{{.Name}}) CopyCellsFrom(frm Tensor, to, start, n int) {
+	if fsm, ok := frm.(*{{.Name}}); ok {
+		for i := 0; i < n; i++ {
+			tsr.Values[to+i] = fsm.Values[start+i]
+			if fsm.IsNull1D(start+i) {
+				tsr.SetNull1D(to+i, true)
+			}
+		}
+		return
+	}
+	for i := 0; i < n; i++ {
+		tsr.Values[to+i] = {{or .Type}}(frm.FloatVal1D(start+i))
+		if frm.IsNull1D(start+i) {
+			tsr.SetNull1D(to+i, true)
+		}
+	}
 }
 
 // SetShape sets the shape params, resizing backing storage appropriately
