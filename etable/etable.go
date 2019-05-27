@@ -152,6 +152,12 @@ func (dt *Table) SetFromSchema(sc Schema, rows int) {
 	dt.UpdateColNameMap()
 }
 
+func NewTable(name string) *Table {
+	et := &Table{}
+	et.SetMetaData("name", name)
+	return et
+}
+
 // New returns a new Table constructed from given Schema.
 // The actual tensor number of rows is enforced to be > 0, because we
 // cannot have a null dimension in tensor shape

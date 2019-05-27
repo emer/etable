@@ -4,6 +4,8 @@
 
 package etable
 
+import "github.com/emer/etable/etensor"
+
 // Splits are lists of indexed views into a given Table, that represent a particular
 // way of splitting up the data, e.g., whenever a given column value changes.
 // Each split can be given a name, which can be used for accessing the split
@@ -49,14 +51,14 @@ func NewSplitsCols(ix *IdxTable, colIdxs []int) *Splits {
 
 // AddAgg adds an aggregation variable over splits, operating on given column index in the table,
 // using given aggregation function.
-func (spl *Splits) AddAgg(aggNm string, colIdx int, ini float64, fun func(val float64, agg float64) float64) {
+func (spl *Splits) AddAgg(aggNm string, colIdx int, ini float64, fun etensor.AggFunc) {
 	spl.AggVars = append(spl.AggVars, aggNm)
 	nspl := len(spl.Splts)
 	if len(spl.Aggs) != nspl {
 		spl.Aggs = make([][][]float64, nspl)
 	}
 	for i, spix := range spl.Splts {
-		ag := spix.AggFuncCol(colIdx, ini, fun)
+		ag := spix.AggCol(colIdx, ini, fun)
 		spl.Aggs[i] = append(spl.Aggs[i], ag)
 	}
 }

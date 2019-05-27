@@ -149,40 +149,37 @@ func (tsr *Bits) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  init is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Bits) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Bits) Agg(ini float64, fun AggFunc) float64 {
 	ln := tsr.Len()
 	ag := ini
 	for j := 0; j < ln; j++ {
-		val := BoolToFloat64(tsr.Values.Index(j))
-		ag = fun(val, ag)
+		ag = fun(j, BoolToFloat64(tsr.Values.Index(j)), ag)
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
+// Eval applies given function to each element in the tensor, using float64
 // conversions of the values, and puts the results into given float64 slice, which is
 // ensured to be of the proper length
-func (tsr *Bits) EvalFunc(fun func(val float64) float64, res *[]float64) {
+func (tsr *Bits) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j := 0; j < ln; j++ {
-		val := BoolToFloat64(tsr.Values.Index(j))
-		(*res)[j] = fun(val)
+		(*res)[j] = fun(j, BoolToFloat64(tsr.Values.Index(j)))
 	}
 }
 
 // SetFunc applies given function to each element in the tensor, using float64
 // conversions of the values, and writes the results back into the same tensor values
-func (tsr *Bits) SetFunc(fun func(val float64) float64) {
+func (tsr *Bits) SetFunc(fun EvalFunc) {
 	ln := tsr.Len()
 	for j := 0; j < ln; j++ {
-		val := BoolToFloat64(tsr.Values.Index(j))
-		tsr.Values.Set(j, Float64ToBool(fun(val)))
+		tsr.Values.Set(j, Float64ToBool(fun(j, BoolToFloat64(tsr.Values.Index(j)))))
 	}
 }
 

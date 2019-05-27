@@ -10,6 +10,15 @@ import (
 
 //go:generate tmpl -i -data=numeric.tmpldata numeric.gen.go.tmpl
 
+// AggFunc is an aggregation function that incrementally updates agg value
+// from each element in the tensor in turn -- returns new agg value that
+// will be passed into next item as agg
+type AggFunc func(idx int, val float64, agg float64) float64
+
+// EvalFunc is an evaluation function that computes a function on each
+// element value, returning the computed value
+type EvalFunc func(idx int, val float64) float64
+
 // Tensor is the general interface for n-dimensional tensors.
 //
 // Tensor is automatically a gonum/mat.Matrix, implementing the Dims(), At(), and T() methods
@@ -162,19 +171,20 @@ type Tensor interface {
 	// Other math operations can be done using gonum/floats package.
 	Range() (min, max float64, minIdx, maxIdx int)
 
-	// AggFunc applies given aggregation function to each element in the tensor, using float64
-	// conversions of the values.  init is the initial value for the agg variable.  returns final
-	// aggregate value
-	AggFunc(ini float64, fun func(val float64, agg float64) float64) float64
+	// Agg applies given aggregation function to each element in the tensor
+	// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+	// init is the initial value for the agg variable. returns final aggregate value
+	Agg(ini float64, fun AggFunc) float64
 
-	// EvalFunc applies given function to each element in the tensor, using float64
-	// conversions of the values, and puts the results into given float64 slice, which is
-	// ensured to be of the proper length
-	EvalFunc(fun func(val float64) float64, res *[]float64)
+	// Eval applies given function to each element in the tensor (automatically
+	// skips IsNull and NaN elements), using float64 conversions of the values.
+	// Puts the results into given float64 slice, which is ensured to be of the proper length.
+	Eval(res *[]float64, fun EvalFunc)
 
-	// SetFunc applies given function to each element in the tensor, using float64
-	// conversions of the values, and writes the results back into the same tensor values
-	SetFunc(fun func(val float64) float64)
+	// SetFunc applies given function to each element in the tensor (automatically
+	// skips IsNull and NaN elements), using float64 conversions of the values.
+	// Writes the results back into the same tensor elements.
+	SetFunc(fun EvalFunc)
 
 	// SetZeros is simple convenience function initialize all values to 0
 	SetZeros()

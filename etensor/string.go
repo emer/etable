@@ -7,6 +7,7 @@ package etensor
 import (
 	"errors"
 	"log"
+	"math"
 	"strconv"
 
 	"github.com/emer/etable/bitslice"
@@ -142,40 +143,45 @@ func (tsr *String) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  init is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *String) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
-	ln := tsr.Len()
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *String) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for j := 0; j < ln; j++ {
-		val := StringToFloat64(tsr.Values[j])
-		ag = fun(val, ag)
+	for j, vl := range tsr.Values {
+		val := StringToFloat64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *String) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *String) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
-	for j := 0; j < ln; j++ {
-		val := StringToFloat64(tsr.Values[j])
-		(*res)[j] = fun(val)
+	for j, vl := range tsr.Values {
+		val := StringToFloat64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *String) SetFunc(fun func(val float64) float64) {
-	ln := tsr.Len()
-	for j := 0; j < ln; j++ {
-		val := StringToFloat64(tsr.Values[j])
-		tsr.Values[j] = Float64ToString(fun(val))
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *String) SetFunc(fun EvalFunc) {
+	for j, vl := range tsr.Values {
+		val := StringToFloat64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = Float64ToString(fun(j, val))
+		}
 	}
 }
 

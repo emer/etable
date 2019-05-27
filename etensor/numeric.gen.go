@@ -154,35 +154,45 @@ func (tsr *Int64) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Int64) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Int64) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Int64) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Int64) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int64) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Int64) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = int64(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = int64(fun(j, val))
+		}
 	}
 }
 
@@ -585,35 +595,45 @@ func (tsr *Uint64) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Uint64) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Uint64) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Uint64) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Uint64) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint64) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Uint64) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = uint64(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = uint64(fun(j, val))
+		}
 	}
 }
 
@@ -1016,35 +1036,45 @@ func (tsr *Float64) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Float64) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Float64) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Float64) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Float64) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Float64) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Float64) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = float64(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = float64(fun(j, val))
+		}
 	}
 }
 
@@ -1447,35 +1477,45 @@ func (tsr *Int32) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Int32) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Int32) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Int32) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Int32) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int32) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Int32) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = int32(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = int32(fun(j, val))
+		}
 	}
 }
 
@@ -1878,35 +1918,45 @@ func (tsr *Uint32) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Uint32) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Uint32) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Uint32) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Uint32) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint32) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Uint32) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = uint32(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = uint32(fun(j, val))
+		}
 	}
 }
 
@@ -2309,35 +2359,45 @@ func (tsr *Float32) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Float32) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Float32) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Float32) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Float32) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Float32) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Float32) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = float32(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = float32(fun(j, val))
+		}
 	}
 }
 
@@ -2740,35 +2800,45 @@ func (tsr *Int16) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Int16) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Int16) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Int16) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Int16) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int16) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Int16) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = int16(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = int16(fun(j, val))
+		}
 	}
 }
 
@@ -3171,35 +3241,45 @@ func (tsr *Uint16) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Uint16) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Uint16) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Uint16) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Uint16) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint16) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Uint16) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = uint16(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = uint16(fun(j, val))
+		}
 	}
 }
 
@@ -3602,35 +3682,45 @@ func (tsr *Int8) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Int8) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Int8) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Int8) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Int8) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Int8) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Int8) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = int8(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = int8(fun(j, val))
+		}
 	}
 }
 
@@ -4033,35 +4123,45 @@ func (tsr *Uint8) Range() (min, max float64, minIdx, maxIdx int) {
 	return
 }
 
-// AggFunc applies given aggregation function to each element in the tensor, using float64
-// conversions of the values.  ini is the initial value for the agg variable.  returns final
-// aggregate value
-func (tsr *Uint8) AggFunc(ini float64, fun func(val float64, agg float64) float64) float64 {
+// Agg applies given aggregation function to each element in the tensor
+// (automatically skips IsNull and NaN elements), using float64 conversions of the values.
+// init is the initial value for the agg variable. returns final aggregate value
+func (tsr *Uint8) Agg(ini float64, fun AggFunc) float64 {
 	ag := ini
-	for _, vl := range tsr.Values {
-		ag = fun(float64(vl), ag)
+	for j, vl := range tsr.Values {
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			ag = fun(j, val, ag)
+		}
 	}
 	return ag
 }
 
-// EvalFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and puts the results into given float64 slice, which is
-// ensured to be of the proper length
-func (tsr *Uint8) EvalFunc(fun func(val float64) float64, res *[]float64) {
+// Eval applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Puts the results into given float64 slice, which is ensured to be of the proper length.
+func (tsr *Uint8) Eval(res *[]float64, fun EvalFunc) {
 	ln := tsr.Len()
 	if len(*res) != ln {
 		*res = make([]float64, ln)
 	}
 	for j, vl := range tsr.Values {
-		(*res)[j] = fun(float64(vl))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			(*res)[j] = fun(j, val)
+		}
 	}
 }
 
-// SetFunc applies given function to each element in the tensor, using float64
-// conversions of the values, and writes the results back into the same tensor values
-func (tsr *Uint8) SetFunc(fun func(val float64) float64) {
+// SetFunc applies given function to each element in the tensor (automatically
+// skips IsNull and NaN elements), using float64 conversions of the values.
+// Writes the results back into the same tensor elements.
+func (tsr *Uint8) SetFunc(fun EvalFunc) {
 	for j, vl := range tsr.Values {
-		tsr.Values[j] = uint8(fun(float64(vl)))
+		val := float64(vl)
+		if !tsr.IsNull1D(j) && !math.IsNaN(val) {
+			tsr.Values[j] = uint8(fun(j, val))
+		}
 	}
 }
 

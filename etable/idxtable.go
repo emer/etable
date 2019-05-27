@@ -170,11 +170,11 @@ func (ix *IdxTable) NewTable() *Table {
 	return nt
 }
 
-// AggFuncCol applies given aggregation function to each element in the given column, using float64
+// AggCol applies given aggregation function to each element in the given column, using float64
 // conversions of the values.  init is the initial value for the agg variable.
 // Operates independently over each cell on n-dimensional columns and returns the result as a slice
 // of values per cell.
-func (ix *IdxTable) AggFuncCol(colIdx int, ini float64, fun func(val float64, agg float64) float64) []float64 {
+func (ix *IdxTable) AggCol(colIdx int, ini float64, fun etensor.AggFunc) []float64 {
 	cl := ix.Table.Cols[colIdx]
 	_, csz := cl.RowCellSize()
 
@@ -184,13 +184,13 @@ func (ix *IdxTable) AggFuncCol(colIdx int, ini float64, fun func(val float64, ag
 	}
 	if csz == 1 {
 		for _, srw := range ix.Idxs {
-			ag[0] = fun(cl.FloatVal1D(srw), ag[0])
+			ag[0] = fun(srw, cl.FloatVal1D(srw), ag[0])
 		}
 	} else {
 		for _, srw := range ix.Idxs {
 			si := srw * csz
 			for j := range ag {
-				ag[j] = fun(cl.FloatVal1D(si+j), ag[j])
+				ag[j] = fun(si+j, cl.FloatVal1D(si+j), ag[j])
 			}
 		}
 	}
