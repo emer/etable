@@ -1,4 +1,4 @@
-// Copyright (c) 2019, The Emergent Authors. All rights reserved.
+// Copyright (c) 2019, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -268,7 +268,8 @@ func (tv *TableView) ConfigSliceGrid() {
 			}
 		}
 		hdr.Data = fli
-		hdr.Tooltip = "(click to sort / toggle sort direction by this column)"
+		hdr.Tooltip = "(click to sort / toggle sort direction by this column) Type: " + col.DataType().String()
+
 		if dsc, has := tv.Table.MetaData[colnm+":desc"]; has {
 			hdr.Tooltip += ": " + dsc
 		}
@@ -564,11 +565,17 @@ func (tv *TableView) UpdateSliceGrid() {
 			var widg gi.Node2D
 			if sg.Kids[cidx] != nil {
 				widg = sg.Kids[cidx].(gi.Node2D)
-				vv.UpdateWidget()
+				wn := widg.AsNode2D()
 				if tv.IsInactive() {
-					widg.AsNode2D().SetInactive()
+					wn.SetInactive()
+				}
+				if col.IsNull1D(i) { // todo: not working:
+					wn.SetProp("background-color", gi.Prefs.Colors.Highlight)
+				} else {
+					wn.DeleteProp("background-color")
 				}
 				widg.AsNode2D().SetSelectedState(issel)
+				vv.UpdateWidget()
 			} else {
 				widg = ki.NewOfType(vtyp).(gi.Node2D)
 				sg.SetChild(widg, cidx, valnm)
@@ -588,9 +595,14 @@ func (tv *TableView) UpdateSliceGrid() {
 							}
 						}
 					})
-				}
-				if tv.IsInactive() {
-					widg.AsNode2D().SetInactive()
+					if tv.IsInactive() {
+						wb.SetInactive()
+					}
+					if col.IsNull1D(i) {
+						wb.SetProp("background-color", gi.Prefs.Colors.Highlight)
+					} else {
+						wb.DeleteProp("background-color")
+					}
 				}
 			}
 			if tgw, istg := widg.(*TensorGrid); istg { // always update disp params

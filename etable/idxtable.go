@@ -1,10 +1,11 @@
-// Copyright (c) 2019, The Emergent Authors. All rights reserved.
+// Copyright (c) 2019, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package etable
 
 import (
+	"math"
 	"sort"
 
 	"github.com/emer/etable/etensor"
@@ -17,9 +18,9 @@ import (
 type LessFunc func(et *Table, i, j int) bool
 
 // FilterFunc is a function used for filtering that returns
-// true if Table row i should be included in the current filtered
+// true if Table row should be included in the current filtered
 // view of the table, and false if it should be removed.
-type FilterFunc func(et *Table, i int) bool
+type FilterFunc func(et *Table, row int) bool
 
 // IdxTable is an indexed wrapper around an etable.Table that provides a
 // specific view onto the Table defined by the set of indexes.
@@ -184,13 +185,19 @@ func (ix *IdxTable) AggCol(colIdx int, ini float64, fun etensor.AggFunc) []float
 	}
 	if csz == 1 {
 		for _, srw := range ix.Idxs {
-			ag[0] = fun(srw, cl.FloatVal1D(srw), ag[0])
+			val := cl.FloatVal1D(srw)
+			if !cl.IsNull1D(srw) && !math.IsNaN(val) {
+				ag[0] = fun(srw, val, ag[0])
+			}
 		}
 	} else {
 		for _, srw := range ix.Idxs {
 			si := srw * csz
 			for j := range ag {
-				ag[j] = fun(si+j, cl.FloatVal1D(si+j), ag[j])
+				val := cl.FloatVal1D(si + j)
+				if !cl.IsNull1D(si+j) && !math.IsNaN(val) {
+					ag[j] = fun(si+j, val, ag[j])
+				}
 			}
 		}
 	}

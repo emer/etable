@@ -1,4 +1,4 @@
-// Copyright (c) 2019, The Emergent Authors. All rights reserved.
+// Copyright (c) 2019, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -59,6 +59,7 @@ func (dt *Table) OpenCSV(filename gi.FileName, delim rune) error {
 // headers, and columns are constructed therefrom.  We parse the C++ emergent column
 // headers, if the first line starts with _H: -- these have full configuration information for tensor
 // dimensionality, and are also supported for writing using WriteCSV.
+// For non-emergent headers, string-valued columns are constructed first and then
 // If the table DOES have existing columns, then those are used robustly for whatever information
 // fits from each row of the file.
 func (dt *Table) ReadCSV(r io.Reader, delim rune) error {
@@ -74,7 +75,7 @@ func (dt *Table) ReadCSV(r io.Reader, delim rune) error {
 	// cols := len(rec[0])
 	strow := 0
 	if dt.NumCols() == 0 || rec[0][0] == "_H:" {
-		sc, err := SchemaFromHeaders(rec[0])
+		sc, err := SchemaFromHeaders(rec[0], rec)
 		if err != nil {
 			log.Println(err.Error())
 			return err
@@ -94,11 +95,15 @@ rowloop:
 		}
 		for j := 0; j < tc; j++ {
 			tsr := dt.Cols[j]
-			_, cells := tsr.RowCellSize()
-			stoff := ri * cells
-			for cc := 0; cc < cells; cc++ {
+			_, csz := tsr.RowCellSize()
+			stoff := ri * csz
+			for cc := 0; cc < csz; cc++ {
 				str := rr[ci]
-				tsr.SetString1D(stoff+cc, str)
+				if str == "" {
+					tsr.SetNull1D(stoff+cc, true) // empty = missing
+				} else {
+					tsr.SetString1D(stoff+cc, str)
+				}
 				ci++
 				if ci >= len(rr) {
 					continue rowloop
@@ -110,11 +115,12 @@ rowloop:
 }
 
 // SchemaFromHeaders attempts to configure a Table Schema based on the headers
-func SchemaFromHeaders(hdrs []string) (Schema, error) {
+// for non-Emergent headers, data is examined to
+func SchemaFromHeaders(hdrs []string, rec [][]string) (Schema, error) {
 	if hdrs[0] == "_H:" {
 		return SchemaFromEmerHeaders(hdrs)
 	}
-	return nil, fmt.Errorf("etable.SchemaFromHeaders: only emergent header format currently supported")
+	return SchemaFromPlainHeaders(hdrs, rec)
 }
 
 // SchemaFromEmerHeaders attempts to configure a Table Schema based on emergent DataTable headers
@@ -204,6 +210,68 @@ func ShapeFromString(dims string) []int {
 		sh[i] = d
 	}
 	return sh
+}
+
+// SchemaFromPlainHeaders configures a Table Schema based on plain headers.
+// All columns are of type String and must be converted later to numerical types
+// as appropriate.
+func SchemaFromPlainHeaders(hdrs []string, rec [][]string) (Schema, error) {
+	nc := len(hdrs)
+	sc := Schema{}
+	nr := len(rec)
+	for ci := 0; ci < nc; ci++ {
+		hd := hdrs[ci]
+		if hd == "" {
+			hd = fmt.Sprintf("col_%d", ci)
+		}
+		dt := etensor.STRING
+		nmatch := 0
+		for ri := 1; ri < nr; ri++ {
+			rv := rec[ri][ci]
+			if rv == "" {
+				continue
+			}
+			cdt := InferDataType(rv)
+			switch {
+			case cdt == etensor.STRING: // definitive
+				dt = cdt
+				break
+			case dt == cdt && (nmatch > 1 || ri == nr-1): // good enough
+				break
+			case dt == cdt: // gather more info
+				nmatch++
+			case dt == etensor.STRING: // always upgrade from string default
+				nmatch = 0
+				dt = cdt
+			case dt == etensor.INT64 && cdt == etensor.FLOAT64: // upgrade
+				nmatch = 0
+				dt = cdt
+			}
+		}
+		sc = append(sc, Column{Name: hd, Type: dt, CellShape: nil})
+	}
+	return sc, nil
+}
+
+// InferDataType returns the inferred data type for the given string
+// only deals with float64, int, and string types
+func InferDataType(str string) etensor.Type {
+	if strings.Contains(str, ".") {
+		_, err := strconv.ParseFloat(str, 64)
+		if err == nil {
+			return etensor.FLOAT64
+		}
+	}
+	_, err := strconv.ParseInt(str, 10, 64)
+	if err == nil {
+		return etensor.INT64
+	}
+	// try float again just in case..
+	_, err = strconv.ParseFloat(str, 64)
+	if err == nil {
+		return etensor.FLOAT64
+	}
+	return etensor.STRING
 }
 
 //////////////////////////////////////////////////////////////////////////

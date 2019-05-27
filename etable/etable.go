@@ -1,4 +1,4 @@
-// Copyright (c) 2019, The Emergent Authors. All rights reserved.
+// Copyright (c) 2019, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -57,8 +57,19 @@ func (dt *Table) Col(i int) etensor.Tensor {
 	return dt.Cols[i]
 }
 
-// ColNameIndex returns the index of the given column name, along with an error if not found
-func (dt *Table) ColNameIndex(name string) (int, error) {
+// ColByNameIdx returns the index of the given column name.
+// returns -1 if name not found -- see Try version for error message.
+func (dt *Table) ColByNameIdx(name string) int {
+	i, ok := dt.ColNameMap[name]
+	if !ok {
+		return -1
+	}
+	return i
+}
+
+// ColByNameIdxTry returns the index of the given column name,
+// along with an error if not found.
+func (dt *Table) ColByNameIdxTry(name string) (int, error) {
 	i, ok := dt.ColNameMap[name]
 	if !ok {
 		return 0, fmt.Errorf("etable.Table ColNameIndex: column named: %v not found", name)
@@ -78,7 +89,7 @@ func (dt *Table) ColByName(name string) etensor.Tensor {
 
 // ColByNameTry returns the tensor at given column name, if not found, returns error
 func (dt *Table) ColByNameTry(name string) (etensor.Tensor, error) {
-	i, err := dt.ColNameIndex(name)
+	i, err := dt.ColByNameIdxTry(name)
 	if err != nil {
 		return nil, err
 	}
@@ -175,8 +186,7 @@ func (dt *Table) Schema() Schema {
 		cl := &sc[i]
 		tsr := dt.Cols[i]
 		cl.Name = dt.ColNames[i]
-		//cl.Type = etensor.Type(tsr.DataType().ID())
-		cl.Type = etensor.Type(tsr.DataType())
+		cl.Type = tsr.DataType()
 		cl.CellShape = tsr.Shapes()[1:]
 		cl.DimNames = tsr.DimNames()[1:]
 	}

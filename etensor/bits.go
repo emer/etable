@@ -1,4 +1,4 @@
-// Copyright (c) 2019, The Emergent Authors. All rights reserved.
+// Copyright (c) 2019, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
@@ -113,13 +113,21 @@ func (tsr *Bits) SetFloat1D(off int, val float64) {
 	tsr.Values.Set(off, Float64ToBool(val))
 }
 
-func (tsr *Bits) Floats1D() []float64 {
+func (tsr *Bits) Floats() []float64 {
 	ln := tsr.Len()
 	res := make([]float64, ln)
 	for j := 0; j < ln; j++ {
 		res[j] = BoolToFloat64(tsr.Values.Index(j))
 	}
 	return res
+}
+
+// SetFloats sets tensor values from a []float64 slice (copies values).
+func (tsr *Bits) SetFloats(vals []float64) {
+	sz := ints.MinInt(tsr.Len(), len(vals))
+	for j := 0; j < sz; j++ {
+		tsr.Values.Set(j, Float64ToBool(vals[j]))
+	}
 }
 
 func (tsr *Bits) StringVal1D(off int) string {

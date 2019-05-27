@@ -1,10 +1,11 @@
-// Copyright (c) 2019, The Emergent Authors. All rights reserved.
+// Copyright (c) 2019, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package main
 
 import (
+	"github.com/emer/etable/agg"
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etview"
 	"github.com/goki/gi/gi"
@@ -19,7 +20,32 @@ func main() {
 	})
 }
 
-func mainrun() {
+// Planets is raw data
+var Planets *etable.Table
+
+// PlanetsDesc are descriptive stats of all (non-Null) data
+var PlanetsDesc *etable.Table
+
+// PlanetsNNDesc are descriptive stats of planets where entire row is non-null
+var PlanetsNNDesc *etable.Table
+
+// AnalyzePlanets analyzes planets.csv data following some of the examples
+// given here, using pandas:
+// 	https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html
+func AnalyzePlanets() {
+	Planets = etable.NewTable("planets")
+	Planets.OpenCSV("./planets.csv", ',')
+
+	PlanetsIdx := etable.NewIdxTable(Planets) // full original data
+
+	NonNull := etable.NewIdxTable(Planets)
+	NonNull.Filter(etable.FilterNull) // filter out all rows with Null values
+
+	PlanetsDesc = agg.DescAll(PlanetsIdx) // individually excludes Null values in each col, but not row-wise
+	PlanetsNNDesc = agg.DescAll(NonNull)  // standard descriptive stats for row-wise non-nulls
+}
+
+func OpenGUI() {
 	width := 1600
 	height := 1200
 
@@ -27,9 +53,6 @@ func mainrun() {
 	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://github.com/emer/etable">etable on GitHub</a>.</p>`)
 
 	plot.DefaultFont = "Helvetica"
-
-	planets := etable.NewTable("planets")
-	planets.OpenCSV("./planets.csv", ',')
 
 	win := gi.NewWindow2D("ra25", "Leabra Random Associator", width, height, true)
 
@@ -40,9 +63,22 @@ func mainrun() {
 
 	tv := gi.AddNewTabView(mfr, "tv")
 
-	plv := tv.AddNewTab(etview.KiT_TableView, "TableView").(*etview.TableView)
-	plv.SetTable(planets, nil)
+	plv := tv.AddNewTab(etview.KiT_TableView, "Planets Data").(*etview.TableView)
+	plv.SetTable(Planets, nil)
+
+	plnndscv := tv.AddNewTab(etview.KiT_TableView, "Planets Non-Null Rows Desc").(*etview.TableView)
+	plnndscv.SetTable(PlanetsNNDesc, nil)
+
+	pldscv := tv.AddNewTab(etview.KiT_TableView, "Planets All Desc").(*etview.TableView)
+	pldscv.SetTable(PlanetsDesc, nil)
+
+	tv.SelectTabIndex(0)
 
 	vp.UpdateEndNoSig(updt)
 	win.StartEventLoop()
+}
+
+func mainrun() {
+	AnalyzePlanets()
+	OpenGUI()
 }
