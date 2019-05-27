@@ -6,6 +6,8 @@ package agg
 
 import "math"
 
+// These are standard AggFunc functions that can operate on etensor.Tensor or etable.Table
+
 // CountFunc is an AggFunc that computes number of elements (non-Null, non-NaN)
 // Use 0 as initial value.
 func CountFunc(idx int, val float64, agg float64) float64 {

@@ -36,9 +36,9 @@ func AnalyzePlanets() {
 	Planets = etable.NewTable("planets")
 	Planets.OpenCSV("./planets.csv", ',')
 
-	PlanetsIdx := etable.NewIdxTable(Planets) // full original data
+	PlanetsIdx := etable.NewIdxView(Planets) // full original data
 
-	NonNull := etable.NewIdxTable(Planets)
+	NonNull := etable.NewIdxView(Planets)
 	NonNull.Filter(etable.FilterNull) // filter out all rows with Null values
 
 	PlanetsDesc = agg.DescAll(PlanetsIdx) // individually excludes Null values in each col, but not row-wise

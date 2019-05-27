@@ -25,12 +25,12 @@ Native support is provided for basic CSV, TSV I/O, including the
 C++ emergent standard TSV format with full type information in the first
 row column headers.
 
-The etable.IdxTable is an indexed view into a Table, which is used for
+The etable.IdxView is an indexed view into a Table, which is used for
 all data-processing operations such as Sort, Filter, Split (groupby),
 and for aggregating data as in a pivot-table.
 
 See etable/agg package for aggregation functions that operate on the
-IdxTable to perform standard aggregation operations such as Sum,
+IdxView to perform standard aggregation operations such as Sum,
 Mean, etc.
 
 Other relevant examples of DataTable-like structures:

@@ -19,7 +19,7 @@ import (
 // DescAll returns a table of standard descriptive aggregate stats for
 // all numeric columns in given table, operating over all non-Null, non-NaN elements
 // in each column.
-func DescAll(ix *etable.IdxTable) *etable.Table {
+func DescAll(ix *etable.IdxView) *etable.Table {
 	st := ix.Table
 	nonqNms := []string{"Count", "Mean", "Std", "Sem", "Min", "Max"} // everything else done wth quantiles
 	statNms := []string{"Count", "Mean", "Std", "Sem", "Min", "Max", "25%", "50%", "75%"}
@@ -69,9 +69,9 @@ func DescAll(ix *etable.IdxTable) *etable.Table {
 }
 
 // DescByIdx returns a table of standard descriptive aggregate stats
-// of non-Null, non-NaN elements in given IdxTable indexed view of an
+// of non-Null, non-NaN elements in given IdxView indexed view of an
 // etable.Table, for given column index.
-func DescByIdx(ix *etable.IdxTable, colIdx int) *etable.Table {
+func DescByIdx(ix *etable.IdxView, colIdx int) *etable.Table {
 	st := ix.Table
 	col := st.Cols[colIdx]
 	nonqNms := []string{"Count", "Mean", "Std", "Sem"} // everything else done wth quantiles
@@ -111,10 +111,10 @@ func DescByIdx(ix *etable.IdxTable, colIdx int) *etable.Table {
 }
 
 // Desc returns a table of standard descriptive aggregate stats
-// of non-Null, non-NaN elements in given IdxTable indexed view of an
+// of non-Null, non-NaN elements in given IdxView indexed view of an
 // etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
-func Desc(ix *etable.IdxTable, colNm string) *etable.Table {
+func Desc(ix *etable.IdxView, colNm string) *etable.Table {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -123,12 +123,12 @@ func Desc(ix *etable.IdxTable, colNm string) *etable.Table {
 }
 
 // Desc returns a table of standard descriptive aggregate stats
-// of non-Null, non-NaN elements in given IdxTable indexed view of an
+// of non-Null, non-NaN elements in given IdxView indexed view of an
 // etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func DescTry(ix *etable.IdxTable, colNm string) (*etable.Table, error) {
+func DescTry(ix *etable.IdxView, colNm string) (*etable.Table, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -140,13 +140,13 @@ func DescTry(ix *etable.IdxTable, colNm string) (*etable.Table, error) {
 //   Stat
 
 // StatByIdx returns statistic according to given stat name applied
-// to all non-Null, non-NaN elements in given IdxTable indexed view of
+// to all non-Null, non-NaN elements in given IdxView indexed view of
 // an etable.Table, for given column index.
 // valid names are: Count, Sum, Var, Std, Sem, VarPop, StdPop, SemPop,
 // Min, Max, SumSq, 25%, 1Q, Median, 50%, 2Q, 75%, 3Q (case insensitive)
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StatByIdx(statNm string, ix *etable.IdxTable, colIdx int) []float64 {
+func StatByIdx(statNm string, ix *etable.IdxView, colIdx int) []float64 {
 	statNm = strings.ToLower(statNm)
 	switch statNm {
 	case "count":
@@ -186,14 +186,14 @@ func StatByIdx(statNm string, ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // StatByIdx returns statistic according to given stat name applied
-// to all non-Null, non-NaN elements in given IdxTable indexed view of
+// to all non-Null, non-NaN elements in given IdxView indexed view of
 // an etable.Table, for given column name.
 // valid names are: Count, Sum, Var, Std, Sem, VarPop, StdPop, SemPop,
 // Min, Max, SumSq (case insensitive)
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Stat(statNm string, ix *etable.IdxTable, colNm string) []float64 {
+func Stat(statNm string, ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -202,14 +202,14 @@ func Stat(statNm string, ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // StatByIdx returns statistic according to given stat name applied
-// to all non-Null, non-NaN elements in given IdxTable indexed view of
+// to all non-Null, non-NaN elements in given IdxView indexed view of
 // an etable.Table, for given column name.
 // valid names are: Count, Sum, Var, Std, Sem, VarPop, StdPop, SemPop,
 // Min, Max, SumSq (case insensitive)
 // If stat name not recognized, or name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StatTry(statNm string, ix *etable.IdxTable, colNm string) ([]float64, error) {
+func StatTry(statNm string, ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -225,19 +225,19 @@ func StatTry(statNm string, ix *etable.IdxTable, colNm string) ([]float64, error
 //   Count
 
 // CountByIdx returns the count of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func CountByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func CountByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	return ix.AggCol(colIdx, 0, CountFunc)
 }
 
 // Count returns the count of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Count(ix *etable.IdxTable, colNm string) []float64 {
+func Count(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -246,11 +246,11 @@ func Count(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // CountTry returns the count of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func CountTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func CountTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -262,19 +262,19 @@ func CountTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Sum
 
 // SumByIdx returns the sum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SumByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func SumByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	return ix.AggCol(colIdx, 0, SumFunc)
 }
 
 // Sum returns the sum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Sum(ix *etable.IdxTable, colNm string) []float64 {
+func Sum(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -283,11 +283,11 @@ func Sum(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // SumTry returns the sum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SumTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func SumTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -299,19 +299,19 @@ func SumTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Prod
 
 // ProdByIdx returns the product of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func ProdByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func ProdByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	return ix.AggCol(colIdx, 1, ProdFunc)
 }
 
 // Prod returns the product of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Prod(ix *etable.IdxTable, colNm string) []float64 {
+func Prod(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -320,11 +320,11 @@ func Prod(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // ProdTry returns the product of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func ProdTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func ProdTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -336,19 +336,19 @@ func ProdTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Max
 
 // MaxByIdx returns the maximum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func MaxByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func MaxByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	return ix.AggCol(colIdx, -math.MaxFloat64, MaxFunc)
 }
 
 // Max returns the maximum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Max(ix *etable.IdxTable, colNm string) []float64 {
+func Max(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -357,11 +357,11 @@ func Max(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // MaxTry returns the maximum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func MaxTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func MaxTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -373,19 +373,19 @@ func MaxTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Min
 
 // MinByIdx returns the minimum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func MinByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func MinByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	return ix.AggCol(colIdx, math.MaxFloat64, MinFunc)
 }
 
 // Min returns the minimum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Min(ix *etable.IdxTable, colNm string) []float64 {
+func Min(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -394,11 +394,11 @@ func Min(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // MinTry returns the minimum of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func MinTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func MinTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -410,10 +410,10 @@ func MinTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Mean
 
 // MeanByIdx returns the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func MeanByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func MeanByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	cnt := CountByIdx(ix, colIdx)
 	if cnt == nil {
 		return nil
@@ -428,11 +428,11 @@ func MeanByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // Mean returns the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Mean(ix *etable.IdxTable, colNm string) []float64 {
+func Mean(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -441,11 +441,11 @@ func Mean(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // MeanTry returns the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func MeanTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func MeanTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -457,11 +457,11 @@ func MeanTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Var
 
 // VarByIdx returns the sample variance of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Sample variance is normalized by 1/(n-1) -- see VarPop version for 1/n normalization.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func VarByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func VarByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	cnt := CountByIdx(ix, colIdx)
 	if cnt == nil {
 		return nil
@@ -488,12 +488,12 @@ func VarByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // Var returns the sample variance of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // Sample variance is normalized by 1/(n-1) -- see VarPop version for 1/n normalization.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Var(ix *etable.IdxTable, colNm string) []float64 {
+func Var(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -502,12 +502,12 @@ func Var(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // VarTry returns the sample variance of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // Sample variance is normalized by 1/(n-1) -- see VarPop version for 1/n normalization.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func VarTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func VarTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -519,11 +519,11 @@ func VarTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Std
 
 // StdByIdx returns the sample std deviation of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Sample std deviation is normalized by 1/(n-1) -- see StdPop version for 1/n normalization.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StdByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func StdByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	std := VarByIdx(ix, colIdx)
 	for i := range std {
 		std[i] = math.Sqrt(std[i])
@@ -532,12 +532,12 @@ func StdByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // Std returns the sample std deviation of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // Sample std deviation is normalized by 1/(n-1) -- see StdPop version for 1/n normalization.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Std(ix *etable.IdxTable, colNm string) []float64 {
+func Std(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -546,12 +546,12 @@ func Std(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // StdTry returns the sample std deviation of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // Sample std deviation is normalized by 1/(n-1) -- see StdPop version for 1/n normalization.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StdTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func StdTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -563,11 +563,11 @@ func StdTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Sem
 
 // SemByIdx returns the sample standard error of the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Sample sem is normalized by 1/(n-1) -- see SemPop version for 1/n normalization.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SemByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func SemByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	cnt := CountByIdx(ix, colIdx)
 	if cnt == nil {
 		return nil
@@ -581,13 +581,13 @@ func SemByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 	return sem
 }
 
-// Sem returns the standard error of the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// Sem returns the sample standard error of the mean of non-Null, non-NaN elements in given
+// IdxView indexed view of an etable.Table, for given column name.
 // Sample sem is normalized by 1/(n-1) -- see SemPop version for 1/n normalization.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Sem(ix *etable.IdxTable, colNm string) []float64 {
+func Sem(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -595,13 +595,13 @@ func Sem(ix *etable.IdxTable, colNm string) []float64 {
 	return SemByIdx(ix, colIdx)
 }
 
-// SemTry returns the standard error of the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// SemTry returns the sample standard error of the mean of non-Null, non-NaN elements in given
+// IdxView indexed view of an etable.Table, for given column name.
 // Sample sem is normalized by 1/(n-1) -- see SemPop version for 1/n normalization.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SemTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func SemTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -613,11 +613,11 @@ func SemTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   VarPop
 
 // VarPopByIdx returns the population variance of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // population variance is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func VarPopByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func VarPopByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	cnt := CountByIdx(ix, colIdx)
 	if cnt == nil {
 		return nil
@@ -644,12 +644,12 @@ func VarPopByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // VarPop returns the population variance of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // population variance is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func VarPop(ix *etable.IdxTable, colNm string) []float64 {
+func VarPop(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -658,12 +658,12 @@ func VarPop(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // VarPopTry returns the population variance of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // population variance is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func VarPopTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func VarPopTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -675,11 +675,11 @@ func VarPopTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   StdPop
 
 // StdPopByIdx returns the population std deviation of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // population std dev is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StdPopByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func StdPopByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	std := VarPopByIdx(ix, colIdx)
 	for i := range std {
 		std[i] = math.Sqrt(std[i])
@@ -688,12 +688,12 @@ func StdPopByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // StdPop returns the population std deviation of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // population std dev is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StdPop(ix *etable.IdxTable, colNm string) []float64 {
+func StdPop(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -702,12 +702,12 @@ func StdPop(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // StdPopTry returns the population std deviation of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // population std dev is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func StdPopTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func StdPopTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -719,11 +719,11 @@ func StdPopTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   SemPop
 
 // SemPopByIdx returns the population standard error of the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // population sem is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SemPopByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func SemPopByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	cnt := CountByIdx(ix, colIdx)
 	if cnt == nil {
 		return nil
@@ -738,12 +738,12 @@ func SemPopByIdx(ix *etable.IdxTable, colIdx int) []float64 {
 }
 
 // SemPop returns the standard error of the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // population sem is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SemPop(ix *etable.IdxTable, colNm string) []float64 {
+func SemPop(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -752,12 +752,12 @@ func SemPop(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // SemPopTry returns the standard error of the mean of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // population sem is normalized by 1/n -- see Var version for 1/(n-1) sample normalization.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SemPopTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func SemPopTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -769,19 +769,19 @@ func SemPopTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   SumSq
 
 // SumSqByIdx returns the sum-of-squares of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SumSqByIdx(ix *etable.IdxTable, colIdx int) []float64 {
+func SumSqByIdx(ix *etable.IdxView, colIdx int) []float64 {
 	return ix.AggCol(colIdx, 0, SumSqFunc)
 }
 
 // SumSq returns the sum-of-squares of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SumSq(ix *etable.IdxTable, colNm string) []float64 {
+func SumSq(ix *etable.IdxView, colNm string) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -790,11 +790,11 @@ func SumSq(ix *etable.IdxTable, colNm string) []float64 {
 }
 
 // SumSqTry returns the sum-of-squares of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func SumSqTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
+func SumSqTry(ix *etable.IdxView, colNm string) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err
@@ -806,12 +806,12 @@ func SumSqTry(ix *etable.IdxTable, colNm string) ([]float64, error) {
 //   Quantiles
 
 // QuantilesByIdx returns the given quantile(s) of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column index.
+// IdxView indexed view of an etable.Table, for given column index.
 // Column must be a 1d Column -- returns nil for n-dimensional columns.
 // qs are 0-1 values, 0 = min, 1 = max, .5 = median, etc.  Uses linear interpolation.
 // Because this requires a sort, it is more efficient to get as many quantiles
 // as needed in one pass.
-func QuantilesByIdx(ix *etable.IdxTable, colIdx int, qs []float64) []float64 {
+func QuantilesByIdx(ix *etable.IdxView, colIdx int, qs []float64) []float64 {
 	nq := len(qs)
 	if nq == 0 {
 		return nil
@@ -852,13 +852,13 @@ func QuantilesByIdx(ix *etable.IdxTable, colIdx int, qs []float64) []float64 {
 }
 
 // Quantiles returns the given quantile(s) of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name.
+// IdxView indexed view of an etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Column must be a 1d Column -- returns nil for n-dimensional columns.
 // qs are 0-1 values, 0 = min, 1 = max, .5 = median, etc.  Uses linear interpolation.
 // Because this requires a sort, it is more efficient to get as many quantiles
 // as needed in one pass.
-func Quantiles(ix *etable.IdxTable, colNm string, qs []float64) []float64 {
+func Quantiles(ix *etable.IdxView, colNm string, qs []float64) []float64 {
 	colIdx := ix.Table.ColByNameIdx(colNm)
 	if colIdx == -1 {
 		return nil
@@ -867,13 +867,13 @@ func Quantiles(ix *etable.IdxTable, colNm string, qs []float64) []float64 {
 }
 
 // QuantilesTry returns the given quantile(s) of non-Null, non-NaN elements in given
-// IdxTable indexed view of an etable.Table, for given column name
+// IdxView indexed view of an etable.Table, for given column name
 // If name not found, error message is returned.
 // Column must be a 1d Column -- returns nil for n-dimensional columns.
 // qs are 0-1 values, 0 = min, 1 = max, .5 = median, etc.  Uses linear interpolation.
 // Because this requires a sort, it is more efficient to get as many quantiles
 // as needed in one pass.
-func QuantilesTry(ix *etable.IdxTable, colNm string, qs []float64) ([]float64, error) {
+func QuantilesTry(ix *etable.IdxView, colNm string, qs []float64) ([]float64, error) {
 	colIdx, err := ix.Table.ColByNameIdxTry(colNm)
 	if err != nil {
 		return nil, err

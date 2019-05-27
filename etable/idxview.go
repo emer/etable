@@ -22,35 +22,35 @@ type LessFunc func(et *Table, i, j int) bool
 // view of the table, and false if it should be removed.
 type FilterFunc func(et *Table, row int) bool
 
-// IdxTable is an indexed wrapper around an etable.Table that provides a
+// IdxView is an indexed wrapper around an etable.Table that provides a
 // specific view onto the Table defined by the set of indexes.
 // This provides an efficient way of sorting and filtering a table by only
 // updating the indexes while doing nothing to the Table itself.
 // To produce a table that has data actually organized according to the
 // indexed order, call the NewTable method.
-// IdxTable views on a table can also be organized together as Splits
+// IdxView views on a table can also be organized together as Splits
 // of the table rows, e.g., by grouping values along a given column.
-type IdxTable struct {
+type IdxView struct {
 	Table    *Table   `desc:"Table that we are an indexed view onto"`
 	Idxs     []int    `desc:"current indexes into Table"`
 	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-" desc:"current Less function used in sorting"`
 }
 
-// NewIdxTable returns a new IdxTable based on given table, initialized with sequential idxes
-func NewIdxTable(et *Table) *IdxTable {
-	ix := &IdxTable{}
+// NewIdxView returns a new IdxView based on given table, initialized with sequential idxes
+func NewIdxView(et *Table) *IdxView {
+	ix := &IdxView{}
 	ix.SetTable(et)
 	return ix
 }
 
 // SetTable sets as indexes into given table with sequential initial indexes
-func (ix *IdxTable) SetTable(et *Table) {
+func (ix *IdxView) SetTable(et *Table) {
 	ix.Table = et
 	ix.Sequential()
 }
 
 // Sequential sets indexes to sequential row-wise indexes into table
-func (ix *IdxTable) Sequential() {
+func (ix *IdxView) Sequential() {
 	if ix.Table == nil {
 		ix.Idxs = nil
 		return
@@ -62,14 +62,14 @@ func (ix *IdxTable) Sequential() {
 }
 
 // AddIndex adds a new index to the list
-func (ix *IdxTable) AddIndex(idx int) {
+func (ix *IdxView) AddIndex(idx int) {
 	ix.Idxs = append(ix.Idxs, idx)
 }
 
 // Sort sorts the indexes into our Table using given Less function.
 // The Less function operates directly on row numbers into the Table
 // as these row numbers have already been projected through the indexes.
-func (ix *IdxTable) Sort(lessFunc LessFunc) {
+func (ix *IdxView) Sort(lessFunc LessFunc) {
 	ix.lessFunc = lessFunc
 	sort.Sort(ix)
 }
@@ -77,7 +77,7 @@ func (ix *IdxTable) Sort(lessFunc LessFunc) {
 // SortCol sorts the indexes into our Table according to values in
 // given column index, using either ascending or descending order.
 // Only valid for 1-dimensional columns.
-func (ix *IdxTable) SortCol(colIdx int, ascending bool) {
+func (ix *IdxView) SortCol(colIdx int, ascending bool) {
 	cl := ix.Table.Cols[colIdx]
 	if cl.DataType() == etensor.STRING {
 		ix.Sort(func(et *Table, i, j int) bool {
@@ -101,7 +101,7 @@ func (ix *IdxTable) SortCol(colIdx int, ascending bool) {
 // SortCols sorts the indexes into our Table according to values in
 // given list of column indexes, using either ascending or descending order for
 // all of the columns.  Only valid for 1-dimensional columns.
-func (ix *IdxTable) SortCols(colIdxs []int, ascending bool) {
+func (ix *IdxView) SortCols(colIdxs []int, ascending bool) {
 	ix.Sort(func(et *Table, i, j int) bool {
 		for _, ci := range colIdxs {
 			cl := ix.Table.Cols[ci]
@@ -142,7 +142,7 @@ func (ix *IdxTable) SortCols(colIdxs []int, ascending bool) {
 // Filter filters the indexes into our Table using given Filter function.
 // The Filter function operates directly on row numbers into the Table
 // as these row numbers have already been projected through the indexes.
-func (ix *IdxTable) Filter(filterFunc FilterFunc) {
+func (ix *IdxView) Filter(filterFunc FilterFunc) {
 	sz := len(ix.Idxs)
 	for i := sz - 1; i >= 0; i-- { // always go in reverse for filtering
 		if !filterFunc(ix.Table, ix.Idxs[i]) { // delete
@@ -153,7 +153,7 @@ func (ix *IdxTable) Filter(filterFunc FilterFunc) {
 
 // NewTable returns a new table with column data organized according to
 // the indexes
-func (ix *IdxTable) NewTable() *Table {
+func (ix *IdxView) NewTable() *Table {
 	rows := len(ix.Idxs)
 	sc := ix.Table.Schema()
 	nt := New(sc, rows)
@@ -175,7 +175,7 @@ func (ix *IdxTable) NewTable() *Table {
 // conversions of the values.  init is the initial value for the agg variable.
 // Operates independently over each cell on n-dimensional columns and returns the result as a slice
 // of values per cell.
-func (ix *IdxTable) AggCol(colIdx int, ini float64, fun etensor.AggFunc) []float64 {
+func (ix *IdxView) AggCol(colIdx int, ini float64, fun etensor.AggFunc) []float64 {
 	cl := ix.Table.Cols[colIdx]
 	_, csz := cl.RowCellSize()
 
@@ -205,30 +205,30 @@ func (ix *IdxTable) AggCol(colIdx int, ini float64, fun etensor.AggFunc) []float
 }
 
 // Clone returns a copy of the current index view with its own index memory
-func (ix *IdxTable) Clone() *IdxTable {
-	nix := &IdxTable{}
+func (ix *IdxView) Clone() *IdxView {
+	nix := &IdxView{}
 	nix.CopyFrom(ix)
 	return nix
 }
 
-// CopyFrom copies from given other IdxTable (we have our own unique copy of indexes)
-func (ix *IdxTable) CopyFrom(oix *IdxTable) {
+// CopyFrom copies from given other IdxView (we have our own unique copy of indexes)
+func (ix *IdxView) CopyFrom(oix *IdxView) {
 	ix.Table = oix.Table
 	ix.Idxs = make([]int, len(oix.Idxs))
 	copy(ix.Idxs, oix.Idxs)
 }
 
 // Len returns the length of the index list
-func (ix *IdxTable) Len() int {
+func (ix *IdxView) Len() int {
 	return len(ix.Idxs)
 }
 
 // Less calls the LessFunc for sorting
-func (ix *IdxTable) Less(i, j int) bool {
+func (ix *IdxView) Less(i, j int) bool {
 	return ix.lessFunc(ix.Table, ix.Idxs[i], ix.Idxs[j])
 }
 
 // Swap switches the indexes for i and j
-func (ix *IdxTable) Swap(i, j int) {
+func (ix *IdxView) Swap(i, j int) {
 	ix.Idxs[i], ix.Idxs[j] = ix.Idxs[j], ix.Idxs[i]
 }
