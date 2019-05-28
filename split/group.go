@@ -6,7 +6,7 @@ package split
 
 import (
 	"github.com/emer/etable/etable"
-	"github.com/goki/ki/slicecopy"
+	"github.com/goki/ki/sliceclone"
 )
 
 // GroupByIdx returns a new Splits set based on the groups of values
@@ -79,7 +79,7 @@ func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits 
 		if nv == 0 {
 			nv = len(sv)
 		}
-		funvals[rw] = slicecopy.String(sv)
+		funvals[rw] = sliceclone.String(sv)
 	}
 
 	srt := ix.Clone()
