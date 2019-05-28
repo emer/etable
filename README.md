@@ -8,6 +8,8 @@
 
 The e-name derives from the `emergent` neural network simulation framework, but `e` is also extra-dimensional, extended, electric, easy-to-use -- all good stuff.. :)
 
+See `examples/dataproc` for a full demo of how to use this system for data analysis, paralleling the example in 	[Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
+
 The following packages are included:
 
 * `bitslice` is a Go slice of bytes `[]byte` that has methods for setting individual bits, as if it was a slice of bools, while being 8x more memory efficient.  This is used for encoding null entries in  `etensor`, and as a Tensor of bool / bits there as well, and is generally very useful for binary (boolean) data.
@@ -18,7 +20,7 @@ The following packages are included:
 
 * `eplot` provides an interactive 2D plotting GUI in [GoGi](https://github.com/goki/gi) for Table data, using the [gonum plot](https://github.com/gonum/plot) plotting package.  You can select which columns to plot and specify various basic plot parameters.
 
-* `etview` provides an interactive tabular, spreadsheet-style GUI for viewing and editing `etable.Table` and `etable.Tensor` objects.  The `etview.TensorGrid` also provides a colored grid display higher-dimensional tensor data.
+* `etview` provides an interactive tabular, spreadsheet-style GUI using [GoGi](https://github.com/goki/gi) for viewing and editing `etable.Table` and `etable.Tensor` objects.  The `etview.TensorGrid` also provides a colored grid display higher-dimensional tensor data.
 
 * `agg` provides standard aggregation functions (`Sum`, `Mean`, `Var`, `Std` etc) operating over `etable.IdxView` views of Table data.  It also defines standard `AggFunc` functions such as `SumFunc` which can be used for `Agg` functions on either a Tensor or IdxView.
 

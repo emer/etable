@@ -624,7 +624,7 @@ func (tv *TensorView) ConfigToolbar() {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}
-	if giv.HasToolBarView(tv.Slice) {
+	if giv.HasToolBarView(tv.Slice) && tv.Viewport != nil {
 		giv.ToolBarView(tv.Slice, tv.Viewport, tb)
 	}
 	tv.ToolbarSlice = tv.Tensor

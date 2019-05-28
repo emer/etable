@@ -57,9 +57,9 @@ func (dt *Table) Col(i int) etensor.Tensor {
 	return dt.Cols[i]
 }
 
-// ColByNameIdx returns the index of the given column name.
+// ColIdxByName returns the index of the given column name.
 // returns -1 if name not found -- see Try version for error message.
-func (dt *Table) ColByNameIdx(name string) int {
+func (dt *Table) ColIdxByName(name string) int {
 	i, ok := dt.ColNameMap[name]
 	if !ok {
 		return -1
@@ -67,14 +67,46 @@ func (dt *Table) ColByNameIdx(name string) int {
 	return i
 }
 
-// ColByNameIdxTry returns the index of the given column name,
+// ColIdxByNameTry returns the index of the given column name,
 // along with an error if not found.
-func (dt *Table) ColByNameIdxTry(name string) (int, error) {
+func (dt *Table) ColIdxByNameTry(name string) (int, error) {
 	i, ok := dt.ColNameMap[name]
 	if !ok {
-		return 0, fmt.Errorf("etable.Table ColNameIndex: column named: %v not found", name)
+		return 0, fmt.Errorf("etable.Table ColIdxByName: column named: %v not found", name)
 	}
 	return i, nil
+}
+
+// ColIdxsByNames returns the indexes of the given column names.
+// idxs have -1 if name not found -- see Try version for error message.
+func (dt *Table) ColIdxsByNames(names []string) []int {
+	nc := len(names)
+	if nc == 0 {
+		return nil
+	}
+	cidx := make([]int, nc)
+	for i, cn := range names {
+		cidx[i] = dt.ColIdxByName(cn)
+	}
+	return cidx
+}
+
+// ColsIdxsByNamesTry returns the indexes of the given column names,
+// along with an error if any not found.
+func (dt *Table) ColIdxsByNamesTry(names []string) ([]int, error) {
+	nc := len(names)
+	if nc == 0 {
+		return nil, fmt.Errorf("etable.Table ColsByNamesIdxs: no column names provided")
+	}
+	cidx := make([]int, nc)
+	var err error
+	for i, cn := range names {
+		cidx[i], err = dt.ColIdxByNameTry(cn)
+		if err != nil {
+			return nil, err
+		}
+	}
+	return cidx, nil
 }
 
 // ColByName returns the tensor at given column name without any error messages -- just
@@ -89,7 +121,7 @@ func (dt *Table) ColByName(name string) etensor.Tensor {
 
 // ColByNameTry returns the tensor at given column name, if not found, returns error
 func (dt *Table) ColByNameTry(name string) (etensor.Tensor, error) {
-	i, err := dt.ColByNameIdxTry(name)
+	i, err := dt.ColIdxByNameTry(name)
 	if err != nil {
 		return nil, err
 	}

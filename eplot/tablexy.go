@@ -29,11 +29,11 @@ func NewTableXY(dt *etable.Table, xcol, ycol int) (*TableXY, error) {
 // NewTableXYNames returns a new XY plot view onto the given etable.Table, from given column names
 // Column indexes are enforced to be valid, with an error message if they are not.
 func NewTableXYNames(dt *etable.Table, xcol, ycol string) (*TableXY, error) {
-	xi, err := dt.ColByNameIdxTry(xcol)
+	xi, err := dt.ColIdxByNameTry(xcol)
 	if err != nil {
 		log.Println(err)
 	}
-	yi, err := dt.ColByNameIdxTry(ycol)
+	yi, err := dt.ColIdxByNameTry(ycol)
 	if err != nil {
 		log.Println(err)
 	}

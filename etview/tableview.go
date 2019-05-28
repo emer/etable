@@ -817,7 +817,7 @@ func (tv *TableView) ConfigToolbar() {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}
-	if giv.HasToolBarView(tv.Table) {
+	if giv.HasToolBarView(tv.Table) && tv.Viewport != nil {
 		giv.ToolBarView(tv.Table, tv.Viewport, tb)
 	}
 	tv.ToolbarSlice = tv.Table

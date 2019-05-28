@@ -9,6 +9,7 @@ import (
 	"sort"
 
 	"github.com/emer/etable/etensor"
+	"github.com/goki/ki/slicecopy"
 )
 
 // LessFunc is a function used for sort comparisons that returns
@@ -214,8 +215,7 @@ func (ix *IdxView) Clone() *IdxView {
 // CopyFrom copies from given other IdxView (we have our own unique copy of indexes)
 func (ix *IdxView) CopyFrom(oix *IdxView) {
 	ix.Table = oix.Table
-	ix.Idxs = make([]int, len(oix.Idxs))
-	copy(ix.Idxs, oix.Idxs)
+	ix.Idxs = slicecopy.Int(oix.Idxs)
 }
 
 // Len returns the length of the index list
