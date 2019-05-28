@@ -6,6 +6,7 @@ package etable
 
 import (
 	"math"
+	"math/rand"
 	"sort"
 
 	"github.com/emer/etable/etensor"
@@ -59,6 +60,23 @@ func (ix *IdxView) Sequential() {
 	ix.Idxs = make([]int, ix.Table.Rows)
 	for i := range ix.Idxs {
 		ix.Idxs[i] = i
+	}
+}
+
+// Permuted sets indexes to a permuted order -- if indexes already exist
+// then existing list of indexes is permuted, otherwise a new set of
+// permuted indexes are generated
+func (ix *IdxView) Permuted() {
+	if ix.Table == nil {
+		ix.Idxs = nil
+		return
+	}
+	if len(ix.Idxs) == 0 {
+		ix.Idxs = rand.Perm(ix.Table.Rows)
+	} else {
+		rand.Shuffle(len(ix.Idxs), func(i, j int) {
+			ix.Idxs[i], ix.Idxs[j] = ix.Idxs[j], ix.Idxs[i]
+		})
 	}
 }
 

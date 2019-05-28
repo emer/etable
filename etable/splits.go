@@ -78,14 +78,14 @@ func (spl *Splits) Table() *Table {
 
 // New adds a new split to the list for given table, and with associated
 // values, which are copied before saving into Values list, and any number of rows
-// from the table associated with this split.
+// from the table associated with this split (also copied).
 // Any existing Aggs are deleted by this.
 func (spl *Splits) New(dt *Table, values []string, rows ...int) *IdxView {
 	spl.Aggs = nil
 	ix := &IdxView{Table: dt}
 	spl.Splits = append(spl.Splits, ix)
 	if len(rows) > 0 {
-		ix.Idxs = append(ix.Idxs, rows...)
+		ix.Idxs = append(ix.Idxs, sliceclone.Int(rows)...)
 	}
 	if len(values) > 0 {
 		spl.Values = append(spl.Values, sliceclone.String(values))
