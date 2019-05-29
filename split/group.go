@@ -9,6 +9,15 @@ import (
 	"github.com/goki/ki/sliceclone"
 )
 
+// All returns a single "split" with all of the rows in given view
+// useful for leveraging the aggregation management functions in splits
+func All(ix *etable.IdxView) *etable.Splits {
+	spl := &etable.Splits{}
+	spl.Levels = []string{"All"}
+	spl.New(ix.Table, []string{"All"}, ix.Idxs...)
+	return spl
+}
+
 // GroupByIdx returns a new Splits set based on the groups of values
 // across the given set of column indexes
 func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
@@ -18,8 +27,8 @@ func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 	}
 	spl := &etable.Splits{}
 	spl.Levels = make([]string, nc)
-	for ci := range colIdxs {
-		spl.Levels[ci] = ix.Table.ColNames[ci]
+	for i, ci := range colIdxs {
+		spl.Levels[i] = ix.Table.ColNames[ci]
 	}
 	srt := ix.Clone()
 	srt.SortCols(colIdxs, true)
@@ -28,11 +37,11 @@ func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 	var curIx *etable.IdxView
 	for _, rw := range srt.Idxs {
 		diff := false
-		for ci := range colIdxs {
+		for i, ci := range colIdxs {
 			cl := ix.Table.Cols[ci]
 			cv := cl.StringVal1D(rw)
-			curVals[ci] = cv
-			if cv != lstVals[ci] {
+			curVals[i] = cv
+			if cv != lstVals[i] {
 				diff = true
 			}
 		}
