@@ -134,6 +134,9 @@ func (pl *Plot2D) XLabel() string {
 
 // Update updates the display based on current state of table
 func (pl *Plot2D) Update() {
+	if pl == nil || pl.This() == nil {
+		return
+	}
 	if !pl.IsVisible() || pl.Table == nil {
 		return
 	}

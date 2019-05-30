@@ -283,65 +283,104 @@ func InferDataType(str string) etensor.Type {
 // and _D: to the data lines.  These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
 func (dt *Table) WriteCSV(w io.Writer, delim rune, headers bool) error {
+	ncol := 0
+	var err error
+	if headers {
+		ncol, err = dt.WriteCSVHeaders(w, delim)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+	}
 	cw := csv.NewWriter(w)
 	if delim != 0 {
 		cw.Comma = delim
 	}
-	hcap := 0
-	if headers {
-		hdrs := dt.EmerHeaders()
-		err := cw.Write(hdrs)
+	for ri := 0; ri < dt.Rows; ri++ {
+		err = dt.WriteCSVRowWriter(cw, ri, headers, ncol)
 		if err != nil {
+			log.Println(err)
 			return err
 		}
-		hcap = len(hdrs)
-	} else {
-		hcap = 100
 	}
-	rec := make([]string, 0, hcap)
-	for ri := 0; ri < dt.Rows; ri++ {
-		rc := 0
-		if headers {
-			vl := "_D:"
+	cw.Flush()
+	return nil
+}
+
+// WriteCSVHeaders writes headers to a comma-separated-values (CSV) file (where comma = any delimiter,
+//  specified in the delim arg).  Returns number of columns in header
+func (dt *Table) WriteCSVHeaders(w io.Writer, delim rune) (int, error) {
+	cw := csv.NewWriter(w)
+	if delim != 0 {
+		cw.Comma = delim
+	}
+	hdrs := dt.EmerHeaders()
+	nc := len(hdrs)
+	err := cw.Write(hdrs)
+	if err != nil {
+		return nc, err
+	}
+	cw.Flush()
+	return nc, nil
+}
+
+// WriteCSVRow writes given row to a comma-separated-values (CSV) file
+// (where comma = any delimiter, specified in the delim arg)
+func (dt *Table) WriteCSVRow(w io.Writer, row int, delim rune, headers bool) error {
+	cw := csv.NewWriter(w)
+	if delim != 0 {
+		cw.Comma = delim
+	}
+	err := dt.WriteCSVRowWriter(cw, row, headers, 0)
+	cw.Flush()
+	return err
+}
+
+// WriteCSVRowWriter uses csv.Writer to write one row
+func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, headers bool, ncol int) error {
+	var rec []string
+	if ncol > 0 {
+		rec = make([]string, 0, ncol)
+	} else {
+		rec = make([]string, 0)
+	}
+	rc := 0
+	if headers {
+		vl := "_D:"
+		if len(rec) <= rc {
+			rec = append(rec, vl)
+		} else {
+			rec[rc] = vl
+		}
+		rc++
+	}
+	for i := range dt.Cols {
+		tsr := dt.Cols[i]
+		nd := tsr.NumDims()
+		if nd == 1 {
+			vl := tsr.StringVal1D(row)
 			if len(rec) <= rc {
 				rec = append(rec, vl)
 			} else {
 				rec[rc] = vl
 			}
 			rc++
-		}
-		for i := range dt.Cols {
-			tsr := dt.Cols[i]
-			nd := tsr.NumDims()
-			if nd == 1 {
-				vl := tsr.StringVal1D(ri)
+		} else {
+			csh := etensor.NewShape(tsr.Shapes()[1:], nil, nil) // cell shape
+			tc := csh.Len()
+			for ti := 0; ti < tc; ti++ {
+				vl := tsr.StringVal1D(row*tc + ti)
 				if len(rec) <= rc {
 					rec = append(rec, vl)
 				} else {
 					rec[rc] = vl
 				}
 				rc++
-			} else {
-				csh := etensor.NewShape(tsr.Shapes()[1:], nil, nil) // cell shape
-				tc := csh.Len()
-				for ti := 0; ti < tc; ti++ {
-					vl := tsr.StringVal1D(ri*tc + ti)
-					if len(rec) <= rc {
-						rec = append(rec, vl)
-					} else {
-						rec[rc] = vl
-					}
-					rc++
-				}
 			}
 		}
-		err := cw.Write(rec)
-		if err != nil {
-			return err
-		}
 	}
-	cw.Flush()
-	return nil
+	err := cw.Write(rec)
+	return err
 }
 
 // EmerHeaders generates emergent DataTable header strings from the table.
