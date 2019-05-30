@@ -7,6 +7,7 @@ package etable
 import (
 	"fmt"
 	"math"
+	"strings"
 
 	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
@@ -237,6 +238,55 @@ func (dt *Table) SetMetaData(key, val string) {
 		dt.MetaData = make(map[string]string)
 	}
 	dt.MetaData[key] = val
+}
+
+// RowsByStringIdx returns the list of rows that have given
+// string value in given column index.
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+func (dt *Table) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bool) []int {
+	col := dt.Cols[colIdx]
+	lowstr := strings.ToLower(str)
+	var idxs []int
+	for i := 0; i < dt.Rows; i++ {
+		val := col.StringVal1D(i)
+		has := false
+		switch {
+		case contains && ignoreCase:
+			has = strings.Contains(strings.ToLower(val), lowstr)
+		case contains:
+			has = strings.Contains(val, str)
+		case ignoreCase:
+			has = strings.EqualFold(val, str)
+		default:
+			has = (val == str)
+		}
+		if has {
+			idxs = append(idxs, i)
+		}
+	}
+	return idxs
+}
+
+// RowsByString returns the list of rows that have given
+// string value in given column name.  returns nil if name invalid -- see also Try.
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+func (dt *Table) RowsByString(colNm string, str string, contains, ignoreCase bool) []int {
+	ci := dt.ColIdx(colNm)
+	if ci < 0 {
+		return nil
+	}
+	return dt.RowsByStringIdx(ci, str, contains, ignoreCase)
+}
+
+// RowsByStringTry returns the list of rows that have given
+// string value in given column name.  returns error message for invalid column name.
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+func (dt *Table) RowsByStringTry(colNm string, str string, contains, ignoreCase bool) ([]int, error) {
+	ci, err := dt.ColIdxTry(colNm)
+	if err != nil {
+		return nil, err
+	}
+	return dt.RowsByStringIdx(ci, str, contains, ignoreCase), nil
 }
 
 //////////////////////////////////////////////////////////////////////////////////////

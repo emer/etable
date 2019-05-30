@@ -8,6 +8,7 @@ import (
 	"math"
 	"math/rand"
 	"sort"
+	"strings"
 
 	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/sliceclone"
@@ -234,6 +235,60 @@ func (ix *IdxView) Clone() *IdxView {
 func (ix *IdxView) CopyFrom(oix *IdxView) {
 	ix.Table = oix.Table
 	ix.Idxs = sliceclone.Int(oix.Idxs)
+}
+
+// RowsByStringIdx returns the list of *our indexes* whose row in the table has
+// given string value in given column index (de-reference our indexes to get actual row).
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+func (ix *IdxView) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bool) []int {
+	dt := ix.Table
+	col := dt.Cols[colIdx]
+	lowstr := strings.ToLower(str)
+	var idxs []int
+	for idx, srw := range ix.Idxs {
+		val := col.StringVal1D(srw)
+		has := false
+		switch {
+		case contains && ignoreCase:
+			has = strings.Contains(strings.ToLower(val), lowstr)
+		case contains:
+			has = strings.Contains(val, str)
+		case ignoreCase:
+			has = strings.EqualFold(val, str)
+		default:
+			has = (val == str)
+		}
+		if has {
+			idxs = append(idxs, idx)
+		}
+	}
+	return idxs
+}
+
+// RowsByString returns the list of *our indexes* whose row in the table has
+// given string value in given column name (de-reference our indexes to get actual row).
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+// returns nil if name invalid -- see also Try.
+func (ix *IdxView) RowsByString(colNm string, str string, contains, ignoreCase bool) []int {
+	dt := ix.Table
+	ci := dt.ColIdx(colNm)
+	if ci < 0 {
+		return nil
+	}
+	return ix.RowsByStringIdx(ci, str, contains, ignoreCase)
+}
+
+// RowsByStringTry returns the list of *our indexes* whose row in the table has
+// given string value in given column name (de-reference our indexes to get actual row).
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+// returns error message for invalid column name.
+func (ix *IdxView) RowsByStringTry(colNm string, str string, contains, ignoreCase bool) ([]int, error) {
+	dt := ix.Table
+	ci, err := dt.ColIdxTry(colNm)
+	if err != nil {
+		return nil, err
+	}
+	return ix.RowsByStringIdx(ci, str, contains, ignoreCase), nil
 }
 
 // Len returns the length of the index list
