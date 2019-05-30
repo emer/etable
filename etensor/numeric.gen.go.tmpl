@@ -41,12 +41,23 @@ func New{{.Name}}(shape, strides []int, names []string) *{{.Name}} {
 }
 
 // New{{.Name}}Shape returns a new n-dimensional array of {{.Type}}s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func New{{.Name}}Shape(shape *Shape) *{{.Name}} {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func New{{.Name}}Shape(shape *Shape, vals []{{or .Type}}) *{{.Name}} {
 	tsr := &{{.Name}}{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]{{or .Type}}, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]{{or .Type}}, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]{{or .Type}}, tsr.Len())
+	}
 	return tsr
 }
 
@@ -215,7 +226,7 @@ func (tsr *{{.Name}}) 	SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *{{.Name}}) Clone() Tensor {
-	csr := New{{.Name}}Shape(&tsr.Shape)
+	csr := New{{.Name}}Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()

@@ -114,7 +114,7 @@ func DescIdx(ix *etable.IdxView, colIdx int) *etable.Table {
 // etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 func Desc(ix *etable.IdxView, colNm string) *etable.Table {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -128,7 +128,7 @@ func Desc(ix *etable.IdxView, colNm string) *etable.Table {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func DescTry(ix *etable.IdxView, colNm string) (*etable.Table, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}

@@ -39,7 +39,7 @@ func CountIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Count(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -52,7 +52,7 @@ func Count(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func CountTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +76,7 @@ func SumIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Sum(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -89,7 +89,7 @@ func Sum(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func SumTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func ProdIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Prod(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -126,7 +126,7 @@ func Prod(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func ProdTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func MaxIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Max(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -163,7 +163,7 @@ func Max(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func MaxTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -187,7 +187,7 @@ func MinIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Min(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -200,7 +200,7 @@ func Min(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func MinTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -234,7 +234,7 @@ func MeanIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Mean(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -247,7 +247,7 @@ func Mean(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func MeanTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -295,7 +295,7 @@ func VarIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Var(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -309,7 +309,7 @@ func Var(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func VarTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -339,7 +339,7 @@ func StdIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Std(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -353,7 +353,7 @@ func Std(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func StdTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -389,7 +389,7 @@ func SemIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Sem(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -403,7 +403,7 @@ func Sem(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func SemTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -451,7 +451,7 @@ func VarPopIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func VarPop(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -465,7 +465,7 @@ func VarPop(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func VarPopTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -495,7 +495,7 @@ func StdPopIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func StdPop(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -509,7 +509,7 @@ func StdPop(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func StdPopTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -545,7 +545,7 @@ func SemPopIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func SemPop(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -559,7 +559,7 @@ func SemPop(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func SemPopTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -583,7 +583,7 @@ func SumSqIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func SumSq(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -596,7 +596,7 @@ func SumSq(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func SumSqTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -620,7 +620,7 @@ func MedianIdx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Median(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -633,7 +633,7 @@ func Median(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func MedianTry(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -657,7 +657,7 @@ func Q1Idx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Q1(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -670,7 +670,7 @@ func Q1(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Q1Try(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -694,7 +694,7 @@ func Q3Idx(ix *etable.IdxView, colIdx int) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Q3(ix *etable.IdxView, colNm string) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -707,7 +707,7 @@ func Q3(ix *etable.IdxView, colNm string) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Q3Try(ix *etable.IdxView, colNm string) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}

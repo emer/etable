@@ -135,6 +135,9 @@ func (vv *TensorValueView) HasAction() bool {
 }
 
 func (vv *TensorValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+		return
+	}
 	opv := kit.OnePtrUnderlyingValue(vv.Value)
 	et := opv.Interface().(etensor.Tensor)
 	if et == nil {
@@ -209,6 +212,9 @@ func (vv *TableValueView) HasAction() bool {
 }
 
 func (vv *TableValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+		return
+	}
 	opv := kit.OnePtrUnderlyingValue(vv.Value)
 	et := opv.Interface().(*etable.Table)
 	if et == nil {

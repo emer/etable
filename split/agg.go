@@ -31,7 +31,7 @@ func Agg(spl *etable.Splits, colNm string, aggTyp agg.Aggs) *etable.SplitAgg {
 	if dt == nil {
 		return nil
 	}
-	return AggIdx(spl, dt.ColIdxByName(colNm), aggTyp)
+	return AggIdx(spl, dt.ColIdx(colNm), aggTyp)
 }
 
 // AggTry performs aggregation using given standard aggregation function across
@@ -42,7 +42,7 @@ func AggTry(spl *etable.Splits, colNm string, aggTyp agg.Aggs) (*etable.SplitAgg
 	if dt == nil {
 		return nil, fmt.Errorf("split.AggTry: No splits to aggregate over")
 	}
-	colIdx, err := dt.ColIdxByNameTry(colNm)
+	colIdx, err := dt.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +77,7 @@ func Desc(spl *etable.Splits, colNm string) {
 	if dt == nil {
 		return
 	}
-	DescIdx(spl, dt.ColIdxByName(colNm))
+	DescIdx(spl, dt.ColIdx(colNm))
 }
 
 // DescTry performs aggregation using standard aggregation functions across
@@ -88,7 +88,7 @@ func DescTry(spl *etable.Splits, colNm string, aggTyp agg.Aggs) error {
 	if dt == nil {
 		return fmt.Errorf("split.AggTry: No splits to aggregate over")
 	}
-	colIdx, err := dt.ColIdxByNameTry(colNm)
+	colIdx, err := dt.ColIdxTry(colNm)
 	if err != nil {
 		return err
 	}

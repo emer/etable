@@ -134,7 +134,7 @@ func AggIdx(ix *etable.IdxView, colIdx int, ag Aggs) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func Agg(ix *etable.IdxView, colNm string, ag Aggs) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -150,7 +150,7 @@ func Agg(ix *etable.IdxView, colNm string, ag Aggs) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func AggTry(ix *etable.IdxView, colNm string, ag Aggs) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}

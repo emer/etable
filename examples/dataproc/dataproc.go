@@ -75,8 +75,8 @@ func AnalyzePlanets() {
 	GpMethodYear = byMethod.AggsToTable(false) // false = include agg name in column
 
 	byMethodDecade := split.GroupByFunc(PlanetsAll, func(row int) []string {
-		meth := Planets.CellStringByName("method", row)
-		yr := Planets.CellFloatByName("year", row)
+		meth := Planets.CellString("method", row)
+		yr := Planets.CellFloat("year", row)
 		decade := math.Floor(yr/10) * 10
 		return []string{meth, fmt.Sprintf("%gs", decade)}
 	})

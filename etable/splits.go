@@ -341,7 +341,7 @@ func (spl *Splits) AggByColName(name string) *SplitAgg {
 		return nil
 	}
 	nmsp := strings.Split(name, ":")
-	colIdx := dt.ColIdxByName(nmsp[0])
+	colIdx := dt.ColIdx(nmsp[0])
 	if colIdx == -1 {
 		return nil
 	}

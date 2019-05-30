@@ -65,7 +65,7 @@ func QuantilesIdx(ix *etable.IdxView, colIdx int, qs []float64) []float64 {
 // Because this requires a sort, it is more efficient to get as many quantiles
 // as needed in one pass.
 func Quantiles(ix *etable.IdxView, colNm string, qs []float64) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -80,7 +80,7 @@ func Quantiles(ix *etable.IdxView, colNm string, qs []float64) []float64 {
 // Because this requires a sort, it is more efficient to get as many quantiles
 // as needed in one pass.
 func QuantilesTry(ix *etable.IdxView, colNm string, qs []float64) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}

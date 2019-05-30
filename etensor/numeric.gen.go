@@ -42,12 +42,23 @@ func NewInt64(shape, strides []int, names []string) *Int64 {
 }
 
 // NewInt64Shape returns a new n-dimensional array of int64s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewInt64Shape(shape *Shape) *Int64 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewInt64Shape(shape *Shape, vals []int64) *Int64 {
 	tsr := &Int64{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]int64, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]int64, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]int64, tsr.Len())
+	}
 	return tsr
 }
 
@@ -215,7 +226,7 @@ func (tsr *Int64) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Int64) Clone() Tensor {
-	csr := NewInt64Shape(&tsr.Shape)
+	csr := NewInt64Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -491,12 +502,23 @@ func NewUint64(shape, strides []int, names []string) *Uint64 {
 }
 
 // NewUint64Shape returns a new n-dimensional array of uint64s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewUint64Shape(shape *Shape) *Uint64 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewUint64Shape(shape *Shape, vals []uint64) *Uint64 {
 	tsr := &Uint64{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]uint64, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]uint64, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]uint64, tsr.Len())
+	}
 	return tsr
 }
 
@@ -664,7 +686,7 @@ func (tsr *Uint64) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Uint64) Clone() Tensor {
-	csr := NewUint64Shape(&tsr.Shape)
+	csr := NewUint64Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -940,12 +962,23 @@ func NewFloat64(shape, strides []int, names []string) *Float64 {
 }
 
 // NewFloat64Shape returns a new n-dimensional array of float64s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewFloat64Shape(shape *Shape) *Float64 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewFloat64Shape(shape *Shape, vals []float64) *Float64 {
 	tsr := &Float64{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]float64, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]float64, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]float64, tsr.Len())
+	}
 	return tsr
 }
 
@@ -1113,7 +1146,7 @@ func (tsr *Float64) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Float64) Clone() Tensor {
-	csr := NewFloat64Shape(&tsr.Shape)
+	csr := NewFloat64Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -1389,12 +1422,23 @@ func NewInt32(shape, strides []int, names []string) *Int32 {
 }
 
 // NewInt32Shape returns a new n-dimensional array of int32s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewInt32Shape(shape *Shape) *Int32 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewInt32Shape(shape *Shape, vals []int32) *Int32 {
 	tsr := &Int32{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]int32, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]int32, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]int32, tsr.Len())
+	}
 	return tsr
 }
 
@@ -1562,7 +1606,7 @@ func (tsr *Int32) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Int32) Clone() Tensor {
-	csr := NewInt32Shape(&tsr.Shape)
+	csr := NewInt32Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -1838,12 +1882,23 @@ func NewUint32(shape, strides []int, names []string) *Uint32 {
 }
 
 // NewUint32Shape returns a new n-dimensional array of uint32s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewUint32Shape(shape *Shape) *Uint32 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewUint32Shape(shape *Shape, vals []uint32) *Uint32 {
 	tsr := &Uint32{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]uint32, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]uint32, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]uint32, tsr.Len())
+	}
 	return tsr
 }
 
@@ -2011,7 +2066,7 @@ func (tsr *Uint32) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Uint32) Clone() Tensor {
-	csr := NewUint32Shape(&tsr.Shape)
+	csr := NewUint32Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -2287,12 +2342,23 @@ func NewFloat32(shape, strides []int, names []string) *Float32 {
 }
 
 // NewFloat32Shape returns a new n-dimensional array of float32s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewFloat32Shape(shape *Shape) *Float32 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewFloat32Shape(shape *Shape, vals []float32) *Float32 {
 	tsr := &Float32{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]float32, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]float32, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]float32, tsr.Len())
+	}
 	return tsr
 }
 
@@ -2460,7 +2526,7 @@ func (tsr *Float32) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Float32) Clone() Tensor {
-	csr := NewFloat32Shape(&tsr.Shape)
+	csr := NewFloat32Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -2736,12 +2802,23 @@ func NewInt16(shape, strides []int, names []string) *Int16 {
 }
 
 // NewInt16Shape returns a new n-dimensional array of int16s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewInt16Shape(shape *Shape) *Int16 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewInt16Shape(shape *Shape, vals []int16) *Int16 {
 	tsr := &Int16{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]int16, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]int16, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]int16, tsr.Len())
+	}
 	return tsr
 }
 
@@ -2909,7 +2986,7 @@ func (tsr *Int16) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Int16) Clone() Tensor {
-	csr := NewInt16Shape(&tsr.Shape)
+	csr := NewInt16Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -3185,12 +3262,23 @@ func NewUint16(shape, strides []int, names []string) *Uint16 {
 }
 
 // NewUint16Shape returns a new n-dimensional array of uint16s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewUint16Shape(shape *Shape) *Uint16 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewUint16Shape(shape *Shape, vals []uint16) *Uint16 {
 	tsr := &Uint16{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]uint16, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]uint16, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]uint16, tsr.Len())
+	}
 	return tsr
 }
 
@@ -3358,7 +3446,7 @@ func (tsr *Uint16) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Uint16) Clone() Tensor {
-	csr := NewUint16Shape(&tsr.Shape)
+	csr := NewUint16Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -3634,12 +3722,23 @@ func NewInt8(shape, strides []int, names []string) *Int8 {
 }
 
 // NewInt8Shape returns a new n-dimensional array of int8s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewInt8Shape(shape *Shape) *Int8 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewInt8Shape(shape *Shape, vals []int8) *Int8 {
 	tsr := &Int8{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]int8, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]int8, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]int8, tsr.Len())
+	}
 	return tsr
 }
 
@@ -3807,7 +3906,7 @@ func (tsr *Int8) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Int8) Clone() Tensor {
-	csr := NewInt8Shape(&tsr.Shape)
+	csr := NewInt8Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()
@@ -4083,12 +4182,23 @@ func NewUint8(shape, strides []int, names []string) *Uint8 {
 }
 
 // NewUint8Shape returns a new n-dimensional array of uint8s.
-// Using shape structure instead of separate data.
-// Nulls are initialized to nil.
-func NewUint8Shape(shape *Shape) *Uint8 {
+// Using shape structure instead of separate slices, and optionally
+// existing values if vals != nil (must be of proper length) -- we
+// directly set our internal Values = vals, thereby sharing the same
+// underlying data. Nulls are initialized to nil.
+func NewUint8Shape(shape *Shape, vals []uint8) *Uint8 {
 	tsr := &Uint8{}
 	tsr.CopyShape(shape)
-	tsr.Values = make([]uint8, tsr.Len())
+	if vals != nil {
+		if len(vals) != tsr.Len() {
+			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			tsr.Values = make([]uint8, tsr.Len())
+		} else {
+			tsr.Values = vals
+		}
+	} else {
+		tsr.Values = make([]uint8, tsr.Len())
+	}
 	return tsr
 }
 
@@ -4256,7 +4366,7 @@ func (tsr *Uint8) SetZeros() {
 // own separate memory representation of all the values, and returns
 // that as a Tensor (which can be converted into the known type as needed).
 func (tsr *Uint8) Clone() Tensor {
-	csr := NewUint8Shape(&tsr.Shape)
+	csr := NewUint8Shape(&tsr.Shape, nil)
 	copy(csr.Values, tsr.Values)
 	if tsr.Nulls != nil {
 		csr.Nulls = tsr.Nulls.Clone()

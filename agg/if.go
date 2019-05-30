@@ -33,7 +33,7 @@ func CountIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func CountIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -47,7 +47,7 @@ func CountIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func CountIfTry(ix *etable.IdxView, colNm string, iffun IfFunc) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func PropIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func PropIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -97,7 +97,7 @@ func PropIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func PropIfTry(ix *etable.IdxView, colNm string, iffun IfFunc) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +133,7 @@ func PctIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func PctIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
-	colIdx := ix.Table.ColIdxByName(colNm)
+	colIdx := ix.Table.ColIdx(colNm)
 	if colIdx == -1 {
 		return nil
 	}
@@ -147,7 +147,7 @@ func PctIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
 func PctIfTry(ix *etable.IdxView, colNm string, iffun IfFunc) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxByNameTry(colNm)
+	colIdx, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		return nil, err
 	}

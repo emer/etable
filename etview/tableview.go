@@ -296,7 +296,7 @@ func (tv *TableView) ConfigSliceGrid() {
 					tvv.SortSliceAction(fldIdx)
 				})
 			} else {
-				cell := tv.Table.CellTensor(fli, 0)
+				cell := tv.Table.CellTensorIdx(fli, 0)
 				tvv := &TensorGridValueView{}
 				tvv.Init(tvv)
 				vv = tvv
@@ -511,7 +511,7 @@ func (tv *TableView) UpdateSliceGrid() {
 							col := vvv.Prop("tv-col").(int)
 							npv := kit.NonPtrValue(vvv.Value)
 							sv := kit.ToString(npv.Interface())
-							tv.Table.SetCellString(col, tvv.StartIdx+row, sv)
+							tv.Table.SetCellStringIdx(col, tvv.StartIdx+row, sv)
 							tvv.ViewSig.Emit(tvv.This(), 0, nil)
 						})
 				} else {
@@ -531,12 +531,12 @@ func (tv *TableView) UpdateSliceGrid() {
 								npv := kit.NonPtrValue(vvv.Value)
 								fv, ok := kit.ToFloat(npv.Interface())
 								if ok {
-									tv.Table.SetCellFloat(col, tvv.StartIdx+row, fv)
+									tv.Table.SetCellFloatIdx(col, tvv.StartIdx+row, fv)
 									tvv.ViewSig.Emit(tvv.This(), 0, nil)
 								}
 							})
 					} else {
-						cell := tv.Table.CellTensor(fli, 0)
+						cell := tv.Table.CellTensorIdx(fli, 0)
 						tvv := &TensorGridValueView{}
 						tvv.Init(tvv)
 						vv = tvv
@@ -553,7 +553,7 @@ func (tv *TableView) UpdateSliceGrid() {
 						fval := col.FloatVal1D(si)
 						vv.SetStandaloneValue(reflect.ValueOf(&fval))
 					} else {
-						cell := tv.Table.CellTensor(fli, si)
+						cell := tv.Table.CellTensorIdx(fli, si)
 						vv.SetStandaloneValue(reflect.ValueOf(cell))
 					}
 				}
