@@ -6,7 +6,6 @@ package eplot
 
 import (
 	"bytes"
-	"image"
 	"log"
 	"os"
 
@@ -25,7 +24,7 @@ func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 
 	sz := svge.BBox.Size()
 
-	if sz == image.ZP {
+	if sz.X == 0 || sz.Y == 0 || scale == 0 {
 		return
 	}
 
@@ -50,7 +49,9 @@ func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 	svge.Scale = float32(scale)
 	svge.SetTransform()
 
-	svge.FullInit2DTree() // critical to enable immediate rendering
+	if svge.IsVisible() {
+		svge.FullInit2DTree() // critical to enable immediate rendering
+	}
 }
 
 // SaveSVGView saves the given gonum Plot exactly as it is rendered given GoGi svg editor widget.
