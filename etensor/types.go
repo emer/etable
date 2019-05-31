@@ -48,7 +48,7 @@ const (
 	INT64 Type = Type(arrow.INT64)
 
 	// FLOAT16 is a 2-byte floating point value
-	FLOAT16 Type = Type(arrow.HALF_FLOAT)
+	FLOAT16 Type = Type(arrow.FLOAT16)
 
 	// FLOAT32 is a 4-byte floating point value
 	FLOAT32 Type = Type(arrow.FLOAT32)
