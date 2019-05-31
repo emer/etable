@@ -31,6 +31,7 @@ type Plot2D struct {
 	GPlot    *plot.Plot    `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
 	SVGFile  gi.FileName   `desc:"current svg file"`
 	DataFile gi.FileName   `desc:"current csv data file"`
+	InPlot   bool          `desc:"currently doing a plot"`
 }
 
 var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)
@@ -148,6 +149,11 @@ func (pl *Plot2D) Update() {
 
 // GenPlot generates the plot
 func (pl *Plot2D) GenPlot() {
+	if pl.InPlot {
+		fmt.Printf("error: in plot already\n")
+		return
+	}
+	pl.InPlot = true
 	plt, _ := plot.New() // todo: not clear how to re-use, due to newtablexynames
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
@@ -185,6 +191,7 @@ func (pl *Plot2D) GenPlot() {
 	pl.GPlot = plt
 	sv := pl.SVGPlot()
 	PlotViewSVG(plt, sv, pl.Params.Scale)
+	pl.InPlot = false
 }
 
 // Config configures the overall view widget
@@ -395,7 +402,9 @@ func (pl *Plot2D) Style2D() {
 	if !pl.IsConfiged() {
 		return
 	}
-	pl.GenPlot()
+	if !pl.InPlot && pl.Viewport != nil && pl.Viewport.IsDoingFullRender() {
+		pl.GenPlot() // this is recursive
+	}
 	pl.ColsUpdate()
 }
 
