@@ -276,8 +276,7 @@ func (tv *TableView) ConfigSliceGrid() {
 		var vv giv.ValueView
 		if stsr, isstr := col.(*etensor.String); isstr {
 			vv = giv.ToValueView(&stsr.Values[0], "")
-			vv.SetSliceValue(reflect.ValueOf(&stsr.Values[0]), stsr.Values, 0, tv.TmpSave)
-
+			vv.SetSliceValue(reflect.ValueOf(&stsr.Values[0]), stsr.Values, 0, tv.TmpSave, tv.ViewPath)
 			hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				act := send.(*gi.Action)
