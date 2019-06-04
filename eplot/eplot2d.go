@@ -42,6 +42,7 @@ func AddNewPlot2D(parent ki.Ki, name string) *Plot2D {
 }
 
 func (pl *Plot2D) Defaults() {
+	pl.Params.Plot = pl
 	pl.Params.Defaults()
 }
 
@@ -161,7 +162,7 @@ func (pl *Plot2D) GenPlot() {
 	plt.BackgroundColor = nil
 
 	for _, cp := range pl.Cols {
-		cp.Update()
+		cp.UpdateVals()
 		if cp.Col == pl.Params.XAxisCol {
 			if cp.Range.FixMin {
 				plt.X.Min = math.Min(plt.X.Min, cp.Range.Min)
@@ -316,6 +317,7 @@ func (pl *Plot2D) ColsConfig() {
 
 	for i, cli := range *vl.Children() {
 		cp := pl.Cols[i]
+		cp.Plot = pl
 		cl := cli.(*gi.Layout)
 		cl.Lay = gi.LayoutHoriz
 		cl.ConfigChildren(clcfg, false)

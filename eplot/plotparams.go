@@ -17,6 +17,7 @@ type PlotParams struct {
 	XAxisCol   string  `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
 	XAxisLabel string  `desc:"optional label to use for XAxis instead of column name"`
 	YAxisLabel string  `desc:"optional label to use for YAxis -- if empty, first column name is used"`
+	Plot       *Plot2D `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -26,6 +27,13 @@ func (pp *PlotParams) Defaults() {
 	}
 	if pp.Scale == 0 {
 		pp.Scale = 2
+	}
+}
+
+// Update satisfies the gi.Updater interface and will trigger display update on edits
+func (pp *PlotParams) Update() {
+	if pp.Plot != nil {
+		pp.Plot.Update()
 	}
 }
 
@@ -41,6 +49,7 @@ type ColParams struct {
 	Lbl       string         `desc:"if non-empty, this is an alternative label to use in plotting"`
 	TensorIdx int            `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot"`
 	ErrCol    string         `desc:"specifies a column containing error bars for this column"`
+	Plot      *Plot2D        `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -50,8 +59,16 @@ func (cp *ColParams) Defaults() {
 	}
 }
 
-// Update updates e.g., color from color name
+// Update satisfies the gi.Updater interface and will trigger display update on edits
 func (cp *ColParams) Update() {
+	cp.UpdateVals()
+	if cp.Plot != nil {
+		cp.Plot.Update()
+	}
+}
+
+// UpdateVals update derived values e.g., color from color name
+func (cp *ColParams) UpdateVals() {
 	if cp.ColorName != "" {
 		clr, err := gi.ColorFromString(string(cp.ColorName), nil)
 		if err == nil {

@@ -28,8 +28,8 @@ func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 		return
 	}
 
-	w := (float64(sz.X) * 72.0) / (scale * 96.0)
-	h := (float64(sz.Y) * 72.0) / (scale * 96.0)
+	w := (float64(sz.X-4) * 96.0) / (scale * 96.0)
+	h := (float64(sz.Y-4) * 96.0) / (scale * 96.0)
 
 	// Create a Canvas for writing SVG images.
 	c := vgsvg.New(vg.Length(w), vg.Length(h))
