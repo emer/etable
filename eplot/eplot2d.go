@@ -134,21 +134,59 @@ func (pl *Plot2D) XLabel() string {
 	return "X"
 }
 
-// Update updates the display based on current state of table
+// GoUpdate updates the display based on current state of table.
+// This version must be used when called from another goroutine
+// does proper blocking to synchronize with updating in the main
+// goroutine.
+func (pl *Plot2D) GoUpdate() {
+	if pl == nil || pl.This() == nil {
+		return
+	}
+	if !pl.IsVisible() || pl.Table == nil || pl.InPlot {
+		return
+	}
+	if pl.Viewport.IsUpdatingNode() { // already updating -- don't add to it
+		return
+	}
+
+	pl.Viewport.BlockUpdates()
+	plupdt := false
+	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.NumCols() {
+		plupdt = pl.UpdateStart()
+		pl.Config()
+	}
+	sv := pl.SVGPlot()
+	updt := sv.UpdateStart()
+	pl.GenPlot()
+	pl.Viewport.UnblockUpdates()
+	sv.UpdateEnd(updt)
+	pl.UpdateEnd(plupdt)
+}
+
+// Update updates the display based on current state of table.
+// This version can only be called within main goroutine for
+// window eventloop -- use GoUpdate for other-goroutine updates.
 func (pl *Plot2D) Update() {
 	if pl == nil || pl.This() == nil {
 		return
 	}
-	if !pl.IsVisible() || pl.Table == nil {
+	if !pl.IsVisible() || pl.Table == nil || pl.InPlot {
 		return
 	}
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.NumCols() {
 		pl.Config()
 	}
-	pl.GenPlot() // just need to redraw svg, not full thing.
+	if pl.Viewport.IsUpdatingNode() { // already updating -- don't add to it
+		return
+	}
+	pl.GenPlot()
 }
 
 // GenPlot generates the plot
+// if blockUpdts is true, then block any other updates on the parent Viewport
+// while we're plotting, because this involves destroying and rebuilding the
+// tree, and is often called from another goroutine.  if called as part of the
+// normal render process (e.g., in Style2D, then do NOT block updates!)
 func (pl *Plot2D) GenPlot() {
 	if pl.InPlot {
 		fmt.Printf("error: in plot already\n")

@@ -18,18 +18,19 @@ import (
 
 // PlotViewSVG shows the given gonum Plot in given GoGi svg editor widget.
 // The scale rescales the default font sizes -- 2-4 recommended.
+// This call must generally be enclosed within an UpdateStart / End
+// as part of the overall update routine using it.
+// if called from a different goroutine, it is essential to
+// surround with BlockUpdates on Viewport as this does full
+// damage to the tree.
 func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
-	updt := svge.UpdateStart()
-	defer svge.UpdateEnd(updt)
-
 	sz := svge.BBox.Size()
-
 	if sz.X == 0 || sz.Y == 0 || scale == 0 {
 		return
 	}
 
-	w := (float64(sz.X-4) * 96.0) / (scale * 96.0)
-	h := (float64(sz.Y-4) * 96.0) / (scale * 96.0)
+	w := float64(sz.X-4) / scale
+	h := float64(sz.Y-4) / scale
 
 	// Create a Canvas for writing SVG images.
 	c := vgsvg.New(vg.Length(w), vg.Length(h))
@@ -40,16 +41,13 @@ func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 	var buf bytes.Buffer
 	if _, err := c.WriteTo(&buf); err != nil {
 		log.Println(err)
-		return
-	}
+	} else {
+		svge.ReadXML(&buf)
 
-	svge.ReadXML(&buf)
+		svge.SetNormXForm()
+		svge.Scale = float32(scale)
+		svge.SetTransform()
 
-	svge.SetNormXForm()
-	svge.Scale = float32(scale)
-	svge.SetTransform()
-
-	if svge.IsVisible() {
 		svge.FullInit2DTree() // critical to enable immediate rendering
 	}
 }
