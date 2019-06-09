@@ -44,6 +44,7 @@ func AddNewPlot2D(parent ki.Ki, name string) *Plot2D {
 func (pl *Plot2D) Defaults() {
 	pl.Params.Plot = pl
 	pl.Params.Defaults()
+	plot.DefaultFont = "Helvetica"
 }
 
 // SetTable sets the table to view and updates view

@@ -89,7 +89,7 @@ func (ix *IdxView) AddIndex(idx int) {
 // Sort sorts the indexes into our Table using given Less function.
 // The Less function operates directly on row numbers into the Table
 // as these row numbers have already been projected through the indexes.
-func (ix *IdxView) Sort(lessFunc LessFunc) {
+func (ix *IdxView) Sort(lessFunc func(et *Table, i, j int) bool) {
 	ix.lessFunc = lessFunc
 	sort.Sort(ix)
 }
@@ -162,7 +162,7 @@ func (ix *IdxView) SortCols(colIdxs []int, ascending bool) {
 // Filter filters the indexes into our Table using given Filter function.
 // The Filter function operates directly on row numbers into the Table
 // as these row numbers have already been projected through the indexes.
-func (ix *IdxView) Filter(filterFunc FilterFunc) {
+func (ix *IdxView) Filter(filterFunc func(et *Table, row int) bool) {
 	sz := len(ix.Idxs)
 	for i := sz - 1; i >= 0; i-- { // always go in reverse for filtering
 		if !filterFunc(ix.Table, ix.Idxs[i]) { // delete

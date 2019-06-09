@@ -141,7 +141,7 @@ func (spl *Splits) Filter(fun func(idx int) bool) {
 }
 
 // Sort sorts the splits according to the given Less function.
-func (spl *Splits) Sort(lessFunc SplitsLessFunc) {
+func (spl *Splits) Sort(lessFunc func(spl *Splits, i, j int) bool) {
 	spl.lessFunc = lessFunc
 	sort.Sort(spl)
 }

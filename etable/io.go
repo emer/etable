@@ -17,6 +17,22 @@ import (
 	"github.com/goki/gi/gi"
 )
 
+const (
+	// Tab is the tab rune delimiter, for TSV tab separated values
+	Tab rune = '\t'
+
+	// Comma is the comma rune delimiter, for CSV comma separated values
+	Comma rune = ','
+
+	// Space is the space rune delimiter, for SSV space separated value
+	Space rune = ' '
+)
+
+// File is an effective alias for os.File so Python does not need to include os
+type File struct {
+	os.File
+}
+
 // SaveCSV writes a table to a comma-separated-values (CSV) file (where comma = any delimiter,
 // specified in the delim arg).
 // If headers = true then generate C++ emergent-tyle column headers and add _H: to the header line
