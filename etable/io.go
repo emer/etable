@@ -28,11 +28,6 @@ const (
 	Space rune = ' '
 )
 
-// File is an effective alias for os.File so Python does not need to include os
-type File struct {
-	os.File
-}
-
 // SaveCSV writes a table to a comma-separated-values (CSV) file (where comma = any delimiter,
 // specified in the delim arg).
 // If headers = true then generate C++ emergent-tyle column headers and add _H: to the header line
