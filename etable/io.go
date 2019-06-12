@@ -349,6 +349,10 @@ func (dt *Table) WriteCSVRow(w io.Writer, row int, delim rune, headers bool) err
 
 // WriteCSVRowWriter uses csv.Writer to write one row
 func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, headers bool, ncol int) error {
+	prec := -1
+	if ps, ok := dt.MetaData["precision"]; ok {
+		prec, _ = strconv.Atoi(ps)
+	}
 	var rec []string
 	if ncol > 0 {
 		rec = make([]string, 0, ncol)
@@ -369,7 +373,12 @@ func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, headers bool, ncol i
 		tsr := dt.Cols[i]
 		nd := tsr.NumDims()
 		if nd == 1 {
-			vl := tsr.StringVal1D(row)
+			vl := ""
+			if prec <= 0 || tsr.DataType() == etensor.STRING {
+				vl = tsr.StringVal1D(row)
+			} else {
+				vl = strconv.FormatFloat(tsr.FloatVal1D(row), 'g', prec, 64)
+			}
 			if len(rec) <= rc {
 				rec = append(rec, vl)
 			} else {
@@ -380,7 +389,12 @@ func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, headers bool, ncol i
 			csh := etensor.NewShape(tsr.Shapes()[1:], nil, nil) // cell shape
 			tc := csh.Len()
 			for ti := 0; ti < tc; ti++ {
-				vl := tsr.StringVal1D(row*tc + ti)
+				vl := ""
+				if prec <= 0 || tsr.DataType() == etensor.STRING {
+					vl = tsr.StringVal1D(row*tc + ti)
+				} else {
+					vl = strconv.FormatFloat(tsr.FloatVal1D(row*tc+ti), 'g', prec, 64)
+				}
 				if len(rec) <= rc {
 					rec = append(rec, vl)
 				} else {
