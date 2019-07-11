@@ -15,10 +15,11 @@ import (
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/mouse"
 	"github.com/goki/gi/units"
-	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 )
+
+const GridExtra = float32(.1)
 
 // TensorLayout are layout options for displaying tensors
 type TensorLayout struct {
@@ -36,6 +37,7 @@ type TensorDisp struct {
 	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
 	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
 	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
+	GridView    *TensorGrid      `copy:"-" json:"-" xml:"-" view:"-" desc:"our gridview, for update method"`
 }
 
 // Defaults sets defaults for values that are at nonsensical initial values
@@ -55,6 +57,13 @@ func (td *TensorDisp) Defaults() {
 	}
 	if td.TotPrefSize.Val == 0 {
 		td.TotPrefSize.Set(20, units.Em)
+	}
+}
+
+// Update satisfies the gi.Updater interface and will trigger display update on edits
+func (td *TensorDisp) Update() {
+	if td.GridView != nil {
+		td.GridView.UpdateSig()
 	}
 }
 
@@ -83,6 +92,7 @@ func AddNewTensorGrid(parent ki.Ki, name string, tsr etensor.Tensor) *TensorGrid
 
 // Defaults sets defaults for values that are at nonsensical initial values
 func (tg *TensorGrid) Defaults() {
+	tg.Disp.GridView = tg
 	tg.Disp.Defaults()
 }
 
@@ -131,14 +141,12 @@ func (tg *TensorGrid) MouseEvent() {
 	tg.ConnectEvent(oswin.MouseEvent, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
 		me := d.(*mouse.Event)
 		tgv := retg.(*TensorGrid)
-		if me.Button == mouse.Left {
-			switch me.Action {
-			case mouse.DoubleClick:
-				giv.StructViewDialog(tgv.Viewport, &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
-			case mouse.Press:
-				me.SetProcessed()
-				tgv.OpenTensorView()
-			}
+		switch {
+		case me.Button == mouse.Right && me.Action == mouse.Press:
+			giv.StructViewDialog(tgv.Viewport, &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
+		case me.Button == mouse.Left && me.Action == mouse.Press:
+			me.SetProcessed()
+			tgv.OpenTensorView()
 		}
 	})
 }
@@ -161,9 +169,11 @@ func (tg *TensorGrid) Size2D(iter int) {
 		// todo: image
 
 		tg.InitLayout2D()
-		rows, cols := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
+		rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
+		frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
+		fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
 		tg.Disp.ToDots(&tg.Sty.UnContext)
-		max := float32(ints.MaxInt(rows, cols))
+		max := float32(math32.Max(frw, fcl))
 		gsz := tg.Disp.TotPrefSize.Dots / max
 		gsz = math32.Max(gsz, tg.Disp.GridMinSize.Dots)
 		gsz = math32.Min(gsz, tg.Disp.GridMaxSize.Dots)
@@ -224,21 +234,32 @@ func (tg *TensorGrid) RenderTensor() {
 
 	tsr := tg.Tensor
 
-	rows, cols := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
-
-	tsz := gi.Vec2D{float32(cols), float32(rows)}
+	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
+	frw := float32(rows) + float32(rowEx)*.1 // extra spacing
+	fcl := float32(cols) + float32(colEx)*.1 // extra spacing
+	rowsInner := rows
+	colsInner := cols
+	if rowEx > 0 {
+		rowsInner = rows / rowEx
+	}
+	if colEx > 0 {
+		colsInner = cols / colEx
+	}
+	tsz := gi.Vec2D{fcl, frw}
 	gsz := sz.Div(tsz)
 
 	ssz := gsz.MulVal(.9) // smaller size with margin
 	// todo: for 4D, need to add the extra margins..
 	for y := 0; y < rows; y++ {
+		yex := float32(int(y/rowsInner)) * GridExtra
 		for x := 0; x < cols; x++ {
+			xex := float32(int(x/colsInner)) * GridExtra
 			ey := y
 			if !tg.Disp.TopZero {
 				ey = (rows - 1) - y
 			}
 			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
-			cr := gi.Vec2D{float32(x), float32(y)}
+			cr := gi.Vec2D{float32(x) + xex, float32(y) + yex}
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
 			pc.FillBoxColor(rs, pr, ssz, clr)

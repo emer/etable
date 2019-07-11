@@ -105,7 +105,7 @@ func (tv *TensorView) Config() {
 }
 
 func (tv *TensorView) UpdtSliceSize() int {
-	tv.SliceSize, tv.NCols = etensor.Prjn2DShape(tv.Tensor, tv.TsrLay.OddRow)
+	tv.SliceSize, tv.NCols, _, _ = etensor.Prjn2DShape(tv.Tensor, tv.TsrLay.OddRow)
 	return tv.SliceSize
 }
 
@@ -616,8 +616,17 @@ func (tv *TensorView) ConfigToolbar() {
 						tvvv.UpdateSliceGrid()
 					})
 			})
+		tb.AddAction(gi.ActOpts{Label: "Grid", Icon: "file-sheet"},
+			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TensorView).(*TensorView)
+				TensorGridDialog(tv.Viewport, tvv.Tensor, giv.DlgOpts{Title: "TensorGrid", Ok: false, Cancel: false},
+					tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+						tvvv := recv.Embed(KiT_TensorView).(*TensorView)
+						tvvv.UpdateSliceGrid()
+					})
+			})
 	}
-	nCustom := 2
+	nCustom := 3
 	sz := len(*tb.Children())
 	if sz > nCustom {
 		for i := sz - 1; i >= nCustom; i-- {

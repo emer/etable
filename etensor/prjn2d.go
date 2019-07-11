@@ -10,60 +10,62 @@ package etensor
 // can either be multipliexed across the row or column, given the oddRow arg.
 // Even multiples of inner-most dimensions are assumed to be row, then column.
 // RowMajor and ColMajor layouts are handled appropriately.
-func Prjn2DShape(tsr Tensor, oddRow bool) (rows, cols int) {
+// rowEx returns the number of "extra" (higher dimensional) rows
+// and colEx returns the number of extra cols
+func Prjn2DShape(tsr Tensor, oddRow bool) (rows, cols, rowEx, colEx int) {
 	if tsr.Len() == 0 {
-		return 1, 1
+		return 1, 1, 0, 0
 	}
 	nd := tsr.NumDims()
 	switch nd {
 	case 1:
 		if oddRow {
-			return tsr.Dim(0), 1
+			return tsr.Dim(0), 1, 0, 0
 		} else {
-			return 1, tsr.Dim(0)
+			return 1, tsr.Dim(0), 0, 0
 		}
 	case 2:
 		if tsr.ShapeObj().IsRowMajor() {
-			return tsr.Dim(0), tsr.Dim(1)
+			return tsr.Dim(0), tsr.Dim(1), 0, 0
 		} else {
-			return tsr.Dim(1), tsr.Dim(0)
+			return tsr.Dim(1), tsr.Dim(0), 0, 0
 		}
 	case 3:
 		if oddRow {
 			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(0) * tsr.Dim(1), tsr.Dim(2)
+				return tsr.Dim(0) * tsr.Dim(1), tsr.Dim(2), tsr.Dim(0), 0
 			} else {
-				return tsr.Dim(2) * tsr.Dim(1), tsr.Dim(0)
+				return tsr.Dim(2) * tsr.Dim(1), tsr.Dim(0), tsr.Dim(2), 0
 			}
 		} else {
 			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(1), tsr.Dim(0) * tsr.Dim(2)
+				return tsr.Dim(1), tsr.Dim(0) * tsr.Dim(2), 0, tsr.Dim(0)
 			} else {
-				return tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0)
+				return tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), 0, tsr.Dim(2)
 			}
 		}
 	case 4:
 		if tsr.ShapeObj().IsRowMajor() {
-			return tsr.Dim(0) * tsr.Dim(2), tsr.Dim(1) * tsr.Dim(3)
+			return tsr.Dim(0) * tsr.Dim(2), tsr.Dim(1) * tsr.Dim(3), 0, 0
 		} else {
-			return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0)
+			return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), 0, 0
 		}
 	case 5:
 		if oddRow {
 			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(0) * tsr.Dim(1) * tsr.Dim(3), tsr.Dim(2) * tsr.Dim(4)
+				return tsr.Dim(0) * tsr.Dim(1) * tsr.Dim(3), tsr.Dim(2) * tsr.Dim(4), tsr.Dim(0) * tsr.Dim(1), 0
 			} else {
-				return tsr.Dim(4) * tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0)
+				return tsr.Dim(4) * tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), tsr.Dim(4) * tsr.Dim(3), 0
 			}
 		} else {
 			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(1) * tsr.Dim(3), tsr.Dim(0) * tsr.Dim(2) * tsr.Dim(4)
+				return tsr.Dim(1) * tsr.Dim(3), tsr.Dim(0) * tsr.Dim(2) * tsr.Dim(4), 0, tsr.Dim(0) * tsr.Dim(1)
 			} else {
-				return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(4) * tsr.Dim(2) * tsr.Dim(0)
+				return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(4) * tsr.Dim(2) * tsr.Dim(0), 0, tsr.Dim(4) * tsr.Dim(2)
 			}
 		}
 	}
-	return 1, 1
+	return 1, 1, 0, 0
 }
 
 // Prjn2DVal returns the float64 value at given row, col coords for a 2D projection

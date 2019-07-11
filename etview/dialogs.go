@@ -43,6 +43,36 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	return dlg
 }
 
+//gopy:interface=handle TensorGridDialog is for viewing a etensor.Tensor using a TensorGrid --
+// optionally connects to given signal receiving object and function for
+// dialog signals (nil to ignore)
+func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
+	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
+
+	frame := dlg.Frame()
+	_, prIdx := dlg.PromptWidget(frame)
+
+	sv := frame.InsertNewChild(KiT_TensorGrid, prIdx+1, "tensor-grid").(*TensorGrid)
+	sv.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
+	if opts.Inactive {
+		sv.SetInactive()
+	}
+	sv.SetStretchMaxHeight()
+	sv.SetStretchMaxWidth()
+	sv.SetTensor(tsr)
+
+	if recv != nil && dlgFunc != nil {
+		dlg.DialogSig.Connect(recv, dlgFunc)
+	}
+	dlg.SetProp("min-width", units.NewEm(60))
+	dlg.SetProp("min-height", units.NewEm(30))
+	dlg.UpdateEndNoSig(true)
+	dlg.Open(0, 0, avp, func() {
+		giv.MainMenuView(tsr, dlg.Win, dlg.Win.MainMenu)
+	})
+	return dlg
+}
+
 //gopy:interface=handle TableViewDialog is for editing an etable.Table using a TableView --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
