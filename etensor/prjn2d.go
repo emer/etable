@@ -46,9 +46,9 @@ func Prjn2DShape(tsr Tensor, oddRow bool) (rows, cols, rowEx, colEx int) {
 		}
 	case 4:
 		if tsr.ShapeObj().IsRowMajor() {
-			return tsr.Dim(0) * tsr.Dim(2), tsr.Dim(1) * tsr.Dim(3), 0, 0
+			return tsr.Dim(0) * tsr.Dim(2), tsr.Dim(1) * tsr.Dim(3), tsr.Dim(0), tsr.Dim(1)
 		} else {
-			return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), 0, 0
+			return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), tsr.Dim(3), tsr.Dim(2)
 		}
 	case 5:
 		if oddRow {
