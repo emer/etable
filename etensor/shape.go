@@ -144,6 +144,19 @@ func (sh *Shape) IsContiguous() bool {
 	return sh.IsRowMajor() || sh.IsColMajor()
 }
 
+// IdxIsValid() returns true if given index is valid (within ranges for all dimensions)
+func (sh *Shape) IdxIsValid(idx []int) bool {
+	if len(idx) != sh.NumDims() {
+		return false
+	}
+	for i, v := range sh.Shp {
+		if idx[i] < 0 || idx[i] >= v {
+			return false
+		}
+	}
+	return true
+}
+
 // todo: cache rowmajor vs. colmajor as flags?  much faster, and this is frequently
 // accessed
 

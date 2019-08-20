@@ -34,6 +34,7 @@ type TensorDisp struct {
 	Range       minmax.Range64   `view:"inline" desc:"range to plot"`
 	MinMax      minmax.F64       `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
 	ColorMap    giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
+	Background  gi.Color         `desc:"background color"`
 	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
 	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
 	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
@@ -44,6 +45,7 @@ type TensorDisp struct {
 func (td *TensorDisp) Defaults() {
 	if td.ColorMap == "" {
 		td.ColorMap = "ColdHot"
+		td.Background.SetName("white")
 	}
 	if td.Range.Max == 0 && td.Range.Min == 0 {
 		td.Range.SetMin(-1)
@@ -231,6 +233,8 @@ func (tg *TensorGrid) RenderTensor() {
 
 	pos := tg.LayData.AllocPos
 	sz := tg.LayData.AllocSize
+
+	pc.FillBoxColor(rs, pos, sz, tg.Disp.Background)
 
 	tsr := tg.Tensor
 
