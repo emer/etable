@@ -20,6 +20,7 @@ type String struct {
 	Shape
 	Values []string
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewString returns a new n-dimensional array of strings
@@ -383,4 +384,23 @@ func (tsr *String) At(i, j int) float64 {
 func (tsr *String) T() mat.Matrix {
 	log.Println("etensor T gonum Matrix call made on String Tensor -- not supported")
 	return mat.Transpose{tsr}
+}
+
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *String) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *String) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
 }

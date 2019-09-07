@@ -221,6 +221,14 @@ type Tensor interface {
 	// SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
 	// Does nothing for other stride layouts
 	SetNumRows(rows int)
+
+	// SetMetaData sets a key=value meta data (stored as a map[string]string).
+	// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+	// min, max set fixed min / max values, background=color
+	SetMetaData(key, val string)
+
+	// MetaData retrieves value of given key, bool = false if not set
+	MetaData(key string) (string, bool)
 }
 
 // Check for interface implementation

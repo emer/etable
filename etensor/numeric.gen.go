@@ -28,6 +28,7 @@ type Int64 struct {
 	Shape
 	Values []int64
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewInt64 returns a new n-dimensional array of int64s.
@@ -488,11 +489,31 @@ func (tsr *Int64) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Int64) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Int64) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Uint64 is an n-dim array of uint64s.
 type Uint64 struct {
 	Shape
 	Values []uint64
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewUint64 returns a new n-dimensional array of uint64s.
@@ -953,11 +974,31 @@ func (tsr *Uint64) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Uint64) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Uint64) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Float64 is an n-dim array of float64s.
 type Float64 struct {
 	Shape
 	Values []float64
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewFloat64 returns a new n-dimensional array of float64s.
@@ -1418,11 +1459,31 @@ func (tsr *Float64) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Float64) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Float64) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Int32 is an n-dim array of int32s.
 type Int32 struct {
 	Shape
 	Values []int32
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewInt32 returns a new n-dimensional array of int32s.
@@ -1883,11 +1944,31 @@ func (tsr *Int32) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Int32) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Int32) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Uint32 is an n-dim array of uint32s.
 type Uint32 struct {
 	Shape
 	Values []uint32
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewUint32 returns a new n-dimensional array of uint32s.
@@ -2348,11 +2429,31 @@ func (tsr *Uint32) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Uint32) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Uint32) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Float32 is an n-dim array of float32s.
 type Float32 struct {
 	Shape
 	Values []float32
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewFloat32 returns a new n-dimensional array of float32s.
@@ -2813,11 +2914,31 @@ func (tsr *Float32) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Float32) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Float32) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Int16 is an n-dim array of int16s.
 type Int16 struct {
 	Shape
 	Values []int16
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewInt16 returns a new n-dimensional array of int16s.
@@ -3278,11 +3399,31 @@ func (tsr *Int16) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Int16) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Int16) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Uint16 is an n-dim array of uint16s.
 type Uint16 struct {
 	Shape
 	Values []uint16
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewUint16 returns a new n-dimensional array of uint16s.
@@ -3743,11 +3884,31 @@ func (tsr *Uint16) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Uint16) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Uint16) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Int8 is an n-dim array of int8s.
 type Int8 struct {
 	Shape
 	Values []int8
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewInt8 returns a new n-dimensional array of int8s.
@@ -4208,11 +4369,31 @@ func (tsr *Int8) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Int8) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Int8) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
+
 // Uint8 is an n-dim array of uint8s.
 type Uint8 struct {
 	Shape
 	Values []uint8
 	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // NewUint8 returns a new n-dimensional array of uint8s.
@@ -4671,6 +4852,25 @@ func (tsr *Uint8) At(i, j int) float64 {
 // It performs an implicit transpose by returning the receiver inside a Transpose.
 func (tsr *Uint8) T() mat.Matrix {
 	return mat.Transpose{tsr}
+}
+
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *Uint8) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *Uint8) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
 }
 
 // New returns a new Tensor of given type, using our Type specifier which is

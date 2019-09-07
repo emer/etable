@@ -9,6 +9,7 @@ import (
 
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
+	"github.com/emer/etable/simat"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/units"
@@ -44,6 +45,11 @@ func init() {
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(etable.KiT_Table), func() giv.ValueView {
 		vv := &TableValueView{}
+		vv.Init(vv)
+		return vv
+	})
+	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(simat.SimMat{})), func() giv.ValueView {
+		vv := &SimMatValueView{}
 		vv.Init(vv)
 		return vv
 	})
@@ -234,4 +240,86 @@ func (vv *TableValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Rec
 		inact = true
 	}
 	TableViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//  SimMatValueView
+
+// SimMatValueView presents a button that pulls up the SimMatGridView viewer for an etable.Table
+type SimMatValueView struct {
+	giv.ValueViewBase
+}
+
+var KiT_SimMatValueView = kit.Types.AddType(&SimMatValueView{}, nil)
+
+func (vv *SimMatValueView) WidgetType() reflect.Type {
+	vv.WidgetTyp = gi.KiT_Action
+	return vv.WidgetTyp
+}
+
+func (vv *SimMatValueView) UpdateWidget() {
+	if vv.Widget == nil {
+		return
+	}
+	ac := vv.Widget.(*gi.Action)
+	npv := kit.NonPtrValue(vv.Value)
+	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(npv) {
+		ac.SetText("nil")
+	} else {
+		opv := kit.OnePtrUnderlyingValue(vv.Value)
+		smat := opv.Interface().(*simat.SimMat)
+		if smat != nil && smat.Mat != nil {
+			if nm, has := smat.Mat.MetaData("name"); has {
+				ac.SetText(nm)
+			} else {
+				ac.SetText("simat.SimMat")
+			}
+		} else {
+			ac.SetText("simat.SimMat")
+		}
+	}
+}
+
+func (vv *SimMatValueView) ConfigWidget(widg gi.Node2D) {
+	vv.Widget = widg
+	ac := vv.Widget.(*gi.Action)
+	ac.Tooltip, _ = vv.Tag("desc")
+	ac.SetProp("padding", units.NewPx(2))
+	ac.SetProp("margin", units.NewPx(2))
+	ac.SetProp("border-radius", units.NewPx(4))
+	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+		vvv, _ := recv.Embed(KiT_SimMatValueView).(*SimMatValueView)
+		ac := vvv.Widget.(*gi.Action)
+		vvv.Activate(ac.Viewport, nil, nil)
+	})
+	vv.UpdateWidget()
+}
+
+func (vv *SimMatValueView) HasAction() bool {
+	return true
+}
+
+func (vv *SimMatValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+		return
+	}
+	opv := kit.OnePtrUnderlyingValue(vv.Value)
+	smat := opv.Interface().(*simat.SimMat)
+	if smat == nil || smat.Mat == nil {
+		return
+	}
+	tynm := "simat.SimMat"
+	olbl := vv.OwnerLabel()
+	if olbl != "" {
+		tynm += " " + olbl
+	}
+	desc, _ := smat.Mat.MetaData("desc")
+	if td, has := vv.Tag("desc"); has {
+		desc += " " + td
+	}
+	_, inact := smat.Mat.MetaData("read-only")
+	if vv.This().(giv.ValueView).IsInactive() {
+		inact = true
+	}
+	SimMatGridDialog(vp, smat, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
 }

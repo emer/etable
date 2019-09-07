@@ -330,3 +330,22 @@ func Cosine64(a, b []float64) float64 {
 	}
 	return ss
 }
+
+///////////////////////////////////////////
+//  InvCosine
+
+// InvCosine32 computes 1 - cosine of the angle between two vectors (-1..1),
+// as the normalized inner product: inner product / sqrt(ssA * ssB).
+// If vectors are mean-normalized = Correlation.
+// Skips NaN's and panics if lengths are not equal.
+func InvCosine32(a, b []float32) float32 {
+	return 1 - Cosine32(a, b)
+}
+
+// InvCosine32 computes 1 - cosine of the angle between two vectors (-1..1),
+// as the normalized inner product: inner product / sqrt(ssA * ssB).
+// If vectors are mean-normalized = Correlation.
+// Skips NaN's and panics if lengths are not equal.
+func InvCosine64(a, b []float64) float64 {
+	return 1 - Cosine64(a, b)
+}

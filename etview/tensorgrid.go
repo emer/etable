@@ -114,15 +114,6 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
 	tg.UpdateSig()
 }
 
-// // SetTensorAction sets the tensor and triggers a display update
-// // and signals the ColorMapSig signal
-// func (tg *TensorGrid) SetTensorAction(tsr etensor.Tensor) {
-//	tg.Tensor = tsr
-//	tg.Defaults()
-// 	tg.ColorMapSig.Emit(tg.This(), 0, nil)
-// 	tg.UpdateSig()
-// }
-
 // OpenTensorView pulls up a TensorView of our tensor
 func (tg *TensorGrid) OpenTensorView() {
 	dlg := TensorViewDialog(tg.Viewport, tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
@@ -239,8 +230,8 @@ func (tg *TensorGrid) RenderTensor() {
 	tsr := tg.Tensor
 
 	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
-	frw := float32(rows) + float32(rowEx)*.1 // extra spacing
-	fcl := float32(cols) + float32(colEx)*.1 // extra spacing
+	frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
+	fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
 	rowsInner := rows
 	colsInner := cols
 	if rowEx > 0 {
@@ -253,7 +244,6 @@ func (tg *TensorGrid) RenderTensor() {
 	gsz := sz.Div(tsz)
 
 	ssz := gsz.MulVal(.9) // smaller size with margin
-	// todo: for 4D, need to add the extra margins..
 	for y := 0; y < rows; y++ {
 		yex := float32(int(y/rowsInner)) * GridExtra
 		for x := 0; x < cols; x++ {

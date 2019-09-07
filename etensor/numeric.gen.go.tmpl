@@ -26,7 +26,8 @@ import (
 type {{.Name}} struct {
 	Shape
 	Values []{{.Type}}
-	Nulls bitslice.Slice
+	Nulls  bitslice.Slice
+	Meta   map[string]string
 }
 
 // New{{.Name}} returns a new n-dimensional array of {{.Type}}s.
@@ -488,6 +489,24 @@ func (tsr *{{.Name}}) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
+// SetMetaData sets a key=value meta data (stored as a map[string]string).
+// For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
+// min, max set fixed min / max values, background=color
+func (tsr *{{.Name}}) SetMetaData(key, val string) {
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	tsr.Meta[key] = val
+}
+
+// MetaData retrieves value of given key, bool = false if not set
+func (tsr *{{.Name}}) MetaData(key string) (string, bool) {
+	if tsr.Meta == nil {
+		return "", false
+	}
+	val, ok := tsr.Meta[key]
+	return val, ok
+}
 
 {{- end}}
 
