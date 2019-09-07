@@ -113,13 +113,18 @@ func (tsr *Bits) SetFloat1D(off int, val float64) {
 	tsr.Values.Set(off, Float64ToBool(val))
 }
 
-func (tsr *Bits) Floats() []float64 {
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = BoolToFloat64(tsr.Values.Index(j))
+func (tsr *Bits) Floats(flt *[]float64) {
+	sz := tsr.Len()
+	if len(*flt) < sz {
+		if cap(*flt) >= sz {
+			*flt = (*flt)[0:sz]
+		} else {
+			*flt = make([]float64, sz)
+		}
 	}
-	return res
+	for j := 0; j < sz; j++ {
+		(*flt)[j] = BoolToFloat64(tsr.Values.Index(j))
+	}
 }
 
 // SetFloats sets tensor values from a []float64 slice (copies values).

@@ -137,11 +137,11 @@ type Tensor interface {
 	// SetFloat1D sets the value of given 1-dimensional index (0-Len()-1) as a float64
 	SetFloat1D(i int, val float64)
 
-	// Floats returns a []float64 slice of all elements in the tensor.
-	// For Float64 tensor type, this directly returns its underlying Values
-	// which are writable as well -- for all others this is a new slice (read only).
-	// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc.
-	Floats() []float64
+	// Floats sets []float64 slice of all elements in the tensor
+	// (length is ensured to be sufficient).
+	// This can be used for all of the gonum/floats methods
+	// for basic math, gonum/stats, etc.
+	Floats(flt *[]float64)
 
 	// SetFloats sets tensor values from a []float64 slice (copies values).
 	SetFloats(vals []float64)

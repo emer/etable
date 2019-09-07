@@ -121,17 +121,22 @@ func (tsr *{{.Name}}) SetString(i []int, val string) {
 func (tsr *{{.Name}}) FloatVal1D(off int) float64 { return float64(tsr.Values[off]) }
 func (tsr *{{.Name}}) SetFloat1D(off int, val float64)  { tsr.Values[off] = {{or .Type}}(val) }
 
-// Floats returns a []float64 slice of all elements in the tensor.
-// For Float64 tensor type, this directly returns its underlying Values
-// which are writable as well -- for all others this is a new slice (read only).
-// This can be used for all of the gonum/floats methods for basic math, gonum/stats, etc.
-func (tsr *{{.Name}}) Floats() []float64 {
-	// todo: condition on Float64!
-	res := make([]float64, tsr.Len())
-	for j, vl := range tsr.Values {
-		res[j] = float64(vl)
+// Floats sets []float64 slice of all elements in the tensor
+// (length is ensured to be sufficient).
+// This can be used for all of the gonum/floats methods
+// for basic math, gonum/stats, etc.
+func (tsr *{{.Name}}) Floats(flt *[]float64) {
+	sz := len(tsr.Values)
+	if len(*flt) < sz {
+		if cap(*flt) >= sz {
+			*flt = (*flt)[0:sz]
+		} else {
+			*flt = make([]float64, sz)
+		}
 	}
-	return res
+	for j, vl := range tsr.Values {
+		(*flt)[j] = float64(vl)
+	}
 }
 
 // SetFloats sets tensor values from a []float64 slice (copies values).

@@ -124,13 +124,18 @@ func (tsr *String) SetFloat1D(off int, val float64) {
 	tsr.Values[off] = Float64ToString(val)
 }
 
-func (tsr *String) Floats() []float64 {
-	ln := tsr.Len()
-	res := make([]float64, ln)
-	for j := 0; j < ln; j++ {
-		res[j] = StringToFloat64(tsr.Values[j])
+func (tsr *String) Floats(flt *[]float64) {
+	sz := len(tsr.Values)
+	if len(*flt) < sz {
+		if cap(*flt) >= sz {
+			*flt = (*flt)[0:sz]
+		} else {
+			*flt = make([]float64, sz)
+		}
 	}
-	return res
+	for j, vl := range tsr.Values {
+		(*flt)[j] = StringToFloat64(vl)
+	}
 }
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
