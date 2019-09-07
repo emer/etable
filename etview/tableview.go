@@ -402,6 +402,7 @@ func (tv *TableView) LayoutHeader() {
 			lbl := sgh.Child(fli).(gi.Node2D).AsWidget()
 			wd := sgf.GridData[gi.Col][fli].AllocSize
 			lbl.SetMinPrefWidth(units.NewValue(wd+spc, units.Dot))
+			lbl.SetProp("max-width", units.NewValue(wd+spc, units.Dot))
 			sumwd += wd + spc
 		}
 		if !tv.IsInactive() {
@@ -409,6 +410,7 @@ func (tv *TableView) LayoutHeader() {
 				lbl := sgh.Child(fli).(gi.Node2D).AsWidget()
 				wd := sgf.GridData[gi.Col][fli].AllocSize
 				lbl.SetMinPrefWidth(units.NewValue(wd+spc, units.Dot))
+				lbl.SetProp("max-width", units.NewValue(wd+spc, units.Dot))
 				sumwd += wd + spc
 			}
 		}
