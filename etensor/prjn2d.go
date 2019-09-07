@@ -132,8 +132,8 @@ func Prjn2DVal(tsr Tensor, oddRow bool, row, col int) float64 {
 		if tsr.ShapeObj().IsRowMajor() {
 			nyy := tsr.Dim(1)
 			ny := tsr.Dim(3)
-			yyy := row / nyy
-			yy := row % nyy
+			yyy := row / (nyy * ny)
+			yy := row % (nyy * ny)
 			y := yy % ny
 			yy = yy / ny
 			nx := tsr.Dim(4)
@@ -143,8 +143,8 @@ func Prjn2DVal(tsr Tensor, oddRow bool, row, col int) float64 {
 		} else {
 			nyy := tsr.Dim(3)
 			ny := tsr.Dim(1)
-			yyy := row / nyy
-			yy := row % nyy
+			yyy := row / (nyy * ny)
+			yy := row % (nyy * ny)
 			y := yy % ny
 			yy = yy / ny
 			nx := tsr.Dim(0)
