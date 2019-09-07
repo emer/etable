@@ -349,3 +349,28 @@ func InvCosine32(a, b []float32) float32 {
 func InvCosine64(a, b []float64) float64 {
 	return 1 - Cosine64(a, b)
 }
+
+///////////////////////////////////////////
+//  InvCorrelation
+
+// InvCorrelation32 computes 1 - the vector similarity in range (-1..1) as the
+// mean of the co-product of each vector element minus the mean of that vector,
+// normalized by the product of their standard deviations:
+// cor(A,B) = E[(A - E(A))(B - E(B))] / sigma(A) sigma(B).
+// (i.e., the standardized covariance) -- equivalent to the cosine of mean-normalized
+// vectors.
+// Skips NaN's and panics if lengths are not equal.
+func InvCorrelation32(a, b []float32) float32 {
+	return 1 - Correlation32(a, b)
+}
+
+// InvCorrelation64 computes 1 - the vector similarity in range (-1..1) as the
+// mean of the co-product of each vector element minus the mean of that vector,
+// normalized by the product of their standard deviations:
+// cor(A,B) = E[(A - E(A))(B - E(B))] / sigma(A) sigma(B).
+// (i.e., the standardized covariance) -- equivalent to the cosine of mean-normalized
+// vectors.
+// Skips NaN's and panics if lengths are not equal.
+func InvCorrelation64(a, b []float64) float64 {
+	return 1 - Correlation64(a, b)
+}
