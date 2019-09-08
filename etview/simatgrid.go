@@ -48,6 +48,9 @@ func (tg *SimMatGrid) Defaults() {
 	tg.Disp.GridView = &tg.TensorGrid
 	tg.Disp.Defaults()
 	tg.Disp.TopZero = true
+	if tg.Tensor != nil {
+		tg.DispFmMeta()
+	}
 }
 
 // func (tg *SimMatGrid) Disconnect() {
@@ -103,7 +106,9 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 			if curblk > 0 {
 				ngps++
 			}
-			minBlank = ints.MinInt(minBlank, curblk)
+			if i > 0 {
+				minBlank = ints.MinInt(minBlank, curblk)
+			}
 			curblk = 0
 			if l > mx {
 				mx = l
@@ -134,8 +139,8 @@ func (tg *SimMatGrid) Size2D(iter int) {
 
 		tg.colMaxSz.Y += tg.rowMaxSz.Y // needs one more for some reason
 
-		rtxtsz := tg.rowMaxSz.Y * float32(tg.rowMinBlank+1)
-		ctxtsz := tg.colMaxSz.X * float32(tg.colMinBlank+1)
+		rtxtsz := tg.rowMaxSz.Y / float32(tg.rowMinBlank+1)
+		ctxtsz := tg.colMaxSz.X / float32(tg.colMinBlank+1)
 		txtsz := mat32.Max(rtxtsz, ctxtsz)
 
 		tg.InitLayout2D()

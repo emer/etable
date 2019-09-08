@@ -6,6 +6,7 @@ package etview
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/chewxy/math32"
 	"github.com/emer/etable/etensor"
@@ -92,10 +93,44 @@ func AddNewTensorGrid(parent ki.Ki, name string, tsr etensor.Tensor) *TensorGrid
 	return tg
 }
 
+// DispFmMeta sets display options from Tensor meta-data
+func (tg *TensorGrid) DispFmMeta() {
+	if op, has := tg.Tensor.MetaData("top-zero"); has {
+		if op == "+" || op == "true" {
+			tg.Disp.TopZero = true
+		}
+	}
+	if op, has := tg.Tensor.MetaData("odd-row"); has {
+		if op == "+" || op == "true" {
+			tg.Disp.OddRow = true
+		}
+	}
+	if op, has := tg.Tensor.MetaData("image"); has {
+		if op == "+" || op == "true" {
+			tg.Disp.Image = true
+		}
+	}
+	if op, has := tg.Tensor.MetaData("min"); has {
+		mv, _ := strconv.ParseFloat(op, 64)
+		tg.Disp.Range.Min = mv
+	}
+	if op, has := tg.Tensor.MetaData("max"); has {
+		mv, _ := strconv.ParseFloat(op, 64)
+		tg.Disp.Range.Max = mv
+	}
+	if op, has := tg.Tensor.MetaData("background"); has {
+		tg.Disp.Background.SetString(op, nil)
+	}
+}
+
 // Defaults sets defaults for values that are at nonsensical initial values
 func (tg *TensorGrid) Defaults() {
 	tg.Disp.GridView = tg
 	tg.Disp.Defaults()
+
+	if tg.Tensor != nil {
+		tg.DispFmMeta()
+	}
 }
 
 // func (tg *TensorGrid) Disconnect() {

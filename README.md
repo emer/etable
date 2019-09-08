@@ -10,6 +10,8 @@ The e-name derives from the `emergent` neural network simulation framework, but 
 
 See `examples/dataproc` for a full demo of how to use this system for data analysis, paralleling the example in 	[Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
 
+See [Wiki](https://github.com/emer/etable/wiki) for how-to documentation, etc.
+
 As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [GoKi Naming Convention](https://github.com/goki/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
 
 The following packages are included:
@@ -27,4 +29,8 @@ The following packages are included:
 * `agg` provides standard aggregation functions (`Sum`, `Mean`, `Var`, `Std` etc) operating over `etable.IdxView` views of Table data.  It also defines standard `AggFunc` functions such as `SumFunc` which can be used for `Agg` functions on either a Tensor or IdxView.
 
 * `tsragg` provides the same agg functions as in `agg`, but operating on all the values in a given `Tensor`.  Because of the indexed, row-based nature of tensors in a Table, these are not the same as the `agg` functions.
+
+* `metric` provides similarity / distance metrics such as `Euclidean`, `Cosine`, or `Correlation` that operate on slices of `[]float64` or `[]float32`.
+
+* `simat` provides similarity / distance matrix computation methods operating on `etensor.Tensor` or `etable.Table` data.  The `SimMat` type holds the resulting matrix and labels for the rows and columns, which has a special `SimMatGrid` view in `etview` for visualizing labeled similarity matricies.
 

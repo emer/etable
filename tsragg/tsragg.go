@@ -2,6 +2,11 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
+/*
+Package tsragg provides aggregation functions (Sum, Mean, etc) that
+operate directly on etensor.Tensor data.  See also agg package that
+operates on an IdxView of an etable.Table column.
+*/
 package tsragg
 
 import (
