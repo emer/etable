@@ -12,7 +12,10 @@ import (
 // PlotParams are parameters for overall plot
 type PlotParams struct {
 	Title      string  `desc:"optional title at top of plot"`
+	Lines      bool    `desc:"plot lines"`
+	Points     bool    `desc:"plot points with symbols"`
 	LineWidth  float64 `desc:"width of lines"`
+	PointSize  float64 `desc:"size of points"`
 	Scale      float64 `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
 	XAxisCol   string  `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
 	XAxisLabel string  `desc:"optional label to use for XAxis instead of column name"`
@@ -24,6 +27,9 @@ type PlotParams struct {
 func (pp *PlotParams) Defaults() {
 	if pp.LineWidth == 0 {
 		pp.LineWidth = 1
+		pp.Lines = true
+		pp.Points = false
+		pp.PointSize = 3
 	}
 	if pp.Scale == 0 {
 		pp.Scale = 2
@@ -41,6 +47,7 @@ func (pp *PlotParams) Update() {
 type ColParams struct {
 	On        bool           `desc:"plot this column"`
 	Col       string         `desc:"name of column we're plotting"`
+	IsString  bool           `desc:"if true this is a string column -- plots as labels"`
 	Range     minmax.Range64 `desc:"effective range of data to plot -- either end can be fixed"`
 	FullRange minmax.F64     `desc:"full actual range of data -- only valid if specifically computed"`
 	ColorName gi.ColorName   `desc:"if non-empty, color is set by this name"`

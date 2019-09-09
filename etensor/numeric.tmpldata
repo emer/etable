@@ -16,14 +16,6 @@
     "Size": "8"
   },
   {
-    "Name": "Float64",
-    "name": "float64",
-    "Type": "float64",
-    "DataType": "FLOAT64",
-    "Default": "0",
-    "Size": "8"
-  },
-  {
     "Name": "Int32",
     "name": "int32",
     "Type": "int32",

@@ -287,7 +287,7 @@ func (tsr *Bits) Dims() (r, c int) {
 	return 0, 0
 }
 
-// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// At is the gonum/mat.Matrix interface method for returning 2D matrix element at given
 // row, column index.  Not supported for Bits -- do not call!
 func (tsr *Bits) At(i, j int) float64 {
 	log.Println("etensor At gonum Matrix call made on Bits Tensor -- not supported")

@@ -372,7 +372,7 @@ func (tsr *String) Dims() (r, c int) {
 	return 0, 0
 }
 
-// At(i, j) is the gonum/mat.Matrix interface method for returning 2D matrix element at given
+// At is the gonum/mat.Matrix interface method for returning 2D matrix element at given
 // row, column index.  Not supported for String -- do not call!
 func (tsr *String) At(i, j int) float64 {
 	log.Println("etensor At gonum Matrix call made on String Tensor -- not supported")

@@ -10,6 +10,7 @@ import (
 	"math"
 
 	"github.com/emer/etable/etable"
+	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin/key"
@@ -200,6 +201,8 @@ func (pl *Plot2D) GenPlot() {
 	plt.Y.Label.Text = pl.YLabel()
 	plt.BackgroundColor = nil
 
+	var firstXY *TableXY
+	var strCols []*ColParams
 	for _, cp := range pl.Cols {
 		cp.UpdateVals()
 		if cp.Col == pl.Params.XAxisCol {
@@ -213,19 +216,55 @@ func (pl *Plot2D) GenPlot() {
 		if !cp.On {
 			continue
 		}
+		if cp.IsString {
+			strCols = append(strCols, cp)
+			continue
+		}
 		if cp.Range.FixMin {
 			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
 		}
 		if cp.Range.FixMax {
 			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
 		}
+
 		xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Col)
-		l, _ := plotter.NewLine(xy)
-		l.LineStyle.Width = vg.Points(pl.Params.LineWidth)
-		l.LineStyle.Color = cp.Color
-		plt.Add(l)
-		plt.Legend.Add(cp.Label(), l)
+		if firstXY == nil {
+			firstXY = xy
+		}
+		var pts *plotter.Scatter
+		var lns *plotter.Line
+		if pl.Params.Lines && pl.Params.Points {
+			lns, pts, _ = plotter.NewLinePoints(xy)
+		} else if pl.Params.Points {
+			pts, _ = plotter.NewScatter(xy)
+		} else {
+			lns, _ = plotter.NewLine(xy)
+		}
+		if lns != nil {
+			lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
+			lns.LineStyle.Color = cp.Color
+			plt.Add(lns)
+			plt.Legend.Add(cp.Label(), lns)
+		}
+		if pts != nil {
+			pts.GlyphStyle.Color = cp.Color
+			pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
+			plt.Add(pts)
+			if lns == nil {
+				plt.Legend.Add(cp.Label(), pts)
+			}
+		}
 	}
+	if firstXY != nil && len(strCols) > 0 {
+		for _, cp := range strCols {
+			xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Col)
+			xy.LblCol = xy.YCol
+			xy.YCol = firstXY.YCol
+			lbls, _ := plotter.NewLabels(xy)
+			plt.Add(lbls)
+		}
+	}
+
 	plt.Legend.Top = true
 
 	pl.GPlot = plt
@@ -314,6 +353,10 @@ func (pl *Plot2D) ColsListUpdate() {
 		}
 		cp := &ColParams{Col: cn, ColorName: gi.ColorName(PlotColorNames[clri%npc])}
 		cp.Defaults()
+		tcol := pl.Table.Cols[ci]
+		if _, ok := tcol.(*etensor.String); ok {
+			cp.IsString = true
+		}
 		pl.Cols[ci] = cp
 		clri += inc
 	}

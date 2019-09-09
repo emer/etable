@@ -7,6 +7,7 @@ package etview
 import (
 	"reflect"
 
+	"github.com/emer/etable/eplot"
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/simat"
@@ -50,6 +51,11 @@ func init() {
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(simat.SimMat{})), func() giv.ValueView {
 		vv := &SimMatValueView{}
+		vv.Init(vv)
+		return vv
+	})
+	giv.ValueViewMapAdd(kit.LongTypeName(eplot.KiT_Plot2D), func() giv.ValueView {
+		vv := &Plot2DValueView{}
 		vv.Init(vv)
 		return vv
 	})
@@ -322,4 +328,86 @@ func (vv *SimMatValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 		inact = true
 	}
 	SimMatGridDialog(vp, smat, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
+}
+
+////////////////////////////////////////////////////////////////////////////////////////
+//  Plot2DValueView
+
+// Plot2DValueView presents a button that pulls up the Plot2D in a dialog
+type Plot2DValueView struct {
+	giv.ValueViewBase
+}
+
+var KiT_Plot2DValueView = kit.Types.AddType(&Plot2DValueView{}, nil)
+
+func (vv *Plot2DValueView) WidgetType() reflect.Type {
+	vv.WidgetTyp = gi.KiT_Action
+	return vv.WidgetTyp
+}
+
+func (vv *Plot2DValueView) UpdateWidget() {
+	if vv.Widget == nil {
+		return
+	}
+	ac := vv.Widget.(*gi.Action)
+	npv := kit.NonPtrValue(vv.Value)
+	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(npv) {
+		ac.SetText("nil")
+	} else {
+		opv := kit.OnePtrUnderlyingValue(vv.Value)
+		plot := opv.Interface().(*eplot.Plot2D)
+		if plot != nil && plot.Table != nil {
+			if nm, has := plot.Table.MetaData["name"]; has {
+				ac.SetText(nm)
+			} else {
+				ac.SetText("eplot.Plot2D")
+			}
+		} else {
+			ac.SetText("eplot.Plot2D")
+		}
+	}
+}
+
+func (vv *Plot2DValueView) ConfigWidget(widg gi.Node2D) {
+	vv.Widget = widg
+	ac := vv.Widget.(*gi.Action)
+	ac.Tooltip, _ = vv.Tag("desc")
+	ac.SetProp("padding", units.NewPx(2))
+	ac.SetProp("margin", units.NewPx(2))
+	ac.SetProp("border-radius", units.NewPx(4))
+	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+		vvv, _ := recv.Embed(KiT_Plot2DValueView).(*Plot2DValueView)
+		ac := vvv.Widget.(*gi.Action)
+		vvv.Activate(ac.Viewport, nil, nil)
+	})
+	vv.UpdateWidget()
+}
+
+func (vv *Plot2DValueView) HasAction() bool {
+	return true
+}
+
+func (vv *Plot2DValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+		return
+	}
+	opv := kit.OnePtrUnderlyingValue(vv.Value)
+	plot := opv.Interface().(*eplot.Plot2D)
+	if plot == nil || plot.Table == nil {
+		return
+	}
+	tynm := "eplot.Plot2D"
+	olbl := vv.OwnerLabel()
+	if olbl != "" {
+		tynm += " " + olbl
+	}
+	desc, _ := plot.Table.MetaData["desc"]
+	if td, has := vv.Tag("desc"); has {
+		desc += " " + td
+	}
+	// _, inact := smat.Mat.MetaData("read-only")
+	// if vv.This().(giv.ValueView).IsInactive() {
+	// 	inact = true
+	// }
+	Plot2DDialog(vp, plot, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave}, recv, dlgFunc)
 }

@@ -442,6 +442,55 @@ func (dt *Table) CellTensorTry(colNm string, row int) (etensor.Tensor, error) {
 	return ct.SubSpaceTry(ct.NumDims()-1, []int{row})
 }
 
+// CellTensorFloat1D returns the float value of a Tensor cell's cell at given
+// 1D offset within cell, for given column (by name), row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns 0 on any error -- see Try version for
+// error returns.
+func (dt *Table) CellTensorFloat1D(colNm string, row int, idx int) float64 {
+	if !dt.IsValidRow(row) {
+		return 0
+	}
+	ct := dt.ColByName(colNm)
+	if ct == nil {
+		return 0
+	}
+	if ct.NumDims() == 1 {
+		return 0
+	}
+	sz := ct.Len() / dt.Rows
+	if idx >= sz || idx < 0 {
+		return 0
+	}
+	off := row*sz + idx
+	return ct.FloatVal1D(off)
+}
+
+// CellTensorFloat1DTry returns the float value of a Tensor cell's cell at given
+// 1D offset within cell, for given column (by name), row index
+// for columns that have higher-dimensional tensors so each row is
+// represented by an n-1 dimensional tensor, with the outer dimension
+// being the row number.  Returns any error.
+func (dt *Table) CellTensorFloat1DTry(colNm string, row int, idx int) (float64, error) {
+	if err := dt.IsValidRowTry(row); err != nil {
+		return 0, err
+	}
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return 0, err
+	}
+	if ct.NumDims() == 1 {
+		return 0, fmt.Errorf("etable.Table: CellTensorFloat1DTry called on column named: %v which is 1-dimensional", colNm)
+	}
+	sz := ct.Len() / dt.Rows
+	if idx >= sz || idx < 0 {
+		return 0, fmt.Errorf("etable.Table: CellTensorFloat1DTry index out of range for cell size")
+	}
+	off := row*sz + idx
+	return ct.FloatVal1D(off), nil
+}
+
 /////////////////////////////////////////////////////////////////////////////////////
 //  Set
 
@@ -584,6 +633,46 @@ func (dt *Table) SetCellTensorTry(colNm string, row int, val etensor.Tensor) err
 		return err
 	}
 	dt.SetCellTensorIdx(ci, row, val)
+	return nil
+}
+
+// SetCellTensorFloat1D sets the tensor cell's float cell value at given 1D index within cell,
+// at given column (by name), row index for columns that have n-dimensional tensors.
+// Returns true if set.
+func (dt *Table) SetCellTensorFloat1D(colNm string, row int, idx int, val float64) bool {
+	if !dt.IsValidRow(row) {
+		return false
+	}
+	ct := dt.ColByName(colNm)
+	if ct == nil {
+		return false
+	}
+	sz := ct.Len() / dt.Rows
+	if idx >= sz || idx < 0 {
+		return false
+	}
+	off := row*sz + idx
+	ct.SetFloat1D(off, val)
+	return true
+}
+
+// SetCellTensorFloat1DTry sets the string value of cell at given column (by name), row index
+// for columns that have 1-dimensional tensors.
+// Returns an error if column not found, or column is not a 1-dimensional tensor.
+func (dt *Table) SetCellTensorFloat1DTry(colNm string, row int, idx int, val float64) error {
+	if err := dt.IsValidRowTry(row); err != nil {
+		return err
+	}
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return err
+	}
+	sz := ct.Len() / dt.Rows
+	if idx >= sz || idx < 0 {
+		return fmt.Errorf("etable.Table: SetCellTensorFloat1DTry index out of range for cell size")
+	}
+	off := row*sz + idx
+	ct.SetFloat1D(off, val)
 	return nil
 }
 

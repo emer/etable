@@ -21,7 +21,7 @@ type EvalFunc func(idx int, val float64) float64
 
 // Tensor is the general interface for n-dimensional tensors.
 //
-// Tensor is automatically a gonum/mat.Matrix, implementing the Dims(), At(), and T() methods
+// Tensor is automatically a gonum/mat.Matrix, implementing the Dims(), At(), T(), and Symmetric() methods
 // which automatically operate on the inner-most two dimensions, assuming default row-major
 // layout. Error messages will be logged if applied to a Tensor with less than 2 dimensions,
 // and care should be taken when using with > 2 dimensions (e.g., will only affect the first
@@ -233,3 +233,18 @@ type Tensor interface {
 
 // Check for interface implementation
 var _ Tensor = (*Float32)(nil)
+
+// CopyDense copies a gonum mat.Dense matrix into given Tensor
+// using standard Float64 interface
+func CopyDense(to Tensor, dm *mat.Dense) {
+	nr, nc := dm.Dims()
+	to.SetShape([]int{nr, nc}, nil, nil)
+	idx := 0
+	for ri := 0; ri < nr; ri++ {
+		for ci := 0; ci < nc; ci++ {
+			v := dm.At(ri, ci)
+			to.SetFloat1D(idx, v)
+			idx++
+		}
+	}
+}
