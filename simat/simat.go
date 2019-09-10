@@ -29,9 +29,9 @@ func (smat *SimMat) Init() {
 
 // TableCol generates a similarity / distance matrix from given column name
 // in given IdxView of an etable.Table, and given metric function.
-// if labNm is not empty, uses given column name for labels, which are
-// automatically filtered so that any sequentially repeated labels are blank
-func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, mfun metric.Func64) error {
+// if labNm is not empty, uses given column name for labels, which if blankRepeat
+// is true are filtered so that any sequentially repeated labels are blank.
+func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, blankRepeat bool, mfun metric.Func64) error {
 	col, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err
@@ -103,7 +103,7 @@ func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, mfun metri
 	last := ""
 	for r := 0; r < rows; r++ {
 		lbl := lc.StringVal1D(ix.Idxs[r])
-		if lbl == last {
+		if blankRepeat && lbl == last {
 			continue
 		}
 		smat.Rows[r] = lbl
