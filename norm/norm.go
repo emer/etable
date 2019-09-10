@@ -145,6 +145,39 @@ func Thresh64(a []float64, hi bool, hiThr float64, lo bool, loThr float64) {
 	}
 }
 
+///////////////////////////////////////////
+//  Binarize
+
+// Binarize32 turns vector into binary-valued, by setting anything >= the threshold
+// to the high value, and everything below to the low value.
+func Binarize32(a []float32, thr, hiVal, loVal float32) {
+	for i, av := range a {
+		if math32.IsNaN(av) {
+			continue
+		}
+		if av >= thr {
+			a[i] = hiVal
+		} else {
+			a[i] = loVal
+		}
+	}
+}
+
+// Binarize64 turns vector into binary-valued, by setting anything >= the threshold
+// to the high value, and everything below to the low value.
+func Binarize64(a []float64, thr, hiVal, loVal float64) {
+	for i, av := range a {
+		if math.IsNaN(av) {
+			continue
+		}
+		if av >= thr {
+			a[i] = hiVal
+		} else {
+			a[i] = loVal
+		}
+	}
+}
+
 // Func32 is a norm function operating on slice of float32 numbers
 type Func32 func(a []float32) float32
 
