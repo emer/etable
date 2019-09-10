@@ -110,6 +110,41 @@ func AddVec64(a []float64, val float64) {
 	}
 }
 
+///////////////////////////////////////////
+//  Thresh
+
+// Thresh32 thresholds the values of the vector -- anything above the high threshold is set
+// to the high value, and everything below the low threshold is set to the low value.
+func Thresh32(a []float32, hi bool, hiThr float32, lo bool, loThr float32) {
+	for i, av := range a {
+		if math32.IsNaN(av) {
+			continue
+		}
+		if hi && av > hiThr {
+			a[i] = hiThr
+		}
+		if lo && av < loThr {
+			a[i] = loThr
+		}
+	}
+}
+
+// Thresh64 thresholds the values of the vector -- anything above the high threshold is set
+// to the high value, and everything below the low threshold is set to the low value.
+func Thresh64(a []float64, hi bool, hiThr float64, lo bool, loThr float64) {
+	for i, av := range a {
+		if math.IsNaN(av) {
+			continue
+		}
+		if hi && av > hiThr {
+			a[i] = hiThr
+		}
+		if lo && av < loThr {
+			a[i] = loThr
+		}
+	}
+}
+
 // Func32 is a norm function operating on slice of float32 numbers
 type Func32 func(a []float32) float32
 
