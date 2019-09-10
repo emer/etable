@@ -8,6 +8,7 @@ import (
 	"math"
 
 	"github.com/chewxy/math32"
+	"github.com/emer/etable/norm"
 )
 
 ///////////////////////////////////////////
@@ -75,45 +76,6 @@ func Euclidean64(a, b []float64) float64 {
 }
 
 ///////////////////////////////////////////
-//  Mean
-
-// Mean32 computes the mean of the vector (sum / N).
-// Skips NaN's and panics if lengths are not equal.
-func Mean32(a []float32) float32 {
-	s := float32(0)
-	n := 0
-	for _, av := range a {
-		if math32.IsNaN(av) {
-			continue
-		}
-		s += av
-		n++
-	}
-	if n > 0 {
-		s /= float32(n)
-	}
-	return s
-}
-
-// Mean64 computes the mean of the vector (sum / N).
-// Skips NaN's and panics if lengths are not equal.
-func Mean64(a []float64) float64 {
-	s := float64(0)
-	n := 0
-	for _, av := range a {
-		if math.IsNaN(av) {
-			continue
-		}
-		s += av
-		n++
-	}
-	if n > 0 {
-		s /= float64(n)
-	}
-	return s
-}
-
-///////////////////////////////////////////
 //  Covariance
 
 // Covariance32 computes the mean of the co-product of each vector element minus
@@ -124,8 +86,8 @@ func Covariance32(a, b []float32) float32 {
 		panic("metric: slice lengths do not match")
 	}
 	ss := float32(0)
-	am := Mean32(a)
-	bm := Mean32(b)
+	am := norm.Mean32(a)
+	bm := norm.Mean32(b)
 	n := 0
 	for i, av := range a {
 		bv := b[i]
@@ -149,8 +111,8 @@ func Covariance64(a, b []float64) float64 {
 		panic("metric: slice lengths do not match")
 	}
 	ss := float64(0)
-	am := Mean64(a)
-	bm := Mean64(b)
+	am := norm.Mean64(a)
+	bm := norm.Mean64(b)
 	n := 0
 	for i, av := range a {
 		bv := b[i]
@@ -181,8 +143,8 @@ func Correlation32(a, b []float32) float32 {
 		panic("metric: slice lengths do not match")
 	}
 	ss := float32(0)
-	am := Mean32(a)
-	bm := Mean32(b)
+	am := norm.Mean32(a)
+	bm := norm.Mean32(b)
 	var avar, bvar float32
 	for i, av := range a {
 		bv := b[i]
@@ -214,8 +176,8 @@ func Correlation64(a, b []float64) float64 {
 		panic("metric: slice lengths do not match")
 	}
 	ss := float64(0)
-	am := Mean64(a)
-	bm := Mean64(b)
+	am := norm.Mean64(a)
+	bm := norm.Mean64(b)
 	var avar, bvar float64
 	for i, av := range a {
 		bv := b[i]

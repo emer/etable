@@ -12,11 +12,7 @@ type Func32 func(a, b []float32) float32
 // Func64 is a distance / similarity metric operating on slices of float64 numbers
 type Func64 func(a, b []float64) float64
 
-// StdMetrics is a logical type -- the subset supported by etable.
-// This is copied directly from arrow.Type
-// They can be expressed as either a primitive physical type
-// (bytes or bits of some fixed size), a nested type consisting of other data types,
-// or another data type (e.g. a timestamp encoded as an int64)
+// StdMetrics are standard metric functions
 type StdMetrics int
 
 const (
@@ -42,8 +38,8 @@ var KiT_StdMetrics = kit.Enums.AddEnum(StdMetricsN, false, nil)
 func (ev StdMetrics) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *StdMetrics) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
 
-// StdMetricFunc32 returns a standard metric function as specified
-func StdMetricFunc32(std StdMetrics) Func32 {
+// StdFunc32 returns a standard metric function as specified
+func StdFunc32(std StdMetrics) Func32 {
 	switch std {
 	case Euclidean:
 		return Euclidean32
@@ -71,8 +67,8 @@ func StdMetricFunc32(std StdMetrics) Func32 {
 	return nil
 }
 
-// StdMetricFunc64 returns a standard metric function as specified
-func StdMetricFunc64(std StdMetrics) Func64 {
+// StdFunc64 returns a standard metric function as specified
+func StdFunc64(std StdMetrics) Func64 {
 	switch std {
 	case Euclidean:
 		return Euclidean64
