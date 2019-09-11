@@ -268,7 +268,7 @@ func (tv *TableView) ConfigSliceGrid() {
 			}
 		}
 		hdr.Data = fli
-		hdr.Tooltip = "(click to sort / toggle sort direction by this column) Type: " + col.DataType().String()
+		hdr.Tooltip = colnm + " (click to sort / toggle sort direction by this column) Type: " + col.DataType().String()
 
 		if dsc, has := tv.Table.MetaData[colnm+":desc"]; has {
 			hdr.Tooltip += ": " + dsc

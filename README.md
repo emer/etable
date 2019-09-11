@@ -30,7 +30,15 @@ The following packages are included:
 
 * `tsragg` provides the same agg functions as in `agg`, but operating on all the values in a given `Tensor`.  Because of the indexed, row-based nature of tensors in a Table, these are not the same as the `agg` functions.
 
+* `split` supports splitting a Table into any number of indexed sub-views and aggregating over those (i.e., pivot tables), grouping, summarizing data, etc.
+
 * `metric` provides similarity / distance metrics such as `Euclidean`, `Cosine`, or `Correlation` that operate on slices of `[]float64` or `[]float32`.
 
 * `simat` provides similarity / distance matrix computation methods operating on `etensor.Tensor` or `etable.Table` data.  The `SimMat` type holds the resulting matrix and labels for the rows and columns, which has a special `SimMatGrid` view in `etview` for visualizing labeled similarity matricies.
+
+* `pca` provides principal-components-analysis (PCA) and covariance matrix computation functions.
+
+* `clust` provides standard agglomerative hierarchical clustering including ability to plot results in an eplot.
+
+* `minmax` is home of basic Min / Max range struct, and `norm` has lots of good functions for computing standard norms and normalizing vectors.
 
