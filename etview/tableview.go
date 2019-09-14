@@ -673,6 +673,10 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 	}
 	ctd := &TensorDisp{}
 	*ctd = tv.TsrDisp
+	if tv.Table != nil {
+		cl := tv.Table.Cols[col]
+		ctd.FmMeta(cl)
+	}
 	tv.ColTsrDisp[col] = ctd
 	return ctd
 }

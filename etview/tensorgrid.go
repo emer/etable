@@ -76,6 +76,36 @@ func (td *TensorDisp) ToDots(uc *units.Context) {
 	td.TotPrefSize.ToDots(uc)
 }
 
+// FmMeta sets display options from Tensor meta-data
+func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
+	if op, has := tsr.MetaData("top-zero"); has {
+		if op == "+" || op == "true" {
+			td.TopZero = true
+		}
+	}
+	if op, has := tsr.MetaData("odd-row"); has {
+		if op == "+" || op == "true" {
+			td.OddRow = true
+		}
+	}
+	if op, has := tsr.MetaData("image"); has {
+		if op == "+" || op == "true" {
+			td.Image = true
+		}
+	}
+	if op, has := tsr.MetaData("min"); has {
+		mv, _ := strconv.ParseFloat(op, 64)
+		td.Range.Min = mv
+	}
+	if op, has := tsr.MetaData("max"); has {
+		mv, _ := strconv.ParseFloat(op, 64)
+		td.Range.Max = mv
+	}
+	if op, has := tsr.MetaData("background"); has {
+		td.Background.SetString(op, nil)
+	}
+}
+
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
 type TensorGrid struct {
 	gi.WidgetBase
@@ -93,43 +123,13 @@ func AddNewTensorGrid(parent ki.Ki, name string, tsr etensor.Tensor) *TensorGrid
 	return tg
 }
 
-// DispFmMeta sets display options from Tensor meta-data
-func (tg *TensorGrid) DispFmMeta() {
-	if op, has := tg.Tensor.MetaData("top-zero"); has {
-		if op == "+" || op == "true" {
-			tg.Disp.TopZero = true
-		}
-	}
-	if op, has := tg.Tensor.MetaData("odd-row"); has {
-		if op == "+" || op == "true" {
-			tg.Disp.OddRow = true
-		}
-	}
-	if op, has := tg.Tensor.MetaData("image"); has {
-		if op == "+" || op == "true" {
-			tg.Disp.Image = true
-		}
-	}
-	if op, has := tg.Tensor.MetaData("min"); has {
-		mv, _ := strconv.ParseFloat(op, 64)
-		tg.Disp.Range.Min = mv
-	}
-	if op, has := tg.Tensor.MetaData("max"); has {
-		mv, _ := strconv.ParseFloat(op, 64)
-		tg.Disp.Range.Max = mv
-	}
-	if op, has := tg.Tensor.MetaData("background"); has {
-		tg.Disp.Background.SetString(op, nil)
-	}
-}
-
 // Defaults sets defaults for values that are at nonsensical initial values
 func (tg *TensorGrid) Defaults() {
 	tg.Disp.GridView = tg
 	tg.Disp.Defaults()
 
 	if tg.Tensor != nil {
-		tg.DispFmMeta()
+		tg.Disp.FmMeta(tg.Tensor)
 	}
 }
 
@@ -194,18 +194,20 @@ func (tg *TensorGrid) Size2D(iter int) {
 	if iter > 0 {
 		return // already updated in previous iter, don't redo!
 	} else {
-		// todo: image
-
-		tg.InitLayout2D()
-		rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
-		frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
-		fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
-		tg.Disp.ToDots(&tg.Sty.UnContext)
-		max := float32(math32.Max(frw, fcl))
-		gsz := tg.Disp.TotPrefSize.Dots / max
-		gsz = math32.Max(gsz, tg.Disp.GridMinSize.Dots)
-		gsz = math32.Min(gsz, tg.Disp.GridMaxSize.Dots)
-		tg.Size2DFromWH(gsz*float32(cols), gsz*float32(rows))
+		if tg.Disp.Image {
+			tg.Size2DFromWH(float32(tg.Tensor.Dim(1)), float32(tg.Tensor.Dim(0)))
+		} else {
+			tg.InitLayout2D()
+			rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
+			frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
+			fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
+			tg.Disp.ToDots(&tg.Sty.UnContext)
+			max := float32(math32.Max(frw, fcl))
+			gsz := tg.Disp.TotPrefSize.Dots / max
+			gsz = math32.Max(gsz, tg.Disp.GridMinSize.Dots)
+			gsz = math32.Min(gsz, tg.Disp.GridMaxSize.Dots)
+			tg.Size2DFromWH(gsz*float32(cols), gsz*float32(rows))
+		}
 	}
 }
 
@@ -226,8 +228,7 @@ func (tg *TensorGrid) EnsureColorMap() {
 }
 
 func (tg *TensorGrid) Color(val float64) (norm float64, clr gi.Color) {
-	clp := tg.Disp.Range.ClipVal(val)
-	norm = tg.Disp.Range.NormVal(clp)
+	norm = tg.Disp.Range.ClipNormVal(val)
 	clr = tg.Map.Map(norm)
 	return
 }
@@ -255,6 +256,7 @@ func (tg *TensorGrid) RenderTensor() {
 	tg.UpdateRange()
 	rs := &tg.Viewport.Render
 	rs.Lock()
+	defer rs.Unlock()
 	pc := &rs.Paint
 
 	pos := tg.LayData.AllocPos
@@ -264,6 +266,37 @@ func (tg *TensorGrid) RenderTensor() {
 
 	tsr := tg.Tensor
 
+	if tg.Disp.Image {
+		posx := int(pos.X)
+		posy := int(pos.Y)
+		ysz := tsr.Dim(0)
+		xsz := tsr.Dim(1)
+		nclr := 1
+		if tsr.NumDims() == 3 {
+			nclr = tsr.Dim(2)
+		}
+		for y := 0; y < ysz; y++ {
+			for x := 0; x < xsz; x++ {
+				if nclr > 1 {
+					var r, g, b, a float64
+					a = 1
+					r = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 0}))
+					g = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 1}))
+					b = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 2}))
+					if nclr > 3 {
+						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 3}))
+					}
+					pc.StrokeStyle.Color.Color.SetFloat64(r, g, b, a)
+					pc.SetPixel(rs, posx+x, posy+y)
+				} else {
+					val := tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x}))
+					pc.StrokeStyle.Color.Color.SetFloat64(val, val, val, 1)
+					pc.SetPixel(rs, posx+x, posy+y)
+				}
+			}
+		}
+		return
+	}
 	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
 	frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
@@ -294,8 +327,6 @@ func (tg *TensorGrid) RenderTensor() {
 			pc.FillBoxColor(rs, pr, ssz, clr)
 		}
 	}
-
-	rs.Unlock()
 }
 
 func (tg *TensorGrid) Render2D() {

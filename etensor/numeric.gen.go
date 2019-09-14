@@ -264,6 +264,12 @@ func (tsr *Int64) CopyFrom(frm Tensor) {
 	}
 }
 
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Int64) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
+}
+
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
 // using flat 1D indexes: to = starting index in this Tensor to start copying into,
 // start = starting index on from Tensor to start copying from, and n = number of
@@ -523,6 +529,25 @@ func (tsr *Int64) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Int64) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Int64) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Uint64 is an n-dim array of uint64s.
 type Uint64 struct {
 	Shape
@@ -762,6 +787,12 @@ func (tsr *Uint64) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Uint64) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -1023,6 +1054,25 @@ func (tsr *Uint64) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Uint64) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Uint64) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Int32 is an n-dim array of int32s.
 type Int32 struct {
 	Shape
@@ -1262,6 +1312,12 @@ func (tsr *Int32) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Int32) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -1523,6 +1579,25 @@ func (tsr *Int32) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Int32) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Int32) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Uint32 is an n-dim array of uint32s.
 type Uint32 struct {
 	Shape
@@ -1762,6 +1837,12 @@ func (tsr *Uint32) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Uint32) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -2023,6 +2104,25 @@ func (tsr *Uint32) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Uint32) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Uint32) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Float32 is an n-dim array of float32s.
 type Float32 struct {
 	Shape
@@ -2262,6 +2362,12 @@ func (tsr *Float32) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Float32) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -2523,6 +2629,25 @@ func (tsr *Float32) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Float32) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Float32) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Int16 is an n-dim array of int16s.
 type Int16 struct {
 	Shape
@@ -2762,6 +2887,12 @@ func (tsr *Int16) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Int16) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -3023,6 +3154,25 @@ func (tsr *Int16) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Int16) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Int16) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Uint16 is an n-dim array of uint16s.
 type Uint16 struct {
 	Shape
@@ -3262,6 +3412,12 @@ func (tsr *Uint16) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Uint16) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -3523,6 +3679,25 @@ func (tsr *Uint16) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Uint16) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Uint16) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Int8 is an n-dim array of int8s.
 type Int8 struct {
 	Shape
@@ -3762,6 +3937,12 @@ func (tsr *Int8) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Int8) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -4023,6 +4204,25 @@ func (tsr *Int8) MetaData(key string) (string, bool) {
 	return val, ok
 }
 
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Int8) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Int8) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
+}
+
 // Uint8 is an n-dim array of uint8s.
 type Uint8 struct {
 	Shape
@@ -4262,6 +4462,12 @@ func (tsr *Uint8) CopyFrom(frm Tensor) {
 			tsr.SetNull1D(i, true)
 		}
 	}
+}
+
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Uint8) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
 
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
@@ -4521,6 +4727,25 @@ func (tsr *Uint8) MetaData(key string) (string, bool) {
 	}
 	val, ok := tsr.Meta[key]
 	return val, ok
+}
+
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Uint8) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Uint8) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
 }
 
 // New returns a new Tensor of given type, using our Type specifier which is

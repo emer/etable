@@ -49,7 +49,7 @@ func (tg *SimMatGrid) Defaults() {
 	tg.Disp.Defaults()
 	tg.Disp.TopZero = true
 	if tg.Tensor != nil {
-		tg.DispFmMeta()
+		tg.Disp.FmMeta(tg.Tensor)
 	}
 }
 

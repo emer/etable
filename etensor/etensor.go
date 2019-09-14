@@ -202,6 +202,10 @@ type Tensor interface {
 	// otherwise it goes through appropriate standard type.
 	CopyFrom(from Tensor)
 
+	// CopyShapeFrom copies just the shape from given source tensor
+	// calling SetShape with the shape params from source (see for more docs).
+	CopyShapeFrom(from Tensor)
+
 	// CopyCellsFrom copies given range of values from other tensor into this tensor,
 	// using flat 1D indexes: to = starting index in this Tensor to start copying into,
 	// start = starting index on from Tensor to start copying from, and n = number of
@@ -229,6 +233,12 @@ type Tensor interface {
 
 	// MetaData retrieves value of given key, bool = false if not set
 	MetaData(key string) (string, bool)
+
+	// MetaDataMap returns the underlying map used for meta data
+	MetaDataMap() map[string]string
+
+	// CopyMetaData copies meta data from given source tensor
+	CopyMetaData(from Tensor)
 }
 
 // Check for interface implementation

@@ -256,6 +256,12 @@ func (tsr *Float64) CopyFrom(frm Tensor) {
 	}
 }
 
+// CopyShapeFrom copies just the shape from given source tensor
+// calling SetShape with the shape params from source (see for more docs).
+func (tsr *Float64) CopyShapeFrom(frm Tensor) {
+	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
+}
+
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
 // using flat 1D indexes: to = starting index in this Tensor to start copying into,
 // start = starting index on from Tensor to start copying from, and n = number of
@@ -513,4 +519,23 @@ func (tsr *Float64) MetaData(key string) (string, bool) {
 	}
 	val, ok := tsr.Meta[key]
 	return val, ok
+}
+
+// MetaDataMap returns the underlying map used for meta data
+func (tsr *Float64) MetaDataMap() map[string]string {
+	return tsr.Meta
+}
+
+// CopyMetaData copies meta data from given source tensor
+func (tsr *Float64) CopyMetaData(frm Tensor) {
+	fmap := frm.MetaDataMap()
+	if len(fmap) == 0 {
+		return
+	}
+	if tsr.Meta == nil {
+		tsr.Meta = make(map[string]string)
+	}
+	for k, v := range fmap {
+		tsr.Meta[k] = v
+	}
 }

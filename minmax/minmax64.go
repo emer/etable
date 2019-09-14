@@ -116,3 +116,14 @@ func (mr *F64) ClipVal(val float64) float64 {
 	}
 	return val
 }
+
+// ClipNormVal clips then normalizes given value within 0-1
+func (mr *F64) ClipNormVal(val float64) float64 {
+	if val < mr.Min {
+		return 0
+	}
+	if val > mr.Max {
+		return 1
+	}
+	return mr.NormVal(val)
+}
