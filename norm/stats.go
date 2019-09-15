@@ -218,3 +218,61 @@ func MaxAbs64(a []float64) float64 {
 	}
 	return m
 }
+
+///////////////////////////////////////////
+//  Min
+
+// Min32 computes the max over vector values.
+// Skips NaN's
+func Min32(a []float32) float32 {
+	m := float32(math.MaxFloat32)
+	for _, av := range a {
+		if math32.IsNaN(av) {
+			continue
+		}
+		m = math32.Min(m, av)
+	}
+	return m
+}
+
+// Min64 computes the max over vector values.
+// Skips NaN's
+func Min64(a []float64) float64 {
+	m := float64(math.MaxFloat64)
+	for _, av := range a {
+		if math.IsNaN(av) {
+			continue
+		}
+		m = math.Min(m, av)
+	}
+	return m
+}
+
+///////////////////////////////////////////
+//  MinAbs
+
+// MinAbs32 computes the max of absolute value over vector values.
+// Skips NaN's
+func MinAbs32(a []float32) float32 {
+	m := float32(math.MaxFloat32)
+	for _, av := range a {
+		if math32.IsNaN(av) {
+			continue
+		}
+		m = math32.Min(m, math32.Abs(av))
+	}
+	return m
+}
+
+// MinAbs64 computes the max over vector values.
+// Skips NaN's
+func MinAbs64(a []float64) float64 {
+	m := float64(math.MaxFloat64)
+	for _, av := range a {
+		if math.IsNaN(av) {
+			continue
+		}
+		m = math.Min(m, math.Abs(av))
+	}
+	return m
+}

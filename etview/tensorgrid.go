@@ -101,6 +101,20 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 		mv, _ := strconv.ParseFloat(op, 64)
 		td.Range.Max = mv
 	}
+	if op, has := tsr.MetaData("fix-min"); has {
+		if op == "+" || op == "true" {
+			td.Range.FixMin = true
+		} else {
+			td.Range.FixMin = false
+		}
+	}
+	if op, has := tsr.MetaData("fix-max"); has {
+		if op == "+" || op == "true" {
+			td.Range.FixMax = true
+		} else {
+			td.Range.FixMax = false
+		}
+	}
 	if op, has := tsr.MetaData("background"); has {
 		td.Background.SetString(op, nil)
 	}

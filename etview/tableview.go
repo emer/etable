@@ -662,6 +662,12 @@ func (tv *TableView) ColTensorDisp(col int) *TensorDisp {
 	if ctd, has := tv.ColTsrDisp[col]; has {
 		return ctd
 	}
+	if tv.Table != nil {
+		cl := tv.Table.Cols[col]
+		if len(cl.MetaDataMap()) > 0 {
+			return tv.SetColTensorDisp(col)
+		}
+	}
 	return &tv.TsrDisp
 }
 

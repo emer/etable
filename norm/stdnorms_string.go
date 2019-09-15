@@ -9,9 +9,9 @@ import (
 
 var _ = errors.New("dummy error")
 
-const _StdNorms_name = "L1L2SumSquaresNSumMeanVarStdMaxMaxAbsStdNormsN"
+const _StdNorms_name = "L1L2SumSquaresNSumMeanVarStdMaxMaxAbsMinMinAbsStdNormsN"
 
-var _StdNorms_index = [...]uint8{0, 2, 4, 14, 15, 18, 22, 25, 28, 31, 37, 46}
+var _StdNorms_index = [...]uint8{0, 2, 4, 14, 15, 18, 22, 25, 28, 31, 37, 40, 46, 55}
 
 func (i StdNorms) String() string {
 	if i < 0 || i >= StdNorms(len(_StdNorms_index)-1) {

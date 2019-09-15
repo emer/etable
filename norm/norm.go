@@ -54,14 +54,29 @@ func SubNorm64(a []float64, nfunc Func64) {
 
 // ZScore32 subtracts the mean and divides by the standard deviation
 func ZScore32(a []float32) {
-	DivNorm32(a, Mean32)
-	SubNorm32(a, Std32)
+	SubNorm32(a, Mean32)
+	DivNorm32(a, Std32)
 }
 
 // ZScore64 subtracts the mean and divides by the standard deviation
 func ZScore64(a []float64) {
-	DivNorm64(a, Mean64)
-	SubNorm64(a, Std64)
+	SubNorm64(a, Mean64)
+	DivNorm64(a, Std64)
+}
+
+///////////////////////////////////////////
+//  Unit
+
+// Unit32 subtracts the min and divides by the max, so that values are in 0-1 unit range
+func Unit32(a []float32) {
+	SubNorm32(a, Min32)
+	DivNorm32(a, Max32)
+}
+
+// Unit64 subtracts the min and divides by the max, so that values are in 0-1 unit range
+func Unit64(a []float64) {
+	SubNorm64(a, Min64)
+	DivNorm64(a, Max64)
 }
 
 ///////////////////////////////////////////
@@ -198,6 +213,8 @@ const (
 	Std
 	Max
 	MaxAbs
+	Min
+	MinAbs
 
 	StdNormsN
 )
@@ -232,6 +249,10 @@ func StdFunc32(std StdNorms) Func32 {
 		return Max32
 	case MaxAbs:
 		return MaxAbs32
+	case Min:
+		return Min32
+	case MinAbs:
+		return MinAbs32
 	}
 	return nil
 }
@@ -259,6 +280,10 @@ func StdFunc64(std StdNorms) Func64 {
 		return Max64
 	case MaxAbs:
 		return MaxAbs64
+	case Min:
+		return Min64
+	case MinAbs:
+		return MinAbs64
 	}
 	return nil
 }
