@@ -5,6 +5,7 @@
 package etable
 
 import (
+	"fmt"
 	"math"
 	"math/rand"
 	"sort"
@@ -94,6 +95,19 @@ func (ix *IdxView) Sort(lessFunc func(et *Table, i, j int) bool) {
 	sort.Sort(ix)
 }
 
+// SortColName sorts the indexes into our Table according to values in
+// given column name, using either ascending or descending order.
+// Only valid for 1-dimensional columns.
+// Returns error if column name not found.
+func (ix *IdxView) SortColName(colNm string, ascending bool) error {
+	ci, err := ix.Table.ColIdxTry(colNm)
+	if err != nil {
+		return err
+	}
+	ix.SortCol(ci, ascending)
+	return nil
+}
+
 // SortCol sorts the indexes into our Table according to values in
 // given column index, using either ascending or descending order.
 // Only valid for 1-dimensional columns.
@@ -116,6 +130,27 @@ func (ix *IdxView) SortCol(colIdx int, ascending bool) {
 			}
 		})
 	}
+}
+
+// SortColNames sorts the indexes into our Table according to values in
+// given column names, using either ascending or descending order.
+// Only valid for 1-dimensional columns.
+// Returns error if column name not found.
+func (ix *IdxView) SortColNames(colNms []string, ascending bool) error {
+	nc := len(colNms)
+	if nc == 0 {
+		return fmt.Errorf("etable.IdxView.SortColNames: no column names provided")
+	}
+	cis := make([]int, nc)
+	for i, cn := range colNms {
+		ci, err := ix.Table.ColIdxTry(cn)
+		if err != nil {
+			return err
+		}
+		cis[i] = ci
+	}
+	ix.SortCols(cis, ascending)
+	return nil
 }
 
 // SortCols sorts the indexes into our Table according to values in

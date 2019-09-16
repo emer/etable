@@ -5,6 +5,8 @@
 package split
 
 import (
+	"log"
+
 	"github.com/emer/etable/etable"
 	"github.com/goki/ki/sliceclone"
 )
@@ -23,6 +25,10 @@ func All(ix *etable.IdxView) *etable.Splits {
 func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 	nc := len(colIdxs)
 	if nc == 0 || ix.Table == nil {
+		return nil
+	}
+	if ix.Table.ColNames == nil {
+		log.Println("split.GroupBy: Table does not have any column names -- will not work")
 		return nil
 	}
 	spl := &etable.Splits{}
