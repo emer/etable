@@ -40,6 +40,18 @@ func (nn *Node) Sprint(smat *simat.SimMat, depth int) string {
 	return sv
 }
 
+// Idxs collects all the indexes in this node
+func (nn *Node) Idxs(ix []int, ctr *int) {
+	if nn.IsLeaf() {
+		ix[*ctr] = nn.Idx
+		(*ctr)++
+	} else {
+		for _, kn := range nn.Kids {
+			kn.Idxs(ix, ctr)
+		}
+	}
+}
+
 // NewNode merges two nodes into a new node
 func NewNode(na, nb *Node, dst float64) *Node {
 	nn := &Node{Dist: dst}
@@ -75,13 +87,22 @@ func GlomInit(ntot int) *Node {
 func GlomClust(root *Node, smat *simat.SimMat, dfunc DistFunc) *Node {
 	ntot := smat.Mat.Dim(0) // number of leaves
 	smatf := smat.Mat.(*etensor.Float64).Values
+	// indexes in each group
+	aidx := make([]int, ntot)
+	bidx := make([]int, ntot)
 	for {
 		var ma, mb []int
 		mval := math.MaxFloat64
 		for ai, ka := range root.Kids {
+			actr := 0
+			ka.Idxs(aidx, &actr)
+			aix := aidx[0:actr]
 			for bi := 0; bi < ai; bi++ {
 				kb := root.Kids[bi]
-				dv := dfunc(ka, kb, ntot, smatf)
+				bctr := 0
+				kb.Idxs(bidx, &bctr)
+				bix := bidx[0:bctr]
+				dv := dfunc(aix, bix, ntot, smatf)
 				if dv < mval {
 					mval = dv
 					ma = []int{ai}
