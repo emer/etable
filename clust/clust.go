@@ -10,6 +10,7 @@ import (
 	"math/rand"
 
 	"github.com/emer/etable/etensor"
+	"github.com/emer/etable/norm"
 	"github.com/emer/etable/simat"
 	"github.com/goki/ki/indent"
 )
@@ -87,6 +88,7 @@ func GlomInit(ntot int) *Node {
 func GlomClust(root *Node, smat *simat.SimMat, dfunc DistFunc) *Node {
 	ntot := smat.Mat.Dim(0) // number of leaves
 	smatf := smat.Mat.(*etensor.Float64).Values
+	maxd := norm.Max64(smatf)
 	// indexes in each group
 	aidx := make([]int, ntot)
 	bidx := make([]int, ntot)
@@ -102,7 +104,7 @@ func GlomClust(root *Node, smat *simat.SimMat, dfunc DistFunc) *Node {
 				bctr := 0
 				kb.Idxs(bidx, &bctr)
 				bix := bidx[0:bctr]
-				dv := dfunc(aix, bix, ntot, smatf)
+				dv := dfunc(aix, bix, ntot, maxd, smatf)
 				if dv < mval {
 					mval = dv
 					ma = []int{ai}
