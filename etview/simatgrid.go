@@ -48,9 +48,6 @@ func (tg *SimMatGrid) Defaults() {
 	tg.Disp.GridView = &tg.TensorGrid
 	tg.Disp.Defaults()
 	tg.Disp.TopZero = true
-	if tg.Tensor != nil {
-		tg.Disp.FmMeta(tg.Tensor)
-	}
 }
 
 // func (tg *SimMatGrid) Disconnect() {
@@ -63,6 +60,9 @@ func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) {
 	tg.SimMat = smat
 	tg.Tensor = smat.Mat
 	tg.Defaults()
+	if tg.Tensor != nil {
+		tg.Disp.FmMeta(tg.Tensor)
+	}
 	tg.UpdateSig()
 }
 
@@ -147,8 +147,8 @@ func (tg *SimMatGrid) Size2D(iter int) {
 		rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
 		rowEx = tg.rowNGps
 		colEx = tg.colNGps
-		frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
-		fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
+		frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
+		fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 		tg.Disp.ToDots(&tg.Sty.UnContext)
 		max := float32(math32.Max(frw, fcl))
 		gsz := tg.Disp.TotPrefSize.Dots / max
@@ -183,8 +183,8 @@ func (tg *SimMatGrid) RenderSimMat() {
 	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
 	rowEx = tg.rowNGps
 	colEx = tg.colNGps
-	frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
-	fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
+	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
+	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 	tsz := gi.Vec2D{fcl, frw}
 	gsz := effsz.Div(tsz)
 
@@ -208,7 +208,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			ygp++
 			prvyblk = false
 		}
-		yex := float32(ygp) * GridExtra
+		yex := float32(ygp) * tg.Disp.DimExtra
 		tr.SetString(lb, &tg.Sty.Font, &tg.Sty.UnContext, &txsty, true, 0, 0)
 		tr.LayoutStdLR(&txsty, &tg.Sty.Font, &tg.Sty.UnContext, tg.rowMaxSz)
 		cr := gi.Vec2D{0, float32(y) + yex}
@@ -233,7 +233,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			xgp++
 			prvxblk = false
 		}
-		xex := float32(xgp) * GridExtra
+		xex := float32(xgp) * tg.Disp.DimExtra
 		tr.SetStringRot90(lb, &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
 		cr := gi.Vec2D{float32(x) + xex, 0}
 		pr := epos.Add(cr.Mul(gsz))
@@ -242,7 +242,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 
 	pos.X += tg.rowMaxSz.X + LabelSpace
 	pos.Y += tg.colMaxSz.Y + LabelSpace
-	ssz := gsz.MulVal(.9) // smaller size with margin
+	ssz := gsz.MulVal(tg.Disp.GridFill) // smaller size with margin
 	prvyblk = false
 	ygp = 0
 	for y := 0; y < rows; y++ {
@@ -251,7 +251,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			ygp++
 			prvyblk = false
 		}
-		yex := float32(ygp) * GridExtra
+		yex := float32(ygp) * tg.Disp.DimExtra
 		prvxblk = false
 		xgp = 0
 		for x := 0; x < cols; x++ {
@@ -260,7 +260,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 				xgp++
 				prvxblk = false
 			}
-			xex := float32(xgp) * GridExtra
+			xex := float32(xgp) * tg.Disp.DimExtra
 			ey := y
 			if !tg.Disp.TopZero {
 				ey = (rows - 1) - y

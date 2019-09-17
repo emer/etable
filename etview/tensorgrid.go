@@ -20,8 +20,6 @@ import (
 	"github.com/goki/ki/kit"
 )
 
-const GridExtra = float32(.1)
-
 // TensorLayout are layout options for displaying tensors
 type TensorLayout struct {
 	OddRow  bool `desc:"even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension"`
@@ -36,6 +34,8 @@ type TensorDisp struct {
 	MinMax      minmax.F64       `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
 	ColorMap    giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
 	Background  gi.Color         `desc:"background color"`
+	GridFill    float32          `min:"0.1" max:"1" step:"0.1" def:"0.9" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
+	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1" desc:"amount of extra space to add at dimension boundaries"`
 	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
 	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
 	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
@@ -60,6 +60,10 @@ func (td *TensorDisp) Defaults() {
 	}
 	if td.TotPrefSize.Val == 0 {
 		td.TotPrefSize.Set(20, units.Em)
+	}
+	if td.GridFill == 0 {
+		td.GridFill = 0.9
+		td.DimExtra = 0.1
 	}
 }
 
@@ -118,6 +122,17 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 	if op, has := tsr.MetaData("background"); has {
 		td.Background.SetString(op, nil)
 	}
+	if op, has := tsr.MetaData("colormap"); has {
+		td.ColorMap = giv.ColorMapName(op)
+	}
+	if op, has := tsr.MetaData("grid-fill"); has {
+		mv, _ := strconv.ParseFloat(op, 32)
+		td.GridFill = float32(mv)
+	}
+	if op, has := tsr.MetaData("dim-extra"); has {
+		mv, _ := strconv.ParseFloat(op, 32)
+		td.DimExtra = float32(mv)
+	}
 }
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
@@ -141,10 +156,6 @@ func AddNewTensorGrid(parent ki.Ki, name string, tsr etensor.Tensor) *TensorGrid
 func (tg *TensorGrid) Defaults() {
 	tg.Disp.GridView = tg
 	tg.Disp.Defaults()
-
-	if tg.Tensor != nil {
-		tg.Disp.FmMeta(tg.Tensor)
-	}
 }
 
 // func (tg *TensorGrid) Disconnect() {
@@ -160,6 +171,9 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
 	}
 	tg.Tensor = tsr
 	tg.Defaults()
+	if tg.Tensor != nil {
+		tg.Disp.FmMeta(tg.Tensor)
+	}
 	tg.UpdateSig()
 }
 
@@ -213,8 +227,8 @@ func (tg *TensorGrid) Size2D(iter int) {
 		} else {
 			tg.InitLayout2D()
 			rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
-			frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
-			fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
+			frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
+			fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 			tg.Disp.ToDots(&tg.Sty.UnContext)
 			max := float32(math32.Max(frw, fcl))
 			gsz := tg.Disp.TotPrefSize.Dots / max
@@ -312,8 +326,8 @@ func (tg *TensorGrid) RenderTensor() {
 		return
 	}
 	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
-	frw := float32(rows) + float32(rowEx)*GridExtra // extra spacing
-	fcl := float32(cols) + float32(colEx)*GridExtra // extra spacing
+	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
+	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 	rowsInner := rows
 	colsInner := cols
 	if rowEx > 0 {
@@ -325,11 +339,11 @@ func (tg *TensorGrid) RenderTensor() {
 	tsz := gi.Vec2D{fcl, frw}
 	gsz := sz.Div(tsz)
 
-	ssz := gsz.MulVal(.9) // smaller size with margin
+	ssz := gsz.MulVal(tg.Disp.GridFill) // smaller size with margin
 	for y := 0; y < rows; y++ {
-		yex := float32(int(y/rowsInner)) * GridExtra
+		yex := float32(int(y/rowsInner)) * tg.Disp.DimExtra
 		for x := 0; x < cols; x++ {
-			xex := float32(int(x/colsInner)) * GridExtra
+			xex := float32(int(x/colsInner)) * tg.Disp.DimExtra
 			ey := y
 			if !tg.Disp.TopZero {
 				ey = (rows - 1) - y
