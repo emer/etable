@@ -18,7 +18,7 @@ import (
 	"github.com/goki/ki/kit"
 )
 
-const LabelSpace = float32(2)
+const LabelSpace = float32(8)
 
 // SimMatGrid is a widget that displays a similarity / distance matrix
 // with tensor values as a grid of colored squares, and labels for rows, cols

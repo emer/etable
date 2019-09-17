@@ -112,3 +112,18 @@ func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, blankRepea
 	smat.Cols = smat.Rows // identical
 	return nil
 }
+
+// BlankRepeat returns string slice with any sequentially repeated strings blanked out
+func BlankRepeat(str []string) []string {
+	sz := len(str)
+	br := make([]string, sz)
+	last := ""
+	for r, s := range str {
+		if s == last {
+			continue
+		}
+		br[r] = s
+		last = s
+	}
+	return br
+}
