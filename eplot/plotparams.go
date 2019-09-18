@@ -43,6 +43,13 @@ func (pp *PlotParams) Update() {
 	}
 }
 
+// CopyFrom copies from other col params
+func (pp *PlotParams) CopyFrom(fr *PlotParams) {
+	pl := pp.Plot
+	*pp = *fr
+	pp.Plot = pl
+}
+
 // ColParams are parameters for plotting one column of data
 type ColParams struct {
 	On        bool           `desc:"plot this column"`
@@ -72,6 +79,13 @@ func (cp *ColParams) Update() {
 	if cp.Plot != nil {
 		cp.Plot.Update()
 	}
+}
+
+// CopyFrom copies from other col params
+func (cp *ColParams) CopyFrom(fr *ColParams) {
+	pl := cp.Plot
+	*cp = *fr
+	cp.Plot = pl
 }
 
 // UpdateVals update derived values e.g., color from color name

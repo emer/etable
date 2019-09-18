@@ -16,6 +16,7 @@ import (
 	"github.com/goki/gi/oswin/key"
 	"github.com/goki/gi/svg"
 	"github.com/goki/gide/gide"
+	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 	"gonum.org/v1/plot"
@@ -40,6 +41,17 @@ var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)
 // AddNewPlot2D adds a new Plot2D to given parent node, with given name.
 func AddNewPlot2D(parent ki.Ki, name string) *Plot2D {
 	return parent.AddNewChild(KiT_Plot2D, name).(*Plot2D)
+}
+
+func (pl *Plot2D) CopyFieldsFrom(frm interface{}) {
+	fr := frm.(*Plot2D)
+	pl.Layout.CopyFieldsFrom(&fr.Layout)
+	pl.Params.CopyFrom(&fr.Params)
+	pl.SetTable(fr.Table)
+	mx := ints.MinInt(len(pl.Cols), len(fr.Cols))
+	for i := 0; i < mx; i++ {
+		pl.Cols[i].CopyFrom(fr.Cols[i])
+	}
 }
 
 func (pl *Plot2D) Defaults() {
@@ -446,7 +458,7 @@ func (pl *Plot2D) PlotConfig() {
 
 func (pl *Plot2D) ToolbarConfig() {
 	tbar := pl.Toolbar()
-	if len(tbar.Kids) != 0 {
+	if len(tbar.Kids) != 0 || pl.Viewport == nil {
 		return
 	}
 
@@ -483,6 +495,7 @@ func (pl *Plot2D) ToolbarConfig() {
 
 func (pl *Plot2D) Style2D() {
 	pl.Layout.Style2D()
+	pl.ToolbarConfig() // safe
 	if !pl.IsConfiged() {
 		return
 	}
