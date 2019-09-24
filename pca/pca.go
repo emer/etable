@@ -90,8 +90,9 @@ func (pca *PCA) PCA() error {
 	if pca.Vectors == nil {
 		pca.Vectors = &etensor.Float64{}
 	}
-	ev := eig.VectorsTo(nil)
-	etensor.CopyDense(pca.Vectors, ev)
+	var ev mat.Dense
+	eig.VectorsTo(&ev)
+	etensor.CopyDense(pca.Vectors, &ev)
 	nr := pca.Vectors.Dim(0)
 	if len(pca.Values) != nr {
 		pca.Values = make([]float64, nr)
