@@ -67,6 +67,7 @@ func (tsr *{{.Name}}) DataType() Type { return {{.DataType}} }
 func (tsr *{{.Name}}) Value(i []int)  {{or .Type}} { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *{{.Name}}) Value1D(i int)  {{or .Type}} { return tsr.Values[i] }
 func (tsr *{{.Name}}) Set(i []int, val {{or .Type}})  { j := tsr.Offset(i); tsr.Values[j] = val }
+func (tsr *{{.Name}}) Set1D(i int, val {{or .Type}})  { tsr.Values[i] = val }
 
 // IsNull returns true if the given index has been flagged as a Null
 // (undefined, not present) value

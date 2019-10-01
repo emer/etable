@@ -65,6 +65,7 @@ func (tsr *Float64) DataType() Type           { return FLOAT64 }
 func (tsr *Float64) Value(i []int) float64    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *Float64) Value1D(i int) float64    { return tsr.Values[i] }
 func (tsr *Float64) Set(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = val }
+func (tsr *Float64) Set1D(i int, val float64) { tsr.Values[i] = val }
 
 // IsNull returns true if the given index has been flagged as a Null
 // (undefined, not present) value

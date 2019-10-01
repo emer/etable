@@ -63,6 +63,11 @@ func (tsr *String) Set(i []int, val string) {
 	tsr.Values[j] = val
 }
 
+// Set1D sets value at given 1D (flat) tensor index
+func (tsr *String) Set1D(i int, val string) {
+	tsr.Values[i] = val
+}
+
 func (tsr *String) IsNull(i []int) bool {
 	if tsr.Nulls == nil {
 		return false

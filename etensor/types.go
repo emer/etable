@@ -13,7 +13,9 @@ import (
 // This is copied directly from arrow.Type
 // They can be expressed as either a primitive physical type
 // (bytes or bits of some fixed size), a nested type consisting of other data types,
-// or another data type (e.g. a timestamp encoded as an int64)
+// or another data type (e.g. a timestamp encoded as an int64).
+// Note that we need the unconventional CAPS names b/c regular CamelCase is taken
+// by the tensor type itself.
 type Type int
 
 const (
@@ -59,13 +61,10 @@ const (
 	// STRING is a UTF8 variable-length string
 	STRING Type = Type(arrow.STRING)
 
-	// COMPLEX64 is composed of 4 bytes for the real part and 4 for the imaginary parts
-	COMPLEX64 Type = STRING + 1
+	// INT is a Signed 64-bit little-endian integer -- should only use on 64bit machines!
+	INT Type = STRING + 1
 
-	// COMPLEX64 is composed of 4 bytes for the real part and 4 for the imaginary parts
-	COMPLEX128 Type = COMPLEX64 + 1
-
-	TypeN = COMPLEX128 + 1
+	TypeN = INT + 1
 )
 
 //go:generate stringer -type=Type

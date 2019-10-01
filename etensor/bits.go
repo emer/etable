@@ -63,6 +63,7 @@ func (tsr *Bits) Value(i []int) bool { j := int(tsr.Offset(i)); return tsr.Value
 func (tsr *Bits) Value1D(i int) bool { return tsr.Values.Index(i) }
 
 func (tsr *Bits) Set(i []int, val bool) { j := int(tsr.Offset(i)); tsr.Values.Set(j, val) }
+func (tsr *Bits) Set1D(i int, val bool) { tsr.Values.Set(i, val) }
 
 // Null not supported for bits
 func (tsr *Bits) IsNull(i []int) bool       { return false }
