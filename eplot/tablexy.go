@@ -63,7 +63,7 @@ func (txy *TableXY) Validate() error {
 
 // Len returns the number of rows in the table
 func (txy *TableXY) Len() int {
-	if txy.Table == nil {
+	if txy.Table == nil || txy.Table.Rows < 0 {
 		return 0
 	}
 	return txy.Table.NumRows()
