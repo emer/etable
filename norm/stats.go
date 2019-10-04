@@ -177,6 +177,23 @@ func Max32(a []float32) float32 {
 	return m
 }
 
+// MaxIdx32 computes the max over vector values, and returns index of max as well
+// Skips NaN's
+func MaxIdx32(a []float32) (float32, int) {
+	m := float32(-math.MaxFloat32)
+	mi := -1
+	for i, av := range a {
+		if math32.IsNaN(av) {
+			continue
+		}
+		if av > m {
+			m = av
+			mi = i
+		}
+	}
+	return m, mi
+}
+
 // Max64 computes the max over vector values.
 // Skips NaN's
 func Max64(a []float64) float64 {
@@ -188,6 +205,23 @@ func Max64(a []float64) float64 {
 		m = math.Max(m, av)
 	}
 	return m
+}
+
+// MaxIdx64 computes the max over vector values, and returns index of max as well
+// Skips NaN's
+func MaxIdx64(a []float64) (float64, int) {
+	m := float64(-math.MaxFloat64)
+	mi := -1
+	for i, av := range a {
+		if math.IsNaN(av) {
+			continue
+		}
+		if av > m {
+			m = av
+			mi = i
+		}
+	}
+	return m, mi
 }
 
 ///////////////////////////////////////////
@@ -235,6 +269,23 @@ func Min32(a []float32) float32 {
 	return m
 }
 
+// MinIdx32 computes the min over vector values, and returns index of min as well
+// Skips NaN's
+func MinIdx32(a []float32) (float32, int) {
+	m := float32(math.MaxFloat32)
+	mi := -1
+	for i, av := range a {
+		if math32.IsNaN(av) {
+			continue
+		}
+		if av < m {
+			m = av
+			mi = i
+		}
+	}
+	return m, mi
+}
+
 // Min64 computes the max over vector values.
 // Skips NaN's
 func Min64(a []float64) float64 {
@@ -246,6 +297,23 @@ func Min64(a []float64) float64 {
 		m = math.Min(m, av)
 	}
 	return m
+}
+
+// MinIdx64 computes the min over vector values, and returns index of min as well
+// Skips NaN's
+func MinIdx64(a []float64) (float64, int) {
+	m := float64(math.MaxFloat64)
+	mi := -1
+	for i, av := range a {
+		if math.IsNaN(av) {
+			continue
+		}
+		if av < m {
+			m = av
+			mi = i
+		}
+	}
+	return m, mi
 }
 
 ///////////////////////////////////////////
