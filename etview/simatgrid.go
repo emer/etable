@@ -96,6 +96,9 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 	mx := 0
 	mxi := 0
 	minBlank = len(lbs)
+	if minBlank == 0 {
+		return
+	}
 	curblk := 0
 	ngps = 0
 	for i, lb := range lbs {

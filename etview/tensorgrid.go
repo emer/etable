@@ -34,8 +34,8 @@ type TensorDisp struct {
 	MinMax      minmax.F64       `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
 	ColorMap    giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
 	Background  gi.Color         `desc:"background color"`
-	GridFill    float32          `min:"0.1" max:"1" step:"0.1" def:"0.9" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
-	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1" desc:"amount of extra space to add at dimension boundaries"`
+	GridFill    float32          `min:"0.1" max:"1" step:"0.1" def:"0.9,1" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
+	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries"`
 	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
 	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
 	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
@@ -62,8 +62,8 @@ func (td *TensorDisp) Defaults() {
 		td.TotPrefSize.Set(20, units.Em)
 	}
 	if td.GridFill == 0 {
-		td.GridFill = 0.9
-		td.DimExtra = 0.1
+		td.GridFill = 1
+		td.DimExtra = 0.3
 	}
 }
 
