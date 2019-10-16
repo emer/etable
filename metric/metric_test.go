@@ -28,8 +28,8 @@ func TestAll(t *testing.T) {
 	}
 
 	ec := Euclidean64(a64, b64)
-	if ec != math.Sqrt(0.27) {
-		t.Errorf("Euclidean64: %g\n", ec)
+	if math.Abs(ec-math.Sqrt(0.27)) > 1.0e-10 {
+		t.Errorf("Euclidean64: %g  vs. %g\n", ec, math.Sqrt(0.27))
 	}
 	ec32 := Euclidean32(a32, b32)
 	if ec32 != float32(ec) {
