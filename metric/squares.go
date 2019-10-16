@@ -16,38 +16,76 @@ import (
 
 // SumSquares32 computes the sum-of-squares distance between two vectors.
 // Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
 func SumSquares32(a, b []float32) float32 {
 	if len(a) != len(b) {
 		panic("metric: slice lengths do not match")
 	}
-	ss := float32(0)
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math32.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float32 = 0
+		sumSquares float32 = 1
+	)
 	for i, av := range a {
 		bv := b[i]
-		if math32.IsNaN(av) || math32.IsNaN(bv) {
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		dv := av - bv
-		ss += dv * dv
+		absxi := math32.Abs(av - bv)
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
 	}
-	return ss
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
+	}
+	return scale * scale * sumSquares
 }
 
 // SumSquares64 computes the sum-of-squares distance between two vectors.
 // Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
 func SumSquares64(a, b []float64) float64 {
 	if len(a) != len(b) {
 		panic("metric: slice lengths do not match")
 	}
-	ss := float64(0)
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float64 = 0
+		sumSquares float64 = 1
+	)
 	for i, av := range a {
 		bv := b[i]
-		if math.IsNaN(av) || math.IsNaN(bv) {
+		if av == bv || math.IsNaN(av) || math.IsNaN(bv) {
 			continue
 		}
-		dv := av - bv
-		ss += dv * dv
+		absxi := math.Abs(av - bv)
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
 	}
-	return ss
+	if math.IsInf(scale, 1) {
+		return math.Inf(1)
+	}
+	return scale * scale * sumSquares
 }
 
 ///////////////////////////////////////////
@@ -56,23 +94,77 @@ func SumSquares64(a, b []float64) float64 {
 // Euclidean32 computes the square-root of sum-of-squares distance
 // between two vectors (aka the L2 norm).
 // Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
 func Euclidean32(a, b []float32) float32 {
 	if len(a) != len(b) {
 		panic("metric: slice lengths do not match")
 	}
-	ss := SumSquares32(a, b)
-	return math32.Sqrt(ss)
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math32.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float32 = 0
+		sumSquares float32 = 1
+	)
+	for i, av := range a {
+		bv := b[i]
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
+			continue
+		}
+		absxi := math32.Abs(av - bv)
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
+	}
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
+	}
+	return scale * math32.Sqrt(sumSquares)
 }
 
 // Euclidean64 computes the square-root of sum-of-squares distance
 // between two vectors (aka the L2 norm).
 // Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
 func Euclidean64(a, b []float64) float64 {
 	if len(a) != len(b) {
 		panic("metric: slice lengths do not match")
 	}
-	ss := SumSquares64(a, b)
-	return math.Sqrt(ss)
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float64 = 0
+		sumSquares float64 = 1
+	)
+	for i, av := range a {
+		bv := b[i]
+		if av == bv || math.IsNaN(av) || math.IsNaN(bv) {
+			continue
+		}
+		absxi := math.Abs(av - bv)
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
+	}
+	if math.IsInf(scale, 1) {
+		return math.Inf(1)
+	}
+	return scale * math.Sqrt(sumSquares)
 }
 
 ///////////////////////////////////////////
