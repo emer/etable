@@ -13,9 +13,7 @@ import (
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
-	"github.com/goki/gi/oswin/key"
 	"github.com/goki/gi/svg"
-	"github.com/goki/gide/gide"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
@@ -114,9 +112,15 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 	pl.SVGFile = fname
 }
 
-// SaveData saves the Table data to a csv (comma-separated values) file
-func (pl *Plot2D) SaveData(fname gi.FileName) {
-	pl.Table.SaveCSV(fname, ',', true)
+// SaveCSV saves the Table data to a csv (comma-separated values) file with headers
+func (pl *Plot2D) SaveCSV(fname gi.FileName) {
+	pl.Table.SaveCSV(fname, etable.Comma, true)
+	pl.DataFile = fname
+}
+
+// OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
+func (pl *Plot2D) OpenCSV(fname gi.FileName, delim rune) {
+	pl.Table.OpenCSV(fname, delim)
 	pl.DataFile = fname
 }
 
@@ -452,8 +456,7 @@ func (pl *Plot2D) PlotConfig() {
 
 	sv.Fill = true
 	sv.SetProp("background-color", "white")
-	sv.SetStretchMaxWidth()
-	sv.SetStretchMaxHeight()
+	sv.SetStretchMax()
 }
 
 func (pl *Plot2D) ToolbarConfig() {
@@ -486,9 +489,13 @@ func (pl *Plot2D) ToolbarConfig() {
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SaveSVG", pl.Viewport)
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Save Data...", Icon: "file-save", Tooltip: "save table data to a csv comma-separated-values file"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "open CSV-formatted file"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveData", pl.Viewport)
+			giv.CallMethod(pl, "OpenCSV", pl.Viewport)
+		})
+	tbar.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "save table data to a csv comma-separated-values file with headers"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl, "SaveCSV", pl.Viewport)
 		})
 
 }
@@ -516,26 +523,10 @@ var Plot2DProps = ki.Props{
 			"desc":     "update graph plot",
 			"icon":     "update",
 		}},
-		// {"ViewFile", ki.Props{
-		// 	"label": "Open...",
-		// 	"icon":  "file-open",
-		// 	"desc":  "open a file in current active text view",
-		// 	"shortcut-func": giv.ShortcutFunc(func(gei interface{}, act *gi.Action) key.Chord {
-		// 		return key.Chord(gide.ChordForFun(gide.KeyFunFileOpen).String())
-		// 	}),
-		// 	"Args": ki.PropSlice{
-		// 		{"File Name", ki.Props{
-		// 			"default-field": "ActiveFilename",
-		// 		}},
-		// 	},
-		// }},
 		{"SaveSVG", ki.Props{
 			"label": "Save SVG...",
 			"desc":  "save plot to an SVG file",
 			"icon":  "file-save",
-			"shortcut-func": giv.ShortcutFunc(func(gei interface{}, act *gi.Action) key.Chord {
-				return key.Chord(gide.ChordForFun(gide.KeyFunBufSaveAs).String())
-			}),
 			"Args": ki.PropSlice{
 				{"File Name", ki.Props{
 					"default-field": "SVGFile",
@@ -543,7 +534,19 @@ var Plot2DProps = ki.Props{
 				}},
 			},
 		}},
-		{"SaveData", ki.Props{
+		{"OpenCSV", ki.Props{
+			"label": "Open CSV File...",
+			"icon":  "file-open",
+			"desc":  "Open CSV-formatted data (or any delimeter -- default is tab (9), comma = 44) -- also recognizes emergent-style headers",
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{}},
+				{"Delimiter", ki.Props{
+					"default": '\t',
+					"desc":    "can use any single-character rune here -- default is tab (9) b/c otherwise hard to type, comma = 44",
+				}},
+			},
+		}},
+		{"SaveCSV", ki.Props{
 			"label": "Save Data...",
 			"icon":  "file-save",
 			"desc":  "save table data to a csv comma-separated-values file",

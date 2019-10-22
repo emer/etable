@@ -83,10 +83,10 @@ func Desc(spl *etable.Splits, colNm string) {
 // DescTry performs aggregation using standard aggregation functions across
 // all splits, and stores results in the Splits.
 // Column is specified by name -- returns error for bad column name.
-func DescTry(spl *etable.Splits, colNm string, aggTyp agg.Aggs) error {
+func DescTry(spl *etable.Splits, colNm string) error {
 	dt := spl.Table()
 	if dt == nil {
-		return fmt.Errorf("split.AggTry: No splits to aggregate over")
+		return fmt.Errorf("split.DescTry: No splits to aggregate over")
 	}
 	colIdx, err := dt.ColIdxTry(colNm)
 	if err != nil {

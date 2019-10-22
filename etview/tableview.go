@@ -191,8 +191,7 @@ func (tv *TableView) ConfigSliceGrid() {
 
 	sg.Lay = gi.LayoutVert
 	sg.SetMinPrefWidth(units.NewEm(10))
-	sg.SetStretchMaxHeight() // for this to work, ALL layers above need it too
-	sg.SetStretchMaxWidth()  // for this to work, ALL layers above need it too
+	sg.SetStretchMax() // for this to work, ALL layers above need it too
 
 	sgcfg := kit.TypeAndNameList{}
 	sgcfg.Add(gi.KiT_ToolBar, "header")
@@ -207,8 +206,7 @@ func (tv *TableView) ConfigSliceGrid() {
 
 	gl := tv.GridLayout()
 	gl.Lay = gi.LayoutHoriz
-	gl.SetStretchMaxHeight() // for this to work, ALL layers above need it too
-	gl.SetStretchMaxWidth()  // for this to work, ALL layers above need it too
+	gl.SetStretchMax() // for this to work, ALL layers above need it too
 	gconfig := kit.TypeAndNameList{}
 	gconfig.Add(gi.KiT_Frame, "grid")
 	gconfig.Add(gi.KiT_ScrollBar, "scrollbar")
@@ -218,8 +216,7 @@ func (tv *TableView) ConfigSliceGrid() {
 	sgf.Lay = gi.LayoutGrid
 	sgf.Stripes = gi.RowStripes
 	sgf.SetMinPrefHeight(units.NewEm(10))
-	sgf.SetStretchMaxHeight() // for this to work, ALL layers above need it too
-	sgf.SetStretchMaxWidth()  // for this to work, ALL layers above need it too
+	sgf.SetStretchMax() // for this to work, ALL layers above need it too
 	sgf.SetProp("columns", nWidgPerRow)
 	sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
 

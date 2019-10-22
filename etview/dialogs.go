@@ -59,8 +59,7 @@ func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	if opts.Inactive {
 		sv.SetInactive()
 	}
-	sv.SetStretchMaxHeight()
-	sv.SetStretchMaxWidth()
+	sv.SetStretchMax()
 	sv.SetTensor(tsr)
 
 	if recv != nil && dlgFunc != nil {
@@ -119,8 +118,7 @@ func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, 
 	if opts.Inactive {
 		sv.SetInactive()
 	}
-	sv.SetStretchMaxHeight()
-	sv.SetStretchMaxWidth()
+	sv.SetStretchMax()
 	sv.SetSimMat(smat)
 
 	if recv != nil && dlgFunc != nil {
