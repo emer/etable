@@ -219,6 +219,9 @@ func (tg *TensorGrid) Style2D() {
 }
 
 func (tg *TensorGrid) Size2D(iter int) {
+	if tg.Tensor == nil || tg.Tensor.Len() == 0 {
+		return
+	}
 	if iter > 0 {
 		return // already updated in previous iter, don't redo!
 	} else {
