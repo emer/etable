@@ -105,7 +105,7 @@ func (tv *TensorView) Config() {
 }
 
 func (tv *TensorView) UpdtSliceSize() int {
-	tv.SliceSize, tv.NCols, _, _ = etensor.Prjn2DShape(tv.Tensor, tv.TsrLay.OddRow)
+	tv.SliceSize, tv.NCols, _, _ = etensor.Prjn2DShape(tv.Tensor.ShapeObj(), tv.TsrLay.OddRow)
 	return tv.SliceSize
 }
 

@@ -147,7 +147,7 @@ func (tg *SimMatGrid) Size2D(iter int) {
 		txtsz := mat32.Max(rtxtsz, ctxtsz)
 
 		tg.InitLayout2D()
-		rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
+		rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
 		rowEx = tg.rowNGps
 		colEx = tg.colNGps
 		frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
@@ -183,7 +183,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 
 	tsr := tg.SimMat.Mat
 
-	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
+	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr.ShapeObj(), tg.Disp.OddRow)
 	rowEx = tg.rowNGps
 	colEx = tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing

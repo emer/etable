@@ -4,7 +4,7 @@
 
 package etensor
 
-// Prjn2DShape returns the size of a 2D projection of the given tensor,
+// Prjn2DShape returns the size of a 2D projection of the given tensor Shape,
 // collapsing higher dimensions down to 2D (and 1D up to 2D).
 // For any odd number of dimensions, the remaining outer-most dimension
 // can either be multipliexed across the row or column, given the oddRow arg.
@@ -12,56 +12,56 @@ package etensor
 // RowMajor and ColMajor layouts are handled appropriately.
 // rowEx returns the number of "extra" (higher dimensional) rows
 // and colEx returns the number of extra cols
-func Prjn2DShape(tsr Tensor, oddRow bool) (rows, cols, rowEx, colEx int) {
-	if tsr.Len() == 0 {
+func Prjn2DShape(shp *Shape, oddRow bool) (rows, cols, rowEx, colEx int) {
+	if shp.Len() == 0 {
 		return 1, 1, 0, 0
 	}
-	nd := tsr.NumDims()
+	nd := shp.NumDims()
 	switch nd {
 	case 1:
 		if oddRow {
-			return tsr.Dim(0), 1, 0, 0
+			return shp.Dim(0), 1, 0, 0
 		} else {
-			return 1, tsr.Dim(0), 0, 0
+			return 1, shp.Dim(0), 0, 0
 		}
 	case 2:
-		if tsr.ShapeObj().IsRowMajor() {
-			return tsr.Dim(0), tsr.Dim(1), 0, 0
+		if shp.IsRowMajor() {
+			return shp.Dim(0), shp.Dim(1), 0, 0
 		} else {
-			return tsr.Dim(1), tsr.Dim(0), 0, 0
+			return shp.Dim(1), shp.Dim(0), 0, 0
 		}
 	case 3:
 		if oddRow {
-			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(0) * tsr.Dim(1), tsr.Dim(2), tsr.Dim(0), 0
+			if shp.IsRowMajor() {
+				return shp.Dim(0) * shp.Dim(1), shp.Dim(2), shp.Dim(0), 0
 			} else {
-				return tsr.Dim(2) * tsr.Dim(1), tsr.Dim(0), tsr.Dim(2), 0
+				return shp.Dim(2) * shp.Dim(1), shp.Dim(0), shp.Dim(2), 0
 			}
 		} else {
-			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(1), tsr.Dim(0) * tsr.Dim(2), 0, tsr.Dim(0)
+			if shp.IsRowMajor() {
+				return shp.Dim(1), shp.Dim(0) * shp.Dim(2), 0, shp.Dim(0)
 			} else {
-				return tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), 0, tsr.Dim(2)
+				return shp.Dim(1), shp.Dim(2) * shp.Dim(0), 0, shp.Dim(2)
 			}
 		}
 	case 4:
-		if tsr.ShapeObj().IsRowMajor() {
-			return tsr.Dim(0) * tsr.Dim(2), tsr.Dim(1) * tsr.Dim(3), tsr.Dim(0), tsr.Dim(1)
+		if shp.IsRowMajor() {
+			return shp.Dim(0) * shp.Dim(2), shp.Dim(1) * shp.Dim(3), shp.Dim(0), shp.Dim(1)
 		} else {
-			return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), tsr.Dim(3), tsr.Dim(2)
+			return shp.Dim(3) * shp.Dim(1), shp.Dim(2) * shp.Dim(0), shp.Dim(3), shp.Dim(2)
 		}
 	case 5:
 		if oddRow {
-			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(0) * tsr.Dim(1) * tsr.Dim(3), tsr.Dim(2) * tsr.Dim(4), tsr.Dim(0) * tsr.Dim(1), 0
+			if shp.IsRowMajor() {
+				return shp.Dim(0) * shp.Dim(1) * shp.Dim(3), shp.Dim(2) * shp.Dim(4), shp.Dim(0) * shp.Dim(1), 0
 			} else {
-				return tsr.Dim(4) * tsr.Dim(3) * tsr.Dim(1), tsr.Dim(2) * tsr.Dim(0), tsr.Dim(4) * tsr.Dim(3), 0
+				return shp.Dim(4) * shp.Dim(3) * shp.Dim(1), shp.Dim(2) * shp.Dim(0), shp.Dim(4) * shp.Dim(3), 0
 			}
 		} else {
-			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.Dim(1) * tsr.Dim(3), tsr.Dim(0) * tsr.Dim(2) * tsr.Dim(4), 0, tsr.Dim(0) * tsr.Dim(1)
+			if shp.IsRowMajor() {
+				return shp.Dim(1) * shp.Dim(3), shp.Dim(0) * shp.Dim(2) * shp.Dim(4), 0, shp.Dim(0) * shp.Dim(1)
 			} else {
-				return tsr.Dim(3) * tsr.Dim(1), tsr.Dim(4) * tsr.Dim(2) * tsr.Dim(0), 0, tsr.Dim(4) * tsr.Dim(2)
+				return shp.Dim(3) * shp.Dim(1), shp.Dim(4) * shp.Dim(2) * shp.Dim(0), 0, shp.Dim(4) * shp.Dim(2)
 			}
 		}
 	}

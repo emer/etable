@@ -229,7 +229,7 @@ func (tg *TensorGrid) Size2D(iter int) {
 			tg.Size2DFromWH(float32(tg.Tensor.Dim(1)), float32(tg.Tensor.Dim(0)))
 		} else {
 			tg.InitLayout2D()
-			rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor, tg.Disp.OddRow)
+			rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
 			frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 			fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 			tg.Disp.ToDots(&tg.Sty.UnContext)
@@ -328,7 +328,7 @@ func (tg *TensorGrid) RenderTensor() {
 		}
 		return
 	}
-	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr, tg.Disp.OddRow)
+	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr.ShapeObj(), tg.Disp.OddRow)
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 	rowsInner := rows
