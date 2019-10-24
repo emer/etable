@@ -68,6 +68,94 @@ func Prjn2DShape(shp *Shape, oddRow bool) (rows, cols, rowEx, colEx int) {
 	return 1, 1, 0, 0
 }
 
+// Prjn2DIdx returns the flat 1D index for given row, col coords for a 2D projection
+// of the given tensor shape, collapsing higher dimensions down to 2D (and 1D up to 2D).
+// For any odd number of dimensions, the remaining outer-most dimension
+// can either be multipliexed across the row or column, given the oddRow arg.
+// Even multiples of inner-most dimensions are assumed to be row, then column.
+// RowMajor and ColMajor layouts are handled appropriately.
+func Prjn2DIdx(shp *Shape, oddRow bool, row, col int) int {
+	nd := shp.NumDims()
+	switch nd {
+	case 1:
+		if oddRow {
+			return row
+		} else {
+			return col
+		}
+	case 2:
+		if shp.IsRowMajor() {
+			return shp.Offset([]int{row, col})
+		} else {
+			return shp.Offset([]int{col, row})
+		}
+	case 3:
+		if oddRow {
+			ny := shp.Dim(1)
+			yy := row / ny
+			y := row % ny
+			if shp.IsRowMajor() {
+				return shp.Offset([]int{yy, y, col})
+			} else {
+				return shp.Offset([]int{col, y, yy})
+			}
+		} else {
+			nx := shp.Dim(2)
+			xx := col / nx
+			x := col % nx
+			if shp.IsRowMajor() {
+				return shp.Offset([]int{xx, row, x})
+			} else {
+				return shp.Offset([]int{x, row, xx})
+			}
+		}
+	case 4:
+		if shp.IsRowMajor() {
+			ny := shp.Dim(2)
+			yy := row / ny
+			y := row % ny
+			nx := shp.Dim(3)
+			xx := col / nx
+			x := col % nx
+			return shp.Offset([]int{yy, xx, y, x})
+		} else {
+			ny := shp.Dim(1)
+			yy := row / ny
+			y := row % ny
+			nx := shp.Dim(0)
+			xx := col / nx
+			x := col % nx
+			return shp.Offset([]int{x, y, xx, yy})
+		}
+	case 5:
+		// todo: oddRows version!
+		if shp.IsRowMajor() {
+			nyy := shp.Dim(1)
+			ny := shp.Dim(3)
+			yyy := row / (nyy * ny)
+			yy := row % (nyy * ny)
+			y := yy % ny
+			yy = yy / ny
+			nx := shp.Dim(4)
+			xx := col / nx
+			x := col % nx
+			return shp.Offset([]int{yyy, yy, xx, y, x})
+		} else {
+			nyy := shp.Dim(3)
+			ny := shp.Dim(1)
+			yyy := row / (nyy * ny)
+			yy := row % (nyy * ny)
+			y := yy % ny
+			yy = yy / ny
+			nx := shp.Dim(0)
+			xx := col / nx
+			x := col % nx
+			return shp.Offset([]int{x, y, xx, yy, yyy})
+		}
+	}
+	return 0
+}
+
 // Prjn2DVal returns the float64 value at given row, col coords for a 2D projection
 // of the given tensor, collapsing higher dimensions down to 2D (and 1D up to 2D).
 // For any odd number of dimensions, the remaining outer-most dimension
@@ -75,85 +163,8 @@ func Prjn2DShape(shp *Shape, oddRow bool) (rows, cols, rowEx, colEx int) {
 // Even multiples of inner-most dimensions are assumed to be row, then column.
 // RowMajor and ColMajor layouts are handled appropriately.
 func Prjn2DVal(tsr Tensor, oddRow bool, row, col int) float64 {
-	nd := tsr.NumDims()
-	switch nd {
-	case 1:
-		if oddRow {
-			return tsr.FloatVal1D(row)
-		} else {
-			return tsr.FloatVal1D(col)
-		}
-	case 2:
-		if tsr.ShapeObj().IsRowMajor() {
-			return tsr.FloatVal([]int{row, col})
-		} else {
-			return tsr.FloatVal([]int{col, row})
-		}
-	case 3:
-		if oddRow {
-			ny := tsr.Dim(1)
-			yy := row / ny
-			y := row % ny
-			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.FloatVal([]int{yy, y, col})
-			} else {
-				return tsr.FloatVal([]int{col, y, yy})
-			}
-		} else {
-			nx := tsr.Dim(2)
-			xx := col / nx
-			x := col % nx
-			if tsr.ShapeObj().IsRowMajor() {
-				return tsr.FloatVal([]int{xx, row, x})
-			} else {
-				return tsr.FloatVal([]int{x, row, xx})
-			}
-		}
-	case 4:
-		if tsr.ShapeObj().IsRowMajor() {
-			ny := tsr.Dim(2)
-			yy := row / ny
-			y := row % ny
-			nx := tsr.Dim(3)
-			xx := col / nx
-			x := col % nx
-			return tsr.FloatVal([]int{yy, xx, y, x})
-		} else {
-			ny := tsr.Dim(1)
-			yy := row / ny
-			y := row % ny
-			nx := tsr.Dim(0)
-			xx := col / nx
-			x := col % nx
-			return tsr.FloatVal([]int{x, y, xx, yy})
-		}
-	case 5:
-		// todo: oddRows version!
-		if tsr.ShapeObj().IsRowMajor() {
-			nyy := tsr.Dim(1)
-			ny := tsr.Dim(3)
-			yyy := row / (nyy * ny)
-			yy := row % (nyy * ny)
-			y := yy % ny
-			yy = yy / ny
-			nx := tsr.Dim(4)
-			xx := col / nx
-			x := col % nx
-			return tsr.FloatVal([]int{yyy, yy, xx, y, x})
-		} else {
-			nyy := tsr.Dim(3)
-			ny := tsr.Dim(1)
-			yyy := row / (nyy * ny)
-			yy := row % (nyy * ny)
-			y := yy % ny
-			yy = yy / ny
-			nx := tsr.Dim(0)
-			xx := col / nx
-			x := col % nx
-			return tsr.FloatVal([]int{x, y, xx, yy, yyy})
-		}
-	}
-	return 0
+	idx := Prjn2DIdx(tsr.ShapeObj(), oddRow, row, col)
+	return tsr.FloatVal1D(idx)
 }
 
 // Prjn2DSet sets a float64 value at given row, col coords for a 2D projection
@@ -163,82 +174,6 @@ func Prjn2DVal(tsr Tensor, oddRow bool, row, col int) float64 {
 // Even multiples of inner-most dimensions are assumed to be row, then column.
 // RowMajor and ColMajor layouts are handled appropriately.
 func Prjn2DSet(tsr Tensor, oddRow bool, row, col int, val float64) {
-	nd := tsr.NumDims()
-	switch nd {
-	case 1:
-		if oddRow {
-			tsr.SetFloat1D(row, val)
-		} else {
-			tsr.SetFloat1D(col, val)
-		}
-	case 2:
-		if tsr.ShapeObj().IsRowMajor() {
-			tsr.SetFloat([]int{row, col}, val)
-		} else {
-			tsr.SetFloat([]int{col, row}, val)
-		}
-	case 3:
-		if oddRow {
-			ny := tsr.Dim(1)
-			yy := row / ny
-			y := row % ny
-			if tsr.ShapeObj().IsRowMajor() {
-				tsr.SetFloat([]int{yy, y, col}, val)
-			} else {
-				tsr.SetFloat([]int{col, y, yy}, val)
-			}
-		} else {
-			nx := tsr.Dim(2)
-			xx := col / nx
-			x := col % nx
-			if tsr.ShapeObj().IsRowMajor() {
-				tsr.SetFloat([]int{xx, row, x}, val)
-			} else {
-				tsr.SetFloat([]int{x, row, xx}, val)
-			}
-		}
-	case 4:
-		if tsr.ShapeObj().IsRowMajor() {
-			ny := tsr.Dim(2)
-			yy := row / ny
-			y := row % ny
-			nx := tsr.Dim(3)
-			xx := col / nx
-			x := col % nx
-			tsr.SetFloat([]int{yy, xx, y, x}, val)
-		} else {
-			ny := tsr.Dim(1)
-			yy := row / ny
-			y := row % ny
-			nx := tsr.Dim(0)
-			xx := col / nx
-			x := col % nx
-			tsr.SetFloat([]int{x, y, xx, yy}, val)
-		}
-	case 5:
-		// todo: oddRows version!
-		if tsr.ShapeObj().IsRowMajor() {
-			nyy := tsr.Dim(1)
-			ny := tsr.Dim(3)
-			yyy := row / nyy
-			yy := row % nyy
-			y := yy % ny
-			yy = yy / ny
-			nx := tsr.Dim(4)
-			xx := col / nx
-			x := col % nx
-			tsr.SetFloat([]int{yyy, yy, xx, y, x}, val)
-		} else {
-			nyy := tsr.Dim(3)
-			ny := tsr.Dim(1)
-			yyy := row / nyy
-			yy := row % nyy
-			y := yy % ny
-			yy = yy / ny
-			nx := tsr.Dim(0)
-			xx := col / nx
-			x := col % nx
-			tsr.SetFloat([]int{x, y, xx, yy, yyy}, val)
-		}
-	}
+	idx := Prjn2DIdx(tsr.ShapeObj(), oddRow, row, col)
+	tsr.SetFloat1D(idx, val)
 }
