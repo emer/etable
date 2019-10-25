@@ -23,6 +23,7 @@ type SimMat struct {
 // Init initializes SimMat with default Matrix and nil rows, cols
 func (smat *SimMat) Init() {
 	smat.Mat = &etensor.Float64{}
+	smat.Mat.SetMetaData("grid-fill", "1") // best for sim mats -- can override later if need to
 	smat.Rows = nil
 	smat.Cols = nil
 }
