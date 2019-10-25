@@ -62,7 +62,7 @@ func (td *TensorDisp) Defaults() {
 		td.TotPrefSize.Set(20, units.Em)
 	}
 	if td.GridFill == 0 {
-		td.GridFill = 1
+		td.GridFill = 0.9
 		td.DimExtra = 0.3
 	}
 }
