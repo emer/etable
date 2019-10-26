@@ -249,7 +249,7 @@ func (pl *Plot2D) GenPlot() {
 		for bi, edRow := range xbreaks {
 			firstXY = nil
 			for _, cp := range pl.Cols {
-				if !cp.On {
+				if !cp.On || cp == xp {
 					continue
 				}
 				if cp.IsString {
@@ -300,7 +300,7 @@ func (pl *Plot2D) GenPlot() {
 		stRow := 0
 		edRow := pl.Table.Rows
 		for _, cp := range pl.Cols {
-			if !cp.On {
+			if !cp.On || cp == xp {
 				continue
 			}
 			if cp.IsString {
