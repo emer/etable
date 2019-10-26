@@ -16,6 +16,7 @@ type PlotParams struct {
 	Points     bool    `desc:"plot points with symbols"`
 	LineWidth  float64 `desc:"width of lines"`
 	PointSize  float64 `desc:"size of points"`
+	NegXDraw   bool    `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
 	Scale      float64 `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
 	XAxisCol   string  `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
 	XAxisLabel string  `desc:"optional label to use for XAxis instead of column name"`

@@ -217,18 +217,18 @@ func (pl *Plot2D) GenPlot() {
 	plt.Y.Label.Text = pl.YLabel()
 	plt.BackgroundColor = nil
 
+	// process xaxis first
+	xi, xbreaks, err := pl.PlotXAxis(plt)
+	if err != nil {
+		return
+	}
+	xp := pl.Cols[xi]
+
 	var firstXY *TableXY
 	var strCols []*ColParams
+
 	for _, cp := range pl.Cols {
 		cp.UpdateVals()
-		if cp.Col == pl.Params.XAxisCol {
-			if cp.Range.FixMin {
-				plt.X.Min = math.Min(plt.X.Min, cp.Range.Min)
-			}
-			if cp.Range.FixMax {
-				plt.X.Max = math.Max(plt.X.Max, cp.Range.Max)
-			}
-		}
 		if !cp.On {
 			continue
 		}
@@ -242,42 +242,113 @@ func (pl *Plot2D) GenPlot() {
 		if cp.Range.FixMax {
 			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
 		}
+	}
 
-		xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Col)
-		if firstXY == nil {
-			firstXY = xy
+	if xbreaks != nil {
+		stRow := 0
+		for bi, edRow := range xbreaks {
+			firstXY = nil
+			for _, cp := range pl.Cols {
+				if !cp.On {
+					continue
+				}
+				if cp.IsString {
+					continue
+				}
+				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+				if firstXY == nil {
+					firstXY = xy
+				}
+				var pts *plotter.Scatter
+				var lns *plotter.Line
+				if pl.Params.Lines && pl.Params.Points {
+					lns, pts, _ = plotter.NewLinePoints(xy)
+				} else if pl.Params.Points {
+					pts, _ = plotter.NewScatter(xy)
+				} else {
+					lns, _ = plotter.NewLine(xy)
+				}
+				if lns != nil {
+					lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
+					lns.LineStyle.Color = cp.Color
+					plt.Add(lns)
+					if bi == 0 {
+						plt.Legend.Add(cp.Label(), lns)
+					}
+				}
+				if pts != nil {
+					pts.GlyphStyle.Color = cp.Color
+					pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
+					plt.Add(pts)
+					if lns == nil && bi == 0 {
+						plt.Legend.Add(cp.Label(), pts)
+					}
+				}
+			}
+			if firstXY != nil && len(strCols) > 0 {
+				for _, cp := range strCols {
+					xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+					xy.LblCol = xy.YCol
+					xy.YCol = firstXY.YCol
+					lbls, _ := plotter.NewLabels(xy)
+					plt.Add(lbls)
+				}
+			}
+			stRow = edRow
 		}
-		var pts *plotter.Scatter
-		var lns *plotter.Line
-		if pl.Params.Lines && pl.Params.Points {
-			lns, pts, _ = plotter.NewLinePoints(xy)
-		} else if pl.Params.Points {
-			pts, _ = plotter.NewScatter(xy)
-		} else {
-			lns, _ = plotter.NewLine(xy)
-		}
-		if lns != nil {
-			lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
-			lns.LineStyle.Color = cp.Color
-			plt.Add(lns)
-			plt.Legend.Add(cp.Label(), lns)
-		}
-		if pts != nil {
-			pts.GlyphStyle.Color = cp.Color
-			pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
-			plt.Add(pts)
-			if lns == nil {
-				plt.Legend.Add(cp.Label(), pts)
+	} else {
+		stRow := 0
+		edRow := pl.Table.Rows
+		for _, cp := range pl.Cols {
+			if !cp.On {
+				continue
+			}
+			if cp.IsString {
+				continue
+			}
+			if cp.Range.FixMin {
+				plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
+			}
+			if cp.Range.FixMax {
+				plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
+			}
+
+			xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+			if firstXY == nil {
+				firstXY = xy
+			}
+			var pts *plotter.Scatter
+			var lns *plotter.Line
+			if pl.Params.Lines && pl.Params.Points {
+				lns, pts, _ = plotter.NewLinePoints(xy)
+			} else if pl.Params.Points {
+				pts, _ = plotter.NewScatter(xy)
+			} else {
+				lns, _ = plotter.NewLine(xy)
+			}
+			if lns != nil {
+				lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
+				lns.LineStyle.Color = cp.Color
+				plt.Add(lns)
+				plt.Legend.Add(cp.Label(), lns)
+			}
+			if pts != nil {
+				pts.GlyphStyle.Color = cp.Color
+				pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
+				plt.Add(pts)
+				if lns == nil {
+					plt.Legend.Add(cp.Label(), pts)
+				}
 			}
 		}
-	}
-	if firstXY != nil && len(strCols) > 0 {
-		for _, cp := range strCols {
-			xy, _ := NewTableXYNames(pl.Table, pl.Params.XAxisCol, cp.Col)
-			xy.LblCol = xy.YCol
-			xy.YCol = firstXY.YCol
-			lbls, _ := plotter.NewLabels(xy)
-			plt.Add(lbls)
+		if firstXY != nil && len(strCols) > 0 {
+			for _, cp := range strCols {
+				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+				xy.LblCol = xy.YCol
+				xy.YCol = firstXY.YCol
+				lbls, _ := plotter.NewLabels(xy)
+				plt.Add(lbls)
+			}
 		}
 	}
 
@@ -287,6 +358,53 @@ func (pl *Plot2D) GenPlot() {
 	sv := pl.SVGPlot()
 	PlotViewSVG(plt, sv, pl.Params.Scale)
 	pl.InPlot = false
+}
+
+// PlotXAxis processes the XAxis and returns its index and any breaks to insert
+// based on negative X axis traversals or NaN values
+func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
+	xi, err = pl.Table.ColIdxTry(pl.Params.XAxisCol)
+	if err != nil {
+		log.Println(err)
+		return
+	}
+	xc := pl.Table.Cols[xi]
+	xp := pl.Cols[xi]
+	sz := 1
+	if xp.Range.FixMin {
+		plt.X.Min = math.Min(plt.X.Min, xp.Range.Min)
+	}
+	if xp.Range.FixMax {
+		plt.X.Max = math.Max(plt.X.Max, xp.Range.Max)
+	}
+	if xc.NumDims() > 1 {
+		sz = xc.Len() / xc.Dim(0)
+		if xp.TensorIdx > sz || xp.TensorIdx < 0 {
+			log.Printf("eplot.PlotXAxis: TensorIdx invalid -- reset to 0")
+			xp.TensorIdx = 0
+		}
+	}
+	if pl.Params.NegXDraw {
+		return
+	}
+	lastx := -math.MaxFloat64
+	for row := 0; row < pl.Table.Rows; row++ {
+		var xv float64
+		if xc.NumDims() > 1 {
+			off := row*sz + xp.TensorIdx
+			xv = xc.FloatVal1D(off)
+		} else {
+			xv = xc.FloatVal1D(row)
+		}
+		if xv < lastx {
+			xbreaks = append(xbreaks, row)
+		}
+		lastx = xv
+	}
+	if xbreaks != nil {
+		xbreaks = append(xbreaks, pl.Table.Rows)
+	}
+	return
 }
 
 // Config configures the overall view widget
