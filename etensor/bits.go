@@ -260,19 +260,6 @@ func (tsr *Bits) SetShape(shape, strides []int, names []string) {
 	tsr.Values.SetLen(nln)
 }
 
-// AddRows adds n rows (outer-most dimension) to RowMajor organized tensor.
-func (tsr *Bits) AddRows(n int) {
-	if !tsr.IsRowMajor() {
-		return
-	}
-	cln := tsr.Len()
-	rows := tsr.Dim(0)
-	inln := cln / rows // length of inner dims
-	nln := (rows + n) * inln
-	tsr.Shape.Shp[0] += n
-	tsr.Values.SetLen(nln)
-}
-
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
 func (tsr *Bits) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {

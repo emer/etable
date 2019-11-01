@@ -159,10 +159,7 @@ func (dt *Table) AddCol(tsr etensor.Tensor, name string) error {
 
 // AddRows adds n rows to each of the columns
 func (dt *Table) AddRows(n int) {
-	for _, tsr := range dt.Cols {
-		tsr.AddRows(n)
-	}
-	dt.Rows += n
+	dt.SetNumRows(dt.Rows + n)
 }
 
 // SetNumRows sets the number of rows in the table, across all columns

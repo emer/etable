@@ -307,23 +307,6 @@ func (tsr *Int) SetShape(shape, strides []int, names []string) {
 	}
 }
 
-// AddRows adds n rows (outer-most dimension) to RowMajor organized tensor.
-func (tsr *Int) AddRows(n int) {
-	if !tsr.IsRowMajor() {
-		return
-	}
-	rows, cells := tsr.RowCellSize()
-	nln := (rows + n) * cells
-	tsr.Shape.Shp[0] += n
-	if cap(tsr.Values) >= nln {
-		tsr.Values = tsr.Values[0:nln]
-	} else {
-		nv := make([]int, nln)
-		copy(nv, tsr.Values)
-		tsr.Values = nv
-	}
-}
-
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
 func (tsr *Int) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {

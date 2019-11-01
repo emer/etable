@@ -218,10 +218,6 @@ type Tensor interface {
 	// existing names will be preserved if nil
 	SetShape(shape, strides []int, names []string)
 
-	// AddRows adds n rows (outer-most dimension) to RowMajor organized tensor.
-	// Does nothing for other stride layouts
-	AddRows(n int)
-
 	// SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
 	// Does nothing for other stride layouts
 	SetNumRows(rows int)
