@@ -129,6 +129,14 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 		mv, _ := strconv.ParseFloat(op, 32)
 		td.GridFill = float32(mv)
 	}
+	if op, has := tsr.MetaData("grid-min"); has {
+		mv, _ := strconv.ParseFloat(op, 32)
+		td.GridMinSize.Val = float32(mv)
+	}
+	if op, has := tsr.MetaData("grid-max"); has {
+		mv, _ := strconv.ParseFloat(op, 32)
+		td.GridMaxSize.Val = float32(mv)
+	}
 	if op, has := tsr.MetaData("dim-extra"); has {
 		mv, _ := strconv.ParseFloat(op, 32)
 		td.DimExtra = float32(mv)
