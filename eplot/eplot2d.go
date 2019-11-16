@@ -411,6 +411,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
 func (pl *Plot2D) Config() {
 	pl.Lay = gi.LayoutVert
 	pl.Defaults()
+	pl.Params.FmMeta(pl.Table)
 	pl.SetProp("spacing", gi.StdDialogVSpaceUnits)
 	config := kit.TypeAndNameList{}
 	config.Add(gi.KiT_ToolBar, "tbar")

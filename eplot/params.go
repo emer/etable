@@ -5,6 +5,7 @@
 package eplot
 
 import (
+	"github.com/emer/etable/etable"
 	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
 )
@@ -49,6 +50,24 @@ func (pp *PlotParams) CopyFrom(fr *PlotParams) {
 	pl := pp.Plot
 	*pp = *fr
 	pp.Plot = pl
+}
+
+// FmMeta sets plot params from meta data
+func (pp *PlotParams) FmMeta(dt *etable.Table) {
+	if op, has := dt.MetaData["lines"]; has {
+		if op == "+" || op == "true" {
+			pp.Lines = true
+		} else {
+			pp.Lines = false
+		}
+	}
+	if op, has := dt.MetaData["points"]; has {
+		if op == "+" || op == "true" {
+			pp.Points = true
+		} else {
+			pp.Points = false
+		}
+	}
 }
 
 // ColParams are parameters for plotting one column of data
