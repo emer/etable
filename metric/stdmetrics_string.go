@@ -9,9 +9,9 @@ import (
 
 var _ = errors.New("dummy error")
 
-const _StdMetrics_name = "EuclideanSumSquaresCovarianceCorrelationCosineInvCosineInvCorrelationInnerProductAbsHammingCrossEntropyStdMetricsN"
+const _StdMetrics_name = "EuclideanSumSquaresAbsHammingInvCosineInvCorrelationCrossEntropyInnerProductCovarianceCorrelationCosineStdMetricsN"
 
-var _StdMetrics_index = [...]uint8{0, 9, 19, 29, 40, 46, 55, 69, 81, 84, 91, 103, 114}
+var _StdMetrics_index = [...]uint8{0, 9, 19, 22, 29, 38, 52, 64, 76, 86, 97, 103, 114}
 
 func (i StdMetrics) String() string {
 	if i < 0 || i >= StdMetrics(len(_StdMetrics_index)-1) {

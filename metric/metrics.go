@@ -18,15 +18,22 @@ type StdMetrics int
 const (
 	Euclidean StdMetrics = iota
 	SumSquares
+	Abs
+	Hamming
+
+	// InvCosine is 1-Cosine -- useful to convert into an Increasing metric
+	InvCosine
+
+	// InvCorrelation is 1-Correlation -- useful to convert into an Increasing metric
+	InvCorrelation
+
+	CrossEntropy
+
+	// Everything below here is !Increasing -- larger = closer, not farther
+	InnerProduct
 	Covariance
 	Correlation
 	Cosine
-	InvCosine
-	InvCorrelation
-	InnerProduct
-	Abs
-	Hamming
-	CrossEntropy
 
 	StdMetricsN
 )
@@ -38,6 +45,17 @@ var KiT_StdMetrics = kit.Enums.AddEnum(StdMetricsN, false, nil)
 func (ev StdMetrics) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *StdMetrics) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
 
+// Increasing returns true if the distance metric is such that metric
+// values increase as a function of distance (e.g., Euclidean)
+// and false if metric values decrease as a function of distance
+// (e.g., Cosine, Correlation)
+func Increasing(std StdMetrics) bool {
+	if std >= InnerProduct {
+		return false
+	}
+	return true
+}
+
 // StdFunc32 returns a standard metric function as specified
 func StdFunc32(std StdMetrics) Func32 {
 	switch std {
@@ -45,24 +63,24 @@ func StdFunc32(std StdMetrics) Func32 {
 		return Euclidean32
 	case SumSquares:
 		return SumSquares32
+	case Abs:
+		return Abs32
+	case Hamming:
+		return Hamming32
+	case InvCorrelation:
+		return InvCorrelation32
+	case InvCosine:
+		return InvCosine32
+	case CrossEntropy:
+		return CrossEntropy32
+	case InnerProduct:
+		return InnerProduct32
 	case Covariance:
 		return Covariance32
 	case Correlation:
 		return Correlation32
 	case Cosine:
 		return Cosine32
-	case InvCorrelation:
-		return InvCorrelation32
-	case InvCosine:
-		return InvCosine32
-	case InnerProduct:
-		return InnerProduct32
-	case Abs:
-		return Abs32
-	case Hamming:
-		return Hamming32
-	case CrossEntropy:
-		return CrossEntropy32
 	}
 	return nil
 }
@@ -74,24 +92,24 @@ func StdFunc64(std StdMetrics) Func64 {
 		return Euclidean64
 	case SumSquares:
 		return SumSquares64
+	case Abs:
+		return Abs64
+	case Hamming:
+		return Hamming64
+	case InvCorrelation:
+		return InvCorrelation64
+	case InvCosine:
+		return InvCosine64
+	case CrossEntropy:
+		return CrossEntropy64
+	case InnerProduct:
+		return InnerProduct64
 	case Covariance:
 		return Covariance64
 	case Correlation:
 		return Correlation64
 	case Cosine:
 		return Cosine64
-	case InvCorrelation:
-		return InvCorrelation64
-	case InvCosine:
-		return InvCosine64
-	case InnerProduct:
-		return InnerProduct64
-	case Abs:
-		return Abs64
-	case Hamming:
-		return Hamming64
-	case CrossEntropy:
-		return CrossEntropy64
 	}
 	return nil
 }

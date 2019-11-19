@@ -52,6 +52,13 @@ func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
 		return
 	}
 	if tv.Table != et {
+		if op, has := et.MetaData["read-only"]; has {
+			if op == "+" || op == "true" {
+				tv.SetInactive()
+			} else {
+				tv.ClearInactive()
+			}
+		}
 		tv.ColTsrDisp = make(map[int]*TensorDisp)
 		tv.TsrDisp.Defaults()
 		if !tv.IsInactive() {
