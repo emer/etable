@@ -365,7 +365,7 @@ func (pl *Plot2D) GenPlot() {
 func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
 	xi, err = pl.Table.ColIdxTry(pl.Params.XAxisCol)
 	if err != nil {
-		log.Println(err)
+		log.Println("eplot.PlotXAxis: " + err.Error())
 		return
 	}
 	xc := pl.Table.Cols[xi]
