@@ -398,7 +398,7 @@ func (dt *Table) CellTensorIdx(col, row int) etensor.Tensor {
 	if ct.NumDims() == 1 {
 		return nil
 	}
-	return ct.SubSpace(ct.NumDims()-1, []int{row})
+	return ct.SubSpace([]int{row})
 }
 
 // CellTensor returns the tensor SubSpace for given column (by name), row index
@@ -417,7 +417,7 @@ func (dt *Table) CellTensor(colNm string, row int) etensor.Tensor {
 	if ct.NumDims() == 1 {
 		return nil
 	}
-	return ct.SubSpace(ct.NumDims()-1, []int{row})
+	return ct.SubSpace([]int{row})
 }
 
 // CellTensorTry returns the tensor SubSpace for given column (by name), row index
@@ -436,7 +436,7 @@ func (dt *Table) CellTensorTry(colNm string, row int) (etensor.Tensor, error) {
 	if ct.NumDims() == 1 {
 		return nil, fmt.Errorf("etable.Table: CellTensorTry called on column named: %v which is 1-dimensional", colNm)
 	}
-	return ct.SubSpaceTry(ct.NumDims()-1, []int{row})
+	return ct.SubSpaceTry([]int{row})
 }
 
 // CellTensorFloat1D returns the float value of a Tensor cell's cell at given

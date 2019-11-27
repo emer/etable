@@ -325,30 +325,33 @@ func (tsr *Int64) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int64) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Int64) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Int64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int64) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Int64{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -360,11 +363,11 @@ func (tsr *Int64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int64{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -834,30 +837,33 @@ func (tsr *Uint64) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint64) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Uint64) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Uint64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint64) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Uint64{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -869,11 +875,11 @@ func (tsr *Uint64) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint64{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -1343,30 +1349,33 @@ func (tsr *Int32) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int32) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Int32) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Int32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int32) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Int32{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -1378,11 +1387,11 @@ func (tsr *Int32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int32{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -1852,30 +1861,33 @@ func (tsr *Uint32) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint32) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Uint32) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Uint32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint32) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Uint32{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -1887,11 +1899,11 @@ func (tsr *Uint32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint32{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -2361,30 +2373,33 @@ func (tsr *Float32) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Float32) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Float32) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Float32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Float32) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Float32{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -2396,11 +2411,11 @@ func (tsr *Float32) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Float32{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -2870,30 +2885,33 @@ func (tsr *Int16) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int16) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Int16) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Int16) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int16) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Int16{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -2905,11 +2923,11 @@ func (tsr *Int16) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int16{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -3379,30 +3397,33 @@ func (tsr *Uint16) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint16) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Uint16) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Uint16) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint16) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Uint16{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -3414,11 +3435,11 @@ func (tsr *Uint16) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint16{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -3888,30 +3909,33 @@ func (tsr *Int8) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Int8) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Int8) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Int8) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Int8) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Int8{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -3923,11 +3947,11 @@ func (tsr *Int8) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int8{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
@@ -4397,30 +4421,33 @@ func (tsr *Uint8) SetNumRows(rows int) {
 	}
 }
 
-// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-// row or column major layouts.
-// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-//   and the first in ColMajor).
-// * offs are offsets for the outer dimensions (len = NDims - subdim)
-//   for the subspace to return.
+// SubSpace returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Only valid for row or column major layouts.
 // The new tensor points to the values of the this tensor (i.e., modifications
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
-func (tsr *Uint8) SubSpace(subdim int, offs []int) Tensor {
-	ss, _ := tsr.SubSpaceTry(subdim, offs)
+func (tsr *Uint8) SubSpace(offs []int) Tensor {
+	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
 }
 
-// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-// do not match the tensor Shape.
-func (tsr *Uint8) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
+// SubSpaceTry returns a new tensor with innermost subspace at given
+// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+// Try version returns an error message if the offs do not fit in tensor Shape.
+// Only valid for row or column major layouts.
+// The new tensor points to the values of the this tensor (i.e., modifications
+// will affect both), as its Values slice is a view onto the original (which
+// is why only inner-most contiguous supsaces are supported).
+// Use Clone() method to separate the two.
+func (tsr *Uint8) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
-	od := nd - subdim
-	if od <= 0 {
-		return nil, errors.New("SubSpace number of sub dimensions was >= NumDims -- must be less")
+	od := len(offs)
+	if od >= nd {
+		return nil, errors.New("SubSpace len(offsets) for outer dimensions was >= NumDims -- must be less")
 	}
+	id := nd - od
 	if tsr.IsRowMajor() {
 		stsr := &Uint8{}
 		stsr.SetShape(tsr.Shp[od:], nil, tsr.Nms[od:]) // row major def
@@ -4432,11 +4459,11 @@ func (tsr *Uint8) SubSpaceTry(subdim int, offs []int) (Tensor, error) {
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint8{}
-		stsr.SetShape(tsr.Shp[:subdim], nil, tsr.Nms[:subdim])
+		stsr.SetShape(tsr.Shp[:id], nil, tsr.Nms[:id])
 		stsr.Strd = ColMajorStrides(stsr.Shp)
 		sti := make([]int, nd)
-		for i := subdim; i < nd; i++ {
-			sti[i] = offs[i-subdim]
+		for i := id; i < nd; i++ {
+			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()

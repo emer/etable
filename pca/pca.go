@@ -125,7 +125,6 @@ func (pca *PCA) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, id
 	if len(*vals) != rows {
 		*vals = make([]float64, rows)
 	}
-	nd := col.NumDims()
 	ln := col.Len()
 	sz := ln / col.Dim(0) // size of cell
 	if sz != nr {
@@ -135,7 +134,7 @@ func (pca *PCA) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, id
 	for row := 0; row < rows; row++ {
 		sum := 0.0
 		rdim[0] = ix.Idxs[row]
-		rt := col.SubSpace(nd-1, rdim)
+		rt := col.SubSpace(rdim)
 		for ci := 0; ci < sz; ci++ {
 			sum += cvec[ci] * rt.FloatVal1D(ci)
 		}

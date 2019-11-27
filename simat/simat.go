@@ -59,12 +59,12 @@ func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, blankRepea
 	for ai := 0; ai < rows; ai++ {
 		ardim[0] = ix.Idxs[ai]
 		sdim[0] = ai
-		ar := col.SubSpace(nd-1, ardim)
+		ar := col.SubSpace(ardim)
 		ar.Floats(&av)
 		for bi := 0; bi <= ai; bi++ { // lower diag
 			brdim[0] = ix.Idxs[bi]
 			sdim[1] = bi
-			br := col.SubSpace(nd-1, brdim)
+			br := col.SubSpace(brdim)
 			br.Floats(&bv)
 			sv := mfun(av, bv)
 			sm.SetFloat(sdim, sv)

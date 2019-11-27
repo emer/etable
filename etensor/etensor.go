@@ -152,22 +152,24 @@ type Tensor interface {
 	// SetString1D sets the value of given 1-dimensional index (0-Len()-1) as a string
 	SetString1D(i int, val string)
 
-	// SubSpace returns a new tensor as a subspace of the current one, incorporating the
-	// given number of dimensions (0 < subdim < NumDims of this tensor). Only valid for
-	// row or column major layouts.
-	// * subdim are the inner, contiguous dimensions (i.e., the last in RowMajor
-	//   and the first in ColMajor).
-	// * offs are offsets for the outer dimensions (len = NDims - subdim)
-	//   for the subspace to return.
+	// SubSpace returns a new tensor with innermost subspace at given
+	// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+	// Only valid for row or column major layouts.
 	// The new tensor points to the values of the this tensor (i.e., modifications
 	// will affect both), as its Values slice is a view onto the original (which
 	// is why only inner-most contiguous supsaces are supported).
 	// Use Clone() method to separate the two.
-	SubSpace(subdim int, offs []int) Tensor
+	SubSpace(offs []int) Tensor
 
-	// SubSpaceTry is SubSpace but returns an error message if the subdim and offs
-	// do not match the tensor Shape.
-	SubSpaceTry(subdim int, offs []int) (Tensor, error)
+	// SubSpaceTry returns a new tensor with innermost subspace at given
+	// offset(s) in outermost dimension(s) (len(offs) < NumDims).
+	// Try version returns an error message if the offs do not fit in tensor Shape.
+	// Only valid for row or column major layouts.
+	// The new tensor points to the values of the this tensor (i.e., modifications
+	// will affect both), as its Values slice is a view onto the original (which
+	// is why only inner-most contiguous supsaces are supported).
+	// Use Clone() method to separate the two.
+	SubSpaceTry(offs []int) (Tensor, error)
 
 	// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 	// This is needed for display and is thus in the core api in optimized form

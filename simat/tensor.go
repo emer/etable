@@ -37,12 +37,12 @@ func Tensor(smat etensor.Tensor, a etensor.Tensor, mfun metric.Func64) error {
 	for ai := 0; ai < rows; ai++ {
 		ardim[0] = ai
 		sdim[0] = ai
-		ar := a.SubSpace(nd-1, ardim)
+		ar := a.SubSpace(ardim)
 		ar.Floats(&av)
 		for bi := 0; bi <= ai; bi++ { // lower diag
 			brdim[0] = bi
 			sdim[1] = bi
-			br := a.SubSpace(nd-1, brdim)
+			br := a.SubSpace(brdim)
 			br.Floats(&bv)
 			sv := mfun(av, bv)
 			smat.SetFloat(sdim, sv)
@@ -97,12 +97,12 @@ func Tensors(smat etensor.Tensor, a, b etensor.Tensor, mfun metric.Func64) error
 	for ai := 0; ai < arows; ai++ {
 		ardim[0] = ai
 		sdim[0] = ai
-		ar := a.SubSpace(and-1, ardim)
+		ar := a.SubSpace(ardim)
 		ar.Floats(&av)
 		for bi := 0; bi < brows; bi++ {
 			brdim[0] = bi
 			sdim[1] = bi
-			br := b.SubSpace(bnd-1, brdim)
+			br := b.SubSpace(brdim)
 			br.Floats(&bv)
 			sv := mfun(av, bv)
 			smat.SetFloat(sdim, sv)
