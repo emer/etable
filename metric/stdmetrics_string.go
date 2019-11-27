@@ -9,9 +9,29 @@ import (
 
 var _ = errors.New("dummy error")
 
-const _StdMetrics_name = "EuclideanSumSquaresAbsHammingInvCosineInvCorrelationCrossEntropyInnerProductCovarianceCorrelationCosineStdMetricsN"
+func _() {
+	// An "invalid array index" compiler error signifies that the constant values have changed.
+	// Re-run the stringer command to generate them again.
+	var x [1]struct{}
+	_ = x[Euclidean-0]
+	_ = x[SumSquares-1]
+	_ = x[Abs-2]
+	_ = x[Hamming-3]
+	_ = x[EuclideanBinTol-4]
+	_ = x[SumSquaresBinTol-5]
+	_ = x[InvCosine-6]
+	_ = x[InvCorrelation-7]
+	_ = x[CrossEntropy-8]
+	_ = x[InnerProduct-9]
+	_ = x[Covariance-10]
+	_ = x[Correlation-11]
+	_ = x[Cosine-12]
+	_ = x[StdMetricsN-13]
+}
 
-var _StdMetrics_index = [...]uint8{0, 9, 19, 22, 29, 38, 52, 64, 76, 86, 97, 103, 114}
+const _StdMetrics_name = "EuclideanSumSquaresAbsHammingEuclideanBinTolSumSquaresBinTolInvCosineInvCorrelationCrossEntropyInnerProductCovarianceCorrelationCosineStdMetricsN"
+
+var _StdMetrics_index = [...]uint8{0, 9, 19, 22, 29, 44, 60, 69, 83, 95, 107, 117, 128, 134, 145}
 
 func (i StdMetrics) String() string {
 	if i < 0 || i >= StdMetrics(len(_StdMetrics_index)-1) {

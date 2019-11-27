@@ -89,6 +89,93 @@ func SumSquares64(a, b []float64) float64 {
 }
 
 ///////////////////////////////////////////
+//  SumSquaresBinTol
+
+// SumSquaresBinTol32 computes the sum-of-squares distance between two vectors.
+// Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
+// BinTol version uses binary tolerance for 0-1 valued-vectors where
+// abs diff < .5 counts as 0 error (i.e., closer than not).
+func SumSquaresBinTol32(a, b []float32) float32 {
+	if len(a) != len(b) {
+		panic("metric: slice lengths do not match")
+	}
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math32.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float32 = 0
+		sumSquares float32 = 1
+	)
+	for i, av := range a {
+		bv := b[i]
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
+			continue
+		}
+		absxi := math32.Abs(av - bv)
+		if absxi < 0.5 {
+			continue
+		}
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
+	}
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
+	}
+	return scale * scale * sumSquares
+}
+
+// SumSquaresBinTol64 computes the sum-of-squares distance between two vectors.
+// Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
+// BinTol version uses binary tolerance for 0-1 valued-vectors where
+// abs diff < .5 counts as 0 error (i.e., closer than not).
+func SumSquaresBinTol64(a, b []float64) float64 {
+	if len(a) != len(b) {
+		panic("metric: slice lengths do not match")
+	}
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float64 = 0
+		sumSquares float64 = 1
+	)
+	for i, av := range a {
+		bv := b[i]
+		if av == bv || math.IsNaN(av) || math.IsNaN(bv) {
+			continue
+		}
+		absxi := math.Abs(av - bv)
+		if absxi < 0.5 {
+			continue
+		}
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
+	}
+	if math.IsInf(scale, 1) {
+		return math.Inf(1)
+	}
+	return scale * scale * sumSquares
+}
+
+///////////////////////////////////////////
 //  Euclidean
 
 // Euclidean32 computes the square-root of sum-of-squares distance
@@ -154,6 +241,95 @@ func Euclidean64(a, b []float64) float64 {
 			continue
 		}
 		absxi := math.Abs(av - bv)
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
+	}
+	if math.IsInf(scale, 1) {
+		return math.Inf(1)
+	}
+	return scale * math.Sqrt(sumSquares)
+}
+
+///////////////////////////////////////////
+//  EuclideanBinTol
+
+// EuclideanBinTol32 computes the square-root of sum-of-squares distance
+// between two vectors (aka the L2 norm).
+// Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
+// BinTol version uses binary tolerance for 0-1 valued-vectors where
+// abs diff < .5 counts as 0 error (i.e., closer than not).
+func EuclideanBinTol32(a, b []float32) float32 {
+	if len(a) != len(b) {
+		panic("metric: slice lengths do not match")
+	}
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math32.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float32 = 0
+		sumSquares float32 = 1
+	)
+	for i, av := range a {
+		bv := b[i]
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
+			continue
+		}
+		absxi := math32.Abs(av - bv)
+		if absxi < 0.5 {
+			continue
+		}
+		if scale < absxi {
+			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
+			scale = absxi
+		} else {
+			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
+		}
+	}
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
+	}
+	return scale * math32.Sqrt(sumSquares)
+}
+
+// EuclideanBinTol64 computes the square-root of sum-of-squares distance
+// between two vectors (aka the L2 norm).
+// Skips NaN's and panics if lengths are not equal.
+// Uses optimized algorithm from BLAS that avoids numerical overflow.
+// BinTol version uses binary tolerance for 0-1 valued-vectors where
+// abs diff < .5 counts as 0 error (i.e., closer than not).
+func EuclideanBinTol64(a, b []float64) float64 {
+	if len(a) != len(b) {
+		panic("metric: slice lengths do not match")
+	}
+	n := len(a)
+	if n < 2 {
+		if n == 1 {
+			return math.Abs(a[0] - b[0])
+		}
+		return 0
+	}
+	var (
+		scale      float64 = 0
+		sumSquares float64 = 1
+	)
+	for i, av := range a {
+		bv := b[i]
+		if av == bv || math.IsNaN(av) || math.IsNaN(bv) {
+			continue
+		}
+		absxi := math.Abs(av - bv)
+		if absxi < 0.5 {
+			continue
+		}
 		if scale < absxi {
 			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
 			scale = absxi

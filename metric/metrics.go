@@ -21,6 +21,9 @@ const (
 	Abs
 	Hamming
 
+	EuclideanBinTol
+	SumSquaresBinTol
+
 	// InvCosine is 1-Cosine -- useful to convert into an Increasing metric
 	InvCosine
 
@@ -67,6 +70,10 @@ func StdFunc32(std StdMetrics) Func32 {
 		return Abs32
 	case Hamming:
 		return Hamming32
+	case EuclideanBinTol:
+		return EuclideanBinTol32
+	case SumSquaresBinTol:
+		return SumSquaresBinTol32
 	case InvCorrelation:
 		return InvCorrelation32
 	case InvCosine:
@@ -96,6 +103,10 @@ func StdFunc64(std StdMetrics) Func64 {
 		return Abs64
 	case Hamming:
 		return Hamming64
+	case EuclideanBinTol:
+		return EuclideanBinTol64
+	case SumSquaresBinTol:
+		return SumSquaresBinTol64
 	case InvCorrelation:
 		return InvCorrelation64
 	case InvCosine:
