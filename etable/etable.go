@@ -223,6 +223,21 @@ func (dt *Table) Schema() Schema {
 	return sc
 }
 
+// note: no really clean definition of CopyFrom -- no point of re-using existing
+// table -- just clone it.
+
+// Clone returns a complete copy of this table
+func (dt *Table) Clone() *Table {
+	sc := dt.Schema()
+	cp := New(sc, dt.Rows)
+	for i, cl := range dt.Cols {
+		ccl := cp.Cols[i]
+		ccl.CopyFrom(cl)
+	}
+	cp.CopyMetaDataFrom(dt)
+	return cp
+}
+
 // SetMetaData sets given meta-data key to given value, safely creating the
 // map if not yet initialized.  Standard Keys are:
 // * name -- name of table
@@ -235,6 +250,20 @@ func (dt *Table) SetMetaData(key, val string) {
 		dt.MetaData = make(map[string]string)
 	}
 	dt.MetaData[key] = val
+}
+
+// CopyMetaDataFrom copies meta data from other table
+func (dt *Table) CopyMetaDataFrom(cp *Table) {
+	nm := len(cp.MetaData)
+	if nm == 0 {
+		return
+	}
+	if dt.MetaData == nil {
+		dt.MetaData = make(map[string]string, nm)
+	}
+	for k, v := range cp.MetaData {
+		dt.MetaData[k] = v
+	}
 }
 
 // RowsByStringIdx returns the list of rows that have given
