@@ -8,21 +8,24 @@ import (
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
+	"github.com/goki/ki/kit"
 )
 
 // PlotParams are parameters for overall plot
 type PlotParams struct {
-	Title      string  `desc:"optional title at top of plot"`
-	Lines      bool    `desc:"plot lines"`
-	Points     bool    `desc:"plot points with symbols"`
-	LineWidth  float64 `desc:"width of lines"`
-	PointSize  float64 `desc:"size of points"`
-	NegXDraw   bool    `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
-	Scale      float64 `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
-	XAxisCol   string  `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
-	XAxisLabel string  `desc:"optional label to use for XAxis instead of column name"`
-	YAxisLabel string  `desc:"optional label to use for YAxis -- if empty, first column name is used"`
-	Plot       *Plot2D `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
+	Title      string    `desc:"optional title at top of plot"`
+	Type       PlotTypes `desc:"type of plot to generate"`
+	Lines      bool      `desc:"plot lines"`
+	Points     bool      `desc:"plot points with symbols"`
+	LineWidth  float64   `desc:"width of lines"`
+	PointSize  float64   `desc:"size of points"`
+	BarWidth   float64   `desc:"width of bars for bar plot"`
+	NegXDraw   bool      `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
+	Scale      float64   `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
+	XAxisCol   string    `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
+	XAxisLabel string    `desc:"optional label to use for XAxis instead of column name"`
+	YAxisLabel string    `desc:"optional label to use for YAxis -- if empty, first column name is used"`
+	Plot       *Plot2D   `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -32,6 +35,7 @@ func (pp *PlotParams) Defaults() {
 		pp.Lines = true
 		pp.Points = false
 		pp.PointSize = 3
+		pp.BarWidth = 20
 	}
 	if pp.Scale == 0 {
 		pp.Scale = 2
@@ -124,3 +128,23 @@ func (cp *ColParams) Label() string {
 	}
 	return cp.Col
 }
+
+// PlotTypes are different types of plots
+type PlotTypes int32
+
+//go:generate stringer -type=PlotTypes
+
+var KiT_PlotTypes = kit.Enums.AddEnum(PlotTypesN, false, nil)
+
+func (ev PlotTypes) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
+func (ev *PlotTypes) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
+
+const (
+	// XY is a standard line / point plot
+	XY PlotTypes = iota
+
+	// Bar plots vertical bars
+	Bar
+
+	PlotTypesN
+)
