@@ -365,8 +365,10 @@ func (pl *Plot2D) ColsListUpdate() {
 		cp := &ColParams{Col: cn, ColorName: gi.ColorName(PlotColorNames[clri%npc])}
 		cp.Defaults()
 		tcol := pl.Table.Cols[ci]
-		if _, ok := tcol.(*etensor.String); ok {
+		if tcol.DataType() == etensor.STRING {
 			cp.IsString = true
+		} else {
+			cp.IsString = false
 		}
 		pl.Cols[ci] = cp
 		clri += inc

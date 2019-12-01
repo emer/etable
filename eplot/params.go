@@ -78,7 +78,6 @@ func (pp *PlotParams) FmMeta(dt *etable.Table) {
 type ColParams struct {
 	On        bool           `desc:"plot this column"`
 	Col       string         `desc:"name of column we're plotting"`
-	IsString  bool           `desc:"if true this is a string column -- plots as labels"`
 	Range     minmax.Range64 `desc:"effective range of data to plot -- either end can be fixed"`
 	FullRange minmax.F64     `desc:"full actual range of data -- only valid if specifically computed"`
 	ColorName gi.ColorName   `desc:"if non-empty, color is set by this name"`
@@ -87,6 +86,7 @@ type ColParams struct {
 	Lbl       string         `desc:"if non-empty, this is an alternative label to use in plotting"`
 	TensorIdx int            `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot"`
 	ErrCol    string         `desc:"specifies a column containing error bars for this column"`
+	IsString  bool           `inactive:"+" desc:"if true this is a string column -- plots as labels"`
 	Plot      *Plot2D        `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
