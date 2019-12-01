@@ -589,6 +589,9 @@ func (pl *Plot2D) PlotConfig() {
 }
 
 func (pl *Plot2D) ToolbarConfig() {
+	if pl.Table == nil {
+		return
+	}
 	tbar := pl.Toolbar()
 	if len(tbar.Kids) != 0 || pl.Viewport == nil {
 		return
