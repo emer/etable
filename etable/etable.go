@@ -266,9 +266,22 @@ func (dt *Table) CopyMetaDataFrom(cp *Table) {
 	}
 }
 
+// Named arg values for Contains, IgnoreCase
+const (
+	// Contains means the string only needs to contain the target string (see Equals)
+	Contains bool = true
+	// Equals means the string must equal the target string (see Contains)
+	Equals = false
+	// IgnoreCase means that differences in case are ignored in comparing strings
+	IgnoreCase = true
+	// UseCase means that case matters when comparing strings
+	UseCase = false
+)
+
 // RowsByStringIdx returns the list of rows that have given
 // string value in given column index.
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Use named args for greater clarity.
 func (dt *Table) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bool) []int {
 	col := dt.Cols[colIdx]
 	lowstr := strings.ToLower(str)
@@ -296,6 +309,7 @@ func (dt *Table) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bo
 // RowsByString returns the list of rows that have given
 // string value in given column name.  returns nil if name invalid -- see also Try.
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Use named args for greater clarity.
 func (dt *Table) RowsByString(colNm string, str string, contains, ignoreCase bool) []int {
 	ci := dt.ColIdx(colNm)
 	if ci < 0 {
@@ -307,6 +321,7 @@ func (dt *Table) RowsByString(colNm string, str string, contains, ignoreCase boo
 // RowsByStringTry returns the list of rows that have given
 // string value in given column name.  returns error message for invalid column name.
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Use named args for greater clarity.
 func (dt *Table) RowsByStringTry(colNm string, str string, contains, ignoreCase bool) ([]int, error) {
 	ci, err := dt.ColIdxTry(colNm)
 	if err != nil {

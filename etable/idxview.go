@@ -275,6 +275,7 @@ func (ix *IdxView) CopyFrom(oix *IdxView) {
 // RowsByStringIdx returns the list of *our indexes* whose row in the table has
 // given string value in given column index (de-reference our indexes to get actual row).
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Use named args for greater clarity.
 func (ix *IdxView) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bool) []int {
 	dt := ix.Table
 	col := dt.Cols[colIdx]
@@ -304,6 +305,7 @@ func (ix *IdxView) RowsByStringIdx(colIdx int, str string, contains, ignoreCase 
 // given string value in given column name (de-reference our indexes to get actual row).
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
 // returns nil if name invalid -- see also Try.
+// Use named args for greater clarity.
 func (ix *IdxView) RowsByString(colNm string, str string, contains, ignoreCase bool) []int {
 	dt := ix.Table
 	ci := dt.ColIdx(colNm)
@@ -317,6 +319,7 @@ func (ix *IdxView) RowsByString(colNm string, str string, contains, ignoreCase b
 // given string value in given column name (de-reference our indexes to get actual row).
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
 // returns error message for invalid column name.
+// Use named args for greater clarity.
 func (ix *IdxView) RowsByStringTry(colNm string, str string, contains, ignoreCase bool) ([]int, error) {
 	dt := ix.Table
 	ci, err := dt.ColIdxTry(colNm)
