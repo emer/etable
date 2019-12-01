@@ -485,7 +485,7 @@ func (dt *Table) CellTensorFloat1D(colNm string, row int, idx int) float64 {
 	if ct.NumDims() == 1 {
 		return 0
 	}
-	sz := ct.Len() / dt.Rows
+	_, sz := ct.RowCellSize()
 	if idx >= sz || idx < 0 {
 		return 0
 	}
@@ -509,7 +509,7 @@ func (dt *Table) CellTensorFloat1DTry(colNm string, row int, idx int) (float64, 
 	if ct.NumDims() == 1 {
 		return 0, fmt.Errorf("etable.Table: CellTensorFloat1DTry called on column named: %v which is 1-dimensional", colNm)
 	}
-	sz := ct.Len() / dt.Rows
+	_, sz := ct.RowCellSize()
 	if idx >= sz || idx < 0 {
 		return 0, fmt.Errorf("etable.Table: CellTensorFloat1DTry index out of range for cell size")
 	}
@@ -628,8 +628,14 @@ func (dt *Table) SetCellTensorIdx(col, row int, val etensor.Tensor) bool {
 	_, csz := ct.RowCellSize()
 	st := row * csz
 	sz := ints.MinInt(csz, val.Len())
-	for j := 0; j < sz; j++ {
-		ct.SetFloat1D(st+j, val.FloatVal1D(j))
+	if ct.DataType() == etensor.STRING {
+		for j := 0; j < sz; j++ {
+			ct.SetString1D(st+j, val.StringVal1D(j))
+		}
+	} else {
+		for j := 0; j < sz; j++ {
+			ct.SetFloat1D(st+j, val.FloatVal1D(j))
+		}
 	}
 	return true
 }
@@ -673,7 +679,7 @@ func (dt *Table) SetCellTensorFloat1D(colNm string, row int, idx int, val float6
 	if ct == nil {
 		return false
 	}
-	sz := ct.Len() / dt.Rows
+	_, sz := ct.RowCellSize()
 	if idx >= sz || idx < 0 {
 		return false
 	}
@@ -693,12 +699,52 @@ func (dt *Table) SetCellTensorFloat1DTry(colNm string, row int, idx int, val flo
 	if err != nil {
 		return err
 	}
-	sz := ct.Len() / dt.Rows
+	_, sz := ct.RowCellSize()
 	if idx >= sz || idx < 0 {
 		return fmt.Errorf("etable.Table: SetCellTensorFloat1DTry index out of range for cell size")
 	}
 	off := row*sz + idx
 	ct.SetFloat1D(off, val)
+	return nil
+}
+
+//////////////////////////////////////////////////////////////////////////////////////
+//  Copy Cell
+
+// CopyCell copies into cell at given col, row from cell in other table.
+// It is robust to differences in type -- uses destination cell type.
+// Returns error if column names are invalid.
+func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpRow int) error {
+	ct, err := dt.ColByNameTry(colNm)
+	if err != nil {
+		return err
+	}
+	cpct, err := cpt.ColByNameTry(cpColNm)
+	if err != nil {
+		return err
+	}
+	_, sz := ct.RowCellSize()
+	if sz == 1 {
+		if ct.DataType() == etensor.STRING {
+			ct.SetString1D(row, cpct.StringVal1D(cpRow))
+		} else {
+			ct.SetFloat1D(row, cpct.FloatVal1D(cpRow))
+		}
+	} else {
+		_, cpsz := cpct.RowCellSize()
+		st := row * sz
+		cst := cpRow * cpsz
+		msz := ints.MinInt(sz, cpsz)
+		if ct.DataType() == etensor.STRING {
+			for j := 0; j < msz; j++ {
+				ct.SetString1D(st+j, cpct.StringVal1D(cst+j))
+			}
+		} else {
+			for j := 0; j < msz; j++ {
+				ct.SetFloat1D(st+j, cpct.FloatVal1D(cst+j))
+			}
+		}
+	}
 	return nil
 }
 

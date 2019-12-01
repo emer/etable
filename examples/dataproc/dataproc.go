@@ -62,7 +62,7 @@ func AnalyzePlanets() {
 
 	byMethod := split.GroupBy(PlanetsAll, []string{"method"})
 	split.Agg(byMethod, "orbital_period", agg.AggMedian)
-	GpMethodOrbit = byMethod.AggsToTable(false) // false = include agg name in column
+	GpMethodOrbit = byMethod.AggsToTable(etable.AddAggName)
 
 	byMethod.DeleteAggs()
 	split.Desc(byMethod, "year") // full desc stats of year
@@ -72,7 +72,7 @@ func AnalyzePlanets() {
 		return ag.Aggs[idx][0] > 0 // exclude results with 0 std
 	})
 
-	GpMethodYear = byMethod.AggsToTable(false) // false = include agg name in column
+	GpMethodYear = byMethod.AggsToTable(etable.AddAggName)
 
 	byMethodDecade := split.GroupByFunc(PlanetsAll, func(row int) []string {
 		meth := Planets.CellString("method", row)
@@ -90,9 +90,9 @@ func AnalyzePlanets() {
 
 	decadeOnly, _ := byMethodDecade.ExtractLevels([]int{1})
 	split.Agg(decadeOnly, "number", agg.AggSum)
-	GpDecade = decadeOnly.AggsToTable(false)
+	GpDecade = decadeOnly.AggsToTable(etable.AddAggName)
 
-	GpMethodDecade = byMethodDecade.AggsToTable(false) // here to ensure that decadeOnly didn't mess up..
+	GpMethodDecade = byMethodDecade.AggsToTable(etable.AddAggName) // here to ensure that decadeOnly didn't mess up..
 
 	// todo: need unstack -- should be specific to the splits data because we already have the cols and
 	// groups etc -- the ExtractLevels method provides key starting point.

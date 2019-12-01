@@ -375,12 +375,20 @@ func (spl *Splits) SetLevels(levels ...string) {
 	spl.Levels = levels
 }
 
-// AggsToTable returns a Table containing this Splits' aggregate data
+// use these for arg to ArgsToTable*
+const (
+	// ColNameOnly means resulting agg table just has the original column name, no aggregation name
+	ColNameOnly bool = true
+	// AddAggName means resulting agg table columns have aggregation name appended
+	AddAggName = false
+)
+
+// AggsToTable returns a Table containing this Splits' aggregate data.
 // Must have Levels and Aggs all created as in the split.Agg* methods.
-// if colNameOnly is true, then the name of the columns for the Table
+// if colName == ColNameOnly, then the name of the columns for the Table
 // is just the corresponding agg column name -- otherwise it also includes
 // the name of the aggregation function with a : divider (e.g., Name:Mean)
-func (spl *Splits) AggsToTable(colNameOnly bool) *Table {
+func (spl *Splits) AggsToTable(colName bool) *Table {
 	nsp := len(spl.Splits)
 	if nsp == 0 {
 		return nil
@@ -393,7 +401,7 @@ func (spl *Splits) AggsToTable(colNameOnly bool) *Table {
 	for _, ag := range spl.Aggs {
 		col := dt.Cols[ag.ColIdx]
 		an := dt.ColNames[ag.ColIdx]
-		if !colNameOnly {
+		if colName == AddAggName {
 			an += ":" + ag.Name
 		}
 		sc = append(sc, Column{an, etensor.FLOAT64, col.Shapes()[1:], col.DimNames()[1:]})
@@ -415,6 +423,68 @@ func (spl *Splits) AggsToTable(colNameOnly bool) *Table {
 				col.SetFloat1D(sti+j, a)
 			}
 			cidx++
+		}
+	}
+	return st
+}
+
+// AggsToTableCopy returns a Table containing this Splits' aggregate data
+// and a copy of the first row of data for each split for all non-agg cols,
+// which is useful for recording other data that goes along with aggregated values.
+// Must have Levels and Aggs all created as in the split.Agg* methods.
+// if colName == ColNameOnly, then the name of the columns for the Table
+// is just the corresponding agg column name -- otherwise it also includes
+// the name of the aggregation function with a : divider (e.g., Name:Mean)
+func (spl *Splits) AggsToTableCopy(colName bool) *Table {
+	nsp := len(spl.Splits)
+	if nsp == 0 {
+		return nil
+	}
+	dt := spl.Splits[0].Table
+	sc := Schema{}
+	exmap := make(map[string]struct{})
+	for _, cn := range spl.Levels {
+		sc = append(sc, Column{cn, etensor.STRING, nil, nil})
+		exmap[cn] = struct{}{}
+	}
+	for _, ag := range spl.Aggs {
+		col := dt.Cols[ag.ColIdx]
+		an := dt.ColNames[ag.ColIdx]
+		exmap[an] = struct{}{}
+		if colName == AddAggName {
+			an += ":" + ag.Name
+		}
+		sc = append(sc, Column{an, etensor.FLOAT64, col.Shapes()[1:], col.DimNames()[1:]})
+	}
+	var cpcol []string
+	for _, cn := range dt.ColNames {
+		if _, ok := exmap[cn]; !ok {
+			cpcol = append(cpcol, cn)
+		}
+	}
+	st := New(sc, nsp)
+	for si, sidx := range spl.Splits {
+		cidx := 0
+		for ci := range spl.Levels {
+			col := st.Cols[cidx]
+			col.SetString1D(si, spl.Values[si][ci])
+			cidx++
+		}
+		for _, ag := range spl.Aggs {
+			col := st.Cols[cidx]
+			_, csz := col.RowCellSize()
+			sti := si * csz
+			av := ag.Aggs[si]
+			for j, a := range av {
+				col.SetFloat1D(sti+j, a)
+			}
+			cidx++
+		}
+		if len(sidx.Idxs) > 0 {
+			stidx := sidx.Idxs[0]
+			for _, cn := range cpcol {
+				st.CopyCell(cn, si, dt, cn, stidx)
+			}
 		}
 	}
 	return st

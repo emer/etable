@@ -86,6 +86,16 @@ func (pl *Plot2D) ColParams(colNm string) *ColParams {
 	return cp
 }
 
+// use these for SetColParams args
+const (
+	On       bool = true
+	Off           = false
+	FixMin        = true
+	FloatMin      = false
+	FixMax        = true
+	FloatMax      = false
+)
+
 // SetColParams sets main parameters for one column
 func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, fixMax bool, max float64) {
 	cp, err := pl.ColParamsTry(colNm)
