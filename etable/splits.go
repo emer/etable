@@ -460,6 +460,8 @@ func (spl *Splits) AggsToTableCopy(colName bool) *Table {
 	for _, cn := range dt.ColNames {
 		if _, ok := exmap[cn]; !ok {
 			cpcol = append(cpcol, cn)
+			col := dt.ColByName(cn)
+			sc = append(sc, Column{cn, col.DataType(), col.Shapes()[1:], col.DimNames()[1:]})
 		}
 	}
 	st := New(sc, nsp)
