@@ -237,7 +237,7 @@ func (pl *Plot2D) GenPlot() {
 }
 
 // PlotXAxis processes the XAxis and returns its index and any breaks to insert
-// based on negative X axis traversals or NaN values
+// based on negative X axis traversals or NaN values.  xbreaks always ends in Rows
 func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
 	xi, err = pl.Table.ColIdxTry(pl.Params.XAxisCol)
 	if err != nil {
@@ -277,9 +277,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
 		}
 		lastx = xv
 	}
-	if xbreaks != nil {
-		xbreaks = append(xbreaks, pl.Table.Rows)
-	}
+	xbreaks = append(xbreaks, pl.Table.Rows)
 	return
 }
 

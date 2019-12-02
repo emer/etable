@@ -84,7 +84,7 @@ type ColParams struct {
 	Color     gi.Color       `desc:"color to use in plotting the line"`
 	NTicks    int            `desc:"desired number of ticks"`
 	Lbl       string         `desc:"if non-empty, this is an alternative label to use in plotting"`
-	TensorIdx int            `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot"`
+	TensorIdx int            `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines"`
 	ErrCol    string         `desc:"specifies a column containing error bars for this column"`
 	IsString  bool           `inactive:"+" desc:"if true this is a string column -- plots as labels"`
 	Plot      *Plot2D        `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`

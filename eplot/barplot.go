@@ -5,10 +5,12 @@
 package eplot
 
 import (
+	"fmt"
 	"log"
 	"math"
 
 	"github.com/emer/etable/etensor"
+	"github.com/goki/gi/gi"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -31,7 +33,7 @@ func (pl *Plot2D) GenPlotBar() {
 
 	var firstXY *TableXY
 	var strCols []*ColParams
-
+	nys := 0
 	for _, cp := range pl.Cols {
 		cp.UpdateVals()
 		if !cp.On {
@@ -41,6 +43,7 @@ func (pl *Plot2D) GenPlotBar() {
 			strCols = append(strCols, cp)
 			continue
 		}
+		nys++
 		if cp.Range.FixMin {
 			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
 		}
@@ -51,16 +54,6 @@ func (pl *Plot2D) GenPlotBar() {
 
 	stRow := 0
 	edRow := pl.Table.Rows
-	nys := 0
-	for _, cp := range pl.Cols {
-		if !cp.On || cp == xp {
-			continue
-		}
-		if cp.IsString {
-			continue
-		}
-		nys++
-	}
 	offset := -0.5 * float64(nys) * float64(pl.Params.BarWidth)
 
 	for _, cp := range pl.Cols {
@@ -70,33 +63,45 @@ func (pl *Plot2D) GenPlotBar() {
 		if cp.IsString {
 			continue
 		}
-		if cp.Range.FixMin {
-			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
-		}
-		if cp.Range.FixMax {
-			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
-		}
 
-		xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
-		if firstXY == nil {
-			firstXY = xy
+		nidx := 1
+		stidx := cp.TensorIdx
+		if cp.TensorIdx < 0 { // do all
+			yc := pl.Table.ColByName(cp.Col)
+			_, sz := yc.RowCellSize()
+			nidx = sz
+			stidx = 0
 		}
-		bar, err := plotter.NewBarChart(xy, vg.Points(pl.Params.BarWidth))
-		if err != nil {
-			log.Println(err)
-			return
-		}
-		bar.Color = cp.Color
-		bar.Offset = vg.Points(offset)
-		offset += pl.Params.BarWidth
-		plt.Add(bar)
-		plt.Legend.Add(cp.Label(), bar)
-		if cp.ErrCol != "" {
-			ec := pl.Table.ColIdx(cp.ErrCol)
-			if ec >= 0 {
-				xy.ErrCol = ec
-				eb, _ := plotter.NewYErrorBars(xy)
-				plt.Add(eb)
+		for ii := 0; ii < nidx; ii++ {
+			idx := stidx + ii
+			xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, idx)
+			if firstXY == nil {
+				firstXY = xy
+			}
+			bar, err := plotter.NewBarChart(xy, vg.Points(pl.Params.BarWidth))
+			if err != nil {
+				log.Println(err)
+				continue
+			}
+			lbl := cp.Label()
+			clr := cp.Color
+			if nidx > 1 {
+				clr, _ = gi.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+				lbl = fmt.Sprintf("%s_%02d", lbl, idx)
+			}
+			bar.Color = clr
+			bar.Offset = vg.Points(offset)
+			offset += pl.Params.BarWidth
+			plt.Add(bar)
+			plt.Legend.Add(lbl, bar)
+			if cp.ErrCol != "" {
+				ec := pl.Table.ColIdx(cp.ErrCol)
+				if ec >= 0 {
+					xy.ErrCol = ec
+					eb, _ := plotter.NewYErrorBars(xy)
+					eb.LineStyle.Color = clr
+					plt.Add(eb)
+				}
 			}
 		}
 	}
@@ -105,6 +110,7 @@ func (pl *Plot2D) GenPlotBar() {
 			xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
 			xy.LblCol = xy.YCol
 			xy.YCol = firstXY.YCol
+			xy.YIdx = firstXY.YIdx
 			lbls, _ := plotter.NewLabels(xy)
 			plt.Add(lbls)
 		}

@@ -5,9 +5,11 @@
 package eplot
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/emer/etable/etensor"
+	"github.com/goki/gi/gi"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -48,23 +50,38 @@ func (pl *Plot2D) GenPlotXY() {
 		}
 	}
 
-	if xbreaks != nil {
-		stRow := 0
-		for bi, edRow := range xbreaks {
-			firstXY = nil
-			for _, cp := range pl.Cols {
-				if !cp.On || cp == xp {
-					continue
-				}
-				if cp.IsString {
-					continue
-				}
-				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+	stRow := 0
+	for bi, edRow := range xbreaks {
+		firstXY = nil
+		for _, cp := range pl.Cols {
+			if !cp.On || cp == xp {
+				continue
+			}
+			if cp.IsString {
+				continue
+			}
+			nidx := 1
+			stidx := cp.TensorIdx
+			if cp.TensorIdx < 0 { // do all
+				yc := pl.Table.ColByName(cp.Col)
+				_, sz := yc.RowCellSize()
+				nidx = sz
+				stidx = 0
+			}
+			for ii := 0; ii < nidx; ii++ {
+				idx := stidx + ii
+				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, idx)
 				if firstXY == nil {
 					firstXY = xy
 				}
 				var pts *plotter.Scatter
 				var lns *plotter.Line
+				lbl := cp.Label()
+				clr := cp.Color
+				if nidx > 1 {
+					clr, _ = gi.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+					lbl = fmt.Sprintf("%s_%02d", lbl, idx)
+				}
 				if pl.Params.Lines && pl.Params.Points {
 					lns, pts, _ = plotter.NewLinePoints(xy)
 				} else if pl.Params.Points {
@@ -74,18 +91,18 @@ func (pl *Plot2D) GenPlotXY() {
 				}
 				if lns != nil {
 					lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
-					lns.LineStyle.Color = cp.Color
+					lns.LineStyle.Color = clr
 					plt.Add(lns)
 					if bi == 0 {
-						plt.Legend.Add(cp.Label(), lns)
+						plt.Legend.Add(lbl, lns)
 					}
 				}
 				if pts != nil {
-					pts.GlyphStyle.Color = cp.Color
+					pts.GlyphStyle.Color = clr
 					pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
 					plt.Add(pts)
 					if lns == nil && bi == 0 {
-						plt.Legend.Add(cp.Label(), pts)
+						plt.Legend.Add(lbl, pts)
 					}
 				}
 				if cp.ErrCol != "" {
@@ -93,71 +110,9 @@ func (pl *Plot2D) GenPlotXY() {
 					if ec >= 0 {
 						xy.ErrCol = ec
 						eb, _ := plotter.NewYErrorBars(xy)
+						eb.LineStyle.Color = clr
 						plt.Add(eb)
 					}
-				}
-			}
-			if firstXY != nil && len(strCols) > 0 {
-				for _, cp := range strCols {
-					xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
-					xy.LblCol = xy.YCol
-					xy.YCol = firstXY.YCol
-					lbls, _ := plotter.NewLabels(xy)
-					plt.Add(lbls)
-				}
-			}
-			stRow = edRow
-		}
-	} else {
-		stRow := 0
-		edRow := pl.Table.Rows
-		for _, cp := range pl.Cols {
-			if !cp.On || cp == xp {
-				continue
-			}
-			if cp.IsString {
-				continue
-			}
-			if cp.Range.FixMin {
-				plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
-			}
-			if cp.Range.FixMax {
-				plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
-			}
-
-			xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
-			if firstXY == nil {
-				firstXY = xy
-			}
-			var pts *plotter.Scatter
-			var lns *plotter.Line
-			if pl.Params.Lines && pl.Params.Points {
-				lns, pts, _ = plotter.NewLinePoints(xy)
-			} else if pl.Params.Points {
-				pts, _ = plotter.NewScatter(xy)
-			} else {
-				lns, _ = plotter.NewLine(xy)
-			}
-			if lns != nil {
-				lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
-				lns.LineStyle.Color = cp.Color
-				plt.Add(lns)
-				plt.Legend.Add(cp.Label(), lns)
-			}
-			if pts != nil {
-				pts.GlyphStyle.Color = cp.Color
-				pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
-				plt.Add(pts)
-				if lns == nil {
-					plt.Legend.Add(cp.Label(), pts)
-				}
-			}
-			if cp.ErrCol != "" {
-				ec := pl.Table.ColIdx(cp.ErrCol)
-				if ec >= 0 {
-					xy.ErrCol = ec
-					eb, _ := plotter.NewYErrorBars(xy)
-					plt.Add(eb)
 				}
 			}
 		}
@@ -166,10 +121,12 @@ func (pl *Plot2D) GenPlotXY() {
 				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
 				xy.LblCol = xy.YCol
 				xy.YCol = firstXY.YCol
+				xy.YIdx = firstXY.YIdx
 				lbls, _ := plotter.NewLabels(xy)
 				plt.Add(lbls)
 			}
 		}
+		stRow = edRow
 	}
 
 	// Use string labels for X axis if X is a string
