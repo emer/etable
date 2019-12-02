@@ -51,6 +51,18 @@ func (pl *Plot2D) GenPlotBar() {
 
 	stRow := 0
 	edRow := pl.Table.Rows
+	nys := 0
+	for _, cp := range pl.Cols {
+		if !cp.On || cp == xp {
+			continue
+		}
+		if cp.IsString {
+			continue
+		}
+		nys++
+	}
+	offset := -0.5 * float64(nys) * float64(pl.Params.BarWidth)
+
 	for _, cp := range pl.Cols {
 		if !cp.On || cp == xp {
 			continue
@@ -75,6 +87,8 @@ func (pl *Plot2D) GenPlotBar() {
 			return
 		}
 		bar.Color = cp.Color
+		bar.Offset = vg.Points(offset)
+		offset += pl.Params.BarWidth
 		plt.Add(bar)
 		plt.Legend.Add(cp.Label(), bar)
 		if cp.ErrCol != "" {
