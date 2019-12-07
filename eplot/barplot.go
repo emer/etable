@@ -14,6 +14,7 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
+	"gonum.org/v1/plot/vg/draw"
 )
 
 // GenPlotBar generates a Bar plot, setting GPlot variable
@@ -54,7 +55,7 @@ func (pl *Plot2D) GenPlotBar() {
 
 	stRow := 0
 	edRow := pl.Table.Rows
-	offset := -0.5 * float64(nys) * float64(pl.Params.BarWidth)
+	offset := -0.5 * float64(nys-1) * float64(pl.Params.BarWidth)
 
 	for _, cp := range pl.Cols {
 		if !cp.On || cp == xp {
@@ -124,5 +125,10 @@ func (pl *Plot2D) GenPlotBar() {
 	}
 
 	plt.Legend.Top = true
+	plt.X.Tick.Label.Rotation = math.Pi * (pl.Params.XAxisRot / 180)
+	if pl.Params.XAxisRot > 10 {
+		plt.X.Tick.Label.YAlign = draw.YCenter
+		plt.X.Tick.Label.XAlign = draw.XRight
+	}
 	pl.GPlot = plt
 }

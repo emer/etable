@@ -25,6 +25,7 @@ type PlotParams struct {
 	XAxisCol   string    `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
 	XAxisLabel string    `desc:"optional label to use for XAxis instead of column name"`
 	YAxisLabel string    `desc:"optional label to use for YAxis -- if empty, first column name is used"`
+	XAxisRot   float64   `desc:"rotation of the X Axis labels, in degrees"`
 	Plot       *Plot2D   `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
