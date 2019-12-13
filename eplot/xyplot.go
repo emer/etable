@@ -123,7 +123,9 @@ func (pl *Plot2D) GenPlotXY() {
 				xy.YCol = firstXY.YCol
 				xy.YIdx = firstXY.YIdx
 				lbls, _ := plotter.NewLabels(xy)
-				plt.Add(lbls)
+				if lbls != nil {
+					plt.Add(lbls)
+				}
 			}
 		}
 		stRow = edRow

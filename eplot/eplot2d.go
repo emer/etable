@@ -14,6 +14,7 @@ import (
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/svg"
+	"github.com/goki/gi/units"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
@@ -391,6 +392,8 @@ func (pl *Plot2D) ColsConfig() {
 	vl.Lay = gi.LayoutVert
 	vl.SetProp("spacing", 0)
 	vl.SetProp("vertical-align", gi.AlignTop)
+	vl.SetMinPrefHeight(units.NewEm(5)) // get separate scroll on cols
+	vl.SetStretchMaxHeight()
 	pl.ColsListUpdate()
 	if len(pl.Cols) == 0 {
 		vl.DeleteChildren(true)
