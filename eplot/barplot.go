@@ -74,6 +74,9 @@ func (pl *Plot2D) GenPlotBar() {
 		for ii := 0; ii < nidx; ii++ {
 			idx := stidx + ii
 			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, idx)
+			if xy == nil {
+				continue
+			}
 			if firstXY == nil {
 				firstXY = xy
 			}

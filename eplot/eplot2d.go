@@ -138,8 +138,9 @@ func (pl *Plot2D) SaveCSV(fname gi.FileName) {
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
 func (pl *Plot2D) OpenCSV(fname gi.FileName, delim rune) {
 	pl.Table.Table.OpenCSV(fname, delim)
-	pl.Table.Sequential()
 	pl.DataFile = fname
+	pl.Config()
+	pl.Update()
 }
 
 // YLabel returns the Y-axis label

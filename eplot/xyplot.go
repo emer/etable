@@ -73,6 +73,9 @@ func (pl *Plot2D) GenPlotXY() {
 				tix := xview.Clone()
 				tix.Idxs = tix.Idxs[stRow:edRow]
 				xy, _ := NewTableXYName(tix, xi, xp.TensorIdx, cp.Col, idx)
+				if xy == nil {
+					continue
+				}
 				if firstXY == nil {
 					firstXY = xy
 				}
