@@ -55,7 +55,7 @@ func (ix *IdxView) SetTable(et *Table) {
 
 // Sequential sets indexes to sequential row-wise indexes into table
 func (ix *IdxView) Sequential() {
-	if ix.Table == nil {
+	if ix.Table == nil || ix.Table.Rows <= 0 {
 		ix.Idxs = nil
 		return
 	}
@@ -69,7 +69,7 @@ func (ix *IdxView) Sequential() {
 // then existing list of indexes is permuted, otherwise a new set of
 // permuted indexes are generated
 func (ix *IdxView) Permuted() {
-	if ix.Table == nil {
+	if ix.Table == nil || ix.Table.Rows <= 0 {
 		ix.Idxs = nil
 		return
 	}

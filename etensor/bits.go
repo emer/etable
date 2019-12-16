@@ -115,6 +115,15 @@ func (tsr *Bits) SetFloat1D(off int, val float64) {
 	tsr.Values.Set(off, Float64ToBool(val))
 }
 
+func (tsr *Bits) FloatValRowCell(row, cell int) float64 {
+	_, sz := tsr.RowCellSize()
+	return BoolToFloat64(tsr.Values.Index(row*sz + cell))
+}
+func (tsr *Bits) SetFloatRowCell(row, cell int, val float64) {
+	_, sz := tsr.RowCellSize()
+	tsr.Values.Set(row*sz+cell, Float64ToBool(val))
+}
+
 func (tsr *Bits) Floats(flt *[]float64) {
 	sz := tsr.Len()
 	if len(*flt) < sz {
@@ -144,6 +153,17 @@ func (tsr *Bits) StringVal1D(off int) string {
 func (tsr *Bits) SetString1D(off int, val string) {
 	if bv, ok := kit.ToBool(val); ok {
 		tsr.Values.Set(off, bv)
+	}
+}
+
+func (tsr *Bits) StringValRowCell(row, cell int) string {
+	_, sz := tsr.RowCellSize()
+	return kit.ToString(tsr.Values.Index(row*sz + cell))
+}
+func (tsr *Bits) SetStringRowCell(row, cell int, val string) {
+	if bv, ok := kit.ToBool(val); ok {
+		_, sz := tsr.RowCellSize()
+		tsr.Values.Set(row*sz+cell, bv)
 	}
 }
 

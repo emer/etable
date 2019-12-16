@@ -130,6 +130,15 @@ func (tsr *String) SetFloat1D(off int, val float64) {
 	tsr.Values[off] = Float64ToString(val)
 }
 
+func (tsr *String) FloatValRowCell(row, cell int) float64 {
+	_, sz := tsr.RowCellSize()
+	return StringToFloat64(tsr.Values[row*sz+cell])
+}
+func (tsr *String) SetFloatRowCell(row, cell int, val float64) {
+	_, sz := tsr.RowCellSize()
+	tsr.Values[row*sz+cell] = Float64ToString(val)
+}
+
 func (tsr *String) Floats(flt *[]float64) {
 	sz := len(tsr.Values)
 	if len(*flt) < sz {
@@ -154,6 +163,15 @@ func (tsr *String) SetFloats(vals []float64) {
 
 func (tsr *String) StringVal1D(off int) string      { return tsr.Values[off] }
 func (tsr *String) SetString1D(off int, val string) { tsr.Values[off] = val }
+
+func (tsr *String) StringValRowCell(row, cell int) string {
+	_, sz := tsr.RowCellSize()
+	return tsr.Values[row*sz+cell]
+}
+func (tsr *String) SetStringRowCell(row, cell int, val string) {
+	_, sz := tsr.RowCellSize()
+	tsr.Values[row*sz+cell] = val
+}
 
 // Range is not applicable to String tensor
 func (tsr *String) Range() (min, max float64, minIdx, maxIdx int) {

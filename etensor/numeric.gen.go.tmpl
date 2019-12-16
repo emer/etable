@@ -123,6 +123,15 @@ func (tsr *{{.Name}}) SetString(i []int, val string) {
 func (tsr *{{.Name}}) FloatVal1D(off int) float64 { return float64(tsr.Values[off]) }
 func (tsr *{{.Name}}) SetFloat1D(off int, val float64)  { tsr.Values[off] = {{or .Type}}(val) }
 
+func (tsr *{{.Name}}) FloatValRowCell(row, cell int) float64 {
+	_, sz := tsr.RowCellSize()
+	return float64(tsr.Values[row*sz+cell])
+}
+func (tsr *{{.Name}}) SetFloatRowCell(row, cell int, val float64) {
+	_, sz := tsr.RowCellSize()
+	tsr.Values[row*sz+cell] = {{or .Type}}(val)
+}
+
 // Floats sets []float64 slice of all elements in the tensor
 // (length is ensured to be sufficient).
 // This can be used for all of the gonum/floats methods
@@ -153,6 +162,17 @@ func (tsr *{{.Name}}) StringVal1D(off int) string { return kit.ToString(tsr.Valu
 func (tsr *{{.Name}}) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = {{or .Type}}(fv)
+	}
+}
+
+func (tsr *{{.Name}}) StringValRowCell(row, cell int) string {
+	_, sz := tsr.RowCellSize()
+	return kit.ToString(tsr.Values[row*sz+cell])
+}
+func (tsr *{{.Name}}) SetStringRowCell(row, cell int, val string) {
+	if fv, err := strconv.ParseFloat(val, 64); err == nil {
+		_, sz := tsr.RowCellSize()
+		tsr.Values[row*sz+cell] = {{or .Type}}(fv)
 	}
 }
 

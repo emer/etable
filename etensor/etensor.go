@@ -137,6 +137,14 @@ type Tensor interface {
 	// SetFloat1D sets the value of given 1-dimensional index (0-Len()-1) as a float64
 	SetFloat1D(i int, val float64)
 
+	// FloatValRowCell returns the value at given row and cell, where row is outer-most dim,
+	// and cell is 1D index into remaining inner dims -- for etable.Table columns
+	FloatValRowCell(row, cell int) float64
+
+	// SetFloatRowCell sets the value at given row and cell, where row is outer-most dim,
+	// and cell is 1D index into remaining inner dims -- for etable.Table columns
+	SetFloatRowCell(row, cell int, val float64)
+
 	// Floats sets []float64 slice of all elements in the tensor
 	// (length is ensured to be sufficient).
 	// This can be used for all of the gonum/floats methods
@@ -151,6 +159,14 @@ type Tensor interface {
 
 	// SetString1D sets the value of given 1-dimensional index (0-Len()-1) as a string
 	SetString1D(i int, val string)
+
+	// StringValRowCell returns the value at given row and cell, where row is outer-most dim,
+	// and cell is 1D index into remaining inner dims -- for etable.Table columns
+	StringValRowCell(row, cell int) string
+
+	// SetStringRowCell sets the value at given row and cell, where row is outer-most dim,
+	// and cell is 1D index into remaining inner dims -- for etable.Table columns
+	SetStringRowCell(row, cell int, val string)
 
 	// SubSpace returns a new tensor with innermost subspace at given
 	// offset(s) in outermost dimension(s) (len(offs) < NumDims).

@@ -356,8 +356,8 @@ func (vv *Plot2DValueView) UpdateWidget() {
 	} else {
 		opv := kit.OnePtrUnderlyingValue(vv.Value)
 		plot := opv.Interface().(*eplot.Plot2D)
-		if plot != nil && plot.Table != nil {
-			if nm, has := plot.Table.MetaData["name"]; has {
+		if plot != nil && plot.Table != nil && plot.Table.Table != nil {
+			if nm, has := plot.Table.Table.MetaData["name"]; has {
 				ac.SetText(nm)
 			} else {
 				ac.SetText("eplot.Plot2D")
@@ -401,7 +401,7 @@ func (vv *Plot2DValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 	if olbl != "" {
 		tynm += " " + olbl
 	}
-	desc, _ := plot.Table.MetaData["desc"]
+	desc, _ := plot.Table.Table.MetaData["desc"]
 	if td, has := vv.Tag("desc"); has {
 		desc += " " + td
 	}

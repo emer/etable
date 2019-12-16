@@ -24,13 +24,13 @@ import (
 // Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
 type Plot2D struct {
 	gi.Layout
-	Table    *etable.Table `desc:"the table that we're plotting"`
-	Params   PlotParams    `desc:"the overall plot parameters"`
-	Cols     []*ColParams  `desc:"the parameters for each column of the table"`
-	GPlot    *plot.Plot    `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
-	SVGFile  gi.FileName   `desc:"current svg file"`
-	DataFile gi.FileName   `desc:"current csv data file"`
-	InPlot   bool          `inactive:"+" desc:"currently doing a plot"`
+	Table    *etable.IdxView `desc:"the idxview of the table that we're plotting"`
+	Params   PlotParams      `desc:"the overall plot parameters"`
+	Cols     []*ColParams    `desc:"the parameters for each column of the table"`
+	GPlot    *plot.Plot      `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
+	SVGFile  gi.FileName     `desc:"current svg file"`
+	DataFile gi.FileName     `desc:"current csv data file"`
+	InPlot   bool            `inactive:"+" desc:"currently doing a plot"`
 }
 
 var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)
@@ -44,7 +44,7 @@ func (pl *Plot2D) CopyFieldsFrom(frm interface{}) {
 	fr := frm.(*Plot2D)
 	pl.Layout.CopyFieldsFrom(&fr.Layout)
 	pl.Params.CopyFrom(&fr.Params)
-	pl.SetTable(fr.Table)
+	pl.SetTableView(fr.Table)
 	mx := ints.MinInt(len(pl.Cols), len(fr.Cols))
 	for i := 0; i < mx; i++ {
 		pl.Cols[i].CopyFrom(fr.Cols[i])
@@ -60,10 +60,16 @@ func (pl *Plot2D) Defaults() {
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) {
 	pl.Defaults()
-	if pl.Table != tab {
-		pl.Table = tab
-		pl.Cols = nil
-	}
+	pl.Table = etable.NewIdxView(tab)
+	pl.Cols = nil
+	pl.Config()
+}
+
+// SetTableView sets the idxview of table to view and updates view
+func (pl *Plot2D) SetTableView(tab *etable.IdxView) {
+	pl.Defaults()
+	pl.Table = tab
+	pl.Cols = nil
 	pl.Config()
 }
 
@@ -124,13 +130,15 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers
 func (pl *Plot2D) SaveCSV(fname gi.FileName) {
-	pl.Table.SaveCSV(fname, etable.Comma, true)
+	vt := pl.Table.NewTable()
+	vt.SaveCSV(fname, etable.Comma, true)
 	pl.DataFile = fname
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
 func (pl *Plot2D) OpenCSV(fname gi.FileName, delim rune) {
-	pl.Table.OpenCSV(fname, delim)
+	pl.Table.Table.OpenCSV(fname, delim)
+	pl.Table.Sequential()
 	pl.DataFile = fname
 }
 
@@ -170,7 +178,22 @@ func (pl *Plot2D) GoUpdate() {
 	if pl == nil || pl.This() == nil {
 		return
 	}
-	if !pl.IsVisible() || pl.Table == nil || pl.InPlot {
+	if pl.Table == nil || pl.Table.Table == nil {
+		return
+	}
+	pl.Table.Sequential()
+	pl.GoUpdatePlot()
+}
+
+// GoUpdatePlot updates the display based on current IdxView into table.
+// This version must be used when called from another goroutine
+// does proper blocking to synchronize with updating in the main
+// goroutine.
+func (pl *Plot2D) GoUpdatePlot() {
+	if pl == nil || pl.This() == nil {
+		return
+	}
+	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
 		return
 	}
 	if pl.Viewport.IsUpdatingNode() { // already updating -- don't add to it
@@ -179,7 +202,7 @@ func (pl *Plot2D) GoUpdate() {
 
 	pl.Viewport.BlockUpdates()
 	plupdt := false
-	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.NumCols() {
+	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
 		plupdt = pl.UpdateStart()
 		pl.Config()
 	}
@@ -192,16 +215,31 @@ func (pl *Plot2D) GoUpdate() {
 }
 
 // Update updates the display based on current state of table.
+// Calls Sequential method on etable.IdxView to view entire current table.
 // This version can only be called within main goroutine for
 // window eventloop -- use GoUpdate for other-goroutine updates.
 func (pl *Plot2D) Update() {
 	if pl == nil || pl.This() == nil {
 		return
 	}
-	if !pl.IsVisible() || pl.Table == nil || pl.InPlot {
+	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
-	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.NumCols() {
+	pl.Table.Sequential()
+	pl.UpdatePlot()
+}
+
+// UpdatePlot updates the display based on current IdxView into table.
+// This version can only be called within main goroutine for
+// window eventloop -- use GoUpdate for other-goroutine updates.
+func (pl *Plot2D) UpdatePlot() {
+	if pl == nil || pl.This() == nil {
+		return
+	}
+	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
+		return
+	}
+	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
 		pl.Config()
 	}
 	if pl.Viewport.IsUpdatingNode() { // already updating -- don't add to it
@@ -213,7 +251,7 @@ func (pl *Plot2D) Update() {
 // GenPlot generates the plot and renders it to SVG
 // It surrounds operation with InPlot true / false to prevent multiple updates
 func (pl *Plot2D) GenPlot() {
-	if pl.Table == nil {
+	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
 	if pl.InPlot {
@@ -226,7 +264,7 @@ func (pl *Plot2D) GenPlot() {
 	case XY:
 		pl.GenPlotXY()
 	case Bar:
-		if pl.Table.Rows > 0 { // doesn't work without rows
+		if pl.Table.Len() > 0 { // doesn't work without rows
 			pl.GenPlotBar()
 		}
 	}
@@ -239,19 +277,23 @@ func (pl *Plot2D) GenPlot() {
 
 // PlotXAxis processes the XAxis and returns its index and any breaks to insert
 // based on negative X axis traversals or NaN values.  xbreaks always ends in Rows
-func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
-	xi, err = pl.Table.ColIdxTry(pl.Params.XAxisCol)
+func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xview *etable.IdxView, xbreaks []int, err error) {
+	xi, err = pl.Table.Table.ColIdxTry(pl.Params.XAxisCol)
 	if err != nil {
 		log.Println("eplot.PlotXAxis: " + err.Error())
 		return
 	}
-	xc := pl.Table.Cols[xi]
+	xview = pl.Table
+	xc := pl.Table.Table.Cols[xi]
 	xp := pl.Cols[xi]
 	sz := 1
+	lim := false
 	if xp.Range.FixMin {
+		lim = true
 		plt.X.Min = math.Min(plt.X.Min, xp.Range.Min)
 	}
 	if xp.Range.FixMax {
+		lim = true
 		plt.X.Max = math.Max(plt.X.Max, xp.Range.Max)
 	}
 	if xc.NumDims() > 1 {
@@ -261,24 +303,42 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
 			xp.TensorIdx = 0
 		}
 	}
+	if lim {
+		xview = pl.Table.Clone()
+		xview.Filter(func(et *etable.Table, row int) bool {
+			var xv float64
+			if xc.NumDims() > 1 {
+				xv = xc.FloatValRowCell(row, xp.TensorIdx)
+			} else {
+				xv = xc.FloatVal1D(row)
+			}
+			if xp.Range.FixMin && xv < xp.Range.Min {
+				return false
+			}
+			if xp.Range.FixMax && xv > xp.Range.Max {
+				return false
+			}
+			return true
+		})
+	}
 	if pl.Params.NegXDraw {
 		return
 	}
 	lastx := -math.MaxFloat64
-	for row := 0; row < pl.Table.Rows; row++ {
+	for row := 0; row < xview.Len(); row++ {
+		trow := xview.Idxs[row] // true table row
 		var xv float64
 		if xc.NumDims() > 1 {
-			off := row*sz + xp.TensorIdx
-			xv = xc.FloatVal1D(off)
+			xv = xc.FloatValRowCell(trow, xp.TensorIdx)
 		} else {
-			xv = xc.FloatVal1D(row)
+			xv = xc.FloatVal1D(trow)
 		}
 		if xv < lastx {
 			xbreaks = append(xbreaks, row)
 		}
 		lastx = xv
 	}
-	xbreaks = append(xbreaks, pl.Table.Rows)
+	xbreaks = append(xbreaks, xview.Len())
 	return
 }
 
@@ -286,7 +346,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xbreaks []int, err error) {
 func (pl *Plot2D) Config() {
 	pl.Lay = gi.LayoutVert
 	pl.Defaults()
-	pl.Params.FmMeta(pl.Table)
+	pl.Params.FmMeta(pl.Table.Table)
 	pl.SetProp("spacing", gi.StdDialogVSpaceUnits)
 	config := kit.TypeAndNameList{}
 	config.Add(gi.KiT_ToolBar, "tbar")
@@ -344,26 +404,27 @@ func (pl *Plot2D) ColsLay() *gi.Frame {
 
 // ColsListUpdate updates the list of columns
 func (pl *Plot2D) ColsListUpdate() {
-	if pl.Table == nil {
+	if pl.Table == nil || pl.Table.Table == nil {
 		pl.Cols = nil
 		return
 	}
-	nc := pl.Table.NumCols()
+	dt := pl.Table.Table
+	nc := dt.NumCols()
 	if nc == len(pl.Cols) {
 		return
 	}
 	npc := len(PlotColorNames)
 	pl.Cols = make([]*ColParams, nc)
 	clri := 0
-	for ci := range pl.Table.Cols {
-		cn := pl.Table.ColNames[ci]
+	for ci := range dt.Cols {
+		cn := dt.ColNames[ci]
 		inc := 1
 		if cn == pl.Params.XAxisCol { // re-use xaxis color
 			inc = 0
 		}
 		cp := &ColParams{Col: cn, ColorName: gi.ColorName(PlotColorNames[clri%npc])}
 		cp.Defaults()
-		tcol := pl.Table.Cols[ci]
+		tcol := dt.Cols[ci]
 		if tcol.DataType() == etensor.STRING {
 			cp.IsString = true
 		} else {
@@ -458,7 +519,7 @@ func (pl *Plot2D) PlotConfig() {
 }
 
 func (pl *Plot2D) ToolbarConfig() {
-	if pl.Table == nil {
+	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
 	tbar := pl.Toolbar()

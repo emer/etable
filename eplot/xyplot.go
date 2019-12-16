@@ -24,7 +24,7 @@ func (pl *Plot2D) GenPlotXY() {
 	plt.BackgroundColor = nil
 
 	// process xaxis first
-	xi, xbreaks, err := pl.PlotXAxis(plt)
+	xi, xview, xbreaks, err := pl.PlotXAxis(plt)
 	if err != nil {
 		return
 	}
@@ -63,14 +63,16 @@ func (pl *Plot2D) GenPlotXY() {
 			nidx := 1
 			stidx := cp.TensorIdx
 			if cp.TensorIdx < 0 { // do all
-				yc := pl.Table.ColByName(cp.Col)
+				yc := pl.Table.Table.ColByName(cp.Col)
 				_, sz := yc.RowCellSize()
 				nidx = sz
 				stidx = 0
 			}
 			for ii := 0; ii < nidx; ii++ {
 				idx := stidx + ii
-				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, idx)
+				tix := xview.Clone()
+				tix.Idxs = tix.Idxs[stRow:edRow]
+				xy, _ := NewTableXYName(tix, xi, xp.TensorIdx, cp.Col, idx)
 				if firstXY == nil {
 					firstXY = xy
 				}
@@ -106,7 +108,7 @@ func (pl *Plot2D) GenPlotXY() {
 					}
 				}
 				if cp.ErrCol != "" {
-					ec := pl.Table.ColIdx(cp.ErrCol)
+					ec := pl.Table.Table.ColIdx(cp.ErrCol)
 					if ec >= 0 {
 						xy.ErrCol = ec
 						eb, _ := plotter.NewYErrorBars(xy)
@@ -118,7 +120,9 @@ func (pl *Plot2D) GenPlotXY() {
 		}
 		if firstXY != nil && len(strCols) > 0 {
 			for _, cp := range strCols {
-				xy, _ := NewTableXYName(pl.Table, stRow, edRow, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+				tix := xview.Clone()
+				tix.Idxs = tix.Idxs[stRow:edRow]
+				xy, _ := NewTableXYName(tix, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
 				xy.LblCol = xy.YCol
 				xy.YCol = firstXY.YCol
 				xy.YIdx = firstXY.YIdx
@@ -132,7 +136,7 @@ func (pl *Plot2D) GenPlotXY() {
 	}
 
 	// Use string labels for X axis if X is a string
-	xc := pl.Table.Cols[xi]
+	xc := pl.Table.Table.Cols[xi]
 	if xc.DataType() == etensor.STRING {
 		xcs := xc.(*etensor.String)
 		plt.NominalX(xcs.Values...)
