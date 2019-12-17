@@ -307,6 +307,9 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xview *etable.IdxView, xbre
 	if lim {
 		xview = pl.Table.Clone()
 		xview.Filter(func(et *etable.Table, row int) bool {
+			if !pl.Table.Table.IsValidRow(row) { // sometimes it seems to get out of whack
+				return false
+			}
 			var xv float64
 			if xc.NumDims() > 1 {
 				xv = xc.FloatValRowCell(row, xp.TensorIdx)
