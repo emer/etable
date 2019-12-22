@@ -43,7 +43,7 @@ const (
 
 //go:generate stringer -type=StdMetrics
 
-var KiT_StdMetrics = kit.Enums.AddEnum(StdMetricsN, false, nil)
+var KiT_StdMetrics = kit.Enums.AddEnum(StdMetricsN, kit.NotBitFlag, nil)
 
 func (ev StdMetrics) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *StdMetrics) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }

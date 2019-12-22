@@ -221,7 +221,7 @@ const (
 
 //go:generate stringer -type=StdNorms
 
-var KiT_StdNorms = kit.Enums.AddEnum(StdNormsN, false, nil)
+var KiT_StdNorms = kit.Enums.AddEnum(StdNormsN, kit.NotBitFlag, nil)
 
 func (ev StdNorms) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *StdNorms) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }

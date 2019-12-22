@@ -19,7 +19,11 @@ import (
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
-	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	dlg, recyc := gi.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	if recyc {
+		return dlg
+	}
+	dlg.Data = tsr
 
 	frame := dlg.Frame()
 	_, prIdx := dlg.PromptWidget(frame)
@@ -49,7 +53,11 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
-	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	dlg, recyc := gi.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	if recyc {
+		return dlg
+	}
+	dlg.Data = tsr
 
 	frame := dlg.Frame()
 	_, prIdx := dlg.PromptWidget(frame)
@@ -78,7 +86,11 @@ func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 func TableViewDialog(avp *gi.Viewport2D, et *etable.Table, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
-	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	dlg, recyc := gi.RecycleStdDialog(et, opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	if recyc {
+		return dlg
+	}
+	dlg.Data = et
 
 	frame := dlg.Frame()
 	_, prIdx := dlg.PromptWidget(frame)
@@ -108,7 +120,11 @@ func TableViewDialog(avp *gi.Viewport2D, et *etable.Table, opts giv.DlgOpts, rec
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
-	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	dlg, recyc := gi.RecycleStdDialog(smat, opts.ToGiOpts(), opts.Ok, opts.Cancel)
+	if recyc {
+		return dlg
+	}
+	dlg.Data = smat
 
 	frame := dlg.Frame()
 	_, prIdx := dlg.PromptWidget(frame)

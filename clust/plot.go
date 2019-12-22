@@ -35,7 +35,9 @@ func (nn *Node) Plot(pt *etable.Table, smat *simat.SimMat) {
 		pt.SetNumRows(row + 1)
 		pt.SetCellFloatIdx(0, row, nn.ParDist)
 		pt.SetCellFloatIdx(1, row, nn.Y)
-		pt.SetCellStringIdx(2, row, smat.Rows[nn.Idx])
+		if len(smat.Rows) > nn.Idx {
+			pt.SetCellStringIdx(2, row, smat.Rows[nn.Idx])
+		}
 	} else {
 		for _, kn := range nn.Kids {
 			pt.SetNumRows(row + 2)

@@ -135,7 +135,7 @@ type PlotTypes int32
 
 //go:generate stringer -type=PlotTypes
 
-var KiT_PlotTypes = kit.Enums.AddEnum(PlotTypesN, false, nil)
+var KiT_PlotTypes = kit.Enums.AddEnum(PlotTypesN, kit.NotBitFlag, nil)
 
 func (ev PlotTypes) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *PlotTypes) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }

@@ -112,7 +112,7 @@ func OpenGUI() {
 
 	plot.DefaultFont = "Helvetica"
 
-	win := gi.NewWindow2D("dataproc", "eTable Data Processing Demo", width, height, true)
+	win := gi.NewMainWindow("dataproc", "eTable Data Processing Demo", width, height)
 
 	vp := win.WinViewport2D()
 	updt := vp.UpdateStart()

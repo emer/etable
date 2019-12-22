@@ -70,7 +70,7 @@ const (
 
 //go:generate stringer -type=Aggs
 
-var KiT_Aggs = kit.Enums.AddEnum(AggsN, false, nil)
+var KiT_Aggs = kit.Enums.AddEnum(AggsN, kit.NotBitFlag, nil)
 
 func (ev Aggs) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *Aggs) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }

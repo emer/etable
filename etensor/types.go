@@ -69,7 +69,7 @@ const (
 
 //go:generate stringer -type=Type
 
-var KiT_Type = kit.Enums.AddEnum(TypeN, false, nil)
+var KiT_Type = kit.Enums.AddEnum(TypeN, kit.NotBitFlag, nil)
 
 func (ev Type) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
 func (ev *Type) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
