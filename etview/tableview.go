@@ -814,21 +814,21 @@ func (tv *TableView) ConfigToolbar() {
 	tb := tv.ToolBar()
 	if len(*tb.Children()) == 0 {
 		tb.SetStretchMaxWidth()
-		tb.AddAction(gi.ActOpts{Label: "Updt", Icon: "update"},
+		tb.AddAction(gi.ActOpts{Label: "UpdtView", Icon: "update", Tooltip: "update the view to reflect current state of table"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				tvv.Update()
 			})
-		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear"},
+		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				tvv.TensorDispAction(-1)
 			})
 	}
-	nCustom := 2
+	ndef := 2
 	sz := len(*tb.Children())
-	if sz > nCustom {
-		for i := sz - 1; i >= nCustom; i-- {
+	if sz > ndef {
+		for i := sz - 1; i >= ndef; i-- {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}

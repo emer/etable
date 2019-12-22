@@ -601,12 +601,12 @@ func (tv *TensorView) ConfigToolbar() {
 	tb := tv.ToolBar()
 	if len(*tb.Children()) == 0 {
 		tb.SetStretchMaxWidth()
-		tb.AddAction(gi.ActOpts{Label: "Updt", Icon: "update"},
+		tb.AddAction(gi.ActOpts{Label: "UpdtView", Icon: "update", Tooltip: "update the view to reflect current state of tensor"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TensorView).(*TensorView)
 				tvv.Update()
 			})
-		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear"},
+		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TensorView).(*TensorView)
 				giv.StructViewDialog(tv.Viewport, &tvv.TsrLay, giv.DlgOpts{Title: "TensorView Display Options", Ok: true, Cancel: true},
@@ -615,7 +615,7 @@ func (tv *TensorView) ConfigToolbar() {
 						tvvv.UpdateSliceGrid()
 					})
 			})
-		tb.AddAction(gi.ActOpts{Label: "Grid", Icon: "file-sheet"},
+		tb.AddAction(gi.ActOpts{Label: "Grid", Icon: "file-sheet", Tooltip: "open a grid view of the tensor -- with a grid of colored squares representing values"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TensorView).(*TensorView)
 				TensorGridDialog(tv.Viewport, tvv.Tensor, giv.DlgOpts{Title: "TensorGrid", Ok: false, Cancel: false},
@@ -625,10 +625,10 @@ func (tv *TensorView) ConfigToolbar() {
 					})
 			})
 	}
-	nCustom := 3
+	ndef := 3
 	sz := len(*tb.Children())
-	if sz > nCustom {
-		for i := sz - 1; i >= nCustom; i-- {
+	if sz > ndef {
+		for i := sz - 1; i >= ndef; i-- {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}
