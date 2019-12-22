@@ -53,11 +53,7 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
-	dlg, recyc := gi.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
-	if recyc {
-		return dlg
-	}
-	dlg.Data = tsr
+	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel) // note: cannot use Recycle here b/c of Table view..
 
 	frame := dlg.Frame()
 	_, prIdx := dlg.PromptWidget(frame)
