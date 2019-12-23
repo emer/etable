@@ -27,7 +27,7 @@ import (
 // etview.TableView provides a GUI interface for etable.Table's
 type TableView struct {
 	giv.SliceViewBase
-	Table      *etable.Table       `desc:"the table that we're a view of"`
+	Table      *etable.IdxView     `desc:"the idx view of the table that we're a view of"`
 	TsrDisp    TensorDisp          `desc:"overall display options for tensor display"`
 	ColTsrDisp map[int]*TensorDisp `desc:"per column tensor display"`
 	NCols      int                 `inactive:"+" desc:"number of columns in table (as of last update)"`
@@ -45,35 +45,41 @@ func AddNewTableView(parent ki.Ki, name string) *TableView {
 // check for interface impl
 var _ giv.SliceViewer = (*TableView)(nil)
 
-// SetTable sets the source table that we are viewing
+// SetTable sets the source table that we are viewing, using a sequential IdxView
 func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
-	updt := false
 	if et == nil {
 		return
 	}
-	if tv.Table != et {
-		if op, has := et.MetaData["read-only"]; has {
-			if op == "+" || op == "true" {
-				tv.SetInactive()
-			} else {
-				tv.ClearInactive()
-			}
-		}
-		tv.ColTsrDisp = make(map[int]*TensorDisp)
-		tv.TsrDisp.Defaults()
-		tv.TsrDisp.BotRtSpace.Set(4, units.Px)
-		if !tv.IsInactive() {
-			tv.SelectedIdx = -1
-		}
-		tv.StartIdx = 0
-		tv.SortIdx = -1
-		tv.SortDesc = false
-		tv.Table = et
-		updt = tv.UpdateStart()
-		tv.ResetSelectedIdxs()
-		tv.SelectMode = false
-		tv.SetFullReRender()
+	tv.SetTableView(etable.NewIdxView(et), tmpSave)
+}
+
+// SetTableView sets the source IdxView of a table
+func (tv *TableView) SetTableView(ix *etable.IdxView, tmpSave giv.ValueView) {
+	updt := false
+	if ix == nil {
+		return
 	}
+	if op, has := ix.Table.MetaData["read-only"]; has {
+		if op == "+" || op == "true" {
+			tv.SetInactive()
+		} else {
+			tv.ClearInactive()
+		}
+	}
+	tv.ColTsrDisp = make(map[int]*TensorDisp)
+	tv.TsrDisp.Defaults()
+	tv.TsrDisp.BotRtSpace.Set(4, units.Px)
+	if !tv.IsInactive() {
+		tv.SelectedIdx = -1
+	}
+	tv.StartIdx = 0
+	tv.SortIdx = -1
+	tv.SortDesc = false
+	tv.Table = ix
+	updt = tv.UpdateStart()
+	tv.ResetSelectedIdxs()
+	tv.SelectMode = false
+	tv.SetFullReRender()
 	tv.ShowIndex = true
 	if sidxp, err := tv.PropTry("index"); err == nil {
 		tv.ShowIndex, _ = kit.ToBool(sidxp)
@@ -124,8 +130,8 @@ func (tv *TableView) Config() {
 }
 
 func (tv *TableView) UpdtSliceSize() int {
-	tv.SliceSize = tv.Table.Rows
-	tv.NCols = tv.Table.NumCols()
+	tv.SliceSize = tv.Table.Len()
+	tv.NCols = tv.Table.Table.NumCols()
 	return tv.SliceSize
 }
 
@@ -183,7 +189,7 @@ func (tv *TableView) RowWidgetNs() (nWidgPerRow, idxOff int) {
 // ConfigSliceGrid configures the SliceGrid for the current slice
 // this is only called by global Config and updates are guarded by that
 func (tv *TableView) ConfigSliceGrid() {
-	if tv.Table == nil {
+	if tv.Table.Table == nil {
 		return
 	}
 
@@ -236,7 +242,7 @@ func (tv *TableView) ConfigSliceGrid() {
 		hcfg.Add(gi.KiT_Label, "head-idx")
 	}
 	for fli := 0; fli < tv.NCols; fli++ {
-		labnm := fmt.Sprintf("head-%v", tv.Table.ColNames[fli])
+		labnm := fmt.Sprintf("head-%v", tv.Table.Table.ColNames[fli])
 		hcfg.Add(gi.KiT_Action, labnm)
 	}
 	if !tv.IsInactive() {
@@ -263,8 +269,8 @@ func (tv *TableView) ConfigSliceGrid() {
 	}
 
 	for fli := 0; fli < tv.NCols; fli++ {
-		col := tv.Table.Cols[fli]
-		colnm := tv.Table.ColNames[fli]
+		col := tv.Table.Table.Cols[fli]
+		colnm := tv.Table.Table.ColNames[fli]
 		hdr := sgh.Child(idxOff + fli).(*gi.Action)
 		hdr.SetText(colnm)
 		if fli == tv.SortIdx {
@@ -276,7 +282,7 @@ func (tv *TableView) ConfigSliceGrid() {
 		}
 		hdr.Data = fli
 		hdr.Tooltip = colnm + " (click to sort by) Type: " + col.DataType().String()
-		if dsc, has := tv.Table.MetaData[colnm+":desc"]; has {
+		if dsc, has := tv.Table.Table.MetaData[colnm+":desc"]; has {
 			hdr.Tooltip += ": " + dsc
 		}
 		var vv giv.ValueView
@@ -301,7 +307,7 @@ func (tv *TableView) ConfigSliceGrid() {
 					tvv.SortSliceAction(fldIdx)
 				})
 			} else {
-				cell := tv.Table.CellTensorIdx(fli, 0)
+				cell := tv.Table.Table.CellTensorIdx(fli, 0)
 				tvv := &TensorGridValueView{}
 				tvv.Init(tvv)
 				vv = tvv
@@ -359,7 +365,7 @@ func (tv *TableView) ConfigSliceGrid() {
 // returns true if UpdateSliceGrid should be called after this
 func (tv *TableView) LayoutSliceGrid() bool {
 	sg := tv.SliceGrid()
-	if tv.Table == nil {
+	if tv.Table.Table == nil {
 		sg.DeleteChildren(true)
 		return false
 	}
@@ -425,7 +431,7 @@ func (tv *TableView) LayoutHeader() {
 
 // UpdateSliceGrid updates grid display -- robust to any time calling
 func (tv *TableView) UpdateSliceGrid() {
-	if tv.Table == nil {
+	if tv.Table.Table == nil {
 		return
 	}
 	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
@@ -463,12 +469,13 @@ func (tv *TableView) UpdateSliceGrid() {
 		tv.StartIdx = 0
 	}
 
-	for i := 0; i < tv.DispRows; i++ {
-		ridx := i * nWidgPerRow
-		si := tv.StartIdx + i // slice idx
+	for ri := 0; ri < tv.DispRows; ri++ {
+		ridx := ri * nWidgPerRow
+		si := tv.StartIdx + ri // slice idx
+		ixi := tv.Table.Idxs[si]
 		issel := tv.IdxIsSelected(si)
 
-		itxt := fmt.Sprintf("%05d", i)
+		itxt := fmt.Sprintf("%05d", ri)
 		sitxt := fmt.Sprintf("%05d", si)
 		labnm := fmt.Sprintf("index-%v", itxt)
 		if tv.ShowIndex {
@@ -478,7 +485,7 @@ func (tv *TableView) UpdateSliceGrid() {
 			} else {
 				idxlab = &gi.Label{}
 				sg.SetChild(idxlab, ridx, labnm)
-				idxlab.SetProp("tv-row", i)
+				idxlab.SetProp("tv-row", ri)
 				idxlab.Selectable = true
 				idxlab.Redrawable = true
 				idxlab.Sty.Template = "View.IndexLabel"
@@ -497,17 +504,17 @@ func (tv *TableView) UpdateSliceGrid() {
 		}
 
 		for fli := 0; fli < tv.NCols; fli++ {
-			col := tv.Table.Cols[fli]
-			// colnm := tv.Table.ColNames[fli]
+			col := tv.Table.Table.Cols[fli]
+			// colnm := tv.Table.Table.ColNames[fli]
 			tdsp := tv.ColTensorDisp(fli)
 
-			vvi := i*tv.NCols + fli
+			vvi := ri*tv.NCols + fli
 			var vv giv.ValueView
 			if tv.Values[vvi] == nil {
 				if stsr, isstr := col.(*etensor.String); isstr {
-					sval := stsr.Values[i]
+					sval := stsr.Values[ri]
 					vv = giv.ToValueView(&sval, "")
-					vv.SetProp("tv-row", i)
+					vv.SetProp("tv-row", ri)
 					vv.SetProp("tv-col", fli)
 					vv.SetStandaloneValue(reflect.ValueOf(&sval))
 					vv.AsValueViewBase().ViewSig.ConnectOnly(tv.This(),
@@ -519,14 +526,14 @@ func (tv *TableView) UpdateSliceGrid() {
 							col := vvv.Prop("tv-col").(int)
 							npv := kit.NonPtrValue(vvv.Value)
 							sv := kit.ToString(npv.Interface())
-							tv.Table.SetCellStringIdx(col, tvv.StartIdx+row, sv)
+							tvv.Table.Table.SetCellStringIdx(col, tvv.Table.Idxs[tvv.StartIdx+row], sv)
 							tvv.ViewSig.Emit(tvv.This(), 0, nil)
 						})
 				} else {
 					if col.NumDims() == 1 {
-						fval := col.FloatVal1D(si)
+						fval := col.FloatVal1D(ixi)
 						vv = giv.ToValueView(&fval, "")
-						vv.SetProp("tv-row", i)
+						vv.SetProp("tv-row", ri)
 						vv.SetProp("tv-col", fli)
 						vv.SetStandaloneValue(reflect.ValueOf(&fval))
 						vv.AsValueViewBase().ViewSig.ConnectOnly(tv.This(),
@@ -539,12 +546,12 @@ func (tv *TableView) UpdateSliceGrid() {
 								npv := kit.NonPtrValue(vvv.Value)
 								fv, ok := kit.ToFloat(npv.Interface())
 								if ok {
-									tv.Table.SetCellFloatIdx(col, tvv.StartIdx+row, fv)
+									tvv.Table.Table.SetCellFloatIdx(col, tvv.Table.Idxs[tvv.StartIdx+row], fv)
 									tvv.ViewSig.Emit(tvv.This(), 0, nil)
 								}
 							})
 					} else {
-						cell := tv.Table.CellTensorIdx(fli, 0)
+						cell := tv.Table.Table.CellTensorIdx(fli, 0)
 						tvv := &TensorGridValueView{}
 						tvv.Init(tvv)
 						vv = tvv
@@ -555,13 +562,13 @@ func (tv *TableView) UpdateSliceGrid() {
 			} else {
 				vv = tv.Values[vvi]
 				if stsr, isstr := col.(*etensor.String); isstr {
-					vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[si]))
+					vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[ixi]))
 				} else {
 					if col.NumDims() == 1 {
-						fval := col.FloatVal1D(si)
+						fval := col.FloatVal1D(ixi)
 						vv.SetStandaloneValue(reflect.ValueOf(&fval))
 					} else {
-						cell := tv.Table.CellTensorIdx(fli, si)
+						cell := tv.Table.Table.CellTensorIdx(fli, ixi)
 						vv.SetStandaloneValue(reflect.ValueOf(cell))
 					}
 				}
@@ -577,7 +584,7 @@ func (tv *TableView) UpdateSliceGrid() {
 				if tv.IsInactive() {
 					wn.SetInactive()
 				}
-				if col.IsNull1D(i) { // todo: not working:
+				if col.IsNull1D(ri) { // todo: not working:
 					wn.SetProp("background-color", gi.Prefs.Colors.Highlight)
 				} else {
 					wn.DeleteProp("background-color")
@@ -590,7 +597,7 @@ func (tv *TableView) UpdateSliceGrid() {
 				vv.ConfigWidget(widg)
 				wb := widg.AsWidget()
 				if wb != nil {
-					wb.SetProp("tv-row", i)
+					wb.SetProp("tv-row", ri)
 					wb.SetProp("vertical-align", gi.AlignTop)
 					wb.ClearSelected()
 					wb.WidgetSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
@@ -606,7 +613,7 @@ func (tv *TableView) UpdateSliceGrid() {
 					if tv.IsInactive() {
 						wb.SetInactive()
 					}
-					if col.IsNull1D(i) {
+					if col.IsNull1D(ri) {
 						wb.SetProp("background-color", gi.Prefs.Colors.Highlight)
 					} else {
 						wb.DeleteProp("background-color")
@@ -627,7 +634,7 @@ func (tv *TableView) UpdateSliceGrid() {
 					sg.SetChild(&addact, cidx, addnm)
 					addact.SetIcon("plus")
 					addact.Tooltip = "insert a new element at this index"
-					addact.Data = i
+					addact.Data = ri
 					addact.Sty.Template = "etview.TableView.AddAction"
 					addact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						act := send.(*gi.Action)
@@ -644,7 +651,7 @@ func (tv *TableView) UpdateSliceGrid() {
 					sg.SetChild(&delact, cidx, delnm)
 					delact.SetIcon("minus")
 					delact.Tooltip = "delete this element"
-					delact.Data = i
+					delact.Data = ri
 					delact.Sty.Template = "etview.TableView.DelAction"
 					delact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						act := send.(*gi.Action)
@@ -670,7 +677,7 @@ func (tv *TableView) ColTensorDisp(col int) *TensorDisp {
 		return ctd
 	}
 	if tv.Table != nil {
-		cl := tv.Table.Cols[col]
+		cl := tv.Table.Table.Cols[col]
 		if len(cl.MetaDataMap()) > 0 {
 			return tv.SetColTensorDisp(col)
 		}
@@ -687,7 +694,7 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 	ctd := &TensorDisp{}
 	*ctd = tv.TsrDisp
 	if tv.Table != nil {
-		cl := tv.Table.Cols[col]
+		cl := tv.Table.Table.Cols[col]
 		ctd.FmMeta(cl)
 	}
 	tv.ColTsrDisp[col] = ctd
@@ -779,8 +786,7 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 	}
 
 	tv.SortIdx = fldIdx
-
-	// kit.StructSliceSort(tv.Slice, rawIdx, !tv.SortDesc)
+	tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
 	tv.UpdateSliceGrid()
 	tv.UpdateEnd(updt)
 }
@@ -845,7 +851,7 @@ func (tv *TableView) ConfigToolbar() {
 // :down depending on descending
 func (tv *TableView) SortFieldName() string {
 	if tv.SortIdx >= 0 && tv.SortIdx < tv.NCols {
-		nm := tv.Table.ColNames[tv.SortIdx]
+		nm := tv.Table.Table.ColNames[tv.SortIdx]
 		if tv.SortDesc {
 			nm += ":down"
 		} else {
@@ -864,7 +870,7 @@ func (tv *TableView) SetSortFieldName(nm string) {
 	}
 	spnm := strings.Split(nm, ":")
 	for fli := 0; fli < tv.NCols; fli++ {
-		colnm := tv.Table.ColNames[fli]
+		colnm := tv.Table.Table.ColNames[fli]
 		if colnm == spnm[0] {
 			tv.SortIdx = fli
 		}
