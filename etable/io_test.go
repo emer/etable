@@ -13,7 +13,7 @@ import (
 )
 
 func TestEmerHeaders(t *testing.T) {
-	hdrstr := `_H:	$Name	%Input[2:0,0]<2:5,5>	%Input[2:1,0]	%Input[2:2,0]	%Input[2:3,0]	%Input[2:4,0]	%Input[2:0,1]	%Input[2:1,1]	%Input[2:2,1]	%Input[2:3,1]	%Input[2:4,1]	%Input[2:0,2]	%Input[2:1,2]	%Input[2:2,2]	%Input[2:3,2]	%Input[2:4,2]	%Input[2:0,3]	%Input[2:1,3]	%Input[2:2,3]	%Input[2:3,3]	%Input[2:4,3]	%Input[2:0,4]	%Input[2:1,4]	%Input[2:2,4]	%Input[2:3,4]	%Input[2:4,4]	%Output[2:0,0]<2:5,5>	%Output[2:1,0]	%Output[2:2,0]	%Output[2:3,0]	%Output[2:4,0]	%Output[2:0,1]	%Output[2:1,1]	%Output[2:2,1]	%Output[2:3,1]	%Output[2:4,1]	%Output[2:0,2]	%Output[2:1,2]	%Output[2:2,2]	%Output[2:3,2]	%Output[2:4,2]	%Output[2:0,3]	%Output[2:1,3]	%Output[2:2,3]	%Output[2:3,3]	%Output[2:4,3]	%Output[2:0,4]	%Output[2:1,4]	%Output[2:2,4]	%Output[2:3,4]	%Output[2:4,4]	`
+	hdrstr := `$Name	%Input[2:0,0]<2:5,5>	%Input[2:1,0]	%Input[2:2,0]	%Input[2:3,0]	%Input[2:4,0]	%Input[2:0,1]	%Input[2:1,1]	%Input[2:2,1]	%Input[2:3,1]	%Input[2:4,1]	%Input[2:0,2]	%Input[2:1,2]	%Input[2:2,2]	%Input[2:3,2]	%Input[2:4,2]	%Input[2:0,3]	%Input[2:1,3]	%Input[2:2,3]	%Input[2:3,3]	%Input[2:4,3]	%Input[2:0,4]	%Input[2:1,4]	%Input[2:2,4]	%Input[2:3,4]	%Input[2:4,4]	%Output[2:0,0]<2:5,5>	%Output[2:1,0]	%Output[2:2,0]	%Output[2:3,0]	%Output[2:4,0]	%Output[2:0,1]	%Output[2:1,1]	%Output[2:2,1]	%Output[2:3,1]	%Output[2:4,1]	%Output[2:0,2]	%Output[2:1,2]	%Output[2:2,2]	%Output[2:3,2]	%Output[2:4,2]	%Output[2:0,3]	%Output[2:1,3]	%Output[2:2,3]	%Output[2:3,3]	%Output[2:4,3]	%Output[2:0,4]	%Output[2:1,4]	%Output[2:2,4]	%Output[2:3,4]	%Output[2:4,4]	`
 
 	hdrs := strings.Split(hdrstr, "\t")
 	sc, err := SchemaFromHeaders(hdrs, nil)
@@ -55,8 +55,8 @@ func TestEmerHeaders(t *testing.T) {
 			t.Errorf("EmerHeaders: hdr %v mismatch %v != %v\n", i, hh, oh)
 		}
 	}
-	if hdrs[27] != outh[27] {
-		t.Errorf("EmerHeaders: hdr %v mismatch %v != %v\n", 27, hdrs[27], outh[27])
+	if hdrs[26] != outh[26] {
+		t.Errorf("EmerHeaders: hdr %v mismatch %v != %v\n", 26, hdrs[26], outh[26])
 	}
 }
 

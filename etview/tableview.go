@@ -46,20 +46,30 @@ func AddNewTableView(parent ki.Ki, name string) *TableView {
 var _ giv.SliceViewer = (*TableView)(nil)
 
 // SetTable sets the source table that we are viewing, using a sequential IdxView
+// and then configures the display
 func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
 	if et == nil {
 		return
 	}
-	tv.SetTableView(etable.NewIdxView(et), tmpSave)
+	tv.Table = etable.NewIdxView(et)
+	tv.TmpSave = tmpSave
+	tv.TableConfig()
 }
 
-// SetTableView sets the source IdxView of a table
+// SetTableView sets the source IdxView of a table (using a copy so original is not modified)
+// and then configures the display
 func (tv *TableView) SetTableView(ix *etable.IdxView, tmpSave giv.ValueView) {
-	updt := false
 	if ix == nil {
 		return
 	}
-	if op, has := ix.Table.MetaData["read-only"]; has {
+	tv.Table = ix.Clone() // always copy
+	tv.TmpSave = tmpSave
+	tv.TableConfig()
+}
+
+// TableConfig does all the configuration for a new Table view
+func (tv *TableView) TableConfig() {
+	if op, has := tv.Table.Table.MetaData["read-only"]; has {
 		if op == "+" || op == "true" {
 			tv.SetInactive()
 		} else {
@@ -75,8 +85,7 @@ func (tv *TableView) SetTableView(ix *etable.IdxView, tmpSave giv.ValueView) {
 	tv.StartIdx = 0
 	tv.SortIdx = -1
 	tv.SortDesc = false
-	tv.Table = ix
-	updt = tv.UpdateStart()
+	updt := tv.UpdateStart()
 	tv.ResetSelectedIdxs()
 	tv.SelectMode = false
 	tv.SetFullReRender()
@@ -88,7 +97,6 @@ func (tv *TableView) SetTableView(ix *etable.IdxView, tmpSave giv.ValueView) {
 	if siknp, err := tv.PropTry("inact-key-nav"); err == nil {
 		tv.InactKeyNav, _ = kit.ToBool(siknp)
 	}
-	tv.TmpSave = tmpSave
 	tv.Config()
 	tv.UpdateEnd(updt)
 }
@@ -353,10 +361,9 @@ func (tv *TableView) ConfigSliceGrid() {
 		}
 	}
 
-	// if tv.SortIdx >= 0 {
-	// 	rawIdx := tv.VisFields[tv.SortIdx].Index
-	// 	kit.StructSliceSort(tv.Slice, rawIdx, !tv.SortDesc)
-	// }
+	if tv.SortIdx >= 0 {
+		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
+	}
 
 	tv.ConfigScroll()
 }
@@ -833,8 +840,31 @@ func (tv *TableView) ConfigToolbar() {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				tvv.TensorDispAction(-1)
 			})
+		tb.AddAction(gi.ActOpts{Label: "Filter", Icon: "update", Tooltip: "filter the rows displayed according to the values in a given column"},
+			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TableView).(*TableView)
+				giv.CallMethod(tvv.Table, "FilterColName", tvv.Viewport)
+				tvv.Update()
+			})
+		tb.AddAction(gi.ActOpts{Label: "Show All", Icon: "update", Tooltip: "show all of the rows of data (undo any filtering)"},
+			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TableView).(*TableView)
+				tvv.Table.Sequential()
+				tvv.Update()
+			})
+		tb.AddSeparator("file")
+		tb.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "open CSV comma-separated-values (or any delimiter) file"}, tv.This(),
+			func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TableView).(*TableView)
+				giv.CallMethod(tvv.Table, "OpenCSV", tvv.Viewport)
+			})
+		tb.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "save table data to a CSV comma-separated-values (or any delimiter) file with headers"}, tv.This(),
+			func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TableView).(*TableView)
+				giv.CallMethod(tvv.Table, "SaveCSV", tvv.Viewport)
+			})
 	}
-	ndef := 2
+	ndef := 7
 	sz := len(*tb.Children())
 	if sz > ndef {
 		for i := sz - 1; i >= ndef; i-- {

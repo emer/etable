@@ -128,15 +128,14 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 	pl.SVGFile = fname
 }
 
-// SaveCSV saves the Table data to a csv (comma-separated values) file with headers
-func (pl *Plot2D) SaveCSV(fname gi.FileName) {
-	vt := pl.Table.NewTable()
-	vt.SaveCSV(fname, etable.Comma, true)
+// SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
+func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) {
+	pl.Table.SaveCSV(fname, delim, true)
 	pl.DataFile = fname
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
-func (pl *Plot2D) OpenCSV(fname gi.FileName, delim rune) {
+func (pl *Plot2D) OpenCSV(fname gi.FileName, delim etable.Delims) {
 	pl.Table.Table.OpenCSV(fname, delim)
 	pl.DataFile = fname
 	pl.Config()
@@ -555,11 +554,11 @@ func (pl *Plot2D) ToolbarConfig() {
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SaveSVG", pl.Viewport)
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "open CSV-formatted file"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "Open CSV-formatted data -- also recognizes emergent-style headers"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "OpenCSV", pl.Viewport)
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "save table data to a csv comma-separated-values file with headers"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SaveCSV", pl.Viewport)
 		})
@@ -581,8 +580,6 @@ func (pl *Plot2D) Style2D() {
 var Plot2DProps = ki.Props{
 	"max-width":  -1,
 	"max-height": -1,
-	// "width":      units.NewEm(5), // this gives the entire plot the scrollbars
-	// "height":     units.NewEm(5),
 	"ToolBar": ki.PropSlice{
 		{"Update", ki.Props{
 			"shortcut": "Command+U",
@@ -603,23 +600,29 @@ var Plot2DProps = ki.Props{
 		{"OpenCSV", ki.Props{
 			"label": "Open CSV File...",
 			"icon":  "file-open",
-			"desc":  "Open CSV-formatted data (or any delimeter -- default is tab (9), comma = 44) -- also recognizes emergent-style headers",
+			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
 			"Args": ki.PropSlice{
-				{"File Name", ki.Props{}},
+				{"File Name", ki.Props{
+					"ext": ".tsv,.csv",
+				}},
 				{"Delimiter", ki.Props{
-					"default": '\t',
-					"desc":    "can use any single-character rune here -- default is tab (9) b/c otherwise hard to type, comma = 44",
+					"default": etable.Tab,
+					"desc":    "delimiter between columns",
 				}},
 			},
 		}},
 		{"SaveCSV", ki.Props{
 			"label": "Save Data...",
 			"icon":  "file-save",
-			"desc":  "save table data to a csv comma-separated-values file",
+			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
 			"Args": ki.PropSlice{
 				{"File Name", ki.Props{
 					"default-field": "DataFile",
-					"ext":           ".csv",
+					"ext":           ".tsv,.csv",
+				}},
+				{"Delimiter", ki.Props{
+					"default": etable.Tab,
+					"desc":    "delimiter between columns",
 				}},
 			},
 		}},

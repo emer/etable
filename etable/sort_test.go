@@ -5,7 +5,6 @@
 package etable
 
 import (
-	"fmt"
 	"math/rand"
 	"sort"
 	"testing"
@@ -38,7 +37,12 @@ func TestSort(t *testing.T) {
 	}
 	sort.Sort(ts)
 
+	// for i := range ts.idx {
+	// 	fmt.Printf("i: %d\t idx[i]: %d\t raw[idx[i]]: %d\n", i, ts.idx[i], ts.raw[ts.idx[i]])
+	// }
 	for i := range ts.idx {
-		fmt.Printf("i: %d\t idx[i]: %d\t raw[idx[i]]: %d\n", i, ts.idx[i], ts.raw[ts.idx[i]])
+		if ts.raw[ts.idx[i]] != i {
+			t.Errorf("TestSort: raw val at index %d is %d, should be %d\n", i, ts.raw[ts.idx[i]], i)
+		}
 	}
 }

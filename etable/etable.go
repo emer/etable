@@ -771,24 +771,26 @@ var TableProps = ki.Props{
 		{"OpenCSV", ki.Props{
 			"label": "Open CSV File...",
 			"icon":  "file-open",
-			"desc":  "Open CSV-formatted data (or any delimeter -- default is tab (9), comma = 44) -- also recognizes emergent-style headers",
+			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
 			"Args": ki.PropSlice{
-				{"File Name", ki.Props{}},
+				{"File Name", ki.Props{
+					"ext": ".tsv,.csv",
+				}},
 				{"Delimiter", ki.Props{
-					"default": '\t',
-					"desc":    "can use any single-character rune here -- default is tab (9) b/c otherwise hard to type, comma = 44",
+					"default": Tab,
 				}},
 			},
 		}},
 		{"SaveCSV", ki.Props{
 			"label": "Save CSV File...",
 			"icon":  "file-save",
-			"desc":  "Save CSV-formatted data (or any delimiter -- default is tab (9), comma = 44) -- header outputs emergent-style header data",
+			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
 			"Args": ki.PropSlice{
-				{"File Name", ki.Props{}},
+				{"File Name", ki.Props{
+					"ext": ".tsv,.csv",
+				}},
 				{"Delimiter", ki.Props{
-					"default": '\t',
-					"desc":    "can use any single-character rune here -- default is tab (9) b/c otherwise hard to type, comma = 44",
+					"default": Tab,
 				}},
 				{"Headers", ki.Props{
 					"default": true,

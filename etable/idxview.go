@@ -12,6 +12,8 @@ import (
 	"strings"
 
 	"github.com/emer/etable/etensor"
+	"github.com/goki/ki/ki"
+	"github.com/goki/ki/kit"
 	"github.com/goki/ki/sliceclone"
 )
 
@@ -39,6 +41,8 @@ type IdxView struct {
 	Idxs     []int    `desc:"current indexes into Table"`
 	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-" desc:"current Less function used in sorting"`
 }
+
+var KiT_IdxView = kit.Types.AddType(&IdxView{}, IdxViewProps)
 
 // NewIdxView returns a new IdxView based on given table, initialized with sequential idxes
 func NewIdxView(et *Table) *IdxView {
@@ -206,6 +210,46 @@ func (ix *IdxView) Filter(filterFunc func(et *Table, row int) bool) {
 	}
 }
 
+// FilterColName filters the indexes into our Table according to values in
+// given column name, using string representation of column values.
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Use named args for greater clarity.
+// Only valid for 1-dimensional columns.
+// Returns error if column name not found.
+func (ix *IdxView) FilterColName(colNm string, str string, contains, ignoreCase bool) error {
+	ci, err := ix.Table.ColIdxTry(colNm)
+	if err != nil {
+		return err
+	}
+	ix.FilterCol(ci, str, contains, ignoreCase)
+	return nil
+}
+
+// FilterCol sorts the indexes into our Table according to values in
+// given column index, using string representation of column values.
+// if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Use named args for greater clarity.
+// Only valid for 1-dimensional columns.
+func (ix *IdxView) FilterCol(colIdx int, str string, contains, ignoreCase bool) {
+	col := ix.Table.Cols[colIdx]
+	lowstr := strings.ToLower(str)
+	ix.Filter(func(et *Table, row int) bool {
+		val := col.StringVal1D(row)
+		has := false
+		switch {
+		case contains && ignoreCase:
+			has = strings.Contains(strings.ToLower(val), lowstr)
+		case contains:
+			has = strings.Contains(val, str)
+		case ignoreCase:
+			has = strings.EqualFold(val, str)
+		default:
+			has = (val == str)
+		}
+		return has
+	})
+}
+
 // NewTable returns a new table with column data organized according to
 // the indexes
 func (ix *IdxView) NewTable() *Table {
@@ -342,4 +386,57 @@ func (ix *IdxView) Less(i, j int) bool {
 // Swap switches the indexes for i and j
 func (ix *IdxView) Swap(i, j int) {
 	ix.Idxs[i], ix.Idxs[j] = ix.Idxs[j], ix.Idxs[i]
+}
+
+var IdxViewProps = ki.Props{
+	"CallMethods": ki.PropSlice{
+		{"SortColName", ki.Props{
+			"desc": "sort by given column name",
+			"icon": "gear",
+			"Args": ki.PropSlice{
+				{"Column Name", ki.Props{}},
+				{"Ascending", ki.Props{}},
+			},
+		}},
+		{"FilterColName", ki.Props{
+			"desc": "filter by given column name, using string representation, with contains and ignore case options",
+			"icon": "gear",
+			"Args": ki.PropSlice{
+				{"Column Name", ki.Props{}},
+				{"Value", ki.Props{}},
+				{"Contains", ki.Props{}},
+				{"Ignore Case", ki.Props{}},
+			},
+		}},
+		{"OpenCSV", ki.Props{
+			"label": "Open CSV File...",
+			"icon":  "file-open",
+			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{
+					"ext": ".tsv,.csv",
+				}},
+				{"Delimiter", ki.Props{
+					"default": Tab,
+				}},
+			},
+		}},
+		{"SaveCSV", ki.Props{
+			"label": "Save CSV File...",
+			"icon":  "file-save",
+			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{
+					"ext": ".tsv,.csv",
+				}},
+				{"Delimiter", ki.Props{
+					"default": Tab,
+				}},
+				{"Headers", ki.Props{
+					"default": true,
+					"desc":    "output C++ emergent-style headers that have type and tensor geometry information",
+				}},
+			},
+		}},
+	},
 }
