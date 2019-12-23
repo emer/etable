@@ -50,7 +50,7 @@ var GpDecade *etable.Table
 // 	https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html
 func AnalyzePlanets() {
 	Planets = etable.NewTable("planets")
-	Planets.OpenCSV("./planets.csv", ',')
+	Planets.OpenCSV("./planets.csv", etable.Comma)
 
 	PlanetsAll := etable.NewIdxView(Planets) // full original data
 
