@@ -61,6 +61,7 @@ func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
 		}
 		tv.ColTsrDisp = make(map[int]*TensorDisp)
 		tv.TsrDisp.Defaults()
+		tv.TsrDisp.BotRtSpace.Set(4, units.Px)
 		if !tv.IsInactive() {
 			tv.SelectedIdx = -1
 		}
@@ -87,6 +88,7 @@ func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
 }
 
 var TableViewProps = ki.Props{
+	"EnumType:Flag":    gi.KiT_NodeFlags,
 	"background-color": &gi.Prefs.Colors.Background,
 	"color":            &gi.Prefs.Colors.Font,
 	"max-width":        -1,
@@ -185,7 +187,7 @@ func (tv *TableView) ConfigSliceGrid() {
 		return
 	}
 
-	sz := tv.UpdtSliceSize()
+	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
@@ -225,7 +227,8 @@ func (tv *TableView) ConfigSliceGrid() {
 	sgf.SetMinPrefHeight(units.NewEm(10))
 	sgf.SetStretchMax() // for this to work, ALL layers above need it too
 	sgf.SetProp("columns", nWidgPerRow)
-	sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
+	// this causes sizing / layout to fail, esp on window resize etc:
+	// sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
 
 	// Configure Header
 	hcfg := kit.TypeAndNameList{}
@@ -272,8 +275,7 @@ func (tv *TableView) ConfigSliceGrid() {
 			}
 		}
 		hdr.Data = fli
-		hdr.Tooltip = colnm + " (click to sort / toggle sort direction by this column) Type: " + col.DataType().String()
-
+		hdr.Tooltip = colnm + " (click to sort by) Type: " + col.DataType().String()
 		if dsc, has := tv.Table.MetaData[colnm+":desc"]; has {
 			hdr.Tooltip += ": " + dsc
 		}
@@ -361,7 +363,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		sg.DeleteChildren(true)
 		return false
 	}
-	sz := tv.UpdtSliceSize()
+	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
 	if sz == 0 {
 		sg.DeleteChildren(true)
 		return false
@@ -372,7 +374,6 @@ func (tv *TableView) LayoutSliceGrid() bool {
 	if sgHt == 0 {
 		return false
 	}
-
 	nWidgPerRow, _ := tv.RowWidgetNs()
 	tv.RowHeight = sg.GridData[gi.Row][0].AllocSize + sg.Spacing.Dots
 	tv.VisRows = int(math32.Floor(sgHt / tv.RowHeight))
@@ -427,12 +428,14 @@ func (tv *TableView) UpdateSliceGrid() {
 	if tv.Table == nil {
 		return
 	}
-	sz := tv.UpdtSliceSize()
+	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
 	sg := tv.SliceGrid()
 	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
+
+	tv.TsrDispToDots()
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nWidg := nWidgPerRow * tv.DispRows
@@ -873,6 +876,18 @@ func (tv *TableView) SetSortFieldName(nm string) {
 			tv.SortDesc = false
 		}
 	}
+}
+
+func (tv *TableView) TsrDispToDots() {
+	tv.TsrDisp.ToDots(&tv.Sty.UnContext)
+	for _, ctd := range tv.ColTsrDisp {
+		ctd.ToDots(&tv.Sty.UnContext)
+	}
+}
+
+func (tv *TableView) Style2D() {
+	tv.SliceViewBase.Style2D()
+	tv.TsrDispToDots()
 }
 
 func (tv *TableView) Layout2D(parBBox image.Rectangle, iter int) bool {

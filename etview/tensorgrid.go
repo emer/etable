@@ -35,7 +35,8 @@ type TensorDisp struct {
 	ColorMap    giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
 	Background  gi.Color         `desc:"background color"`
 	GridFill    float32          `min:"0.1" max:"1" step:"0.1" def:"0.9,1" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
-	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries"`
+	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries, as a proportion of total grid size"`
+	BotRtSpace  units.Value      `desc:"extra space to add at bottom of grid -- needed when included in TableView for example"`
 	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
 	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
 	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
@@ -75,6 +76,7 @@ func (td *TensorDisp) Update() {
 }
 
 func (td *TensorDisp) ToDots(uc *units.Context) {
+	td.BotRtSpace.ToDots(uc)
 	td.GridMinSize.ToDots(uc)
 	td.GridMaxSize.ToDots(uc)
 	td.TotPrefSize.ToDots(uc)
@@ -245,7 +247,7 @@ func (tg *TensorGrid) Size2D(iter int) {
 			gsz := tg.Disp.TotPrefSize.Dots / max
 			gsz = math32.Max(gsz, tg.Disp.GridMinSize.Dots)
 			gsz = math32.Min(gsz, tg.Disp.GridMaxSize.Dots)
-			tg.Size2DFromWH(gsz*float32(cols), gsz*float32(rows))
+			tg.Size2DFromWH(gsz*float32(cols)+tg.Disp.BotRtSpace.Dots, gsz*float32(rows)+tg.Disp.BotRtSpace.Dots)
 		}
 	}
 }
@@ -300,6 +302,7 @@ func (tg *TensorGrid) RenderTensor() {
 
 	pos := tg.LayData.AllocPos
 	sz := tg.LayData.AllocSize
+	sz.SetSubVal(tg.Disp.BotRtSpace.Dots)
 
 	pc.FillBoxColor(rs, pos, sz, tg.Disp.Background)
 
