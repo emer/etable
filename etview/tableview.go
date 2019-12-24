@@ -307,7 +307,7 @@ func (tv *TableView) ConfigSliceGrid() {
 			if col.NumDims() == 1 {
 				fval := 1.0
 				vv = giv.ToValueView(&fval, "")
-				vv.SetStandaloneValue(reflect.ValueOf(&fval))
+				vv.SetSoloValue(reflect.ValueOf(&fval))
 				hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 					tvv := recv.Embed(KiT_TableView).(*TableView)
 					act := send.(*gi.Action)
@@ -319,7 +319,7 @@ func (tv *TableView) ConfigSliceGrid() {
 				tvv := &TensorGridValueView{}
 				tvv.Init(tvv)
 				vv = tvv
-				vv.SetStandaloneValue(reflect.ValueOf(cell))
+				vv.SetSoloValue(reflect.ValueOf(cell))
 				hdr.Tooltip = "(click to edit display parameters for this column)"
 				hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 					tvv := recv.Embed(KiT_TableView).(*TableView)
@@ -523,7 +523,7 @@ func (tv *TableView) UpdateSliceGrid() {
 					vv = giv.ToValueView(&sval, "")
 					vv.SetProp("tv-row", ri)
 					vv.SetProp("tv-col", fli)
-					vv.SetStandaloneValue(reflect.ValueOf(&sval))
+					vv.SetSoloValue(reflect.ValueOf(&sval))
 					vv.AsValueViewBase().ViewSig.ConnectOnly(tv.This(),
 						func(recv, send ki.Ki, sig int64, data interface{}) {
 							tvv, _ := recv.Embed(KiT_TableView).(*TableView)
@@ -542,7 +542,7 @@ func (tv *TableView) UpdateSliceGrid() {
 						vv = giv.ToValueView(&fval, "")
 						vv.SetProp("tv-row", ri)
 						vv.SetProp("tv-col", fli)
-						vv.SetStandaloneValue(reflect.ValueOf(&fval))
+						vv.SetSoloValue(reflect.ValueOf(&fval))
 						vv.AsValueViewBase().ViewSig.ConnectOnly(tv.This(),
 							func(recv, send ki.Ki, sig int64, data interface{}) {
 								tvv, _ := recv.Embed(KiT_TableView).(*TableView)
@@ -562,21 +562,21 @@ func (tv *TableView) UpdateSliceGrid() {
 						tvv := &TensorGridValueView{}
 						tvv.Init(tvv)
 						vv = tvv
-						vv.SetStandaloneValue(reflect.ValueOf(cell))
+						vv.SetSoloValue(reflect.ValueOf(cell))
 					}
 				}
 				tv.Values[vvi] = vv
 			} else {
 				vv = tv.Values[vvi]
 				if stsr, isstr := col.(*etensor.String); isstr {
-					vv.SetStandaloneValue(reflect.ValueOf(&stsr.Values[ixi]))
+					vv.SetSoloValue(reflect.ValueOf(&stsr.Values[ixi]))
 				} else {
 					if col.NumDims() == 1 {
 						fval := col.FloatVal1D(ixi)
-						vv.SetStandaloneValue(reflect.ValueOf(&fval))
+						vv.SetSoloValue(reflect.ValueOf(&fval))
 					} else {
 						cell := tv.Table.Table.CellTensorIdx(fli, ixi)
-						vv.SetStandaloneValue(reflect.ValueOf(cell))
+						vv.SetSoloValue(reflect.ValueOf(cell))
 					}
 				}
 			}
@@ -720,8 +720,7 @@ func (tv *TableView) SliceNewAt(idx int) {
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
 
-	// todo: insert row -- do we even have this??  no!
-	// kit.SliceNewAt(tv.Slice, idx)
+	tv.Table.InsertRows(idx, 1)
 
 	if tv.TmpSave != nil {
 		tv.TmpSave.SaveTmp()
@@ -744,7 +743,7 @@ func (tv *TableView) SliceDeleteAt(idx int, doupdt bool) {
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
 
-	// kit.SliceDeleteAt(tv.Slice, idx)
+	tv.Table.DeleteRows(idx, 1)
 
 	if tv.TmpSave != nil {
 		tv.TmpSave.SaveTmp()
@@ -835,10 +834,17 @@ func (tv *TableView) ConfigToolbar() {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				tvv.Update()
 			})
-		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view"},
+		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view -- particularly the tensor display options"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				tvv.TensorDispAction(-1)
+			})
+		tb.AddSeparator("view")
+		tb.AddAction(gi.ActOpts{Label: "Add Rows", Icon: "plus", Tooltip: "add rows to end of table"},
+			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tvv := recv.Embed(KiT_TableView).(*TableView)
+				giv.CallMethod(tvv.Table, "Add Rows", tvv.Viewport)
+				tvv.Update()
 			})
 		tb.AddAction(gi.ActOpts{Label: "Filter", Icon: "update", Tooltip: "filter the rows displayed according to the values in a given column"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {

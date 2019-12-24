@@ -38,6 +38,9 @@ const (
 	// Space is the space rune delimiter, for SSV space separated value
 	Space
 
+	// Detect is used during reading a file -- reads the first line and detects tabs or commas
+	Detect
+
 	DelimsN
 )
 

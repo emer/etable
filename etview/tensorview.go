@@ -241,17 +241,20 @@ func (tv *TensorView) ConfigSliceGrid() {
 	}
 
 	for fli := 0; fli < tv.NCols; fli++ {
-		colnm := fmt.Sprintf("X:%03d", fli) // todo: deal with embedded dims
+		_, cc := etensor.Prjn2DCoords(tv.Tensor.ShapeObj(), tv.TsrLay.OddRow, 0, fli)
+		sitxt := ""
+		for i, ccc := range cc {
+			sitxt += fmt.Sprintf("%03d", ccc)
+			if i < len(cc)-1 {
+				sitxt += ","
+			}
+		}
 		hdr := sgh.Child(idxOff + fli).(*gi.Label)
-		hdr.SetText(colnm)
-		// no metadata on tensors by themselves
-		// if dsc, has := tv.Tensor.MetaData[colnm+":desc"]; has {
-		// 	hdr.Tooltip += ": " + dsc
-		// }
+		hdr.SetText(sitxt)
 
 		fval := 1.0
 		vv := giv.ToValueView(&fval, "")
-		vv.SetStandaloneValue(reflect.ValueOf(&fval))
+		vv.SetSoloValue(reflect.ValueOf(&fval))
 		vtyp := vv.WidgetType()
 		valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
 		cidx := idxOff + fli
@@ -394,16 +397,22 @@ func (tv *TensorView) UpdateSliceGrid() {
 		tv.StartIdx = 0
 	}
 
-	for i := 0; i < tv.DispRows; i++ {
-		ridx := i * nWidgPerRow
-		si := tv.StartIdx + i // slice idx
+	for ri := 0; ri < tv.DispRows; ri++ {
+		ridx := ri * nWidgPerRow
+		si := tv.StartIdx + ri // slice idx
 		if !tv.TsrLay.TopZero {
 			si = (tv.SliceSize - 1) - si
 		}
 		issel := tv.IdxIsSelected(si)
-
-		itxt := fmt.Sprintf("%05d", i)
-		sitxt := fmt.Sprintf("%05d", si)
+		itxt := fmt.Sprintf("%05d", ri)
+		cr, _ := etensor.Prjn2DCoords(tv.Tensor.ShapeObj(), tv.TsrLay.OddRow, si, 0)
+		sitxt := ""
+		for i, crc := range cr {
+			sitxt += fmt.Sprintf("%03d", crc)
+			if i < len(cr)-1 {
+				sitxt += ","
+			}
+		}
 		labnm := fmt.Sprintf("index-%v", itxt)
 		if tv.ShowIndex {
 			var idxlab *gi.Label
@@ -412,7 +421,7 @@ func (tv *TensorView) UpdateSliceGrid() {
 			} else {
 				idxlab = &gi.Label{}
 				sg.SetChild(idxlab, ridx, labnm)
-				idxlab.SetProp("tv-row", i)
+				idxlab.SetProp("tv-row", ri)
 				idxlab.Selectable = true
 				idxlab.Redrawable = true
 				idxlab.Sty.Template = "View.IndexLabel"
@@ -432,17 +441,17 @@ func (tv *TensorView) UpdateSliceGrid() {
 
 		for fli := 0; fli < tv.NCols; fli++ {
 			fval := etensor.Prjn2DVal(tv.Tensor, tv.TsrLay.OddRow, si, fli)
-			vvi := i*tv.NCols + fli
+			vvi := ri*tv.NCols + fli
 			var vv giv.ValueView
 			if tv.Values[vvi] == nil {
 				vv = giv.ToValueView(&fval, "")
-				vv.SetStandaloneValue(reflect.ValueOf(&fval))
+				vv.SetSoloValue(reflect.ValueOf(&fval))
 				tv.Values[vvi] = vv
-				vv.SetProp("tv-row", i)
+				vv.SetProp("tv-row", ri)
 				vv.SetProp("tv-col", fli)
 			} else {
 				vv = tv.Values[vvi]
-				vv.SetStandaloneValue(reflect.ValueOf(&fval))
+				vv.SetSoloValue(reflect.ValueOf(&fval))
 			}
 
 			vtyp := vv.WidgetType()
@@ -462,7 +471,7 @@ func (tv *TensorView) UpdateSliceGrid() {
 				vv.ConfigWidget(widg)
 				wb := widg.AsWidget()
 				if wb != nil {
-					wb.SetProp("tv-row", i)
+					wb.SetProp("tv-row", ri)
 					wb.ClearSelected()
 					wb.WidgetSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						if sig == int64(gi.WidgetSelected) || sig == int64(gi.WidgetFocused) {
@@ -484,11 +493,12 @@ func (tv *TensorView) UpdateSliceGrid() {
 						tvv.SetChanged()
 						vvv := send.(giv.ValueView).AsValueViewBase()
 						row := vvv.Prop("tv-row").(int)
+						rsi := (tvv.SliceSize - 1) - (tvv.StartIdx + row)
 						col := vvv.Prop("tv-col").(int)
 						npv := kit.NonPtrValue(vvv.Value)
 						fv, ok := kit.ToFloat(npv.Interface())
 						if ok {
-							etensor.Prjn2DSet(tv.Tensor, tv.TsrLay.OddRow, tvv.StartIdx+row, col, fv)
+							etensor.Prjn2DSet(tvv.Tensor, tvv.TsrLay.OddRow, rsi, col, fv)
 							tvv.ViewSig.Emit(tvv.This(), 0, nil)
 						}
 					})
@@ -505,7 +515,7 @@ func (tv *TensorView) UpdateSliceGrid() {
 					sg.SetChild(&addact, cidx, addnm)
 					addact.SetIcon("plus")
 					addact.Tooltip = "insert a new element at this index"
-					addact.Data = i
+					addact.Data = ri
 					addact.Sty.Template = "etview.TensorView.AddAction"
 					addact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						act := send.(*gi.Action)
@@ -522,7 +532,7 @@ func (tv *TensorView) UpdateSliceGrid() {
 					sg.SetChild(&delact, cidx, delnm)
 					delact.SetIcon("minus")
 					delact.Tooltip = "delete this element"
-					delact.Data = i
+					delact.Data = ri
 					delact.Sty.Template = "etview.TensorView.DelAction"
 					delact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						act := send.(*gi.Action)

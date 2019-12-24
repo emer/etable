@@ -768,6 +768,24 @@ func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpR
 
 var TableProps = ki.Props{
 	"ToolBar": ki.PropSlice{
+		{"AddRows", ki.Props{
+			"icon": "plus",
+			"Args": ki.PropSlice{
+				{"N Rows", ki.Props{
+					"default": 1,
+				}},
+			},
+		}},
+		{"SetNumRows", ki.Props{
+			"label": "Set N Rows",
+			"icon":  "new",
+			"Args": ki.PropSlice{
+				{"N Rows", ki.Props{
+					"default-field": "Rows",
+				}},
+			},
+		}},
+		{"sep-file", ki.BlankProp{}},
 		{"OpenCSV", ki.Props{
 			"label": "Open CSV File...",
 			"icon":  "file-open",
@@ -795,24 +813,6 @@ var TableProps = ki.Props{
 				{"Headers", ki.Props{
 					"default": true,
 					"desc":    "output C++ emergent-style headers that have type and tensor geometry information",
-				}},
-			},
-		}},
-		{"sep-file", ki.BlankProp{}},
-		{"AddRows", ki.Props{
-			"icon": "new",
-			"Args": ki.PropSlice{
-				{"N Rows", ki.Props{
-					"default": 1,
-				}},
-			},
-		}},
-		{"SetNumRows", ki.Props{
-			"label": "Set N Rows",
-			"icon":  "new",
-			"Args": ki.PropSlice{
-				{"N Rows", ki.Props{
-					"default-field": "Rows",
 				}},
 			},
 		}},

@@ -6,6 +6,7 @@ package etable
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"math/rand"
 	"sort"
@@ -106,6 +107,7 @@ func (ix *IdxView) Sort(lessFunc func(et *Table, i, j int) bool) {
 func (ix *IdxView) SortColName(colNm string, ascending bool) error {
 	ci, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	ix.SortCol(ci, ascending)
@@ -149,6 +151,7 @@ func (ix *IdxView) SortColNames(colNms []string, ascending bool) error {
 	for i, cn := range colNms {
 		ci, err := ix.Table.ColIdxTry(cn)
 		if err != nil {
+			log.Println(err)
 			return err
 		}
 		cis[i] = ci
@@ -219,6 +222,7 @@ func (ix *IdxView) Filter(filterFunc func(et *Table, row int) bool) {
 func (ix *IdxView) FilterColName(colNm string, str string, contains, ignoreCase bool) error {
 	ci, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
+		log.Println(err)
 		return err
 	}
 	ix.FilterCol(ci, str, contains, ignoreCase)
@@ -316,6 +320,32 @@ func (ix *IdxView) CopyFrom(oix *IdxView) {
 	ix.Idxs = sliceclone.Int(oix.Idxs)
 }
 
+// AddRows adds n rows to end of underlying Table, and to the indexes in this view
+func (ix *IdxView) AddRows(n int) {
+	stidx := ix.Table.Rows
+	ix.Table.SetNumRows(stidx + n)
+	for i := stidx; i < stidx+n; i++ {
+		ix.Idxs = append(ix.Idxs, i)
+	}
+}
+
+// InsertRows adds n rows to end of underlying Table, and to the indexes starting at
+// given index in this view
+func (ix *IdxView) InsertRows(at, n int) {
+	stidx := ix.Table.Rows
+	ix.Table.SetNumRows(stidx + n)
+	nw := make([]int, n, n+len(ix.Idxs)-at)
+	for i := 0; i < n; i++ {
+		nw[i] = stidx + i
+	}
+	ix.Idxs = append(ix.Idxs[:at], append(nw, ix.Idxs[at:]...)...)
+}
+
+// DeleteRows deletes n rows of indexes starting at given index in the list of indexes
+func (ix *IdxView) DeleteRows(at, n int) {
+	ix.Idxs = append(ix.Idxs[:at], ix.Idxs[at+n:]...)
+}
+
 // RowsByStringIdx returns the list of *our indexes* whose row in the table has
 // given string value in given column index (de-reference our indexes to get actual row).
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
@@ -389,18 +419,28 @@ func (ix *IdxView) Swap(i, j int) {
 }
 
 var IdxViewProps = ki.Props{
-	"CallMethods": ki.PropSlice{
+	"ToolBar": ki.PropSlice{
+		{"AddRows", ki.Props{
+			"icon": "plus",
+			"Args": ki.PropSlice{
+				{"N Rows", ki.Props{
+					"default": 1,
+				}},
+			},
+		}},
 		{"SortColName", ki.Props{
-			"desc": "sort by given column name",
-			"icon": "gear",
+			"label": "Sort...",
+			"desc":  "sort by given column name",
+			"icon":  "update",
 			"Args": ki.PropSlice{
 				{"Column Name", ki.Props{}},
 				{"Ascending", ki.Props{}},
 			},
 		}},
 		{"FilterColName", ki.Props{
-			"desc": "filter by given column name, using string representation, with contains and ignore case options",
-			"icon": "gear",
+			"label": "Filter...",
+			"desc":  "filter by given column name, using string representation, with contains and ignore case options",
+			"icon":  "search",
 			"Args": ki.PropSlice{
 				{"Column Name", ki.Props{}},
 				{"Value", ki.Props{}},
@@ -408,6 +448,7 @@ var IdxViewProps = ki.Props{
 				{"Ignore Case", ki.Props{}},
 			},
 		}},
+		{"sep-file", ki.BlankProp{}},
 		{"OpenCSV", ki.Props{
 			"label": "Open CSV File...",
 			"icon":  "file-open",

@@ -16,12 +16,13 @@ func _() {
 	_ = x[Tab-0]
 	_ = x[Comma-1]
 	_ = x[Space-2]
-	_ = x[DelimsN-3]
+	_ = x[Detect-3]
+	_ = x[DelimsN-4]
 }
 
-const _Delims_name = "TabCommaSpaceDelimsN"
+const _Delims_name = "TabCommaSpaceDetectDelimsN"
 
-var _Delims_index = [...]uint8{0, 3, 8, 13, 20}
+var _Delims_index = [...]uint8{0, 3, 8, 13, 19, 26}
 
 func (i Delims) String() string {
 	if i < 0 || i >= Delims(len(_Delims_index)-1) {

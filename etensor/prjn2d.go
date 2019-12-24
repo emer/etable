@@ -156,6 +156,64 @@ func Prjn2DIdx(shp *Shape, oddRow bool, row, col int) int {
 	return 0
 }
 
+// Prjn2DCoords returns the corresponding full-dimensional coordinates
+// that go into the given row, col coords for a 2D projection of the given tensor,
+// collapsing higher dimensions down to 2D (and 1D up to 2D).
+func Prjn2DCoords(shp *Shape, oddRow bool, row, col int) (rowCoords, colCoords []int) {
+	idx := Prjn2DIdx(shp, oddRow, row, col)
+	dims := shp.Index(idx)
+	nd := shp.NumDims()
+	switch nd {
+	case 1:
+		if oddRow {
+			return dims, []int{0}
+		} else {
+			return []int{0}, dims
+		}
+	case 2:
+		if shp.IsRowMajor() {
+			return dims[:1], dims[1:]
+		} else {
+			return dims[1:], dims[:1]
+		}
+	case 3:
+		if oddRow {
+			if shp.IsRowMajor() {
+				return dims[:2], dims[2:]
+			} else {
+				return dims[1:], dims[:1]
+			}
+		} else {
+			if shp.IsRowMajor() {
+				return dims[:1], dims[1:]
+			} else {
+				return dims[2:], dims[:2]
+			}
+		}
+	case 4:
+		if shp.IsRowMajor() {
+			return []int{dims[0], dims[2]}, []int{dims[1], dims[3]}
+		} else {
+			return []int{dims[1], dims[3]}, []int{dims[0], dims[2]}
+		}
+	case 5:
+		if oddRow {
+			if shp.IsRowMajor() {
+				return []int{dims[0], dims[1], dims[3]}, []int{dims[2], dims[4]}
+			} else {
+				return []int{dims[1], dims[3], dims[4]}, []int{dims[0], dims[2]}
+			}
+		} else {
+			if shp.IsRowMajor() {
+				return []int{dims[1], dims[3]}, []int{dims[0], dims[2], dims[4]}
+			} else {
+				return []int{dims[1], dims[3]}, []int{dims[0], dims[2], dims[4]}
+			}
+		}
+	}
+	return nil, nil
+}
+
 // Prjn2DVal returns the float64 value at given row, col coords for a 2D projection
 // of the given tensor, collapsing higher dimensions down to 2D (and 1D up to 2D).
 // For any odd number of dimensions, the remaining outer-most dimension
