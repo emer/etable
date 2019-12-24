@@ -493,7 +493,10 @@ func (tv *TensorView) UpdateSliceGrid() {
 						tvv.SetChanged()
 						vvv := send.(giv.ValueView).AsValueViewBase()
 						row := vvv.Prop("tv-row").(int)
-						rsi := (tvv.SliceSize - 1) - (tvv.StartIdx + row)
+						rsi := (tvv.StartIdx + row)
+						if !tvv.TsrLay.TopZero {
+							rsi = (tvv.SliceSize - 1) - rsi
+						}
 						col := vvv.Prop("tv-col").(int)
 						npv := kit.NonPtrValue(vvv.Value)
 						fv, ok := kit.ToFloat(npv.Interface())
@@ -503,44 +506,6 @@ func (tv *TensorView) UpdateSliceGrid() {
 						}
 					})
 				}
-			}
-		}
-
-		if !tv.IsInactive() {
-			cidx := ridx + tv.NCols + idxOff
-			if !tv.NoAdd {
-				if sg.Kids[cidx] == nil {
-					addnm := fmt.Sprintf("add-%v", itxt)
-					addact := gi.Action{}
-					sg.SetChild(&addact, cidx, addnm)
-					addact.SetIcon("plus")
-					addact.Tooltip = "insert a new element at this index"
-					addact.Data = ri
-					addact.Sty.Template = "etview.TensorView.AddAction"
-					addact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-						act := send.(*gi.Action)
-						tvv := recv.Embed(KiT_TableView).(*TableView)
-						tvv.SliceNewAtRow(act.Data.(int) + 1)
-					})
-				}
-				cidx++
-			}
-			if !tv.NoDelete {
-				if sg.Kids[cidx] == nil {
-					delnm := fmt.Sprintf("del-%v", itxt)
-					delact := gi.Action{}
-					sg.SetChild(&delact, cidx, delnm)
-					delact.SetIcon("minus")
-					delact.Tooltip = "delete this element"
-					delact.Data = ri
-					delact.Sty.Template = "etview.TensorView.DelAction"
-					delact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-						act := send.(*gi.Action)
-						tvv := recv.Embed(KiT_TableView).(*TableView)
-						tvv.SliceDeleteAtRow(act.Data.(int), true)
-					})
-				}
-				cidx++
 			}
 		}
 	}

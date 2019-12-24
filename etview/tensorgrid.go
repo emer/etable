@@ -43,6 +43,8 @@ type TensorDisp struct {
 	GridView    *TensorGrid      `copy:"-" json:"-" xml:"-" view:"-" desc:"our gridview, for update method"`
 }
 
+var KiT_TensorDisp = kit.Types.AddType(&TensorDisp{}, TensorDispProps)
+
 // Defaults sets defaults for values that are at nonsensical initial values
 func (td *TensorDisp) Defaults() {
 	if td.ColorMap == "" {
@@ -383,4 +385,13 @@ func (tg *TensorGrid) Render2D() {
 	} else {
 		tg.DisconnectAllEvents(gi.RegPri)
 	}
+}
+
+var TensorDispProps = ki.Props{
+	"ToolBar": ki.PropSlice{
+		{"Update", ki.Props{
+			"label": "Update Grid",
+			"icon":  "update",
+		}},
+	},
 }
