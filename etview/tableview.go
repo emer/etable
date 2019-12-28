@@ -5,8 +5,11 @@
 package etview
 
 import (
+	"bytes"
+	"encoding/csv"
 	"fmt"
 	"image"
+	"log"
 	"reflect"
 	"strings"
 
@@ -18,10 +21,12 @@ import (
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/cursor"
 	"github.com/goki/gi/oswin/mimedata"
+	"github.com/goki/gi/oswin/mouse"
 	"github.com/goki/gi/units"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
+	"github.com/goki/pi/filecat"
 )
 
 // etview.TableView provides a GUI interface for etable.Table's
@@ -1021,19 +1026,89 @@ func (tv *TableView) SelectRowWidgets(row int, sel bool) {
 	}
 }
 
+//////////////////////////////////////////////////////////////////////////////
+//    Copy / Cut / Paste
+
 // CopySelToMime copies selected rows to mime data
 func (tv *TableView) CopySelToMime() mimedata.Mimes {
-	return nil
+	nitms := len(tv.SelectedIdxs)
+	if nitms == 0 {
+		return nil
+	}
+	ix := &etable.IdxView{}
+	ix.Table = tv.Table.Table
+	idx := tv.SelectedIdxsList(false) // ascending
+	iidx := make([]int, len(idx))
+	for i, di := range idx {
+		iidx[i] = tv.Table.Idxs[di]
+	}
+	ix.Idxs = iidx
+	var b bytes.Buffer
+	ix.WriteCSV(&b, etable.Tab, etable.Headers)
+	md := mimedata.NewTextBytes(b.Bytes())
+	md[0].Type = filecat.DataCsv
+	return md
+}
+
+// FromMimeData returns records from csv of mime data
+func (tv *TableView) FromMimeData(md mimedata.Mimes) [][]string {
+	var recs [][]string
+	for _, d := range md {
+		if d.Type == filecat.DataCsv {
+			b := bytes.NewBuffer(d.Data)
+			cr := csv.NewReader(b)
+			cr.Comma = etable.Tab.Rune()
+			rec, err := cr.ReadAll()
+			if err != nil || len(rec) == 0 {
+				log.Printf("Error reading CSV from clipboard: %s\n", err)
+				return nil
+			}
+			recs = append(recs, rec...)
+		}
+	}
+	return recs
 }
 
 // PasteAssign assigns mime data (only the first one!) to this idx
 func (tv *TableView) PasteAssign(md mimedata.Mimes, idx int) {
-	// todo
+	recs := tv.FromMimeData(md)
+	if len(recs) == 0 {
+		return
+	}
+	updt := tv.UpdateStart()
+	tv.Table.Table.ReadCSVRow(recs[1], tv.Table.Idxs[idx])
+	if tv.TmpSave != nil {
+		tv.TmpSave.SaveTmp()
+	}
+	tv.SetChanged()
+	tv.This().(giv.SliceViewer).UpdateSliceGrid()
+	tv.UpdateEnd(updt)
 }
 
 // PasteAtIdx inserts object(s) from mime data at (before) given slice index
+// adds to end of table
 func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
-	// todo
+	recs := tv.FromMimeData(md)
+	nr := len(recs) - 1
+	if nr == 0 {
+		return
+	}
+	wupdt := tv.Viewport.Win.UpdateStart()
+	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	updt := tv.UpdateStart()
+	tv.Table.InsertRows(idx, nr)
+	for ri := 0; ri < nr; ri++ {
+		rec := recs[1+ri]
+		rw := tv.Table.Idxs[idx+ri]
+		tv.Table.Table.ReadCSVRow(rec, rw)
+	}
+	if tv.TmpSave != nil {
+		tv.TmpSave.SaveTmp()
+	}
+	tv.SetChanged()
+	tv.This().(giv.SliceViewer).UpdateSliceGrid()
+	tv.UpdateEnd(updt)
+	tv.SelectIdxAction(idx, mouse.SelectOne)
 }
 
 func (tv *TableView) ItemCtxtMenu(idx int) {

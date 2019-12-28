@@ -56,6 +56,14 @@ func (dl Delims) Rune() rune {
 	return '\t'
 }
 
+const (
+	//	Headers is passed to CSV methods for the headers arg, to use headers
+	Headers = true
+
+	// NoHeaders is passed to CSV methods for the headers arg, to not use headers
+	NoHeaders = false
+)
+
 // SaveCSV writes a table to a comma-separated-values (CSV) file
 // (where comma = any delimiter, specified in the delim arg).
 // If headers = true then generate C++ emergent-tyle column headers.
@@ -157,34 +165,41 @@ func (dt *Table) ReadCSV(r io.Reader, delim Delims) error {
 		rows--
 		dt.SetFromSchema(sc, rows)
 	}
-	tc := dt.NumCols()
 	dt.SetNumRows(rows)
-rowloop:
 	for ri := 0; ri < rows; ri++ {
-		ci := 0
-		rr := rec[ri+strow]
-		if rr[0] == "_D:" { // emergent data row
-			ci++
-		}
-		for j := 0; j < tc; j++ {
-			tsr := dt.Cols[j]
-			_, csz := tsr.RowCellSize()
-			stoff := ri * csz
-			for cc := 0; cc < csz; cc++ {
-				str := rr[ci]
-				if str == "" {
+		dt.ReadCSVRow(rec[ri+strow], ri)
+	}
+	return nil
+}
+
+// ReadCSVRow reads a record of CSV data into given row in table
+func (dt *Table) ReadCSVRow(rec []string, row int) {
+	tc := dt.NumCols()
+	ci := 0
+	if rec[0] == "_D:" { // emergent data row
+		ci++
+	}
+	for j := 0; j < tc; j++ {
+		tsr := dt.Cols[j]
+		_, csz := tsr.RowCellSize()
+		stoff := row * csz
+		for cc := 0; cc < csz; cc++ {
+			str := rec[ci]
+			if tsr.DataType() != etensor.STRING {
+				if str == "" || str == "NaN" || str == "-NaN" || str == "Inf" || str == "-Inf" {
 					tsr.SetNull1D(stoff+cc, true) // empty = missing
 				} else {
 					tsr.SetString1D(stoff+cc, str)
 				}
-				ci++
-				if ci >= len(rr) {
-					continue rowloop
-				}
+			} else {
+				tsr.SetString1D(stoff+cc, str)
+			}
+			ci++
+			if ci >= len(rec) {
+				return
 			}
 		}
 	}
-	return nil
 }
 
 // SchemaFromHeaders attempts to configure a Table Schema based on the headers
@@ -380,7 +395,7 @@ func (dt *Table) WriteCSV(w io.Writer, delim Delims, headers bool) error {
 	cw := csv.NewWriter(w)
 	cw.Comma = delim.Rune()
 	for ri := 0; ri < dt.Rows; ri++ {
-		err = dt.WriteCSVRowWriter(cw, ri, headers, ncol)
+		err = dt.WriteCSVRowWriter(cw, ri, ncol)
 		if err != nil {
 			log.Println(err)
 			return err
@@ -409,7 +424,7 @@ func (ix *IdxView) WriteCSV(w io.Writer, delim Delims, headers bool) error {
 	cw.Comma = delim.Rune()
 	nrow := ix.Len()
 	for ri := 0; ri < nrow; ri++ {
-		err = ix.Table.WriteCSVRowWriter(cw, ix.Idxs[ri], headers, ncol)
+		err = ix.Table.WriteCSVRowWriter(cw, ix.Idxs[ri], ncol)
 		if err != nil {
 			log.Println(err)
 			return err
@@ -437,16 +452,16 @@ func (dt *Table) WriteCSVHeaders(w io.Writer, delim Delims) (int, error) {
 
 // WriteCSVRow writes given row to a comma-separated-values (CSV) file
 // (where comma = any delimiter, specified in the delim arg)
-func (dt *Table) WriteCSVRow(w io.Writer, row int, delim Delims, headers bool) error {
+func (dt *Table) WriteCSVRow(w io.Writer, row int, delim Delims) error {
 	cw := csv.NewWriter(w)
 	cw.Comma = delim.Rune()
-	err := dt.WriteCSVRowWriter(cw, row, headers, 0)
+	err := dt.WriteCSVRowWriter(cw, row, 0)
 	cw.Flush()
 	return err
 }
 
 // WriteCSVRowWriter uses csv.Writer to write one row
-func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, headers bool, ncol int) error {
+func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, ncol int) error {
 	prec := -1
 	if ps, ok := dt.MetaData["precision"]; ok {
 		prec, _ = strconv.Atoi(ps)

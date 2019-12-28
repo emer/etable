@@ -130,7 +130,7 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
 func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) {
-	pl.Table.SaveCSV(fname, delim, true)
+	pl.Table.SaveCSV(fname, delim, etable.Headers)
 	pl.DataFile = fname
 }
 

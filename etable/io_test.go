@@ -102,6 +102,6 @@ func TestReadEmerDat(t *testing.T) {
 		if err != nil {
 			t.Error(err)
 		}
-		dt.WriteCSV(fo, '\t', true)
+		dt.WriteCSV(fo, '\t', Headers)
 	}
 }
