@@ -252,7 +252,7 @@ func (tv *TableView) ConfigSliceGrid() {
 	// Configure Header
 	hcfg := kit.TypeAndNameList{}
 	if tv.ShowIndex {
-		hcfg.Add(gi.KiT_Label, "head-idx")
+		hcfg.Add(gi.KiT_Action, "head-idx")
 	}
 	for fli := 0; fli < tv.NCols; fli++ {
 		labnm := fmt.Sprintf("head-%v", tv.Table.Table.ColNames[fli])
@@ -273,9 +273,13 @@ func (tv *TableView) ConfigSliceGrid() {
 	labnm := fmt.Sprintf("index-%v", itxt)
 
 	if tv.ShowIndex {
-		lbl := sgh.Child(0).(*gi.Label)
-		lbl.Text = "Index"
-
+		hdr := sgh.Child(0).(*gi.Action)
+		hdr.SetText("Index")
+		hdr.Tooltip = "Click to sort by original native table order"
+		hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+			tvv := recv.Embed(KiT_TableView).(*TableView)
+			tvv.SortSliceAction(-1)
+		})
 		idxlab := &gi.Label{}
 		sgf.SetChild(idxlab, 0, labnm)
 		idxlab.Text = itxt
@@ -797,7 +801,11 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 	}
 
 	tv.SortIdx = fldIdx
-	tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
+	if fldIdx == -1 {
+		tv.Table.SortIdxs()
+	} else {
+		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
+	}
 	tv.UpdateSliceGrid()
 	tv.UpdateEnd(updt)
 }
@@ -1029,6 +1037,10 @@ func (tv *TableView) SelectRowWidgets(row int, sel bool) {
 //////////////////////////////////////////////////////////////////////////////
 //    Copy / Cut / Paste
 
+func (tv *TableView) MimeDataType() string {
+	return filecat.DataCsv
+}
+
 // CopySelToMime copies selected rows to mime data
 func (tv *TableView) CopySelToMime() mimedata.Mimes {
 	nitms := len(tv.SelectedIdxs)
@@ -1090,7 +1102,7 @@ func (tv *TableView) PasteAssign(md mimedata.Mimes, idx int) {
 func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
 	recs := tv.FromMimeData(md)
 	nr := len(recs) - 1
-	if nr == 0 {
+	if nr <= 0 {
 		return
 	}
 	wupdt := tv.Viewport.Win.UpdateStart()
@@ -1112,21 +1124,10 @@ func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
 }
 
 func (tv *TableView) ItemCtxtMenu(idx int) {
+	var men gi.Menu
+	tv.StdCtxtMenu(&men, idx)
+	if len(men) > 0 {
+		pos := tv.IdxPos(idx)
+		gi.PopupMenu(men, pos.X, pos.Y, tv.Viewport, tv.Nm+"-menu")
+	}
 }
-
-// // SelectFieldVal sets SelField and SelVal and attempts to find corresponding
-// // row, setting SelectedIdx and selecting row if found -- returns true if
-// // found, false otherwise
-// func (tv *TableView) SelectFieldVal(fld, val string) bool {
-// 	tv.SelField = fld
-// 	tv.SelVal = val
-// 	if tv.SelField != "" && tv.SelVal != nil {
-// 		idx, _ := StructSliceIdxByValue(tv.Slice, tv.SelField, tv.SelVal)
-// 		if idx >= 0 {
-// 			tv.ScrollToIdx(idx)
-// 			tv.UpdateSelectIdx(idx, true)
-// 			return true
-// 		}
-// 	}
-// 	return false
-// }

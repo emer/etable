@@ -100,6 +100,13 @@ func (ix *IdxView) Sort(lessFunc func(et *Table, i, j int) bool) {
 	sort.Sort(ix)
 }
 
+// SortIdxs sorts the indexes into our Table directly in
+// numerical order, producing the native ordering, while preserving
+// any filtering that might have occurred.
+func (ix *IdxView) SortIdxs() {
+	sort.Ints(ix.Idxs)
+}
+
 // SortColName sorts the indexes into our Table according to values in
 // given column name, using either ascending or descending order.
 // Only valid for 1-dimensional columns.
