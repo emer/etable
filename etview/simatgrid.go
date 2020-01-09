@@ -25,10 +25,10 @@ const LabelSpace = float32(8)
 type SimMatGrid struct {
 	TensorGrid
 	SimMat      *simat.SimMat `desc:"the similarity / distance matrix"`
-	rowMaxSz    gi.Vec2D      // maximum label size
+	rowMaxSz    mat32.Vec2    // maximum label size
 	rowMinBlank int           // minimum number of blank rows
 	rowNGps     int           // number of groups in row (non-blank after blank)
-	colMaxSz    gi.Vec2D      // maximum label size
+	colMaxSz    mat32.Vec2    // maximum label size
 	colMinBlank int           // minimum number of blank cols
 	colNGps     int           // number of groups in col (non-blank after blank)
 }
@@ -92,7 +92,7 @@ func (tg *SimMatGrid) Style2D() {
 	tg.Disp.ToDots(&tg.Sty.UnContext)
 }
 
-func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, sz gi.Vec2D) {
+func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, sz mat32.Vec2) {
 	mx := 0
 	mxi := 0
 	minBlank = len(lbs)
@@ -188,7 +188,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 	colEx = tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-	tsz := gi.Vec2D{fcl, frw}
+	tsz := mat32.Vec2{fcl, frw}
 	gsz := effsz.Div(tsz)
 
 	// Render Rows
@@ -214,7 +214,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 		yex := float32(ygp) * tg.Disp.DimExtra
 		tr.SetString(lb, &tg.Sty.Font, &tg.Sty.UnContext, &txsty, true, 0, 0)
 		tr.LayoutStdLR(&txsty, &tg.Sty.Font, &tg.Sty.UnContext, tg.rowMaxSz)
-		cr := gi.Vec2D{0, float32(y) + yex}
+		cr := mat32.Vec2{0, float32(y) + yex}
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(rs, pr)
 	}
@@ -238,14 +238,14 @@ func (tg *SimMatGrid) RenderSimMat() {
 		}
 		xex := float32(xgp) * tg.Disp.DimExtra
 		tr.SetStringRot90(lb, &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
-		cr := gi.Vec2D{float32(x) + xex, 0}
+		cr := mat32.Vec2{float32(x) + xex, 0}
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(rs, pr)
 	}
 
 	pos.X += tg.rowMaxSz.X + LabelSpace
 	pos.Y += tg.colMaxSz.Y + LabelSpace
-	ssz := gsz.MulVal(tg.Disp.GridFill) // smaller size with margin
+	ssz := gsz.MulScalar(tg.Disp.GridFill) // smaller size with margin
 	prvyblk = false
 	ygp = 0
 	for y := 0; y < rows; y++ {
@@ -269,7 +269,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 				ey = (rows - 1) - y
 			}
 			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
-			cr := gi.Vec2D{float32(x) + xex, float32(y) + yex}
+			cr := mat32.Vec2{float32(x) + xex, float32(y) + yex}
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
 			pc.FillBoxColor(rs, pr, ssz, clr)

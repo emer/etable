@@ -13,6 +13,7 @@ import (
 	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
+	"github.com/goki/gi/mat32"
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/mouse"
 	"github.com/goki/gi/units"
@@ -304,7 +305,7 @@ func (tg *TensorGrid) RenderTensor() {
 
 	pos := tg.LayData.AllocPos
 	sz := tg.LayData.AllocSize
-	sz.SetSubVal(tg.Disp.BotRtSpace.Dots)
+	sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
 
 	pc.FillBoxColor(rs, pos, sz, tg.Disp.Background)
 
@@ -352,10 +353,10 @@ func (tg *TensorGrid) RenderTensor() {
 	if colEx > 0 {
 		colsInner = cols / colEx
 	}
-	tsz := gi.Vec2D{fcl, frw}
+	tsz := mat32.Vec2{fcl, frw}
 	gsz := sz.Div(tsz)
 
-	ssz := gsz.MulVal(tg.Disp.GridFill) // smaller size with margin
+	ssz := gsz.MulScalar(tg.Disp.GridFill) // smaller size with margin
 	for y := 0; y < rows; y++ {
 		yex := float32(int(y/rowsInner)) * tg.Disp.DimExtra
 		for x := 0; x < cols; x++ {
@@ -365,7 +366,7 @@ func (tg *TensorGrid) RenderTensor() {
 				ey = (rows - 1) - y
 			}
 			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
-			cr := gi.Vec2D{float32(x) + xex, float32(y) + yex}
+			cr := mat32.Vec2{float32(x) + xex, float32(y) + yex}
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
 			pc.FillBoxColor(rs, pr, ssz, clr)
