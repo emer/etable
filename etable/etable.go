@@ -787,7 +787,7 @@ var TableProps = ki.Props{
 		}},
 		{"sep-file", ki.BlankProp{}},
 		{"OpenCSV", ki.Props{
-			"label": "Open CSV File...",
+			"label": "Open CSV...",
 			"icon":  "file-open",
 			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
 			"Args": ki.PropSlice{
@@ -800,7 +800,7 @@ var TableProps = ki.Props{
 			},
 		}},
 		{"SaveCSV", ki.Props{
-			"label": "Save CSV File...",
+			"label": "Save CSV...",
 			"icon":  "file-save",
 			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
 			"Args": ki.PropSlice{

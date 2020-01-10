@@ -438,7 +438,7 @@ var IdxViewProps = ki.Props{
 		{"SortColName", ki.Props{
 			"label": "Sort...",
 			"desc":  "sort by given column name",
-			"icon":  "update",
+			"icon":  "edit",
 			"Args": ki.PropSlice{
 				{"Column Name", ki.Props{}},
 				{"Ascending", ki.Props{}},
@@ -455,9 +455,15 @@ var IdxViewProps = ki.Props{
 				{"Ignore Case", ki.Props{}},
 			},
 		}},
+		{"Sequential", ki.Props{
+			"label": "Show All",
+			"desc":  "show all rows in the table (undo any filtering and sorting)",
+			"icon":  "update",
+		}},
+
 		{"sep-file", ki.BlankProp{}},
 		{"OpenCSV", ki.Props{
-			"label": "Open CSV File...",
+			"label": "Open CSV...",
 			"icon":  "file-open",
 			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
 			"Args": ki.PropSlice{
@@ -470,7 +476,7 @@ var IdxViewProps = ki.Props{
 			},
 		}},
 		{"SaveCSV", ki.Props{
-			"label": "Save CSV File...",
+			"label": "Save CSV...",
 			"icon":  "file-save",
 			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
 			"Args": ki.PropSlice{

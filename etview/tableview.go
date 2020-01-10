@@ -852,38 +852,8 @@ func (tv *TableView) ConfigToolbar() {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
 				tvv.TensorDispAction(-1)
 			})
-		tb.AddSeparator("view")
-		tb.AddAction(gi.ActOpts{Label: "Add Rows", Icon: "plus", Tooltip: "add rows to end of table"},
-			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				giv.CallMethod(tvv.Table, "Add Rows", tvv.Viewport)
-				tvv.Update()
-			})
-		tb.AddAction(gi.ActOpts{Label: "Filter", Icon: "update", Tooltip: "filter the rows displayed according to the values in a given column"},
-			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				giv.CallMethod(tvv.Table, "FilterColName", tvv.Viewport)
-				tvv.Update()
-			})
-		tb.AddAction(gi.ActOpts{Label: "Show All", Icon: "update", Tooltip: "show all of the rows of data (undo any filtering)"},
-			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				tvv.Table.Sequential()
-				tvv.Update()
-			})
-		tb.AddSeparator("file")
-		tb.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "open CSV comma-separated-values (or any delimiter) file"}, tv.This(),
-			func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				giv.CallMethod(tvv.Table, "OpenCSV", tvv.Viewport)
-			})
-		tb.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "save table data to a CSV comma-separated-values (or any delimiter) file with headers"}, tv.This(),
-			func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				giv.CallMethod(tvv.Table, "SaveCSV", tvv.Viewport)
-			})
 	}
-	ndef := 7
+	ndef := 2
 	sz := len(*tb.Children())
 	if sz > ndef {
 		for i := sz - 1; i >= ndef; i-- {
