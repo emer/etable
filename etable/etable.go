@@ -238,6 +238,23 @@ func (dt *Table) Clone() *Table {
 	return cp
 }
 
+// AppendRows appends shared columns in both tables with input table rows
+func (dt *Table) AppendRows(dt2 *Table) {
+	shared := false
+	for iCol := range dt.Cols {
+		colName := dt.ColName(iCol)
+		if dt2.ColIdx(colName) != -1 {
+			if !shared {
+				shared = true
+				dt.AddRows(dt2.NumRows())
+			}
+			for iRow := 0; iRow < dt2.NumRows; iRow++ {
+				dt.CopyCell(colName, iRow+dt1.NumRows, dt2, colName, iRow)
+			}
+		}
+	}
+}
+
 // SetMetaData sets given meta-data key to given value, safely creating the
 // map if not yet initialized.  Standard Keys are:
 // * name -- name of table
