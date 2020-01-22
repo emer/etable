@@ -248,8 +248,8 @@ func (dt *Table) AppendRows(dt2 *Table) {
 				shared = true
 				dt.AddRows(dt2.NumRows())
 			}
-			for iRow := 0; iRow < dt2.NumRows; iRow++ {
-				dt.CopyCell(colName, iRow+dt1.NumRows, dt2, colName, iRow)
+			for iRow := 0; iRow < dt2.NumRows(); iRow++ {
+				dt.CopyCell(colName, iRow+dt.NumRows(), dt2, colName, iRow)
 			}
 		}
 	}
