@@ -9,6 +9,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/emer/emergent/erand"
 	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
@@ -251,6 +252,17 @@ func (dt *Table) AppendRows(dt2 *Table) {
 			for iRow := 0; iRow < dt2.NumRows(); iRow++ {
 				dt.CopyCell(colName, iRow+dt.NumRows(), dt2, colName, iRow)
 			}
+		}
+	}
+}
+
+// Shuffle shuffles rows in specified columns in the table independently
+func (dt *Table) Shuffle(rows []int, colNames []string) {
+	cl := dt.Clone()
+	for _, colNm := range colNames {
+		erand.PermuteInts(rows)
+		for row := range rows {
+			dt.CellTensor(colNm, row).CopyFrom(cl.CellTensor(colNm, rows[row]))
 		}
 	}
 }
