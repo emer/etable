@@ -21,6 +21,16 @@ func (pl *Plot2D) GenPlotXY() {
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
+
+	plt.Title.Color = gi.Prefs.Colors.Font
+	plt.Legend.Color = gi.Prefs.Colors.Font
+	plt.X.Color = gi.Prefs.Colors.Font
+	plt.Y.Color = gi.Prefs.Colors.Font
+	plt.X.Label.Color = gi.Prefs.Colors.Font
+	plt.Y.Label.Color = gi.Prefs.Colors.Font
+	plt.X.Tick.Color = gi.Prefs.Colors.Font
+	plt.Y.Tick.Color = gi.Prefs.Colors.Font
+
 	plt.BackgroundColor = nil
 
 	// process xaxis first

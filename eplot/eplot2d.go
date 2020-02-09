@@ -517,7 +517,7 @@ func (pl *Plot2D) PlotConfig() {
 	sv.InitScale()
 
 	sv.Fill = true
-	sv.SetProp("background-color", "white")
+	sv.SetProp("background-color", &gi.Prefs.Colors.Background)
 	sv.SetStretchMax()
 }
 
