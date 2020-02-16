@@ -12,6 +12,7 @@ import (
 	"log"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/apache/arrow/go/arrow"
 	"github.com/apache/arrow/go/arrow/array"
@@ -409,25 +410,21 @@ func (tsr *Int64) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -941,25 +938,21 @@ func (tsr *Uint64) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -1473,25 +1466,21 @@ func (tsr *Int32) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -2005,25 +1994,21 @@ func (tsr *Uint32) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -2537,25 +2522,21 @@ func (tsr *Float32) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -3069,25 +3050,21 @@ func (tsr *Int16) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -3601,25 +3578,21 @@ func (tsr *Uint16) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -4133,25 +4106,21 @@ func (tsr *Int8) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor
@@ -4665,25 +4634,21 @@ func (tsr *Uint8) String() string {
 	if sz > 1000 {
 		return str
 	}
-	for i := 0; i < sz; i++ {
-		idx := tsr.Index(i)
-		for j := 1; j < len(idx); j++ {
-			if idx[j] == 0 {
-				str += "\n["
-				for k := 0; k < len(idx); k++ {
-					str += fmt.Sprintf("%d", idx[k])
-					if k < len(idx)-1 {
-						str += ","
-					}
-				}
-				str += "]: "
-				break
-			}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%7g ", vl))
 		}
-		str += tsr.StringVal1D(i) + " "
+		b.WriteString("\n")
 	}
-	str += "\n"
-	return str
+	return b.String()
 }
 
 // ToArrow returns the apache arrow equivalent of the tensor

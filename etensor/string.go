@@ -6,9 +6,11 @@ package etensor
 
 import (
 	"errors"
+	"fmt"
 	"log"
 	"math"
 	"strconv"
+	"strings"
 
 	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
@@ -397,6 +399,36 @@ func (tsr *String) At(i, j int) float64 {
 func (tsr *String) T() mat.Matrix {
 	log.Println("etensor T gonum Matrix call made on String Tensor -- not supported")
 	return mat.Transpose{tsr}
+}
+
+// Label satisfies the gi.Labeler interface for a summary description of the tensor
+func (tsr *String) Label() string {
+	return fmt.Sprintf("String: %s", tsr.Shape.String())
+}
+
+// String satisfies the fmt.Stringer interface for string of tensor data
+func (tsr *String) String() string {
+	str := tsr.Label()
+	sz := len(tsr.Values)
+	if sz > 1000 {
+		return str
+	}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			idx := Prjn2DIdx(&tsr.Shape, oddRow, r, c)
+			vl := tsr.Values[idx]
+			b.WriteString(fmt.Sprintf("%s, ", vl))
+		}
+		b.WriteString("\n")
+	}
+	return b.String()
 }
 
 // SetMetaData sets a key=value meta data (stored as a map[string]string).

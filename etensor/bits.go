@@ -6,7 +6,9 @@ package etensor
 
 import (
 	"errors"
+	"fmt"
 	"log"
+	"strings"
 
 	"github.com/apache/arrow/go/arrow"
 	"github.com/emer/etable/bitslice"
@@ -313,6 +315,35 @@ func (tsr *Bits) At(i, j int) float64 {
 func (tsr *Bits) T() mat.Matrix {
 	log.Println("etensor T gonum Matrix call made on Bits Tensor -- not supported")
 	return mat.Transpose{tsr}
+}
+
+// Label satisfies the gi.Labeler interface for a summary description of the tensor
+func (tsr *Bits) Label() string {
+	return fmt.Sprintf("Bits: %s", tsr.Shape.String())
+}
+
+// String satisfies the fmt.Stringer interface for string of tensor data
+func (tsr *Bits) String() string {
+	str := tsr.Label()
+	sz := tsr.Len()
+	if sz > 1000 {
+		return str
+	}
+	var b strings.Builder
+	b.WriteString(str)
+	b.WriteString("\n")
+	oddRow := true
+	rows, cols, _, _ := Prjn2DShape(&tsr.Shape, oddRow)
+	for r := 0; r < rows; r++ {
+		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
+		b.WriteString(fmt.Sprintf("%v: ", rc))
+		for c := 0; c < cols; c++ {
+			vl := Prjn2DVal(tsr, oddRow, r, c)
+			b.WriteString(fmt.Sprintf("%g ", vl))
+		}
+		b.WriteString("\n")
+	}
+	return b.String()
 }
 
 // SetMetaData sets a key=value meta data (stored as a map[string]string).
