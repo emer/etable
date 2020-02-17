@@ -241,6 +241,7 @@ func (dt *Table) Clone() *Table {
 // AppendRows appends shared columns in both tables with input table rows
 func (dt *Table) AppendRows(dt2 *Table) {
 	shared := false
+	strow := dt.NumRows()
 	for iCol := range dt.Cols {
 		colName := dt.ColName(iCol)
 		if dt2.ColIdx(colName) != -1 {
@@ -249,7 +250,7 @@ func (dt *Table) AppendRows(dt2 *Table) {
 				dt.AddRows(dt2.NumRows())
 			}
 			for iRow := 0; iRow < dt2.NumRows(); iRow++ {
-				dt.CopyCell(colName, iRow+dt.NumRows(), dt2, colName, iRow)
+				dt.CopyCell(colName, iRow+strow, dt2, colName, iRow)
 			}
 		}
 	}
