@@ -128,6 +128,12 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 	pl.SVGFile = fname
 }
 
+// SavePNG saves the current plot to a png, capturing current render
+func (pl *Plot2D) SavePNG(fname gi.FileName) {
+	sv := pl.SVGPlot()
+	sv.SavePNG(string(fname))
+}
+
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
 func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) {
 	pl.Table.SaveCSV(fname, delim, etable.Headers)
@@ -549,11 +555,16 @@ func (pl *Plot2D) ToolbarConfig() {
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.StructViewDialog(pl.Viewport, &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
 		})
-	tbar.AddSeparator("ctrl")
+	tbar.AddSeparator("file")
 	tbar.AddAction(gi.ActOpts{Label: "Save SVG...", Icon: "file-save", Tooltip: "save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SaveSVG", pl.Viewport)
 		})
+	tbar.AddAction(gi.ActOpts{Label: "Save PNG...", Icon: "file-save", Tooltip: "save plot to a .png file, capturing the exact bits you currently see as the render"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl, "SavePNG", pl.Viewport)
+		})
+	tbar.AddSeparator("img")
 	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "Open CSV-formatted data -- also recognizes emergent-style headers"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "OpenCSV", pl.Viewport)
@@ -561,6 +572,15 @@ func (pl *Plot2D) ToolbarConfig() {
 	tbar.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SaveCSV", pl.Viewport)
+		})
+	tbar.AddSeparator("filt")
+	tbar.AddAction(gi.ActOpts{Label: "Filter...", Icon: "search", Tooltip: "filter data being plotted by given column name, using string representation, with contains and ignore case options"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl.Table, "FilterColName", pl.Viewport)
+		})
+	tbar.AddAction(gi.ActOpts{Label: "Plot All", Icon: "search", Tooltip: "plot all rows in the table (undo any filtering )"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl.Table, "Sequential", pl.Viewport)
 		})
 
 }
@@ -594,6 +614,16 @@ var Plot2DProps = ki.Props{
 				{"File Name", ki.Props{
 					"default-field": "SVGFile",
 					"ext":           ".svg",
+				}},
+			},
+		}},
+		{"SavePNG", ki.Props{
+			"label": "Save PNG...",
+			"desc":  "save current render of plot to PNG file",
+			"icon":  "file-save",
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{
+					"ext": ".png",
 				}},
 			},
 		}},

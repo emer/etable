@@ -124,7 +124,11 @@ func (pl *Plot2D) GenPlotBar() {
 	xc := pl.Table.Table.Cols[xi]
 	if xc.DataType() == etensor.STRING {
 		xcs := xc.(*etensor.String)
-		plt.NominalX(xcs.Values...)
+		vals := make([]string, pl.Table.Len())
+		for i, dx := range pl.Table.Idxs {
+			vals[i] = xcs.Values[dx]
+		}
+		plt.NominalX(vals...)
 	}
 
 	plt.Legend.Top = true

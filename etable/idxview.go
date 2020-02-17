@@ -440,7 +440,9 @@ var IdxViewProps = ki.Props{
 			"desc":  "sort by given column name",
 			"icon":  "edit",
 			"Args": ki.PropSlice{
-				{"Column Name", ki.Props{}},
+				{"Column Name", ki.Props{
+					"width": 20,
+				}},
 				{"Ascending", ki.Props{}},
 			},
 		}},
@@ -449,8 +451,12 @@ var IdxViewProps = ki.Props{
 			"desc":  "filter by given column name, using string representation, with contains and ignore case options",
 			"icon":  "search",
 			"Args": ki.PropSlice{
-				{"Column Name", ki.Props{}},
-				{"Value", ki.Props{}},
+				{"Column Name", ki.Props{
+					"width": 20,
+				}},
+				{"Value", ki.Props{
+					"width": 50,
+				}},
 				{"Contains", ki.Props{}},
 				{"Ignore Case", ki.Props{}},
 			},
