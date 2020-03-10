@@ -738,11 +738,12 @@ func (tv *TableView) SliceNewAt(idx int) {
 	tv.This().(giv.SliceViewer).LayoutSliceGrid()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	tv.ViewSig.Emit(tv.This(), 0, nil)
+	tv.SliceViewSig.Emit(tv.This(), int64(giv.SliceViewInserted), idx)
 }
 
-// SliceDeleteAt deletes element at given index from slice -- doupdt means
+// SliceDeleteAt deletes element at given index from slice -- doUpdt means
 // call UpdateSliceGrid to update display
-func (tv *TableView) SliceDeleteAt(idx int, doupdt bool) {
+func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
 	if idx < 0 {
 		return
 	}
@@ -758,11 +759,12 @@ func (tv *TableView) SliceDeleteAt(idx int, doupdt bool) {
 		tv.TmpSave.SaveTmp()
 	}
 	tv.SetChanged()
-	if doupdt {
+	if doUpdt {
 		tv.This().(giv.SliceViewer).LayoutSliceGrid()
 		tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	}
 	tv.ViewSig.Emit(tv.This(), 0, nil)
+	tv.SliceViewSig.Emit(tv.This(), int64(giv.SliceViewDeleted), idx)
 }
 
 // SortSliceAction sorts the slice for given field index -- toggles ascending
