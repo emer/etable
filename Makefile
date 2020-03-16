@@ -52,13 +52,18 @@ update:
 	go get -u ./...
 	go mod tidy
 
+mod-update: export GO111MODULE = on
+mod-update:
+	@echo "GO111MODULE = $(value GO111MODULE)"
+	go get -u ./...
+	go mod tidy
+
 # gopath-update is for GOPATH to get most things updated.
 # need to call it in a target executable directory
 gopath-update: export GO111MODULE = off
 gopath-update:
 	@echo "GO111MODULE = $(value GO111MODULE)"
-	cd cmd/gide; go get -u ./...
-	
+	cd examples/dataproc; go get -u ./...
 	
 release:
 	$(MAKE) -C etable release
