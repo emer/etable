@@ -104,8 +104,8 @@ func AnalyzePlanets() {
 }
 
 func OpenGUI() {
-	width := 1600
-	height := 1200
+	width := 1280
+	height := 768
 
 	gi.SetAppName("dataproc")
 	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://github.com/emer/etable">etable on GitHub</a>.</p>`)
