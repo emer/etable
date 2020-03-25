@@ -126,7 +126,7 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 	} else {
 		tr.SetString(lbs[mxi], &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0, 0)
 	}
-	tsz := tg.LayData.SizePrefOrMax()
+	tsz := tg.LayState.SizePrefOrMax()
 	if !col {
 		tr.LayoutStdLR(&tg.Sty.Text, &tg.Sty.Font, &tg.Sty.UnContext, tsz)
 	}
@@ -173,8 +173,8 @@ func (tg *SimMatGrid) RenderSimMat() {
 	rs.Lock()
 	pc := &rs.Paint
 
-	pos := tg.LayData.AllocPos
-	sz := tg.LayData.AllocSize
+	pos := tg.LayState.Alloc.Pos
+	sz := tg.LayState.Alloc.Size
 	effsz := sz
 	effsz.X -= tg.rowMaxSz.X + LabelSpace
 	effsz.Y -= tg.colMaxSz.Y + LabelSpace

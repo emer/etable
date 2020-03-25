@@ -6,7 +6,7 @@ require (
 	github.com/ajstarks/svgo v0.0.0-20200204031535-0cbcf57ea1d8 // indirect
 	github.com/apache/arrow/go/arrow v0.0.0-20200316010513-440f02122465
 	github.com/chewxy/math32 v1.0.4
-	github.com/goki/gi v0.9.15
+	github.com/goki/gi v0.9.16
 	github.com/goki/ki v0.9.13
 	github.com/goki/mat32 v1.0.0
 	github.com/goki/pi v0.9.15

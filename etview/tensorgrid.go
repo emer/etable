@@ -303,8 +303,8 @@ func (tg *TensorGrid) RenderTensor() {
 	defer rs.Unlock()
 	pc := &rs.Paint
 
-	pos := tg.LayData.AllocPos
-	sz := tg.LayData.AllocSize
+	pos := tg.LayState.Alloc.Pos
+	sz := tg.LayState.Alloc.Size
 	sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
 
 	pc.FillBoxColor(rs, pos, sz, tg.Disp.Background)
