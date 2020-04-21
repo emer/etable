@@ -11,6 +11,7 @@ import (
 	"github.com/emer/etable/simat"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
+	"github.com/goki/gi/units"
 	"github.com/goki/ki/ki"
 )
 
@@ -157,6 +158,8 @@ func Plot2DDialog(avp *gi.Viewport2D, plot *eplot.Plot2D, opts giv.DlgOpts, recv
 	if recv != nil && dlgFunc != nil {
 		dlg.DialogSig.Connect(recv, dlgFunc)
 	}
+	dlg.SetProp("min-width", units.NewEm(60))
+	dlg.SetProp("min-height", units.NewEm(30))
 	dlg.UpdateEndNoSig(true)
 	dlg.Open(0, 0, avp, func() {
 		giv.MainMenuView(clplot, dlg.Win, dlg.Win.MainMenu)
