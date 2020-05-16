@@ -315,7 +315,8 @@ func (tv *TensorView) LayoutSliceGrid() bool {
 	}
 	tv.RowHeight = math32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
 
-	if tv.Viewport != nil && tv.Viewport.HasFlag(int(gi.VpFlagPrefSizing)) {
+	mvp := tv.ViewportSafe()
+	if mvp != nil && mvp.HasFlag(int(gi.VpFlagPrefSizing)) {
 		tv.VisRows = ints.MinInt(gi.LayoutPrefMaxRows, tv.SliceSize)
 		tv.LayoutHeight = float32(tv.VisRows) * tv.RowHeight
 	} else {
@@ -392,10 +393,8 @@ func (tv *TensorView) UpdateSliceGrid() {
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nWidg := nWidgPerRow * tv.DispRows
 
-	if tv.Viewport != nil && tv.Viewport.Win != nil {
-		wupdt := tv.Viewport.Win.UpdateStart()
-		defer tv.Viewport.Win.UpdateEnd(wupdt)
-	}
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := sg.UpdateStart()
 	defer sg.UpdateEnd(updt)
@@ -540,8 +539,8 @@ func (tv *TensorView) StyleRow(svnp reflect.Value, widg gi.Node2D, idx, fidx int
 // SliceNewAt inserts a new blank element at given index in the slice -- -1
 // means the end
 func (tv *TensorView) SliceNewAt(idx int) {
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
@@ -564,8 +563,8 @@ func (tv *TensorView) SliceDeleteAt(idx int, doupdt bool) {
 	if idx < 0 {
 		return
 	}
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
@@ -602,7 +601,7 @@ func (tv *TensorView) ConfigToolbar() {
 		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TensorView).(*TensorView)
-				giv.StructViewDialog(tv.Viewport, &tvv.TsrLay, giv.DlgOpts{Title: "TensorView Display Options", Ok: true, Cancel: true},
+				giv.StructViewDialog(tv.ViewportSafe(), &tvv.TsrLay, giv.DlgOpts{Title: "TensorView Display Options", Ok: true, Cancel: true},
 					tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						tvvv := recv.Embed(KiT_TensorView).(*TensorView)
 						tvvv.UpdateSliceGrid()
@@ -611,7 +610,7 @@ func (tv *TensorView) ConfigToolbar() {
 		tb.AddAction(gi.ActOpts{Label: "Grid", Icon: "file-sheet", Tooltip: "open a grid view of the tensor -- with a grid of colored squares representing values"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TensorView).(*TensorView)
-				TensorGridDialog(tv.Viewport, tvv.Tensor, giv.DlgOpts{Title: "TensorGrid", Ok: false, Cancel: false},
+				TensorGridDialog(tv.ViewportSafe(), tvv.Tensor, giv.DlgOpts{Title: "TensorGrid", Ok: false, Cancel: false},
 					tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						tvvv := recv.Embed(KiT_TensorView).(*TensorView)
 						tvvv.UpdateSliceGrid()
@@ -625,8 +624,9 @@ func (tv *TensorView) ConfigToolbar() {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}
-	if giv.HasToolBarView(tv.Slice) && tv.Viewport != nil {
-		giv.ToolBarView(tv.Slice, tv.Viewport, tb)
+	mvp := tv.ViewportSafe()
+	if giv.HasToolBarView(tv.Slice) && mvp != nil {
+		giv.ToolBarView(tv.Slice, mvp, tb)
 	}
 	tv.ToolbarSlice = tv.Tensor
 }
@@ -697,8 +697,8 @@ func (tv *TensorView) SelectRowWidgets(row int, sel bool) {
 	if row < 0 {
 		return
 	}
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	sg := tv.SliceGrid()
 	nWidgPerRow, idxOff := tv.RowWidgetNs()

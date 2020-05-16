@@ -137,7 +137,7 @@ func (vv *TensorValueView) ConfigWidget(widg gi.Node2D) {
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 		vvv, _ := recv.Embed(KiT_TensorValueView).(*TensorValueView)
 		ac := vvv.Widget.(*gi.Action)
-		vvv.Activate(ac.Viewport, nil, nil)
+		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }
@@ -214,7 +214,7 @@ func (vv *TableValueView) ConfigWidget(widg gi.Node2D) {
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 		vvv, _ := recv.Embed(KiT_TableValueView).(*TableValueView)
 		ac := vvv.Widget.(*gi.Action)
-		vvv.Activate(ac.Viewport, nil, nil)
+		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }
@@ -296,7 +296,7 @@ func (vv *SimMatValueView) ConfigWidget(widg gi.Node2D) {
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 		vvv, _ := recv.Embed(KiT_SimMatValueView).(*SimMatValueView)
 		ac := vvv.Widget.(*gi.Action)
-		vvv.Activate(ac.Viewport, nil, nil)
+		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }
@@ -378,7 +378,7 @@ func (vv *Plot2DValueView) ConfigWidget(widg gi.Node2D) {
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 		vvv, _ := recv.Embed(KiT_Plot2DValueView).(*Plot2DValueView)
 		ac := vvv.Widget.(*gi.Action)
-		vvv.Activate(ac.Viewport, nil, nil)
+		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }

@@ -73,7 +73,7 @@ func (tg *SimMatGrid) MouseEvent() {
 		tgv := retg.(*SimMatGrid)
 		switch {
 		case me.Button == mouse.Right && me.Action == mouse.Press:
-			giv.StructViewDialog(tgv.Viewport, &tgv.Disp, giv.DlgOpts{Title: "SimMatGrid Display Options", Ok: true, Cancel: true}, nil, nil)
+			giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "SimMatGrid Display Options", Ok: true, Cancel: true}, nil, nil)
 		case me.Button == mouse.Left && me.Action == mouse.Press:
 			me.SetProcessed()
 			tgv.OpenTensorView()
@@ -169,9 +169,8 @@ func (tg *SimMatGrid) RenderSimMat() {
 	tg.Defaults()
 	tg.EnsureColorMap()
 	tg.UpdateRange()
-	rs := &tg.Viewport.Render
-	rs.Lock()
-	pc := &rs.Paint
+	rs, pc, _ := tg.RenderLock()
+	defer tg.RenderUnlock(rs)
 
 	pos := tg.LayState.Alloc.Pos
 	sz := tg.LayState.Alloc.Size
@@ -281,8 +280,6 @@ func (tg *SimMatGrid) RenderSimMat() {
 			prvyblk = true
 		}
 	}
-
-	rs.Unlock()
 }
 
 func (tg *SimMatGrid) Render2D() {

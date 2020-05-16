@@ -95,6 +95,6 @@ func StringViewSVG(svgstr string, svge *svg.Editor, scale float64) {
 	svge.ReadXML(&buf)
 
 	svge.SetNormXForm()
-	svge.Scale = float32(scale) * (svge.Viewport.Win.LogicalDPI() / 96.0)
+	svge.Scale = float32(scale) * (svge.ParentWindow().LogicalDPI() / 96.0)
 	svge.SetTransform()
 }

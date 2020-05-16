@@ -202,11 +202,12 @@ func (pl *Plot2D) GoUpdatePlot() {
 	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
 		return
 	}
-	if pl.Viewport.IsUpdatingNode() { // already updating -- don't add to it
+	mvp := pl.ViewportSafe()
+	if mvp.IsUpdatingNode() { // already updating -- don't add to it
 		return
 	}
 
-	pl.Viewport.BlockUpdates()
+	mvp.BlockUpdates()
 	plupdt := false
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
 		plupdt = pl.UpdateStart()
@@ -215,7 +216,7 @@ func (pl *Plot2D) GoUpdatePlot() {
 	sv := pl.SVGPlot()
 	updt := sv.UpdateStart()
 	pl.GenPlot()
-	pl.Viewport.UnblockUpdates()
+	mvp.UnblockUpdates()
 	sv.UpdateEnd(updt)
 	pl.UpdateEnd(plupdt)
 }
@@ -248,7 +249,7 @@ func (pl *Plot2D) UpdatePlot() {
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
 		pl.Config()
 	}
-	if pl.Viewport.IsUpdatingNode() { // already updating -- don't add to it
+	if pl.ViewportSafe().IsUpdatingNode() { // already updating -- don't add to it
 		return
 	}
 	pl.GenPlot()
@@ -511,7 +512,7 @@ func (pl *Plot2D) ColsConfig() {
 			caa := send.(*gi.Action)
 			idx := caa.Data.(int)
 			cpp := pll.Cols[idx]
-			giv.StructViewDialog(pl.Viewport, cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
+			giv.StructViewDialog(pl.ViewportSafe(), cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
 		})
 	}
 	vl.UpdateEnd(updt)
@@ -532,7 +533,7 @@ func (pl *Plot2D) ToolbarConfig() {
 		return
 	}
 	tbar := pl.Toolbar()
-	if len(tbar.Kids) != 0 || pl.Viewport == nil {
+	if len(tbar.Kids) != 0 || pl.ViewportSafe() == nil {
 		return
 	}
 
@@ -553,34 +554,34 @@ func (pl *Plot2D) ToolbarConfig() {
 		})
 	tbar.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "set parameters that control display (font size etc)"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.StructViewDialog(pl.Viewport, &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
+			giv.StructViewDialog(pl.ViewportSafe(), &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
 		})
 	tbar.AddSeparator("file")
 	tbar.AddAction(gi.ActOpts{Label: "Save SVG...", Icon: "file-save", Tooltip: "save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveSVG", pl.Viewport)
+			giv.CallMethod(pl, "SaveSVG", pl.ViewportSafe())
 		})
 	tbar.AddAction(gi.ActOpts{Label: "Save PNG...", Icon: "file-save", Tooltip: "save plot to a .png file, capturing the exact bits you currently see as the render"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SavePNG", pl.Viewport)
+			giv.CallMethod(pl, "SavePNG", pl.ViewportSafe())
 		})
 	tbar.AddSeparator("img")
 	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "Open CSV-formatted data -- also recognizes emergent-style headers"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "OpenCSV", pl.Viewport)
+			giv.CallMethod(pl, "OpenCSV", pl.ViewportSafe())
 		})
 	tbar.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveCSV", pl.Viewport)
+			giv.CallMethod(pl, "SaveCSV", pl.ViewportSafe())
 		})
 	tbar.AddSeparator("filt")
 	tbar.AddAction(gi.ActOpts{Label: "Filter...", Icon: "search", Tooltip: "filter data being plotted by given column name, using string representation, with contains and ignore case options"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl.Table, "FilterColName", pl.Viewport)
+			giv.CallMethod(pl.Table, "FilterColName", pl.ViewportSafe())
 		})
 	tbar.AddAction(gi.ActOpts{Label: "Plot All", Icon: "search", Tooltip: "plot all rows in the table (undo any filtering )"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl.Table, "Sequential", pl.Viewport)
+			giv.CallMethod(pl.Table, "Sequential", pl.ViewportSafe())
 		})
 
 }
@@ -591,7 +592,8 @@ func (pl *Plot2D) Style2D() {
 	if !pl.IsConfiged() {
 		return
 	}
-	if !pl.InPlot && pl.Viewport != nil && pl.Viewport.IsDoingFullRender() {
+	mvp := pl.ViewportSafe()
+	if !pl.InPlot && mvp != nil && mvp.IsDoingFullRender() {
 		pl.GenPlot() // this is recursive
 	}
 	pl.ColsUpdate()

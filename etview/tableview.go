@@ -402,7 +402,8 @@ func (tv *TableView) LayoutSliceGrid() bool {
 	}
 	tv.RowHeight = math32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
 
-	if tv.Viewport != nil && tv.Viewport.HasFlag(int(gi.VpFlagPrefSizing)) {
+	mvp := tv.ViewportSafe()
+	if mvp != nil && mvp.HasFlag(int(gi.VpFlagPrefSizing)) {
 		tv.VisRows = ints.MinInt(gi.LayoutPrefMaxRows, tv.SliceSize)
 		tv.LayoutHeight = float32(tv.VisRows) * tv.RowHeight
 	} else {
@@ -481,10 +482,8 @@ func (tv *TableView) UpdateSliceGrid() {
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nWidg := nWidgPerRow * tv.DispRows
 
-	if tv.Viewport != nil && tv.Viewport.Win != nil {
-		wupdt := tv.Viewport.Win.UpdateStart()
-		defer tv.Viewport.Win.UpdateEnd(wupdt)
-	}
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := sg.UpdateStart()
 	defer sg.UpdateEnd(updt)
@@ -742,8 +741,8 @@ func (tv *TableView) StyleRow(svnp reflect.Value, widg gi.Node2D, idx, fidx int,
 // SliceNewAt inserts a new blank element at given index in the slice -- -1
 // means the end
 func (tv *TableView) SliceNewAt(idx int) {
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
@@ -766,8 +765,8 @@ func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
 	if idx < 0 {
 		return
 	}
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
@@ -789,11 +788,11 @@ func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
 // SortSliceAction sorts the slice for given field index -- toggles ascending
 // vs. descending if already sorting on this dimension
 func (tv *TableView) SortSliceAction(fldIdx int) {
-	oswin.TheApp.Cursor(tv.Viewport.Win.OSWin).Push(cursor.Wait)
-	defer oswin.TheApp.Cursor(tv.Viewport.Win.OSWin).Pop()
+	oswin.TheApp.Cursor(tv.ParentWindow().OSWin).Push(cursor.Wait)
+	defer oswin.TheApp.Cursor(tv.ParentWindow().OSWin).Pop()
 
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := tv.UpdateStart()
 	sgh := tv.SliceHeader()
@@ -834,15 +833,15 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 // TensorDispAction allows user to select tensor display options for column
 // pass -1 for global params for the entire table
 func (tv *TableView) TensorDispAction(fldIdx int) {
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	updt := tv.UpdateStart()
 	ctd := &tv.TsrDisp
 	if fldIdx >= 0 {
 		ctd = tv.SetColTensorDisp(fldIdx)
 	}
-	giv.StructViewDialog(tv.Viewport, ctd, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true},
+	giv.StructViewDialog(tv.ViewportSafe(), ctd, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true},
 		tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 			tvv := recv.Embed(KiT_TableView).(*TableView)
 			tvv.UpdateSliceGrid()
@@ -881,8 +880,9 @@ func (tv *TableView) ConfigToolbar() {
 			tb.DeleteChildAtIndex(i, true)
 		}
 	}
-	if giv.HasToolBarView(tv.Table) && tv.Viewport != nil {
-		giv.ToolBarView(tv.Table, tv.Viewport, tb)
+	mvp := tv.ViewportSafe()
+	if giv.HasToolBarView(tv.Table) && mvp != nil {
+		giv.ToolBarView(tv.Table, mvp, tb)
 	}
 	tv.ToolbarSlice = tv.Table
 }
@@ -1002,8 +1002,8 @@ func (tv *TableView) SelectRowWidgets(row int, sel bool) {
 	if row < 0 {
 		return
 	}
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 
 	sg := tv.SliceGrid()
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
@@ -1096,8 +1096,8 @@ func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
 	if nr <= 0 {
 		return
 	}
-	wupdt := tv.Viewport.Win.UpdateStart()
-	defer tv.Viewport.Win.UpdateEnd(wupdt)
+	wupdt := tv.TopUpdateStart()
+	defer tv.TopUpdateEnd(wupdt)
 	updt := tv.UpdateStart()
 	tv.Table.InsertRows(idx, nr)
 	for ri := 0; ri < nr; ri++ {
@@ -1119,6 +1119,6 @@ func (tv *TableView) ItemCtxtMenu(idx int) {
 	tv.StdCtxtMenu(&men, idx)
 	if len(men) > 0 {
 		pos := tv.IdxPos(idx)
-		gi.PopupMenu(men, pos.X, pos.Y, tv.Viewport, tv.Nm+"-menu")
+		gi.PopupMenu(men, pos.X, pos.Y, tv.ViewportSafe(), tv.Nm+"-menu")
 	}
 }

@@ -192,7 +192,7 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
 
 // OpenTensorView pulls up a TensorView of our tensor
 func (tg *TensorGrid) OpenTensorView() {
-	dlg := TensorViewDialog(tg.Viewport, tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
+	dlg := TensorViewDialog(tg.ViewportSafe(), tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
 	tvk := dlg.Frame().ChildByType(KiT_TensorView, true, 2)
 	if tvk != nil {
 		tv := tvk.(*TensorView)
@@ -212,7 +212,7 @@ func (tg *TensorGrid) MouseEvent() {
 		tgv := retg.(*TensorGrid)
 		switch {
 		case me.Button == mouse.Right && me.Action == mouse.Press:
-			giv.StructViewDialog(tgv.Viewport, &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
+			giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
 		case me.Button == mouse.Left && me.Action == mouse.Press:
 			me.SetProcessed()
 			tgv.OpenTensorView()
@@ -298,10 +298,9 @@ func (tg *TensorGrid) RenderTensor() {
 	tg.Defaults()
 	tg.EnsureColorMap()
 	tg.UpdateRange()
-	rs := &tg.Viewport.Render
-	rs.Lock()
-	defer rs.Unlock()
-	pc := &rs.Paint
+
+	rs, pc, _ := tg.RenderLock()
+	defer tg.RenderUnlock(rs)
 
 	pos := tg.LayState.Alloc.Pos
 	sz := tg.LayState.Alloc.Size
