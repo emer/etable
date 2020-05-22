@@ -14,18 +14,19 @@ import (
 // PlotParams are parameters for overall plot
 type PlotParams struct {
 	Title      string    `desc:"optional title at top of plot"`
-	Type       PlotTypes `desc:"type of plot to generate"`
+	Type       PlotTypes `desc:"type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional"`
 	Lines      bool      `desc:"plot lines"`
 	Points     bool      `desc:"plot points with symbols"`
 	LineWidth  float64   `desc:"width of lines"`
 	PointSize  float64   `desc:"size of points"`
-	BarWidth   float64   `desc:"width of bars for bar plot"`
+	BarWidth   float64   `min:"0.01" max:"1" desc:"width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default"`
 	NegXDraw   bool      `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
 	Scale      float64   `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
-	XAxisCol   string    `desc:"what column to use for the common x axis -- if empty or not found, the row number is used"`
+	XAxisCol   string    `desc:"what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values."`
 	XAxisLabel string    `desc:"optional label to use for XAxis instead of column name"`
 	YAxisLabel string    `desc:"optional label to use for YAxis -- if empty, first column name is used"`
 	XAxisRot   float64   `desc:"rotation of the X Axis labels, in degrees"`
+	LegendCol  string    `desc:"optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"`
 	Plot       *Plot2D   `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
@@ -36,7 +37,7 @@ func (pp *PlotParams) Defaults() {
 		pp.Lines = true
 		pp.Points = false
 		pp.PointSize = 3
-		pp.BarWidth = 20
+		pp.BarWidth = .8
 	}
 	if pp.Scale == 0 {
 		pp.Scale = 2
@@ -45,6 +46,9 @@ func (pp *PlotParams) Defaults() {
 
 // Update satisfies the gi.Updater interface and will trigger display update on edits
 func (pp *PlotParams) Update() {
+	if pp.BarWidth > 1 {
+		pp.BarWidth = .8
+	}
 	if pp.Plot != nil {
 		pp.Plot.Update()
 	}

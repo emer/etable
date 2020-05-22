@@ -258,7 +258,7 @@ func (pl *Plot2D) UpdatePlot() {
 // GenPlot generates the plot and renders it to SVG
 // It surrounds operation with InPlot true / false to prevent multiple updates
 func (pl *Plot2D) GenPlot() {
-	if pl.Table == nil || pl.Table.Table == nil {
+	if pl.Table == nil || pl.Table.Table == nil || pl.Table.Len() == 0 {
 		return
 	}
 	if pl.InPlot {
@@ -271,9 +271,7 @@ func (pl *Plot2D) GenPlot() {
 	case XY:
 		pl.GenPlotXY()
 	case Bar:
-		if pl.Table.Len() > 0 { // doesn't work without rows
-			pl.GenPlotBar()
-		}
+		pl.GenPlotBar()
 	}
 	if pl.GPlot != nil {
 		sv := pl.SVGPlot()

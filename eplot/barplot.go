@@ -9,21 +9,30 @@ import (
 	"log"
 	"math"
 
+	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
+	"github.com/emer/etable/split"
 	"github.com/goki/gi/gi"
+	"github.com/goki/ki/ints"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
-	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
 )
 
+// bar plot is on integer positions, with different Y values and / or
+// legend values interleaved
+
 // GenPlotBar generates a Bar plot, setting GPlot variable
 func (pl *Plot2D) GenPlotBar() {
-	plt, _ := plot.New() // todo: not clear how to re-use, due to newtablexynames
+	plt, _ := plot.New() // note: not clear how to re-use, due to newtablexynames
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
 	plt.BackgroundColor = nil
+
+	if pl.Params.BarWidth > 1 {
+		pl.Params.BarWidth = .8
+	}
 
 	// process xaxis first
 	xi, xview, _, err := pl.PlotXAxis(plt)
@@ -31,6 +40,13 @@ func (pl *Plot2D) GenPlotBar() {
 		return
 	}
 	xp := pl.Cols[xi]
+
+	var lsplit *etable.Splits
+	nleg := 1
+	if pl.Params.LegendCol != "" {
+		lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
+		nleg = ints.MaxInt(lsplit.Len(), 1)
+	}
 
 	var firstXY *TableXY
 	var strCols []*ColParams
@@ -44,7 +60,13 @@ func (pl *Plot2D) GenPlotBar() {
 			strCols = append(strCols, cp)
 			continue
 		}
-		nys++
+		if cp.TensorIdx < 0 {
+			yc := pl.Table.Table.ColByName(cp.Col)
+			_, sz := yc.RowCellSize()
+			nys += sz
+		} else {
+			nys++
+		}
 		if cp.Range.FixMin {
 			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
 		}
@@ -53,8 +75,18 @@ func (pl *Plot2D) GenPlotBar() {
 		}
 	}
 
-	offset := -0.5 * float64(nys-1) * float64(pl.Params.BarWidth)
+	if nys == 0 {
+		return
+	}
 
+	stride := nys * nleg
+	if stride > 1 {
+		stride += 1 // extra gap
+	}
+
+	yoff := 0
+	yidx := 0
+	maxx := 0 // max number of x values
 	for _, cp := range pl.Cols {
 		if !cp.On || cp == xp {
 			continue
@@ -62,74 +94,119 @@ func (pl *Plot2D) GenPlotBar() {
 		if cp.IsString {
 			continue
 		}
-
-		nidx := 1
-		stidx := cp.TensorIdx
-		if cp.TensorIdx < 0 { // do all
-			yc := pl.Table.Table.ColByName(cp.Col)
-			_, sz := yc.RowCellSize()
-			nidx = sz
-			stidx = 0
-		}
-		for ii := 0; ii < nidx; ii++ {
-			idx := stidx + ii
-			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, idx)
-			if xy == nil {
-				continue
+		start := yoff
+		for li := 0; li < nleg; li++ {
+			lview := xview
+			leg := ""
+			if nleg > 1 {
+				leg = lsplit.Values[li][0]
+				lview = lsplit.Splits[li]
 			}
-			if firstXY == nil {
-				firstXY = xy
+			nidx := 1
+			stidx := cp.TensorIdx
+			if cp.TensorIdx < 0 { // do all
+				yc := pl.Table.Table.ColByName(cp.Col)
+				_, sz := yc.RowCellSize()
+				nidx = sz
+				stidx = 0
 			}
-			bar, err := plotter.NewBarChart(xy, vg.Points(pl.Params.BarWidth))
-			if err != nil {
-				log.Println(err)
-				continue
-			}
-			lbl := cp.Label()
-			clr := cp.Color
-			if nidx > 1 {
-				clr, _ = gi.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
-				lbl = fmt.Sprintf("%s_%02d", lbl, idx)
-			}
-			bar.Color = clr
-			bar.Offset = vg.Points(offset)
-			offset += pl.Params.BarWidth
-			plt.Add(bar)
-			plt.Legend.Add(lbl, bar)
-			if cp.ErrCol != "" {
-				ec := pl.Table.Table.ColIdx(cp.ErrCol)
-				if ec >= 0 {
-					xy.ErrCol = ec
-					eb, _ := plotter.NewYErrorBars(xy)
-					eb.LineStyle.Color = clr
-					plt.Add(eb)
+			for ii := 0; ii < nidx; ii++ {
+				idx := stidx + ii
+				xy, _ := NewTableXYName(lview, xi, xp.TensorIdx, cp.Col, idx)
+				if xy == nil {
+					continue
 				}
+				maxx = ints.MaxInt(maxx, lview.Len())
+				if firstXY == nil {
+					firstXY = xy
+				}
+				lbl := cp.Label()
+				clr := cp.Color
+				if nleg > 1 {
+					cidx := yidx*nleg + li
+					clr, _ = gi.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
+					if nys > 1 {
+						lbl = leg + " " + lbl
+					} else {
+						lbl = leg
+					}
+				}
+				if nidx > 1 {
+					clr, _ = gi.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+					lbl = fmt.Sprintf("%s_%02d", lbl, idx)
+				}
+				ec := -1
+				if cp.ErrCol != "" {
+					ec = pl.Table.Table.ColIdx(cp.ErrCol)
+				}
+				var bar *ErrBarChart
+				if ec >= 0 {
+					exy, _ := NewTableXY(lview, ec, 0, ec, 0)
+					bar, err = NewErrBarChart(xy, exy)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+				} else {
+					bar, err = NewErrBarChart(xy, nil)
+					if err != nil {
+						log.Println(err)
+						continue
+					}
+				}
+				bar.Color = clr
+				bar.Stride = float64(stride)
+				bar.Start = float64(start)
+				bar.Width = pl.Params.BarWidth
+				plt.Add(bar)
+				plt.Legend.Add(lbl, bar)
+				start++
 			}
 		}
+		yidx++
+		yoff += nleg
+	}
+	mid := (stride - 1) / 2
+	if stride > 1 {
+		mid = (stride - 2) / 2
 	}
 	if firstXY != nil && len(strCols) > 0 {
+		firstXY.Table = xview
+		n := xview.Len()
 		for _, cp := range strCols {
 			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
 			xy.LblCol = xy.YCol
 			xy.YCol = firstXY.YCol
 			xy.YIdx = firstXY.YIdx
-			lbls, _ := plotter.NewLabels(xy)
+
+			xyl := plotter.XYLabels{}
+			xyl.XYs = make(plotter.XYs, n)
+			xyl.Labels = make([]string, n)
+
+			for i := range xview.Idxs {
+				y := firstXY.Value(i)
+				x := float64(mid + (i%maxx)*stride)
+				xyl.XYs[i] = plotter.XY{x, y}
+				xyl.Labels[i] = xy.Label(i)
+			}
+			lbls, _ := plotter.NewLabels(xyl)
 			if lbls != nil {
 				plt.Add(lbls)
 			}
 		}
 	}
 
-	// Use string labels for X axis if X is a string
+	netn := pl.Table.Len() * stride
 	xc := pl.Table.Table.Cols[xi]
-	if xc.DataType() == etensor.STRING {
-		xcs := xc.(*etensor.String)
-		vals := make([]string, pl.Table.Len())
-		for i, dx := range pl.Table.Idxs {
-			vals[i] = xcs.Values[dx]
+	xcs := xc.(*etensor.String)
+	vals := make([]string, netn)
+	for i, dx := range pl.Table.Idxs {
+		pi := mid + i*stride
+		if pi < netn && dx < xcs.Len() {
+			vals[pi] = xcs.StringVal1D(dx)
 		}
-		plt.NominalX(vals...)
 	}
+	plt.NominalX(vals...)
 
 	plt.Legend.Top = true
 	plt.X.Tick.Label.Rotation = math.Pi * (pl.Params.XAxisRot / 180)
