@@ -107,6 +107,14 @@ func (ix *IdxView) SortIdxs() {
 	sort.Ints(ix.Idxs)
 }
 
+const (
+	// Ascending specifies an ascending sort direction for etable Sort routines
+	Ascending = true
+
+	// Descending specifies a descending sort direction for etable Sort routines
+	Descending = false
+)
+
 // SortColName sorts the indexes into our Table according to values in
 // given column name, using either ascending or descending order.
 // Only valid for 1-dimensional columns.

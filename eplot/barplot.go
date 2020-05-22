@@ -44,6 +44,7 @@ func (pl *Plot2D) GenPlotBar() {
 	var lsplit *etable.Splits
 	nleg := 1
 	if pl.Params.LegendCol != "" {
+		xview.SortColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending) // make it fit!
 		lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
 		nleg = ints.MaxInt(lsplit.Len(), 1)
 	}
