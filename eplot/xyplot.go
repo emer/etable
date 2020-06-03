@@ -13,6 +13,7 @@ import (
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
+	"gonum.org/v1/plot/vg/draw"
 )
 
 // GenPlotXY generates an XY (lines, points) plot, setting GPlot variable
@@ -160,5 +161,10 @@ func (pl *Plot2D) GenPlotXY() {
 	}
 
 	plt.Legend.Top = true
+	plt.X.Tick.Label.Rotation = math.Pi * (pl.Params.XAxisRot / 180)
+	if pl.Params.XAxisRot > 10 {
+		plt.X.Tick.Label.YAlign = draw.YCenter
+		plt.X.Tick.Label.XAlign = draw.XRight
+	}
 	pl.GPlot = plt
 }
