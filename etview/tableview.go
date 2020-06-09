@@ -143,6 +143,9 @@ func (tv *TableView) Config() {
 }
 
 func (tv *TableView) UpdtSliceSize() int {
+	if tv.Table.Len() != tv.Table.Table.Rows {
+		tv.Table.Sequential()
+	}
 	tv.SliceSize = tv.Table.Len()
 	tv.NCols = tv.Table.Table.NumCols()
 	return tv.SliceSize
