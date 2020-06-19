@@ -143,9 +143,7 @@ func (tv *TableView) Config() {
 }
 
 func (tv *TableView) UpdtSliceSize() int {
-	if tv.Table.Len() != tv.Table.Table.Rows {
-		tv.Table.Sequential()
-	}
+	tv.Table.DeleteInvalid() // table could have changed
 	tv.SliceSize = tv.Table.Len()
 	tv.NCols = tv.Table.Table.NumCols()
 	return tv.SliceSize
@@ -588,7 +586,7 @@ func (tv *TableView) UpdateSliceGrid() {
 								}
 							})
 					} else {
-						cell := tv.Table.Table.CellTensorIdx(fli, 0)
+						cell := tv.Table.Table.CellTensorIdx(fli, si)
 						tvv := &TensorGridValueView{}
 						tvv.Init(tvv)
 						vv = tvv

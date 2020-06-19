@@ -58,6 +58,21 @@ func (ix *IdxView) SetTable(et *Table) {
 	ix.Sequential()
 }
 
+// DeleteInvalid deletes all invalid indexes from the list.
+// Call this if rows (could) have been deleted from table.
+func (ix *IdxView) DeleteInvalid() {
+	if ix.Table == nil || ix.Table.Rows <= 0 {
+		ix.Idxs = nil
+		return
+	}
+	ni := ix.Len()
+	for i := ni - 1; i >= 0; i-- {
+		if ix.Idxs[i] >= ix.Table.Rows {
+			ix.Idxs = append(ix.Idxs[:i], ix.Idxs[i+1:]...)
+		}
+	}
+}
+
 // Sequential sets indexes to sequential row-wise indexes into table
 func (ix *IdxView) Sequential() {
 	if ix.Table == nil || ix.Table.Rows <= 0 {

@@ -10,7 +10,6 @@ import (
 	"math"
 
 	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/split"
 	"github.com/goki/gi/gi"
 	"github.com/goki/ki/ints"
@@ -199,12 +198,11 @@ func (pl *Plot2D) GenPlotBar() {
 
 	netn := pl.Table.Len() * stride
 	xc := pl.Table.Table.Cols[xi]
-	xcs := xc.(*etensor.String)
 	vals := make([]string, netn)
 	for i, dx := range pl.Table.Idxs {
 		pi := mid + i*stride
-		if pi < netn && dx < xcs.Len() {
-			vals[pi] = xcs.StringVal1D(dx)
+		if pi < netn && dx < xc.Len() {
+			vals[pi] = xc.StringVal1D(dx)
 		}
 	}
 	plt.NominalX(vals...)
