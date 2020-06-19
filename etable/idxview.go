@@ -245,26 +245,28 @@ func (ix *IdxView) Filter(filterFunc func(et *Table, row int) bool) {
 
 // FilterColName filters the indexes into our Table according to values in
 // given column name, using string representation of column values.
-// if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Includes rows with matching values unless exclude is set.
+// If contains, only checks if row contains string; if ignoreCase, ignores case.
 // Use named args for greater clarity.
 // Only valid for 1-dimensional columns.
 // Returns error if column name not found.
-func (ix *IdxView) FilterColName(colNm string, str string, contains, ignoreCase bool) error {
+func (ix *IdxView) FilterColName(colNm string, str string, exclude, contains, ignoreCase bool) error {
 	ci, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		log.Println(err)
 		return err
 	}
-	ix.FilterCol(ci, str, contains, ignoreCase)
+	ix.FilterCol(ci, str, exclude, contains, ignoreCase)
 	return nil
 }
 
 // FilterCol sorts the indexes into our Table according to values in
 // given column index, using string representation of column values.
-// if contains, only checks if row contains string; if ignoreCase, ignores case.
+// Includes rows with matching values unless exclude is set.
+// If contains, only checks if row contains string; if ignoreCase, ignores case.
 // Use named args for greater clarity.
 // Only valid for 1-dimensional columns.
-func (ix *IdxView) FilterCol(colIdx int, str string, contains, ignoreCase bool) {
+func (ix *IdxView) FilterCol(colIdx int, str string, exclude, contains, ignoreCase bool) {
 	col := ix.Table.Cols[colIdx]
 	lowstr := strings.ToLower(str)
 	ix.Filter(func(et *Table, row int) bool {
@@ -279,6 +281,9 @@ func (ix *IdxView) FilterCol(colIdx int, str string, contains, ignoreCase bool) 
 			has = strings.EqualFold(val, str)
 		default:
 			has = (val == str)
+		}
+		if exclude {
+			return !has
 		}
 		return has
 	})
@@ -471,7 +476,7 @@ var IdxViewProps = ki.Props{
 		}},
 		{"FilterColName", ki.Props{
 			"label": "Filter...",
-			"desc":  "filter by given column name, using string representation, with contains and ignore case options",
+			"desc":  "Filter by given column name, using string representation.  Includes matches unless exclude is set.  contains matches if column contains value, otherwise must be entire value.",
 			"icon":  "search",
 			"Args": ki.PropSlice{
 				{"Column Name", ki.Props{
@@ -480,6 +485,7 @@ var IdxViewProps = ki.Props{
 				{"Value", ki.Props{
 					"width": 50,
 				}},
+				{"Exclude", ki.Props{}},
 				{"Contains", ki.Props{}},
 				{"Ignore Case", ki.Props{}},
 			},

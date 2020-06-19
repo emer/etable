@@ -575,7 +575,7 @@ func (pl *Plot2D) ToolbarConfig() {
 			giv.CallMethod(pl, "SaveCSV", pl.ViewportSafe())
 		})
 	tbar.AddSeparator("filt")
-	tbar.AddAction(gi.ActOpts{Label: "Filter...", Icon: "search", Tooltip: "filter data being plotted by given column name, using string representation, with contains and ignore case options"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Filter...", Icon: "search", Tooltip: "filter data being plotted by given column name, using string representation, with exclude, contains and ignore case options"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl.Table, "FilterColName", pl.ViewportSafe())
 		})
