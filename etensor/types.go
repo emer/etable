@@ -23,7 +23,7 @@ const (
 	NULL Type = Type(arrow.NULL)
 
 	// Bool is a 1 bit, LSB bit-packed ordering
-	BOOl Type = Type(arrow.BOOL)
+	BOOL Type = Type(arrow.BOOL)
 
 	// UINT8 is an Unsigned 8-bit little-endian integer
 	UINT8 Type = Type(arrow.UINT8)

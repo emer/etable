@@ -262,7 +262,7 @@ var EmerHdrCharToType = map[byte]etensor.Type{
 	'|': etensor.INT64,
 	'@': etensor.UINT8,
 	'&': etensor.STRING,
-	'^': etensor.BOOl,
+	'^': etensor.BOOL,
 }
 
 var EmerHdrTypeToChar map[etensor.Type]byte
