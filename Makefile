@@ -47,11 +47,6 @@ old:
 	@echo "GO111MODULE = $(value GO111MODULE)"
 	go list -u -m all | grep '\['
 	
-update:
-	@echo "GO111MODULE = $(value GO111MODULE)"
-	go get -u ./...
-	go mod tidy
-
 mod-update: export GO111MODULE = on
 mod-update:
 	@echo "GO111MODULE = $(value GO111MODULE)"
