@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"log"
 	"math"
+	"strings"
 
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
@@ -460,8 +461,8 @@ func (pl *Plot2D) ColsUpdate() {
 	}
 }
 
-// ToggleCols toggles columns on / off
-func (pl *Plot2D) ToggleCols() {
+// SetAllCols turns all Cols on or off (except X axis)
+func (pl *Plot2D) SetAllCols(on bool) {
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i == 0 {
@@ -469,7 +470,33 @@ func (pl *Plot2D) ToggleCols() {
 		}
 		ci := i - 1
 		cp := pl.Cols[ci]
-		cp.On = !cp.On
+		if cp.Col == pl.Params.XAxisCol {
+			continue
+		}
+		cp.On = on
+		cl := cli.(*gi.Layout)
+		cb := cl.Child(0).(*gi.CheckBox)
+		cb.SetChecked(cp.On)
+	}
+	pl.Update()
+}
+
+// SetColsByName turns cols On or Off if their name contains given string
+func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
+	vl := pl.ColsLay()
+	for i, cli := range *vl.Children() {
+		if i == 0 {
+			continue
+		}
+		ci := i - 1
+		cp := pl.Cols[ci]
+		if cp.Col == pl.Params.XAxisCol {
+			continue
+		}
+		if !strings.Contains(cp.Col, nameContains) {
+			continue
+		}
+		cp.On = on
 		cl := cli.(*gi.Layout)
 		cb := cl.Child(0).(*gi.CheckBox)
 		cb.SetChecked(cp.On)
@@ -514,18 +541,19 @@ func (pl *Plot2D) ColsConfig() {
 		ca := cl.Child(1).(*gi.Action)
 		if i == 0 {
 			cb.SetChecked(false)
-			cb.Tooltip = "click to toggle selected state of columns"
+			cb.Tooltip = "click to turn all columns on or off"
 			cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				if sig == int64(gi.ButtonToggled) {
 					pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-					pll.ToggleCols()
+					cbb := send.(*gi.CheckBox)
+					pll.SetAllCols(cbb.IsChecked())
 				}
 			})
 			ca.SetText("Select Cols")
 			ca.Tooltip = "click to select columns based on column name"
 			ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				// pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-				// todo: just call method
+				pll := recv.Embed(KiT_Plot2D).(*Plot2D)
+				giv.CallMethod(pll, "SetColsByName", pll.ViewportSafe())
 			})
 		} else {
 			ci := i - 1
@@ -695,6 +723,17 @@ var Plot2DProps = ki.Props{
 				{"Delimiter", ki.Props{
 					"default": etable.Tab,
 					"desc":    "delimiter between columns",
+				}},
+			},
+		}},
+	},
+	"CallMethods": ki.PropSlice{
+		{"SetColsByName", ki.Props{
+			"desc": "Turn columns containing given string On or Off",
+			"Args": ki.PropSlice{
+				{"Name Contains", ki.Props{}},
+				{"On", ki.Props{
+					"default": true,
 				}},
 			},
 		}},
