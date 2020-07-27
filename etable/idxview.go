@@ -476,7 +476,7 @@ var IdxViewProps = ki.Props{
 		}},
 		{"FilterColName", ki.Props{
 			"label": "Filter...",
-			"desc":  "Filter by given column name, using string representation.  Includes matches unless exclude is set.  contains matches if column contains value, otherwise must be entire value.",
+			"desc":  "Filter rows by values in given column name, using string representation.  Includes matches unless exclude is set.  contains matches if column contains value, otherwise must be entire value.",
 			"icon":  "search",
 			"Args": ki.PropSlice{
 				{"Column Name", ki.Props{

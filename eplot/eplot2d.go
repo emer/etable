@@ -449,11 +449,32 @@ func (pl *Plot2D) ColsListUpdate() {
 func (pl *Plot2D) ColsUpdate() {
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		cp := pl.Cols[i]
+		if i == 0 {
+			continue
+		}
+		ci := i - 1
+		cp := pl.Cols[ci]
 		cl := cli.(*gi.Layout)
 		cb := cl.Child(0).(*gi.CheckBox)
 		cb.SetChecked(cp.On)
 	}
+}
+
+// ToggleCols toggles columns on / off
+func (pl *Plot2D) ToggleCols() {
+	vl := pl.ColsLay()
+	for i, cli := range *vl.Children() {
+		if i == 0 {
+			continue
+		}
+		ci := i - 1
+		cp := pl.Cols[ci]
+		cp.On = !cp.On
+		cl := cli.(*gi.Layout)
+		cb := cl.Child(0).(*gi.CheckBox)
+		cb.SetChecked(cp.On)
+	}
+	pl.Update()
 }
 
 // ColsConfig configures the column gui buttons
@@ -471,6 +492,7 @@ func (pl *Plot2D) ColsConfig() {
 		return
 	}
 	config := kit.TypeAndNameList{}
+	config.Add(gi.KiT_Layout, "sel-cols")
 	for _, cn := range pl.Cols {
 		config.Add(gi.KiT_Layout, cn.Col)
 	}
@@ -483,37 +505,55 @@ func (pl *Plot2D) ColsConfig() {
 	clcfg.Add(gi.KiT_Action, "col")
 
 	for i, cli := range *vl.Children() {
-		cp := pl.Cols[i]
-		cp.Plot = pl
 		cl := cli.(*gi.Layout)
 		cl.Lay = gi.LayoutHoriz
 		cl.ConfigChildren(clcfg, false)
 		cl.SetProp("margin", 0)
 		cl.SetProp("max-width", -1)
 		cb := cl.Child(0).(*gi.CheckBox)
-		cb.SetChecked(cp.On)
-		cb.SetProp("idx", i)
-		cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-			if sig == int64(gi.ButtonToggled) {
-				pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-				cbb := send.(*gi.CheckBox)
-				idx := cb.Prop("idx").(int)
-				cpp := pll.Cols[idx]
-				cpp.On = cbb.IsChecked()
-				pll.Update()
-			}
-		})
-
 		ca := cl.Child(1).(*gi.Action)
-		ca.SetText(cp.Col)
-		ca.Data = i
-		ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-			pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-			caa := send.(*gi.Action)
-			idx := caa.Data.(int)
-			cpp := pll.Cols[idx]
-			giv.StructViewDialog(pl.ViewportSafe(), cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
-		})
+		if i == 0 {
+			cb.SetChecked(false)
+			cb.Tooltip = "click to toggle selected state of columns"
+			cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				if sig == int64(gi.ButtonToggled) {
+					pll := recv.Embed(KiT_Plot2D).(*Plot2D)
+					pll.ToggleCols()
+				}
+			})
+			ca.SetText("Select Cols")
+			ca.Tooltip = "click to select columns based on column name"
+			ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				// pll := recv.Embed(KiT_Plot2D).(*Plot2D)
+				// todo: just call method
+			})
+		} else {
+			ci := i - 1
+			cp := pl.Cols[ci]
+			cp.Plot = pl
+
+			cb.SetChecked(cp.On)
+			cb.SetProp("idx", ci)
+			cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				if sig == int64(gi.ButtonToggled) {
+					pll := recv.Embed(KiT_Plot2D).(*Plot2D)
+					cbb := send.(*gi.CheckBox)
+					idx := cb.Prop("idx").(int)
+					cpp := pll.Cols[idx]
+					cpp.On = cbb.IsChecked()
+					pll.Update()
+				}
+			})
+			ca.SetText(cp.Col)
+			ca.Data = ci
+			ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				pll := recv.Embed(KiT_Plot2D).(*Plot2D)
+				caa := send.(*gi.Action)
+				idx := caa.Data.(int)
+				cpp := pll.Cols[idx]
+				giv.StructViewDialog(pl.ViewportSafe(), cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
+			})
+		}
 	}
 	vl.UpdateEnd(updt)
 }
