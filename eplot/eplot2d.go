@@ -413,6 +413,8 @@ func (pl *Plot2D) ColsLay() *gi.Frame {
 	return pl.PlotLay().ChildByName("cols", 0).(*gi.Frame)
 }
 
+const NColsHeader = 2
+
 // ColsListUpdate updates the list of columns
 func (pl *Plot2D) ColsListUpdate() {
 	if pl.Table == nil || pl.Table.Table == nil {
@@ -450,10 +452,10 @@ func (pl *Plot2D) ColsListUpdate() {
 func (pl *Plot2D) ColsUpdate() {
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		if i == 0 {
+		if i < NColsHeader {
 			continue
 		}
-		ci := i - 1
+		ci := i - NColsHeader
 		cp := pl.Cols[ci]
 		cl := cli.(*gi.Layout)
 		cb := cl.Child(0).(*gi.CheckBox)
@@ -465,10 +467,10 @@ func (pl *Plot2D) ColsUpdate() {
 func (pl *Plot2D) SetAllCols(on bool) {
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		if i == 0 {
+		if i < NColsHeader {
 			continue
 		}
-		ci := i - 1
+		ci := i - NColsHeader
 		cp := pl.Cols[ci]
 		if cp.Col == pl.Params.XAxisCol {
 			continue
@@ -485,10 +487,10 @@ func (pl *Plot2D) SetAllCols(on bool) {
 func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		if i == 0 {
+		if i < NColsHeader {
 			continue
 		}
-		ci := i - 1
+		ci := i - NColsHeader
 		cp := pl.Cols[ci]
 		if cp.Col == pl.Params.XAxisCol {
 			continue
@@ -520,6 +522,7 @@ func (pl *Plot2D) ColsConfig() {
 	}
 	config := kit.TypeAndNameList{}
 	config.Add(gi.KiT_Layout, "sel-cols")
+	config.Add(gi.KiT_Separator, "sep")
 	for _, cn := range pl.Cols {
 		config.Add(gi.KiT_Layout, cn.Col)
 	}
@@ -532,6 +535,11 @@ func (pl *Plot2D) ColsConfig() {
 	clcfg.Add(gi.KiT_Action, "col")
 
 	for i, cli := range *vl.Children() {
+		if i == 1 {
+			sp := cli.(*gi.Separator)
+			sp.Horiz = true
+			continue
+		}
 		cl := cli.(*gi.Layout)
 		cl.Lay = gi.LayoutHoriz
 		cl.ConfigChildren(clcfg, false)
@@ -556,7 +564,7 @@ func (pl *Plot2D) ColsConfig() {
 				giv.CallMethod(pll, "SetColsByName", pll.ViewportSafe())
 			})
 		} else {
-			ci := i - 1
+			ci := i - NColsHeader
 			cp := pl.Cols[ci]
 			cp.Plot = pl
 
@@ -620,7 +628,7 @@ func (pl *Plot2D) ToolbarConfig() {
 			pl.Config()
 			pl.Update()
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "set parameters that control display (font size etc)"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Config...", Icon: "gear", Tooltip: "set parameters that control display (font size etc)"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.StructViewDialog(pl.ViewportSafe(), &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
 		})
@@ -647,7 +655,7 @@ func (pl *Plot2D) ToolbarConfig() {
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl.Table, "FilterColName", pl.ViewportSafe())
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Plot All", Icon: "search", Tooltip: "plot all rows in the table (undo any filtering )"}, pl.This(),
+	tbar.AddAction(gi.ActOpts{Label: "Unfilter", Icon: "search", Tooltip: "plot all rows in the table (undo any filtering )"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl.Table, "Sequential", pl.ViewportSafe())
 		})
