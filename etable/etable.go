@@ -157,6 +157,23 @@ func (dt *Table) AddCol(tsr etensor.Tensor, name string) error {
 	return nil
 }
 
+// DeleteColName deletes column of given name.
+func (dt *Table) DeleteColName(name string) error {
+	ci, err := dt.ColIdxTry(name)
+	if err != nil {
+		return err
+	}
+	dt.DeleteColIdx(ci)
+	return nil
+}
+
+// DeleteColIdx deletes column of given index
+func (dt *Table) DeleteColIdx(idx int) {
+	dt.Cols = append(dt.Cols[:idx], dt.Cols[idx+1:]...)
+	dt.ColNames = append(dt.ColNames[:idx], dt.ColNames[idx+1:]...)
+	dt.UpdateColNameMap()
+}
+
 // AddRows adds n rows to each of the columns
 func (dt *Table) AddRows(n int) {
 	dt.SetNumRows(dt.Rows + n)
