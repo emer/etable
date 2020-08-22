@@ -114,6 +114,14 @@ var TableViewProps = ki.Props{
 	"max-height":       -1,
 }
 
+// UpdateTable updates view of Table -- regenerates indexes and calls Update
+func (tv *TableView) UpdateTable() {
+	if tv.Table != nil {
+		tv.Table.Sequential()
+	}
+	tv.Update()
+}
+
 // IsConfiged returns true if the widget is fully configured
 func (tv *TableView) IsConfiged() bool {
 	if len(tv.Kids) == 0 {
@@ -157,13 +165,21 @@ func (tv *TableView) SliceFrame() *gi.Frame {
 
 // GridLayout returns the SliceGrid grid-layout widget, with grid and scrollbar
 func (tv *TableView) GridLayout() *gi.Layout {
-	return tv.SliceFrame().ChildByName("grid-lay", 0).(*gi.Layout)
+	gli := tv.SliceFrame().ChildByName("grid-lay", 0)
+	if gli == nil {
+		return nil
+	}
+	return gli.(*gi.Layout)
 }
 
 // SliceGrid returns the SliceGrid grid frame widget, which contains all the
 // fields and values, within SliceFrame
 func (tv *TableView) SliceGrid() *gi.Frame {
-	return tv.GridLayout().ChildByName("grid", 0).(*gi.Frame)
+	gl := tv.GridLayout()
+	if gl == nil {
+		return nil
+	}
+	return gl.ChildByName("grid", 0).(*gi.Frame)
 }
 
 // ScrollBar returns the SliceGrid scrollbar
@@ -384,6 +400,9 @@ func (tv *TableView) ConfigSliceGrid() {
 // returns true if UpdateSliceGrid should be called after this
 func (tv *TableView) LayoutSliceGrid() bool {
 	sg := tv.SliceGrid()
+	if sg == nil {
+		return false
+	}
 	if tv.Table.Table == nil {
 		sg.DeleteChildren(true)
 		return false
@@ -476,6 +495,9 @@ func (tv *TableView) UpdateSliceGrid() {
 		return
 	}
 	sg := tv.SliceGrid()
+	if sg == nil {
+		return
+	}
 	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
 
 	tv.TsrDispToDots()
