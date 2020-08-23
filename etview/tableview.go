@@ -224,8 +224,11 @@ func (tv *TableView) ConfigSliceGrid() {
 	}
 
 	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
-	if sz == 0 {
+	if tv.NCols == 0 {
 		return
+	}
+	if sz == 0 {
+		tv.Table.Table.SetNumRows(1) // temp
 	}
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
@@ -389,6 +392,10 @@ func (tv *TableView) ConfigSliceGrid() {
 		}
 	}
 
+	if sz == 0 {
+		tv.Table.Table.SetNumRows(0) // revert
+	}
+
 	if tv.SortIdx >= 0 {
 		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
 	}
@@ -407,8 +414,8 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		sg.DeleteChildren(true)
 		return false
 	}
-	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
-	if sz == 0 {
+	tv.This().(giv.SliceViewer).UpdtSliceSize()
+	if tv.NCols == 0 {
 		sg.DeleteChildren(true)
 		return false
 	}
