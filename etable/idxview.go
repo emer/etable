@@ -231,6 +231,118 @@ func (ix *IdxView) SortCols(colIdxs []int, ascending bool) {
 	})
 }
 
+/////////////////////////////////////////////////////////////////////////
+//  Stable sorts -- sometimes essential..
+
+// SortStable stably sorts the indexes into our Table using given Less function.
+// The Less function operates directly on row numbers into the Table
+// as these row numbers have already been projected through the indexes.
+func (ix *IdxView) SortStable(lessFunc func(et *Table, i, j int) bool) {
+	ix.lessFunc = lessFunc
+	sort.Stable(ix)
+}
+
+// SortStableColName sorts the indexes into our Table according to values in
+// given column name, using either ascending or descending order.
+// Only valid for 1-dimensional columns.
+// Returns error if column name not found.
+func (ix *IdxView) SortStableColName(colNm string, ascending bool) error {
+	ci, err := ix.Table.ColIdxTry(colNm)
+	if err != nil {
+		log.Println(err)
+		return err
+	}
+	ix.SortStableCol(ci, ascending)
+	return nil
+}
+
+// SortStableCol sorts the indexes into our Table according to values in
+// given column index, using either ascending or descending order.
+// Only valid for 1-dimensional columns.
+func (ix *IdxView) SortStableCol(colIdx int, ascending bool) {
+	cl := ix.Table.Cols[colIdx]
+	if cl.DataType() == etensor.STRING {
+		ix.SortStable(func(et *Table, i, j int) bool {
+			if ascending {
+				return cl.StringVal1D(i) < cl.StringVal1D(j)
+			} else {
+				return cl.StringVal1D(i) > cl.StringVal1D(j)
+			}
+		})
+	} else {
+		ix.SortStable(func(et *Table, i, j int) bool {
+			if ascending {
+				return cl.FloatVal1D(i) < cl.FloatVal1D(j)
+			} else {
+				return cl.FloatVal1D(i) > cl.FloatVal1D(j)
+			}
+		})
+	}
+}
+
+// SortStableColNames sorts the indexes into our Table according to values in
+// given column names, using either ascending or descending order.
+// Only valid for 1-dimensional columns.
+// Returns error if column name not found.
+func (ix *IdxView) SortStableColNames(colNms []string, ascending bool) error {
+	nc := len(colNms)
+	if nc == 0 {
+		return fmt.Errorf("etable.IdxView.SortStableColNames: no column names provided")
+	}
+	cis := make([]int, nc)
+	for i, cn := range colNms {
+		ci, err := ix.Table.ColIdxTry(cn)
+		if err != nil {
+			log.Println(err)
+			return err
+		}
+		cis[i] = ci
+	}
+	ix.SortStableCols(cis, ascending)
+	return nil
+}
+
+// SortStableCols sorts the indexes into our Table according to values in
+// given list of column indexes, using either ascending or descending order for
+// all of the columns.  Only valid for 1-dimensional columns.
+func (ix *IdxView) SortStableCols(colIdxs []int, ascending bool) {
+	ix.SortStable(func(et *Table, i, j int) bool {
+		for _, ci := range colIdxs {
+			cl := ix.Table.Cols[ci]
+			if cl.DataType() == etensor.STRING {
+				if ascending {
+					if cl.StringVal1D(i) < cl.StringVal1D(j) {
+						return true
+					} else if cl.StringVal1D(i) > cl.StringVal1D(j) {
+						return false
+					} // if equal, fallthrough to next col
+				} else {
+					if cl.StringVal1D(i) > cl.StringVal1D(j) {
+						return true
+					} else if cl.StringVal1D(i) < cl.StringVal1D(j) {
+						return false
+					} // if equal, fallthrough to next col
+				}
+			} else {
+				if ascending {
+					if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+						return true
+					} else if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+						return false
+					} // if equal, fallthrough to next col
+				} else {
+					if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
+						return true
+					} else if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+						return false
+					} // if equal, fallthrough to next col
+				}
+			}
+		}
+		return false
+	})
+}
+
 // Filter filters the indexes into our Table using given Filter function.
 // The Filter function operates directly on row numbers into the Table
 // as these row numbers have already been projected through the indexes.

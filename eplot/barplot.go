@@ -34,7 +34,7 @@ func (pl *Plot2D) GenPlotBar() {
 	}
 
 	// process xaxis first
-	xi, xview, _, err := pl.PlotXAxis(plt)
+	xi, xview, _, err := pl.PlotXAxis(plt, pl.Table)
 	if err != nil {
 		return
 	}
@@ -43,9 +43,14 @@ func (pl *Plot2D) GenPlotBar() {
 	var lsplit *etable.Splits
 	nleg := 1
 	if pl.Params.LegendCol != "" {
-		xview.SortColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending) // make it fit!
-		lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
-		nleg = ints.MaxInt(lsplit.Len(), 1)
+		_, err = pl.Table.Table.ColIdxTry(pl.Params.LegendCol)
+		if err != nil {
+			log.Println("eplot.LegendCol: " + err.Error())
+		} else {
+			xview.SortColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending) // make it fit!
+			lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
+			nleg = ints.MaxInt(lsplit.Len(), 1)
+		}
 	}
 
 	var firstXY *TableXY

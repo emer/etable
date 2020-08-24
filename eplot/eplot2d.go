@@ -284,15 +284,15 @@ func (pl *Plot2D) GenPlot() {
 }
 
 // PlotXAxis processes the XAxis and returns its index and any breaks to insert
-// based on negative X axis traversals or NaN values.  xbreaks always ends in Rows
-func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xview *etable.IdxView, xbreaks []int, err error) {
-	xi, err = pl.Table.Table.ColIdxTry(pl.Params.XAxisCol)
+// based on negative X axis traversals or NaN values.  xbreaks always ends in last row.
+func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview *etable.IdxView, xbreaks []int, err error) {
+	xi, err = ixvw.Table.ColIdxTry(pl.Params.XAxisCol)
 	if err != nil {
 		log.Println("eplot.PlotXAxis: " + err.Error())
 		return
 	}
-	xview = pl.Table
-	xc := pl.Table.Table.Cols[xi]
+	xview = ixvw
+	xc := ixvw.Table.Cols[xi]
 	xp := pl.Cols[xi]
 	sz := 1
 	lim := false
@@ -312,9 +312,9 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot) (xi int, xview *etable.IdxView, xbre
 		}
 	}
 	if lim {
-		xview = pl.Table.Clone()
+		xview = ixvw.Clone()
 		xview.Filter(func(et *etable.Table, row int) bool {
-			if !pl.Table.Table.IsValidRow(row) { // sometimes it seems to get out of whack
+			if !ixvw.Table.IsValidRow(row) { // sometimes it seems to get out of whack
 				return false
 			}
 			var xv float64

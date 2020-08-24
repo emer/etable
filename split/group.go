@@ -21,7 +21,8 @@ func All(ix *etable.IdxView) *etable.Splits {
 }
 
 // GroupByIdx returns a new Splits set based on the groups of values
-// across the given set of column indexes
+// across the given set of column indexes.
+// Uses a stable sort on columns, so ordering of other dimensions is preserved.
 func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 	nc := len(colIdxs)
 	if nc == 0 || ix.Table == nil {
@@ -37,7 +38,7 @@ func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 		spl.Levels[i] = ix.Table.ColNames[ci]
 	}
 	srt := ix.Clone()
-	srt.SortCols(colIdxs, true)
+	srt.SortStableCols(colIdxs, true) // important for consistency
 	lstVals := make([]string, nc)
 	curVals := make([]string, nc)
 	var curIx *etable.IdxView
@@ -63,12 +64,14 @@ func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 
 // GroupBy returns a new Splits set based on the groups of values
 // across the given set of column names (see Try for version with error)
+// Uses a stable sort on columns, so ordering of other dimensions is preserved.
 func GroupBy(ix *etable.IdxView, colNms []string) *etable.Splits {
 	return GroupByIdx(ix, ix.Table.ColIdxsByNames(colNms))
 }
 
 // GroupByTry returns a new Splits set based on the groups of values
 // across the given set of column names.  returns error for bad column names.
+// Uses a stable sort on columns, so ordering of other dimensions is preserved.
 func GroupByTry(ix *etable.IdxView, colNms []string) (*etable.Splits, error) {
 	cidx, err := ix.Table.ColIdxsByNamesTry(colNms)
 	if err != nil {
@@ -81,6 +84,7 @@ func GroupByTry(ix *etable.IdxView, colNms []string) (*etable.Splits, error) {
 // which returns value(s) to group on for each row of the table.
 // The function should always return the same number of values -- if
 // it doesn't behavior is undefined.
+// Uses a stable sort on columns, so ordering of other dimensions is preserved.
 func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits {
 	if ix.Table == nil {
 		return nil
@@ -98,7 +102,7 @@ func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits 
 	}
 
 	srt := ix.Clone()
-	srt.Sort(func(et *etable.Table, i, j int) bool { // sort based on given function values
+	srt.SortStable(func(et *etable.Table, i, j int) bool { // sort based on given function values
 		fvi := funvals[i]
 		fvj := funvals[j]
 		for fi := 0; fi < nv; fi++ {
