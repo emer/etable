@@ -895,7 +895,7 @@ func (tv *TableView) ConfigToolbar() {
 		tb.AddAction(gi.ActOpts{Label: "UpdtView", Icon: "update", Tooltip: "update the view to reflect current state of table"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				tvv := recv.Embed(KiT_TableView).(*TableView)
-				tvv.Update()
+				tvv.UpdateTable()
 			})
 		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view -- particularly the tensor display options"},
 			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {

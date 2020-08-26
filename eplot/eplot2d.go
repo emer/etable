@@ -62,7 +62,7 @@ func (pl *Plot2D) Defaults() {
 func (pl *Plot2D) SetTable(tab *etable.Table) {
 	pl.Defaults()
 	pl.Table = etable.NewIdxView(tab)
-	pl.Cols = nil
+	// pl.Cols = nil // todo: is this necessary!?
 	pl.Config()
 }
 
