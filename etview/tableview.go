@@ -241,6 +241,9 @@ func (tv *TableView) ConfigSliceGrid() {
 	sg.SetMinPrefWidth(units.NewCh(20))
 	sg.SetProp("overflow", gi.OverflowScroll) // this still gives it true size during PrefSize
 	sg.SetStretchMax()                        // for this to work, ALL layers above need it too
+	sg.SetProp("border-width", 0)
+	sg.SetProp("margin", 0)
+	sg.SetProp("padding", 0)
 
 	sgcfg := kit.TypeAndNameList{}
 	sgcfg.Add(gi.KiT_ToolBar, "header")
@@ -359,6 +362,9 @@ func (tv *TableView) ConfigSliceGrid() {
 					tvv.TensorDispAction(fldIdx)
 				})
 			}
+		}
+		if wd, has := tv.Table.Table.MetaData[colnm+":width"]; has {
+			vv.SetTag("width", wd)
 		}
 		vtyp := vv.WidgetType()
 		valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
@@ -569,7 +575,7 @@ func (tv *TableView) UpdateSliceGrid() {
 
 		for fli := 0; fli < tv.NCols; fli++ {
 			col := tv.Table.Table.Cols[fli]
-			// colnm := tv.Table.Table.ColNames[fli]
+			colnm := tv.Table.Table.ColNames[fli]
 			tdsp := tv.ColTensorDisp(fli)
 
 			vvi := ri*tv.NCols + fli
@@ -638,6 +644,9 @@ func (tv *TableView) UpdateSliceGrid() {
 				}
 			}
 
+			if wd, has := tv.Table.Table.MetaData[colnm+":width"]; has {
+				vv.SetTag("width", wd)
+			}
 			vtyp := vv.WidgetType()
 			valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
 			cidx := ridx + idxOff + fli
