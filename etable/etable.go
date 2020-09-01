@@ -153,7 +153,8 @@ func (dt *Table) AddCol(tsr etensor.Tensor, name string) error {
 	dt.Cols = append(dt.Cols, tsr)
 	dt.ColNames = append(dt.ColNames, name)
 	dt.UpdateColNameMap()
-	tsr.SetNumRows(dt.Rows)
+	rows := ints.MaxInt(1, dt.Rows)
+	tsr.SetNumRows(rows)
 	return nil
 }
 

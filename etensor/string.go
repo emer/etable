@@ -318,7 +318,10 @@ func (tsr *String) SetNumRows(rows int) {
 	rows = ints.MaxInt(1, rows) // must be > 0
 	cln := tsr.Len()
 	crows := tsr.Dim(0)
-	inln := cln / crows // length of inner dims
+	inln := 1
+	if crows > 0 {
+		inln = cln / crows // length of inner dims
+	}
 	nln := rows * inln
 	tsr.Shape.Shp[0] = rows
 	if cap(tsr.Values) >= nln {
