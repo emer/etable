@@ -25,7 +25,7 @@ import (
 // damage to the tree.
 func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 	sz := svge.BBox.Size()
-	if sz.X == 0 || sz.Y == 0 || scale == 0 {
+	if sz.X < 10 || sz.Y < 10 || scale == 0 {
 		return
 	}
 

@@ -259,6 +259,9 @@ func (pl *Plot2D) UpdatePlot() {
 // GenPlot generates the plot and renders it to SVG
 // It surrounds operation with InPlot true / false to prevent multiple updates
 func (pl *Plot2D) GenPlot() {
+	if !pl.IsVisible() {
+		return
+	}
 	if pl.InPlot {
 		fmt.Printf("error: in plot already\n")
 		return
