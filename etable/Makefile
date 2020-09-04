@@ -6,7 +6,6 @@ GOCLEAN=$(GOCMD) clean
 GOTEST=$(GOCMD) test
 GOGET=$(GOCMD) get
 
-
 all: build
 
 build: 
@@ -17,7 +16,7 @@ clean:
 	$(GOCLEAN)
 	
 # NOTE: MUST update version number here prior to running 'make release'
-VERS=v1.0.12
+VERS=v1.0.13
 PACKAGE=etable
 GIT_COMMIT=`git rev-parse --short HEAD`
 VERS_DATE=`date -u +%Y-%m-%d\ %H:%M`
