@@ -31,7 +31,8 @@ import (
 // Bar Width is in data units, e.g., should be <= Stride.
 // Defaults provide a unit-spaced plot.
 type ErrBarChart struct {
-	plotter.Values
+	// Values are the plotted values
+	Values plotter.Values
 
 	// YErrors is a copy of the Y errors for each point.
 	Errors plotter.Values
