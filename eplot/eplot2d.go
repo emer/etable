@@ -6,6 +6,7 @@ package eplot
 
 import (
 	"fmt"
+	"image"
 	"log"
 	"math"
 	"strings"
@@ -259,7 +260,7 @@ func (pl *Plot2D) UpdatePlot() {
 // GenPlot generates the plot and renders it to SVG
 // It surrounds operation with InPlot true / false to prevent multiple updates
 func (pl *Plot2D) GenPlot() {
-	if !pl.IsVisible() {
+	if !pl.IsVisible() { // need this to make things render better on tab opening etc
 		return
 	}
 	if pl.InPlot {
@@ -669,13 +670,18 @@ func (pl *Plot2D) Style2D() {
 	pl.Layout.Style2D()
 	pl.ToolbarConfig() // safe
 	if !pl.IsConfiged() {
-		return
-	}
-	mvp := pl.ViewportSafe()
-	if !pl.InPlot && mvp != nil && mvp.IsDoingFullRender() {
-		pl.GenPlot() // this is recursive
+		pl.Config()
 	}
 	pl.ColsUpdate()
+}
+
+func (pl *Plot2D) Layout2D(parBBox image.Rectangle, iter int) bool {
+	redo := pl.Layout.Layout2D(parBBox, iter)
+	mvp := pl.ViewportSafe()
+	if pl.IsConfiged() && !pl.InPlot && mvp != nil { // note: for tabs, not full re-rend
+		pl.GenPlot() // only if visible; this is recursive
+	}
+	return redo
 }
 
 var Plot2DProps = ki.Props{

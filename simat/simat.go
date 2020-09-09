@@ -28,6 +28,15 @@ func (smat *SimMat) Init() {
 	smat.Cols = nil
 }
 
+// TableColStd generates a similarity / distance matrix from given column name
+// in given IdxView of an etable.Table, and given standard metric function.
+// if labNm is not empty, uses given column name for labels, which if blankRepeat
+// is true are filtered so that any sequentially repeated labels are blank.
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func (smat *SimMat) TableColStd(ix *etable.IdxView, colNm, labNm string, blankRepeat bool, met metric.StdMetrics) error {
+	return smat.TableCol(ix, colNm, labNm, blankRepeat, metric.StdFunc64(met))
+}
+
 // TableCol generates a similarity / distance matrix from given column name
 // in given IdxView of an etable.Table, and given metric function.
 // if labNm is not empty, uses given column name for labels, which if blankRepeat
