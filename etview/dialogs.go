@@ -15,9 +15,10 @@ import (
 	"github.com/goki/ki/ki"
 )
 
-//gopy:interface=handle TensorViewDialog is for editing an etensor.Tensor using a TensorView --
+// TensorViewDialog is for editing an etensor.Tensor using a TensorView --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
+// gopy:interface=handle
 func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
 	dlg, recyc := gi.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
 	if recyc {
@@ -47,9 +48,10 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	return dlg
 }
 
-//gopy:interface=handle TensorGridDialog is for viewing a etensor.Tensor using a TensorGrid --
+// TensorGridDialog is for viewing a etensor.Tensor using a TensorGrid --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
+// gopy:interface=handle
 func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
 	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel) // note: cannot use Recycle here b/c of Table view..
 
@@ -74,9 +76,10 @@ func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	return dlg
 }
 
-//gopy:interface=handle TableViewDialog is for editing an etable.Table using a TableView --
+// TableViewDialog is for editing an etable.Table using a TableView --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
+// gopy:interface=handle
 func TableViewDialog(avp *gi.Viewport2D, et *etable.Table, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
 	dlg, recyc := gi.RecycleStdDialog(et, opts.ToGiOpts(), opts.Ok, opts.Cancel)
 	if recyc {
@@ -106,9 +109,10 @@ func TableViewDialog(avp *gi.Viewport2D, et *etable.Table, opts giv.DlgOpts, rec
 	return dlg
 }
 
-//gopy:interface=handle SimMatGridDialog is for viewing a etensor.Tensor using a SimMatGrid --
+// SimMatGridDialog is for viewing a etensor.Tensor using a SimMatGrid --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
+// gopy:interface=handle
 func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
 	dlg, recyc := gi.RecycleStdDialog(smat, opts.ToGiOpts(), opts.Ok, opts.Cancel)
 	if recyc {
@@ -137,9 +141,10 @@ func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, 
 	return dlg
 }
 
-//gopy:interface=handle Plot2DDialog is for viewing an eplot.Plot2D --
+// Plot2DDialog is for viewing an eplot.Plot2D --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
+// gopy:interface=handle
 func Plot2DDialog(avp *gi.Viewport2D, plot *eplot.Plot2D, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
 	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
 
