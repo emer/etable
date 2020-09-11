@@ -6,6 +6,7 @@ package etable
 
 import (
 	"fmt"
+	"log"
 	"math"
 	"strings"
 
@@ -140,6 +141,9 @@ func (dt *Table) UpdateColNameMap() {
 	dt.ColNameMap = make(map[string]int, nc)
 	for i := range dt.ColNames {
 		dt.ColNameMap[dt.ColNames[i]] = i
+	}
+	if len(dt.ColNameMap) != nc {
+		log.Printf("Warning: etable.Table has multiple columns with same name!\n%v\n", dt.ColNames)
 	}
 }
 

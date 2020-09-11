@@ -41,13 +41,13 @@ func NewShape(shape, strides []int, names []string) *Shape {
 // If names is nil, a slice of empty strings will be created.
 func (sh *Shape) SetShape(shape, strides []int, names []string) {
 	sh.Shp = CopyInts(shape)
-	if strides == nil {
+	if len(strides) != len(shape) {
 		sh.Strd = RowMajorStrides(shape)
 	} else {
 		sh.Strd = CopyInts(strides)
 	}
 	sh.Nms = make([]string, len(sh.Shp))
-	if names != nil {
+	if len(names) == len(shape) {
 		copy(sh.Nms, names)
 	}
 }
