@@ -71,6 +71,16 @@ func Glom(smat *simat.SimMat, dfunc DistFunc) *Node {
 	return GlomClust(root, smat, dfunc)
 }
 
+// GlomStd implements basic agglomerative clustering, based on a raw similarity matrix as given.
+// This calls GlomInit to initialize the root node with all of the leaves, and the calls
+// GlomClust to do the iterative clustering process.  If you want to start with pre-defined
+// initial clusters, then call GlomClust with a root node so-initialized.
+// The smat.Mat matrix must be an etensor.Float64.
+// Std version uses std distance functions
+func GlomStd(smat *simat.SimMat, std StdDists) *Node {
+	return Glom(smat, StdFunc(std))
+}
+
 // GlomInit returns a standard root node initialized with all of the leaves
 func GlomInit(ntot int) *Node {
 	root := &Node{}

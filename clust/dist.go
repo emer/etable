@@ -4,7 +4,11 @@
 
 package clust
 
-import "math"
+import (
+	"math"
+
+	"github.com/goki/ki/kit"
+)
 
 // DistFunc is a clustering distance function that evaluates aggregate distance
 // between nodes, given the indexes of leaves in a and b clusters
@@ -87,4 +91,45 @@ func ContrastDist(aix, bix []int, ntot int, maxd float64, smat []float64) float6
 	}
 	bd := AvgDist(abix, oix, ntot, maxd, smat)
 	return maxd + (wd - bd)
+}
+
+// StdDists are standard clustering distance functions
+type StdDists int
+
+const (
+	// Min is the minimum-distance or single-linkage weighting function
+	Min StdDists = iota
+
+	// Max is the maximum-distance or complete-linkage weighting function
+	Max
+
+	// Avg is the average-distance or average-linkage weighting function
+	Avg
+
+	// Contrast computes maxd + (average within distance - average between distance)
+	Contrast
+
+	StdDistsN
+)
+
+//go:generate stringer -type=StdDists
+
+var KiT_StdDists = kit.Enums.AddEnum(StdDistsN, kit.NotBitFlag, nil)
+
+func (ev StdDists) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
+func (ev *StdDists) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
+
+// StdFunc returns a standard distance function as specified
+func StdFunc(std StdDists) DistFunc {
+	switch std {
+	case Min:
+		return MinDist
+	case Max:
+		return MaxDist
+	case Avg:
+		return AvgDist
+	case Contrast:
+		return ContrastDist
+	}
+	return nil
 }
