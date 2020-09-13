@@ -75,6 +75,42 @@ func (pca *PCA) Tensor(tsr etensor.Tensor, mfun metric.Func64) error {
 	return pca.PCA()
 }
 
+// TableColStd is a convenience method that computes a covariance matrix
+// on given column of table and then performs the PCA on the resulting matrix.
+// If no error occurs, the results can be read out from Vectors and Values
+// or used in Projection methods.
+// mfun is a Std metric function, typically Covariance or Correlation -- use Covar
+// if vars have similar overall scaling, which is typical in neural network models,
+// and use Correl if they are on very different scales -- Correl effectively rescales).
+// A Covariance matrix computes the *row-wise* vector similarities for each
+// pairwise combination of column cells -- i.e., the extent to which each
+// cell co-varies in its value with each other cell across the rows of the table.
+// This is the input to the PCA eigenvalue decomposition of the resulting
+// covariance matrix, which extracts the eigenvectors as directions with maximal
+// variance in this matrix.
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func (pca *PCA) TableColStd(ix *etable.IdxView, colNm string, met metric.StdMetrics) error {
+	return pca.TableCol(ix, colNm, metric.StdFunc64(met))
+}
+
+// TensorStd is a convenience method that computes a covariance matrix
+// on given tensor and then performs the PCA on the resulting matrix.
+// If no error occurs, the results can be read out from Vectors and Values
+// or used in Projection methods.
+// mfun is Std metric function, typically Covariance or Correlation -- use Covar
+// if vars have similar overall scaling, which is typical in neural network models,
+// and use Correl if they are on very different scales -- Correl effectively rescales).
+// A Covariance matrix computes the *row-wise* vector similarities for each
+// pairwise combination of column cells -- i.e., the extent to which each
+// cell co-varies in its value with each other cell across the rows of the table.
+// This is the input to the PCA eigenvalue decomposition of the resulting
+// covariance matrix, which extracts the eigenvectors as directions with maximal
+// variance in this matrix.
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func (pca *PCA) TensorStd(tsr etensor.Tensor, met metric.StdMetrics) error {
+	return pca.Tensor(tsr, metric.StdFunc64(met))
+}
+
 // PCA performs the eigen decomposition of the existing Covar matrix.
 // Vectors and Values fields contain the results.
 func (pca *PCA) PCA() error {

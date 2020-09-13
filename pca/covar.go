@@ -160,3 +160,34 @@ func TensorRowsVec(vec []float64, tsr etensor.Tensor, cidx int) {
 		vec[ri] = tsr.FloatVal1D(coff)
 	}
 }
+
+// CovarTableColStd generates a covariance matrix from given column name
+// in given IdxView of an etable.Table, and given metric function
+// (typically Covariance or Correlation -- use Covar if vars have similar
+// overall scaling, which is typical in neural network models, and use
+// Correl if they are on very different scales -- Correl effectively rescales).
+// A Covariance matrix computes the *row-wise* vector similarities for each
+// pairwise combination of column cells -- i.e., the extent to which each
+// cell co-varies in its value with each other cell across the rows of the table.
+// This is the input to the PCA eigenvalue decomposition of the resulting
+// covariance matrix.
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func CovarTableColStd(cmat etensor.Tensor, ix *etable.IdxView, colNm string, met metric.StdMetrics) error {
+	return CovarTableCol(cmat, ix, colNm, metric.StdFunc64(met))
+}
+
+// CovarTensorStd generates a covariance matrix from given etensor.Tensor,
+// where the outer-most dimension is rows, and all other dimensions within that
+// are covaried against each other, using given metric function
+// (typically Covariance or Correlation -- use Covar if vars have similar
+// overall scaling, which is typical in neural network models, and use
+// Correl if they are on very different scales -- Correl effectively rescales).
+// A Covariance matrix computes the *row-wise* vector similarities for each
+// pairwise combination of column cells -- i.e., the extent to which each
+// cell co-varies in its value with each other cell across the rows of the table.
+// This is the input to the PCA eigenvalue decomposition of the resulting
+// covariance matrix.
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func CovarTensorStd(cmat etensor.Tensor, tsr etensor.Tensor, met metric.StdMetrics) error {
+	return CovarTensor(cmat, tsr, metric.StdFunc64(met))
+}

@@ -110,3 +110,25 @@ func Tensors(smat etensor.Tensor, a, b etensor.Tensor, mfun metric.Func64) error
 	}
 	return nil
 }
+
+// TensorStd computes a similarity / distance matrix on tensor
+// using given Std metric function.   Outer-most dimension ("rows") is
+// used as "indexical" dimension and all other dimensions within that
+// are compared.
+// Results go in smat which is ensured to have proper square 2D shape
+// (rows * rows).
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func TensorStd(smat etensor.Tensor, a etensor.Tensor, met metric.StdMetrics) error {
+	return Tensor(smat, a, metric.StdFunc64(met))
+}
+
+// TensorsStd computes a similarity / distance matrix on two tensors
+// using given Std metric function.   Outer-most dimension ("rows") is
+// used as "indexical" dimension and all other dimensions within that
+// are compared.  Resulting reduced 2D shape of two tensors must be
+// the same (returns error if not).
+// Rows of smat = a, cols = b
+// This Std version is usable e.g., in Python where the func cannot be passed.
+func TensorsStd(smat etensor.Tensor, a, b etensor.Tensor, met metric.StdMetrics) error {
+	return Tensors(smat, a, b, metric.StdFunc64(met))
+}
