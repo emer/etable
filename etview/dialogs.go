@@ -146,6 +146,10 @@ func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, 
 // dialog signals (nil to ignore)
 // gopy:interface=handle
 func Plot2DDialog(avp *gi.Viewport2D, plot *eplot.Plot2D, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
+	if plot == nil || plot.Table == nil {
+		return nil
+	}
+
 	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
 
 	frame := dlg.Frame()
