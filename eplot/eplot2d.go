@@ -669,10 +669,12 @@ func (pl *Plot2D) ToolbarConfig() {
 func (pl *Plot2D) Style2D() {
 	pl.Layout.Style2D()
 	pl.ToolbarConfig() // safe
-	if !pl.IsConfiged() {
+	if !pl.IsConfiged() && pl.Table != nil && pl.Table.Table != nil {
 		pl.Config()
 	}
-	pl.ColsUpdate()
+	if pl.IsConfiged() {
+		pl.ColsUpdate()
+	}
 }
 
 func (pl *Plot2D) Layout2D(parBBox image.Rectangle, iter int) bool {
