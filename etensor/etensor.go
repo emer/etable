@@ -175,6 +175,7 @@ type Tensor interface {
 	// will affect both), as its Values slice is a view onto the original (which
 	// is why only inner-most contiguous supsaces are supported).
 	// Use Clone() method to separate the two.
+	// Null value bits are NOT shared but are copied if present.
 	SubSpace(offs []int) Tensor
 
 	// SubSpaceTry returns a new tensor with innermost subspace at given
@@ -185,6 +186,7 @@ type Tensor interface {
 	// will affect both), as its Values slice is a view onto the original (which
 	// is why only inner-most contiguous supsaces are supported).
 	// Use Clone() method to separate the two.
+	// Null value bits are NOT shared but are copied if present.
 	SubSpaceTry(offs []int) (Tensor, error)
 
 	// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.

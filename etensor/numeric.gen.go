@@ -359,6 +359,7 @@ func (tsr *Int64) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int64) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -372,6 +373,7 @@ func (tsr *Int64) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int64) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -899,6 +901,7 @@ func (tsr *Uint64) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint64) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -912,6 +915,7 @@ func (tsr *Uint64) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint64) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -1439,6 +1443,7 @@ func (tsr *Int32) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int32) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -1452,6 +1457,7 @@ func (tsr *Int32) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int32) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -1979,6 +1985,7 @@ func (tsr *Uint32) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint32) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -1992,6 +1999,7 @@ func (tsr *Uint32) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint32) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -2519,6 +2527,7 @@ func (tsr *Float32) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Float32) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -2532,6 +2541,7 @@ func (tsr *Float32) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Float32) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -3059,6 +3069,7 @@ func (tsr *Int16) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int16) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -3072,6 +3083,7 @@ func (tsr *Int16) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int16) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -3599,6 +3611,7 @@ func (tsr *Uint16) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint16) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -3612,6 +3625,7 @@ func (tsr *Uint16) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint16) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -4139,6 +4153,7 @@ func (tsr *Int8) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int8) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -4152,6 +4167,7 @@ func (tsr *Int8) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Int8) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
@@ -4679,6 +4695,7 @@ func (tsr *Uint8) SetNumRows(rows int) {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint8) SubSpace(offs []int) Tensor {
 	ss, _ := tsr.SubSpaceTry(offs)
 	return ss
@@ -4692,6 +4709,7 @@ func (tsr *Uint8) SubSpace(offs []int) Tensor {
 // will affect both), as its Values slice is a view onto the original (which
 // is why only inner-most contiguous supsaces are supported).
 // Use Clone() method to separate the two.
+// Null value bits are NOT shared but are copied if present.
 func (tsr *Uint8) SubSpaceTry(offs []int) (Tensor, error) {
 	nd := tsr.NumDims()
 	od := len(offs)
