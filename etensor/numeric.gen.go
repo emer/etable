@@ -326,6 +326,9 @@ func (tsr *Int64) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -343,6 +346,9 @@ func (tsr *Int64) SetNumRows(rows int) {
 		nv := make([]int64, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -854,6 +860,9 @@ func (tsr *Uint64) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -871,6 +880,9 @@ func (tsr *Uint64) SetNumRows(rows int) {
 		nv := make([]uint64, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -1382,6 +1394,9 @@ func (tsr *Int32) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -1399,6 +1414,9 @@ func (tsr *Int32) SetNumRows(rows int) {
 		nv := make([]int32, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -1910,6 +1928,9 @@ func (tsr *Uint32) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -1927,6 +1948,9 @@ func (tsr *Uint32) SetNumRows(rows int) {
 		nv := make([]uint32, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -2438,6 +2462,9 @@ func (tsr *Float32) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -2455,6 +2482,9 @@ func (tsr *Float32) SetNumRows(rows int) {
 		nv := make([]float32, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -2966,6 +2996,9 @@ func (tsr *Int16) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -2983,6 +3016,9 @@ func (tsr *Int16) SetNumRows(rows int) {
 		nv := make([]int16, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -3494,6 +3530,9 @@ func (tsr *Uint16) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -3511,6 +3550,9 @@ func (tsr *Uint16) SetNumRows(rows int) {
 		nv := make([]uint16, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -4022,6 +4064,9 @@ func (tsr *Int8) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -4039,6 +4084,9 @@ func (tsr *Int8) SetNumRows(rows int) {
 		nv := make([]int8, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -4550,6 +4598,9 @@ func (tsr *Uint8) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -4567,6 +4618,9 @@ func (tsr *Uint8) SetNumRows(rows int) {
 		nv := make([]uint8, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 

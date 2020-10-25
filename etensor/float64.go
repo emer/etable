@@ -318,6 +318,9 @@ func (tsr *Float64) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -335,6 +338,9 @@ func (tsr *Float64) SetNumRows(rows int) {
 		nv := make([]float64, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
