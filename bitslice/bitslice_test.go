@@ -63,6 +63,30 @@ func TestBitSlice10(t *testing.T) {
 	if out != ex {
 		t.Errorf("append false != %v", out)
 	}
+
+	ss := bs.SubSlice(2, 6)
+	// fmt.Printf("subslice: %v\n", ss.String())
+	ex = "[1 0 1 0 ]"
+	out = ss.String()
+	if out != ex {
+		t.Errorf("subslice[2,6] != %v", out)
+	}
+
+	ds := bs.Delete(2, 4)
+	// fmt.Printf("delete: %v\n", ds.String())
+	ex = "[0 0 0 0 0 1 1 0 ]"
+	out = ds.String()
+	if out != ex {
+		t.Errorf("Delete(2,4) != %v", out)
+	}
+
+	is := bs.Insert(3, 2)
+	// fmt.Printf("insert: %v\n", is.String())
+	ex = "[0 0 1 0 0 0 1 0 0 0 0 1 1 0 ]"
+	out = is.String()
+	if out != ex {
+		t.Errorf("Insert(3,2) != %v", out)
+	}
 }
 
 func TestBitSlice8(t *testing.T) {

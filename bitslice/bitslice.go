@@ -136,12 +136,84 @@ func (bs *Slice) ToBools() []bool {
 
 // Clone creates a new copy of this bitslice with separate memory
 func (bs *Slice) Clone() Slice {
-	cp := make([]byte, len(*bs))
+	cp := make(Slice, len(*bs))
 	copy(cp, *bs)
 	return cp
 }
 
-// todo: insert, delete, sub-slice, copy..
+// SubSlice returns a new Slice from given start, end range indexes of this slice
+// if end is <= 0 then the length of the source slice is used (equivalent to omitting
+// the number after the : in a Go subslice expression)
+func (bs *Slice) SubSlice(start, end int) Slice {
+	ln := bs.Len()
+	if end <= 0 {
+		end = ln
+	}
+	if end > ln {
+		panic("bitslice.SubSlice: end index is beyond length of slice")
+	}
+	if start > end {
+		panic("bitslice.SubSlice: start index greater than end index")
+	}
+	nln := end - start
+	if nln <= 0 {
+		return Slice{}
+	}
+	ss := Make(nln, 0)
+	for i := 0; i < nln; i++ {
+		ss.Set(i, bs.Index(i+start))
+	}
+	return ss
+}
+
+// Delete returns a new bit slice with N elements removed starting at given index.
+// This must be a copy given the nature of the 8-bit aliasing.
+func (bs *Slice) Delete(start, n int) Slice {
+	ln := bs.Len()
+	if n <= 0 {
+		panic("bitslice.Delete: n <= 0")
+	}
+	if start >= ln {
+		panic("bitslice.Delete: start index >= length")
+	}
+	end := start + n
+	if end > ln {
+		panic("bitslice.Delete: end index greater than length")
+	}
+	nln := ln - n
+	if nln <= 0 {
+		return Slice{}
+	}
+	ss := Make(nln, 0)
+	for i := 0; i < start; i++ {
+		ss.Set(i, bs.Index(i))
+	}
+	for i := end; i < ln; i++ {
+		ss.Set(i-n, bs.Index(i))
+	}
+	return ss
+}
+
+// Insert returns a new bit slice with N false elements inserted starting at given index.
+// This must be a copy given the nature of the 8-bit aliasing.
+func (bs *Slice) Insert(start, n int) Slice {
+	ln := bs.Len()
+	if n <= 0 {
+		panic("bitslice.Insert: n <= 0")
+	}
+	if start > ln {
+		panic("bitslice.Insert: start index greater than length")
+	}
+	nln := ln + n
+	ss := Make(nln, 0)
+	for i := 0; i < start; i++ {
+		ss.Set(i, bs.Index(i))
+	}
+	for i := start; i < ln; i++ {
+		ss.Set(i+n, bs.Index(i))
+	}
+	return ss
+}
 
 // String satisfies the fmt.Stringer interface
 func (bs *Slice) String() string {

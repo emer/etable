@@ -308,6 +308,9 @@ func (tsr *String) SetShape(shape, strides []int, names []string) {
 		copy(nv, tsr.Values)
 		tsr.Values = nv
 	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
+	}
 }
 
 // SetNumRows sets the number of rows (outer-most dimension) in a RowMajor organized tensor.
@@ -330,6 +333,9 @@ func (tsr *String) SetNumRows(rows int) {
 		nv := make([]string, nln)
 		copy(nv, tsr.Values)
 		tsr.Values = nv
+	}
+	if tsr.Nulls != nil {
+		tsr.Nulls.SetLen(nln)
 	}
 }
 
@@ -366,7 +372,11 @@ func (tsr *String) SubSpaceTry(offs []int) (Tensor, error) {
 		sti := make([]int, nd)
 		copy(sti, offs)
 		stoff := tsr.Offset(sti)
-		stsr.Values = tsr.Values[stoff:]
+		sln := stsr.Len()
+		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &String{}
@@ -377,7 +387,11 @@ func (tsr *String) SubSpaceTry(offs []int) (Tensor, error) {
 			sti[i] = offs[i-id]
 		}
 		stoff := tsr.Offset(sti)
-		stsr.Values = tsr.Values[stoff:]
+		sln := stsr.Len()
+		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")

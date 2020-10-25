@@ -387,6 +387,9 @@ func (tsr *Int64) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int64{}
@@ -399,6 +402,9 @@ func (tsr *Int64) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -921,6 +927,9 @@ func (tsr *Uint64) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint64{}
@@ -933,6 +942,9 @@ func (tsr *Uint64) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -1455,6 +1467,9 @@ func (tsr *Int32) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int32{}
@@ -1467,6 +1482,9 @@ func (tsr *Int32) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -1989,6 +2007,9 @@ func (tsr *Uint32) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint32{}
@@ -2001,6 +2022,9 @@ func (tsr *Uint32) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -2523,6 +2547,9 @@ func (tsr *Float32) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Float32{}
@@ -2535,6 +2562,9 @@ func (tsr *Float32) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -3057,6 +3087,9 @@ func (tsr *Int16) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int16{}
@@ -3069,6 +3102,9 @@ func (tsr *Int16) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -3591,6 +3627,9 @@ func (tsr *Uint16) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint16{}
@@ -3603,6 +3642,9 @@ func (tsr *Uint16) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -4125,6 +4167,9 @@ func (tsr *Int8) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Int8{}
@@ -4137,6 +4182,9 @@ func (tsr *Int8) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
@@ -4659,6 +4707,9 @@ func (tsr *Uint8) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	} else if tsr.IsColMajor() {
 		stsr := &Uint8{}
@@ -4671,6 +4722,9 @@ func (tsr *Uint8) SubSpaceTry(offs []int) (Tensor, error) {
 		stoff := tsr.Offset(sti)
 		sln := stsr.Len()
 		stsr.Values = tsr.Values[stoff : stoff+sln]
+		if tsr.Nulls != nil {
+			stsr.Nulls = tsr.Nulls.SubSlice(stoff, stoff+sln)
+		}
 		return stsr, nil
 	}
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
