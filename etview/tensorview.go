@@ -144,14 +144,6 @@ func (tv *TensorView) ToolBar() *gi.ToolBar {
 // RowWidgetNs returns number of widgets per row and offset for index label
 func (tv *TensorView) RowWidgetNs() (nWidgPerRow, idxOff int) {
 	nWidgPerRow = 1 + tv.NCols
-	if !tv.IsInactive() {
-		if !tv.NoAdd {
-			nWidgPerRow += 1
-		}
-		if !tv.NoDelete {
-			nWidgPerRow += 1
-		}
-	}
 	idxOff = 1
 	if !tv.ShowIndex {
 		nWidgPerRow -= 1
@@ -264,31 +256,6 @@ func (tv *TensorView) ConfigSliceGrid() {
 		sgf.SetChild(widg, cidx, valnm)
 		vv.ConfigWidget(widg)
 	}
-
-	if !tv.IsInactive() {
-		cidx := tv.NCols + idxOff
-		if !tv.NoAdd {
-			lbl := sgh.Child(cidx).(*gi.Label)
-			lbl.Text = "+"
-			lbl.Tooltip = "insert row"
-			addnm := fmt.Sprintf("add-%v", itxt)
-			addact := gi.Action{}
-			sgf.SetChild(&addact, cidx, addnm)
-			addact.SetIcon("plus")
-			cidx++
-		}
-		if !tv.NoDelete {
-			lbl := sgh.Child(cidx).(*gi.Label)
-			lbl.Text = "-"
-			lbl.Tooltip = "delete row"
-			delnm := fmt.Sprintf("del-%v", itxt)
-			delact := gi.Action{}
-			sgf.SetChild(&delact, cidx, delnm)
-			delact.SetIcon("minus")
-			cidx++
-		}
-	}
-
 	tv.ConfigScroll()
 }
 
