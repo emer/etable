@@ -91,3 +91,28 @@ func ClosestRow64(probe etensor.Tensor, col etensor.Tensor, mfun Func64) (int, f
 	}
 	return ci, minv
 }
+
+// ClosestRow32Py returns the closest fit between probe pattern and patterns in
+// an etensor.Float32 where the outer-most dimension is assumed to be a row
+// (e.g., as a column in an etable), using the given metric function,
+// *which must have the Increasing property* -- i.e., larger = further.
+// returns the row and metric value for that row.
+// Col cell sizes must match size of probe (panics if not).
+// Py version is for Python, returns a slice with row, cor, takes std metric
+func ClosestRow32Py(probe *etensor.Float32, col *etensor.Float32, std StdMetrics) []float32 {
+	row, cor := ClosestRow32(probe, col, StdFunc32(std))
+	return []float32{float32(row), cor}
+}
+
+// ClosestRow64Py returns the closest fit between probe pattern and patterns in
+// an etensor.Tensor where the outer-most dimension is assumed to be a row
+// (e.g., as a column in an etable), using the given metric function,
+// *which must have the Increasing property* -- i.e., larger = further.
+// returns the row and metric value for that row.
+// Col cell sizes must match size of probe (panics if not).
+// Optimized for etensor.Float64 but works for any tensor.
+// Py version is for Python, returns a slice with row, cor, takes std metric
+func ClosestRow64Py(probe etensor.Tensor, col etensor.Tensor, std StdMetrics) []float64 {
+	row, cor := ClosestRow64(probe, col, StdFunc64(std))
+	return []float64{float64(row), cor}
+}
