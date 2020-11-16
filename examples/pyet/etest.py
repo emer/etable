@@ -9,7 +9,7 @@
 
 from leabra import go, etable, efile, split, etensor, etview, rand, erand, patgen, gi, giv, pygiv, mat32
 
-import etorch
+import pyet
 
 import io, sys, getopt
 import numpy as np
@@ -63,14 +63,66 @@ class Sim(pygiv.ClassViewObj):
         dt.SetFromSchema(sch, 3)
         patgen.PermutedBinaryRows(dt.Cols[1], 6, 1, 0)
         patgen.PermutedBinaryRows(dt.Cols[2], 6, 1, 0)
+        cn = etensor.String(dt.Cols[0])
+        cn.Values.copy(["any", "baker", "cheese"])
 
-    def ToTorch(ss):
+    def Numpy(ss):
+        """
+        test conversions to / from numpy
+        """
         dt = ss.Pats
-        ttd = etorch.etable_to_torch(dt)
-        print(ttd) # not much useful info there
+        
+        etf = etensor.Float32(dt.Cols[1])
+        npf = pyet.etensor_to_numpy(etf)
+        print(npf)
+        ctf = pyet.numpy_to_etensor(npf)
+        print(ctf)
+        
+        etu32 = etensor.NewUint32(go.Slice_int([3,4,5]), go.nil, go.nil)
+        sz = etf.Len()
+        for i in range(sz):
+            etu32.Values[i] = int(etf.Values[i])
+        print(etu32)
+        npu32 = pyet.etensor_to_numpy(etu32)
+        print(npu32)
+        ctu32 = pyet.numpy_to_etensor(npu32)
+        print(ctu32)
+        
+        ets = etensor.String(dt.Cols[0])
+        nps = pyet.etensor_to_numpy(ets)
+        print(nps)
+        cts = pyet.numpy_to_etensor(nps)
+        print(cts)
+        
+        ets = etensor.String(dt.Cols[0])
+        nps = pyet.etensor_to_numpy(ets)
+        print(nps)
+        cts = pyet.numpy_to_etensor(nps)
+        print(cts)
+        
+        etb = etensor.NewBits(go.Slice_int([3,4,5]), go.nil, go.nil)
+        sz = etb.Len()
+        for i in range(sz):
+            etb.Set1D(i, erand.BoolProb(.2, -1))
+        print(etb)
+        npb = pyet.etensor_to_numpy(etb)
+        print(npb)
+        ctb = pyet.numpy_to_etensor(npb)
+        print(ctb)
+        
+    def Torch(ss):
+        """
+        test conversions to torch
+        """
+        dt = ss.Pats
+        pdt = pyet.etable_to_py(dt)
+        print(pdt)
+        ttd = pyet.etable_to_torch(pdt)
+        print(ttd)
 
     def Test(ss):
-        ss.ToTorch()
+        ss.Numpy()
+        ss.Torch()
         
     def ConfigGui(ss):
         """

@@ -139,8 +139,8 @@ func (dt *Table) ColName(i int) string {
 func (dt *Table) UpdateColNameMap() {
 	nc := dt.NumCols()
 	dt.ColNameMap = make(map[string]int, nc)
-	for i := range dt.ColNames {
-		dt.ColNameMap[dt.ColNames[i]] = i
+	for i, nm := range dt.ColNames {
+		dt.ColNameMap[nm] = i
 	}
 	if len(dt.ColNameMap) != nc {
 		log.Printf("Warning: etable.Table has multiple columns with same name!\n%v\n", dt.ColNames)
