@@ -61,6 +61,8 @@ class Sim(pygiv.ClassViewObj):
             etable.Column("Output", etensor.FLOAT32, go.Slice_int([4, 5]), go.Slice_string(["Y", "X"]))]
         )
         dt.SetFromSchema(sch, 3)
+        ss.Pats.SetMetaData("name", "Pats")
+        ss.Pats.SetMetaData("desc", "Training patterns")
         patgen.PermutedBinaryRows(dt.Cols[1], 6, 1, 0)
         patgen.PermutedBinaryRows(dt.Cols[2], 6, 1, 0)
         cn = etensor.String(dt.Cols[0])
@@ -71,7 +73,9 @@ class Sim(pygiv.ClassViewObj):
         test conversions to / from numpy
         """
         dt = ss.Pats
-        
+
+        print("\n\n##############################")
+        print("to / from numpy")
         etf = etensor.Float32(dt.Cols[1])
         npf = pyet.etensor_to_numpy(etf)
         print(npf)
@@ -87,18 +91,16 @@ class Sim(pygiv.ClassViewObj):
         print(npu32)
         ctu32 = pyet.numpy_to_etensor(npu32)
         print(ctu32)
+        pyet.copy_etensor_to_numpy(npu32, etu32)
+        pyet.copy_numpy_to_etensor(etu32, npu32)
         
         ets = etensor.String(dt.Cols[0])
         nps = pyet.etensor_to_numpy(ets)
         print(nps)
         cts = pyet.numpy_to_etensor(nps)
         print(cts)
-        
-        ets = etensor.String(dt.Cols[0])
-        nps = pyet.etensor_to_numpy(ets)
-        print(nps)
-        cts = pyet.numpy_to_etensor(nps)
-        print(cts)
+        pyet.copy_etensor_to_numpy(nps, ets)
+        pyet.copy_numpy_to_etensor(ets, nps)
         
         etb = etensor.NewBits(go.Slice_int([3,4,5]), go.nil, go.nil)
         sz = etb.Len()
@@ -109,20 +111,58 @@ class Sim(pygiv.ClassViewObj):
         print(npb)
         ctb = pyet.numpy_to_etensor(npb)
         print(ctb)
+        pyet.copy_etensor_to_numpy(npb, etb)
+        pyet.copy_numpy_to_etensor(etb, npb)
         
+    def PyEtable(ss):
+        """
+        test conversions to PyEtable
+        """
+        print("\n\n##############################")
+        print("to / from PyEtable")
+        dt = ss.Pats
+        print(dt.MetaData)
+        pdt = pyet.etable_to_py(dt)
+        print(pdt)
+        ttd = pyet.py_to_etable(pdt)
+        print("recovered from: PyEtable")
+        print(ttd.MetaData)
+        print(ttd)
+        pyet.copy_etable_to_py(pdt, dt)
+        pyet.copy_py_to_etable(ttd, pdt)
+
     def Torch(ss):
         """
         test conversions to torch
         """
         dt = ss.Pats
         pdt = pyet.etable_to_py(dt)
-        print(pdt)
         ttd = pyet.etable_to_torch(pdt)
         print(ttd)
 
+    def Pandas(ss):
+        """
+        test conversions to pandas and back
+        """
+        dt = ss.Pats
+        dt.SaveCSV("pats.csv", etable.Comma, etable.Headers)
+        pdt = pyet.etable_to_py(dt)
+        df = pyet.etable_to_pandas(pdt)
+        print(df)
+        df.to_csv("pandas.csv")
+        pcd = pyet.pandas_to_etable(df)
+        print(pcd)
+        pcd.MergeCols('Input_0', 20) # merge back into tensor
+        pcd.MergeCols('Output_0', 20) # merge back into tensor
+        pcd.ReshapeCol('Input_0', (pcd.Rows, 4, 5))
+        pcd.ReshapeCol('Output_0', (pcd.Rows, 4, 5))
+        print(pcd)
+        
     def Test(ss):
         ss.Numpy()
+        ss.PyEtable()
         ss.Torch()
+        ss.Pandas()
         
     def ConfigGui(ss):
         """
