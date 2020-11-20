@@ -20,23 +20,23 @@ And two similar methods for copying between existing objects (dest first arg, sr
 
 # etable -> Python
 
-Because the various Python DataFrames don't quite capture the same columns-of-tensors structure of the etable.Table, we have a `pyet.PyEtable` class that just holds a converted Table as a list of numpy.ndarray columns, with a dictionary for accessing by name.  
+Because the various Python DataFrames don't quite capture the same columns-of-tensors structure of the etable.Table, we have a `pyet.eTable` class that just holds a converted Table as a list of numpy.ndarray columns, with a dictionary for accessing by name.  
 
-Thus, the procedure is to first convert an `etable.Table` to `pyet.PyEtable` using `pyet.etable_to_py`, and then from there you can do further conversions.
+Thus, the procedure is to first convert an `etable.Table` to `pyet.eTable` using `pyet.etable_to_py`, and then from there you can do further conversions.
 
-* `pyet.etable_to_py(etable.Table) -> pyet.PyEtable` returns converted `pyet.PyEtable`, which can be used directly by accessing the `numpy.ndarray` columns of data, or converted further.
+* `pyet.etable_to_py(etable.Table) -> pyet.eTable` returns converted `pyet.eTable`, which can be used directly by accessing the `numpy.ndarray` columns of data, or converted further.
 
-* `pyet.py_to_etable(PyEtable) -> etable.Table` returns PyEtable converted to an etable.Table.
+* `pyet.py_to_etable(eTable) -> etable.Table` returns eTable converted to an etable.Table.
 
-* `pyet.copy_etable_to_py(PyEtable, etable.Table)` copies etable.Table values to same-named PyEtable columns.
+* `pyet.copy_etable_to_py(eTable, etable.Table)` copies etable.Table values to same-named eTable columns.
 
-* `pyet.copy_py_to_etable(etable.Table, PyEtable)` copies PyEtable values to same-named etable.Table columns.
+* `pyet.copy_py_to_etable(etable.Table, eTable)` copies eTable values to same-named etable.Table columns.
 
-* `pyet.etable_to_torch(PyEtable)` returns a pytorch `TensorDataset`, which has the same structure as an `etable`, and is used in the `pytorch` neural network framework, except that the `TensorDataset` does NOT support string columns as labels, so those are skipped.
+* `pyet.etable_to_torch(eTable)` returns a pytorch `TensorDataset`, which has the same structure as an `etable`, and is used in the `pytorch` neural network framework, except that the `TensorDataset` does NOT support string columns as labels, so those are skipped.
 
-* `pyet.etable_to_pandas(PyEtable) -> pandas.DataFrame` returns a `pandas.DataFrame` with data from the table -- if there are tensor (multidimensional) columns, they are splayed out across sequential 1D columns, numbered with _idx subscripts.  Optional skip_tensors arg instead just skips over tensors.
+* `pyet.etable_to_pandas(eTable) -> pandas.DataFrame` returns a `pandas.DataFrame` with data from the table -- if there are tensor (multidimensional) columns, they are splayed out across sequential 1D columns, numbered with _idx subscripts.  Optional skip_tensors arg instead just skips over tensors.
 
-* `pyet.pandas_to_etable(pandas.DataFrame) -> pyet.PyEtable` returns a PyEtable from pandas dataframe.  By definition, all columns will be 1D.  See the Pandas test case in `etest.py` for use of `MergeCols` and `ReshapeCol` to turn 1D cols back into multidimensional tensor columns.
+* `pyet.pandas_to_etable(pandas.DataFrame) -> pyet.eTable` returns a eTable from pandas dataframe.  By definition, all columns will be 1D.  See the Pandas test case in `etest.py` for use of `MergeCols` and `ReshapeCol` to turn 1D cols back into multidimensional tensor columns.
 
 # Arrow
 

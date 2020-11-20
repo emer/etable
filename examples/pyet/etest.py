@@ -114,18 +114,18 @@ class Sim(pygiv.ClassViewObj):
         pyet.copy_etensor_to_numpy(npb, etb)
         pyet.copy_numpy_to_etensor(etb, npb)
         
-    def PyEtable(ss):
+    def PeTable(ss):
         """
-        test conversions to PyEtable
+        test conversions to eTable
         """
         print("\n\n##############################")
-        print("to / from PyEtable")
+        print("to / from eTable")
         dt = ss.Pats
         print(dt.MetaData)
         pdt = pyet.etable_to_py(dt)
         print(pdt)
         ttd = pyet.py_to_etable(pdt)
-        print("recovered from: PyEtable")
+        print("recovered from: eTable")
         print(ttd.MetaData)
         print(ttd)
         pyet.copy_etable_to_py(pdt, dt)
@@ -160,7 +160,7 @@ class Sim(pygiv.ClassViewObj):
         
     def Test(ss):
         ss.Numpy()
-        ss.PyEtable()
+        ss.PeTable()
         ss.Torch()
         ss.Pandas()
         
@@ -171,10 +171,10 @@ class Sim(pygiv.ClassViewObj):
         width = 1600
         height = 1200
 
-        gi.SetAppName("epyarrow")
-        gi.SetAppAbout('testing of using arrow to port data between Go and Python. See <a href="https://github.com/emer/etable/blob/master/examples/pyarrow/README.md">README.md on GitHub</a>.</p>')
+        gi.SetAppName("pyet")
+        gi.SetAppAbout('testing of converting etable data between Go and Python. See <a href="https://github.com/emer/etable/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>')
 
-        win = gi.NewMainWindow("epyarrow", "ePy Arrow", width, height)
+        win = gi.NewMainWindow("pyet", "PyEt Testing", width, height)
         ss.Win = win
 
         vp = win.WinViewport2D()
