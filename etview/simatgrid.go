@@ -9,6 +9,8 @@ import (
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/simat"
 	"github.com/goki/gi/gi"
+	"github.com/goki/gi/girl"
+	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/mouse"
@@ -120,7 +122,7 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 		}
 	}
 	minBlank = ints.MinInt(minBlank, curblk)
-	tr := gi.TextRender{}
+	tr := girl.Text{}
 	if col {
 		tr.SetStringRot90(lbs[mxi], &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
 	} else {
@@ -195,9 +197,9 @@ func (tg *SimMatGrid) RenderSimMat() {
 	epos.Y += tg.colMaxSz.Y + LabelSpace
 	nr := len(tg.SimMat.Rows)
 	mx := ints.MinInt(nr, rows)
-	tr := gi.TextRender{}
+	tr := girl.Text{}
 	txsty := tg.Sty.Text
-	txsty.AlignV = gi.AlignTop
+	txsty.AlignV = gist.AlignTop
 	ygp := 0
 	prvyblk := false
 	for y := 0; y < mx; y++ {

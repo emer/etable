@@ -13,6 +13,7 @@ import (
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/split"
 	"github.com/goki/gi/gi"
+	"github.com/goki/gi/gist"
 	"github.com/goki/ki/ints"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
@@ -133,7 +134,7 @@ func (pl *Plot2D) GenPlotXY() {
 					clr := cp.Color
 					if nleg > 1 {
 						cidx := yidx*nleg + li
-						clr, _ = gi.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
+						clr, _ = gist.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
 						if nys > 1 {
 							lbl = leg + " " + lbl
 						} else {
@@ -141,7 +142,7 @@ func (pl *Plot2D) GenPlotXY() {
 						}
 					}
 					if nidx > 1 {
-						clr, _ = gi.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+						clr, _ = gist.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
 						lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 					}
 					if pl.Params.Lines && pl.Params.Points {

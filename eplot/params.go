@@ -8,6 +8,7 @@ import (
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
+	"github.com/goki/gi/gist"
 	"github.com/goki/ki/kit"
 )
 
@@ -120,7 +121,7 @@ func (cp *ColParams) CopyFrom(fr *ColParams) {
 // UpdateVals update derived values e.g., color from color name
 func (cp *ColParams) UpdateVals() {
 	if cp.ColorName != "" {
-		clr, err := gi.ColorFromString(string(cp.ColorName), nil)
+		clr, err := gist.ColorFromString(string(cp.ColorName), nil)
 		if err == nil {
 			cp.Color = clr
 		}

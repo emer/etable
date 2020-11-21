@@ -14,6 +14,7 @@ import (
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
+	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/svg"
 	"github.com/goki/gi/units"
@@ -516,7 +517,7 @@ func (pl *Plot2D) ColsConfig() {
 	vl.SetReRenderAnchor()
 	vl.Lay = gi.LayoutVert
 	vl.SetProp("spacing", 0)
-	vl.SetProp("vertical-align", gi.AlignTop)
+	vl.SetProp("vertical-align", gist.AlignTop)
 	vl.SetMinPrefHeight(units.NewEm(5)) // get separate scroll on cols
 	vl.SetStretchMaxHeight()
 	pl.ColsListUpdate()

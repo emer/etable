@@ -17,6 +17,8 @@ import (
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
+	"github.com/goki/gi/girl"
+	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/cursor"
@@ -239,8 +241,8 @@ func (tv *TableView) ConfigSliceGrid() {
 
 	sg.Lay = gi.LayoutVert
 	sg.SetMinPrefWidth(units.NewCh(20))
-	sg.SetProp("overflow", gi.OverflowScroll) // this still gives it true size during PrefSize
-	sg.SetStretchMax()                        // for this to work, ALL layers above need it too
+	sg.SetProp("overflow", gist.OverflowScroll) // this still gives it true size during PrefSize
+	sg.SetStretchMax()                          // for this to work, ALL layers above need it too
 	sg.SetProp("border-width", 0)
 	sg.SetProp("margin", 0)
 	sg.SetProp("padding", 0)
@@ -252,7 +254,7 @@ func (tv *TableView) ConfigSliceGrid() {
 
 	sgh := tv.SliceHeader()
 	sgh.Lay = gi.LayoutHoriz
-	sgh.SetProp("overflow", gi.OverflowHidden) // no scrollbars!
+	sgh.SetProp("overflow", gist.OverflowHidden) // no scrollbars!
 	sgh.SetProp("spacing", 0)
 	// sgh.SetStretchMaxWidth()
 
@@ -270,7 +272,7 @@ func (tv *TableView) ConfigSliceGrid() {
 	sgf.SetMinPrefHeight(units.NewEm(10))
 	sgf.SetStretchMax() // for this to work, ALL layers above need it too
 	sgf.SetProp("columns", nWidgPerRow)
-	sgf.SetProp("overflow", gi.OverflowScroll) // this still gives it true size during PrefSize
+	sgf.SetProp("overflow", gist.OverflowScroll) // this still gives it true size during PrefSize
 	// this causes sizing / layout to fail, esp on window resize etc:
 	// sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
 
@@ -431,7 +433,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		tv.RowHeight = sg.GridData[gi.Row][0].AllocSize + sg.Spacing.Dots
 	}
 	if tv.Sty.Font.Face == nil {
-		tv.Sty.Font.OpenFont(&tv.Sty.UnContext)
+		girl.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
 	}
 	tv.RowHeight = math32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
 
@@ -671,7 +673,7 @@ func (tv *TableView) UpdateSliceGrid() {
 				wb := widg.AsWidget()
 				if wb != nil {
 					wb.SetProp("tv-row", ri)
-					wb.SetProp("vertical-align", gi.AlignTop)
+					wb.SetProp("vertical-align", gist.AlignTop)
 					wb.ClearSelected()
 					wb.WidgetSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						if sig == int64(gi.WidgetSelected) {
