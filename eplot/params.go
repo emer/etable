@@ -87,7 +87,7 @@ type ColParams struct {
 	Range     minmax.Range64 `desc:"effective range of data to plot -- either end can be fixed"`
 	FullRange minmax.F64     `desc:"full actual range of data -- only valid if specifically computed"`
 	ColorName gi.ColorName   `desc:"if non-empty, color is set by this name"`
-	Color     gi.Color       `desc:"color to use in plotting the line"`
+	Color     gist.Color     `desc:"color to use in plotting the line"`
 	NTicks    int            `desc:"desired number of ticks"`
 	Lbl       string         `desc:"if non-empty, this is an alternative label to use in plotting"`
 	TensorIdx int            `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines"`

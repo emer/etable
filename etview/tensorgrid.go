@@ -12,6 +12,7 @@ import (
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
+	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/mouse"
@@ -34,7 +35,7 @@ type TensorDisp struct {
 	Range       minmax.Range64   `view:"inline" desc:"range to plot"`
 	MinMax      minmax.F64       `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
 	ColorMap    giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
-	Background  gi.Color         `desc:"background color"`
+	Background  gist.Color       `desc:"background color"`
 	GridFill    float32          `min:"0.1" max:"1" step:"0.1" def:"0.9,1" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
 	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries, as a proportion of total grid size"`
 	BotRtSpace  units.Value      `desc:"extra space to add at bottom of grid -- needed when included in TableView for example"`
@@ -271,7 +272,7 @@ func (tg *TensorGrid) EnsureColorMap() {
 	}
 }
 
-func (tg *TensorGrid) Color(val float64) (norm float64, clr gi.Color) {
+func (tg *TensorGrid) Color(val float64) (norm float64, clr gist.Color) {
 	norm = tg.Disp.Range.ClipNormVal(val)
 	clr = tg.Map.Map(norm)
 	return
