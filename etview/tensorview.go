@@ -521,6 +521,7 @@ func (tv *TensorView) SliceNewAt(idx int) {
 		tv.TmpSave.SaveTmp()
 	}
 	tv.SetChanged()
+	tv.SetFullReRender()
 	tv.This().(giv.SliceViewer).LayoutSliceGrid()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	tv.ViewSig.Emit(tv.This(), 0, nil)
@@ -538,6 +539,8 @@ func (tv *TensorView) SliceDeleteAt(idx int, doupdt bool) {
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
 
+	delete(tv.SelectedIdxs, idx)
+
 	// kit.SliceDeleteAt(tv.Slice, idx)
 
 	if tv.TmpSave != nil {
@@ -545,6 +548,7 @@ func (tv *TensorView) SliceDeleteAt(idx int, doupdt bool) {
 	}
 	tv.SetChanged()
 	if doupdt {
+		tv.SetFullReRender()
 		tv.This().(giv.SliceViewer).LayoutSliceGrid()
 		tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	}
