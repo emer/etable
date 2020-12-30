@@ -14,6 +14,7 @@ import (
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/mouse"
+	"github.com/goki/gi/units"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
@@ -89,6 +90,7 @@ func (tg *SimMatGrid) ConnectEvents2D() {
 }
 
 func (tg *SimMatGrid) Style2D() {
+	tg.SetProp("font-size", units.NewPt(tg.Disp.FontSize))
 	tg.WidgetBase.Style2D()
 	tg.Disp.Defaults()
 	tg.Disp.ToDots(&tg.Sty.UnContext)

@@ -42,6 +42,7 @@ type TensorDisp struct {
 	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
 	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
 	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
+	FontSize    float32          `desc:"font size in standard point units for labels (e.g., SimMat)"`
 	GridView    *TensorGrid      `copy:"-" json:"-" xml:"-" view:"-" desc:"our gridview, for update method"`
 }
 
@@ -69,6 +70,9 @@ func (td *TensorDisp) Defaults() {
 	if td.GridFill == 0 {
 		td.GridFill = 0.9
 		td.DimExtra = 0.3
+	}
+	if td.FontSize == 0 {
+		td.FontSize = 24
 	}
 }
 
