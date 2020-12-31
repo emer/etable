@@ -89,8 +89,8 @@ github.com/go-latex/latex v0.0.0-20200518072620-0806b477ea35 h1:uroDDLmuCK5Pz5J/
 github.com/go-latex/latex v0.0.0-20200518072620-0806b477ea35/go.mod h1:PNI+CcWytn/2Z/9f1SGOOYn0eILruVyp0v2/iAs8asQ=
 github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff h1:W71vTCKoxtdXgnm1ECDFkfQnpdqAO00zzGXLA5yaEX8=
 github.com/goki/freetype v0.0.0-20181231101311-fa8a33aabaff/go.mod h1:wfqRWLHRBsRgkp5dmbG56SA0DmVtwrF5N3oPdI8t+Aw=
-github.com/goki/gi v1.1.3 h1:q3S1c77kI5qFMat/76wu2UznRfJhtn1PeJTnfud42ZE=
-github.com/goki/gi v1.1.3/go.mod h1:rSlh8A8zVgm97mrtgmpk6EKkvK6YIm0+k91YYzFaLh8=
+github.com/goki/gi v1.1.4 h1:AKZpEfYmInPXJnKL+wfbZrQIu1EiyZxdLno+Vzk8Ox8=
+github.com/goki/gi v1.1.4/go.mod h1:rSlh8A8zVgm97mrtgmpk6EKkvK6YIm0+k91YYzFaLh8=
 github.com/goki/ki v1.0.0 h1:tsg8UII9T9vbEI55tNoJe+Y9MMdsE3b9mMrRWGZBZ4Y=
 github.com/goki/ki v1.0.0/go.mod h1:X+gmVeAym3JDSbbiA7iF1qkgAlTVWl1JV9sRsGDzxOA=
 github.com/goki/ki v1.0.7 h1:MrXlPF0edSKrdBuvTqfEUc3v7xDPfpJS6CBoiG0J+Kk=
