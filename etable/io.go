@@ -9,6 +9,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -179,6 +180,7 @@ func (dt *Table) ReadCSVRow(rec []string, row int) {
 	if rec[0] == "_D:" { // emergent data row
 		ci++
 	}
+	nan := math.NaN()
 	for j := 0; j < tc; j++ {
 		tsr := dt.Cols[j]
 		_, csz := tsr.RowCellSize()
@@ -188,6 +190,7 @@ func (dt *Table) ReadCSVRow(rec []string, row int) {
 			if tsr.DataType() != etensor.STRING {
 				if str == "" || str == "NaN" || str == "-NaN" || str == "Inf" || str == "-Inf" {
 					tsr.SetNull1D(stoff+cc, true) // empty = missing
+					tsr.SetFloat1D(stoff+cc, nan)
 				} else {
 					tsr.SetString1D(stoff+cc, str)
 				}

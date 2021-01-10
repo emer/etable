@@ -116,6 +116,9 @@ func (txy *TableXY) TRowValue(row int) float64 {
 		}
 	default:
 		y = yc.FloatVal1D(row)
+		if yc.IsNull1D(row) {
+			y = math.NaN()
+		}
 	}
 	return y
 }
@@ -138,6 +141,9 @@ func (txy *TableXY) Value(row int) float64 {
 		}
 	default:
 		y = yc.FloatVal1D(trow)
+		if yc.IsNull1D(trow) {
+			y = math.NaN()
+		}
 	}
 	return y
 }
@@ -159,6 +165,9 @@ func (txy *TableXY) TRowXValue(row int) float64 {
 		}
 	default:
 		x = xc.FloatVal1D(row)
+		if xc.IsNull1D(row) {
+			x = math.NaN()
+		}
 	}
 	return x
 }
@@ -181,6 +190,9 @@ func (txy *TableXY) XValue(row int) float64 {
 		}
 	default:
 		x = xc.FloatVal1D(trow)
+		if xc.IsNull1D(trow) {
+			x = math.NaN()
+		}
 	}
 	return x
 }
