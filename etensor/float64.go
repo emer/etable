@@ -136,14 +136,7 @@ func (tsr *Float64) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Float64) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	copy(*flt, tsr.Values) // diff: blit from values directly
 }
 

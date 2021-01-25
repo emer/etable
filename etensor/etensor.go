@@ -274,3 +274,20 @@ func CopyDense(to Tensor, dm *mat.Dense) {
 		}
 	}
 }
+
+// SetFloat64SliceLen is a utility function to set given slice of float64 values
+// to given length, reusing existing where possible and making a new one as needed.
+// For use in WriteGeom routines.
+func SetFloat64SliceLen(dat *[]float64, sz int) {
+	switch {
+	case len(*dat) == sz:
+	case len(*dat) < sz:
+		if cap(*dat) >= sz {
+			*dat = (*dat)[0:sz]
+		} else {
+			*dat = make([]float64, sz)
+		}
+	default:
+		*dat = (*dat)[0:sz]
+	}
+}

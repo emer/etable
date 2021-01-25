@@ -142,14 +142,7 @@ func (tsr *String) SetFloatRowCell(row, cell int, val float64) {
 }
 
 func (tsr *String) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = StringToFloat64(vl)
 	}

@@ -128,13 +128,7 @@ func (tsr *Bits) SetFloatRowCell(row, cell int, val float64) {
 
 func (tsr *Bits) Floats(flt *[]float64) {
 	sz := tsr.Len()
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, sz)
 	for j := 0; j < sz; j++ {
 		(*flt)[j] = BoolToFloat64(tsr.Values.Index(j))
 	}

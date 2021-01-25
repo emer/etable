@@ -139,14 +139,7 @@ func (tsr *Int64) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Int64) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -681,14 +674,7 @@ func (tsr *Uint64) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Uint64) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -1223,14 +1209,7 @@ func (tsr *Int32) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Int32) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -1765,14 +1744,7 @@ func (tsr *Uint32) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Uint32) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -2307,14 +2279,7 @@ func (tsr *Float32) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Float32) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -2849,14 +2814,7 @@ func (tsr *Int16) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Int16) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -3391,14 +3349,7 @@ func (tsr *Uint16) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Uint16) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -3933,14 +3884,7 @@ func (tsr *Int8) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Int8) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
@@ -4475,14 +4419,7 @@ func (tsr *Uint8) SetFloatRowCell(row, cell int, val float64) {
 // This can be used for all of the gonum/floats methods
 // for basic math, gonum/stats, etc.
 func (tsr *Uint8) Floats(flt *[]float64) {
-	sz := len(tsr.Values)
-	if len(*flt) < sz {
-		if cap(*flt) >= sz {
-			*flt = (*flt)[0:sz]
-		} else {
-			*flt = make([]float64, sz)
-		}
-	}
+	SetFloat64SliceLen(flt, len(tsr.Values))
 	for j, vl := range tsr.Values {
 		(*flt)[j] = float64(vl)
 	}
