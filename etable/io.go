@@ -5,6 +5,7 @@
 package etable
 
 import (
+	"bufio"
 	"encoding/csv"
 	"fmt"
 	"io"
@@ -77,7 +78,7 @@ func (dt *Table) SaveCSV(filename gi.FileName, delim Delims, headers bool) error
 		log.Println(err)
 		return err
 	}
-	dt.WriteCSV(fp, delim, headers)
+	dt.WriteCSV(bufio.NewWriter(fp), delim, headers)
 	return nil
 }
 
@@ -93,7 +94,7 @@ func (ix *IdxView) SaveCSV(filename gi.FileName, delim Delims, headers bool) err
 		log.Println(err)
 		return err
 	}
-	ix.WriteCSV(fp, delim, headers)
+	ix.WriteCSV(bufio.NewWriter(fp), delim, headers)
 	return nil
 }
 
@@ -113,7 +114,7 @@ func (dt *Table) OpenCSV(filename gi.FileName, delim Delims) error {
 		log.Println(err)
 		return err
 	}
-	return dt.ReadCSV(fp, delim)
+	return dt.ReadCSV(bufio.NewReader(fp), delim)
 }
 
 // OpenCSV reads a table idx view from a comma-separated-values (CSV) file
@@ -132,7 +133,7 @@ func (ix *IdxView) OpenCSV(filename gi.FileName, delim Delims) error {
 		log.Println(err)
 		return err
 	}
-	err = ix.Table.ReadCSV(fp, delim)
+	err = ix.Table.ReadCSV(bufio.NewReader(fp), delim)
 	ix.Sequential()
 	return err
 }

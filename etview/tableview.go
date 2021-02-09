@@ -143,7 +143,7 @@ func (tv *TableView) Config() {
 	config := kit.TypeAndNameList{}
 	config.Add(gi.KiT_ToolBar, "toolbar")
 	config.Add(gi.KiT_Frame, "frame")
-	mods, updt := tv.ConfigChildren(config, true)
+	mods, updt := tv.ConfigChildren(config)
 	tv.ConfigSliceGrid()
 	tv.ConfigToolbar()
 	if mods {
@@ -250,7 +250,7 @@ func (tv *TableView) ConfigSliceGrid() {
 	sgcfg := kit.TypeAndNameList{}
 	sgcfg.Add(gi.KiT_ToolBar, "header")
 	sgcfg.Add(gi.KiT_Layout, "grid-lay")
-	sg.ConfigChildren(sgcfg, true)
+	sg.ConfigChildren(sgcfg)
 
 	sgh := tv.SliceHeader()
 	sgh.Lay = gi.LayoutHoriz
@@ -264,7 +264,7 @@ func (tv *TableView) ConfigSliceGrid() {
 	gconfig := kit.TypeAndNameList{}
 	gconfig.Add(gi.KiT_Frame, "grid")
 	gconfig.Add(gi.KiT_ScrollBar, "scrollbar")
-	gl.ConfigChildren(gconfig, true) // covered by above
+	gl.ConfigChildren(gconfig) // covered by above
 
 	sgf := tv.SliceGrid()
 	sgf.Lay = gi.LayoutGrid
@@ -289,7 +289,7 @@ func (tv *TableView) ConfigSliceGrid() {
 		hcfg.Add(gi.KiT_Label, "head-add")
 		hcfg.Add(gi.KiT_Label, "head-del")
 	}
-	sgh.ConfigChildren(hcfg, false) // headers SHOULD be unique, but with labels..
+	sgh.ConfigChildren(hcfg)
 
 	// at this point, we make one dummy row to get size of widgets
 
@@ -353,7 +353,7 @@ func (tv *TableView) ConfigSliceGrid() {
 			} else {
 				cell := tv.Table.Table.CellTensorIdx(fli, 0)
 				tvv := &TensorGridValueView{}
-				tvv.Init(tvv)
+				ki.InitNode(tvv)
 				vv = tvv
 				vv.SetSoloValue(reflect.ValueOf(cell))
 				hdr.Tooltip = "(click to edit display parameters for this column)"
@@ -625,7 +625,7 @@ func (tv *TableView) UpdateSliceGrid() {
 					} else {
 						cell := tv.Table.Table.CellTensorIdx(fli, si)
 						tvv := &TensorGridValueView{}
-						tvv.Init(tvv)
+						ki.InitNode(tvv)
 						vv = tvv
 						vv.SetSoloValue(reflect.ValueOf(cell))
 					}

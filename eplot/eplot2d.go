@@ -367,7 +367,7 @@ func (pl *Plot2D) Config() {
 	config := kit.TypeAndNameList{}
 	config.Add(gi.KiT_ToolBar, "tbar")
 	config.Add(gi.KiT_Layout, "plot")
-	mods, updt := pl.ConfigChildren(config, false)
+	mods, updt := pl.ConfigChildren(config)
 	if !mods {
 		updt = pl.UpdateStart()
 	}
@@ -381,7 +381,7 @@ func (pl *Plot2D) Config() {
 	vncfg := kit.TypeAndNameList{}
 	vncfg.Add(gi.KiT_Frame, "cols")
 	vncfg.Add(svg.KiT_Editor, "plot")
-	play.ConfigChildren(vncfg, false) // won't do update b/c of above updt
+	play.ConfigChildren(vncfg) // won't do update b/c of above updt
 
 	pl.ColsConfig()
 	pl.PlotConfig()
@@ -531,7 +531,7 @@ func (pl *Plot2D) ColsConfig() {
 	for _, cn := range pl.Cols {
 		config.Add(gi.KiT_Layout, cn.Col)
 	}
-	mods, updt := vl.ConfigChildren(config, false)
+	mods, updt := vl.ConfigChildren(config)
 	if !mods {
 		updt = vl.UpdateStart()
 	}
@@ -547,7 +547,7 @@ func (pl *Plot2D) ColsConfig() {
 		}
 		cl := cli.(*gi.Layout)
 		cl.Lay = gi.LayoutHoriz
-		cl.ConfigChildren(clcfg, false)
+		cl.ConfigChildren(clcfg)
 		cl.SetProp("margin", 0)
 		cl.SetProp("max-width", -1)
 		cb := cl.Child(0).(*gi.CheckBox)

@@ -21,42 +21,42 @@ import (
 func init() {
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Float32{})), func() giv.ValueView {
 		vv := &TensorValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Float64{})), func() giv.ValueView {
 		vv := &TensorValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Int64{})), func() giv.ValueView {
 		vv := &TensorValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Int32{})), func() giv.ValueView {
 		vv := &TensorValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.String{})), func() giv.ValueView {
 		vv := &TensorValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(etable.KiT_Table), func() giv.ValueView {
 		vv := &TableValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(simat.SimMat{})), func() giv.ValueView {
 		vv := &SimMatValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 	giv.ValueViewMapAdd(kit.LongTypeName(eplot.KiT_Plot2D), func() giv.ValueView {
 		vv := &Plot2DValueView{}
-		vv.Init(vv)
+		ki.InitNode(vv)
 		return vv
 	})
 }
