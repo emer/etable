@@ -78,8 +78,10 @@ func (dt *Table) SaveCSV(filename gi.FileName, delim Delims, headers bool) error
 		log.Println(err)
 		return err
 	}
-	dt.WriteCSV(bufio.NewWriter(fp), delim, headers)
-	return nil
+	bw := bufio.NewWriter(fp)
+	err := dt.WriteCSV(bw, delim, headers)
+	bw.Flush()
+	return err
 }
 
 // SaveCSV writes a table idx view to a comma-separated-values (CSV) file
@@ -94,8 +96,10 @@ func (ix *IdxView) SaveCSV(filename gi.FileName, delim Delims, headers bool) err
 		log.Println(err)
 		return err
 	}
-	ix.WriteCSV(bufio.NewWriter(fp), delim, headers)
-	return nil
+	bw := bufio.NewWriter(fp)
+	err := ix.WriteCSV(bw, delim, headers)
+	bw.Flush()
+	return err
 }
 
 // OpenCSV reads a table from a comma-separated-values (CSV) file
