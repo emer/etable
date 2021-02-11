@@ -79,7 +79,7 @@ func (dt *Table) SaveCSV(filename gi.FileName, delim Delims, headers bool) error
 		return err
 	}
 	bw := bufio.NewWriter(fp)
-	err := dt.WriteCSV(bw, delim, headers)
+	err = dt.WriteCSV(bw, delim, headers)
 	bw.Flush()
 	return err
 }
@@ -97,7 +97,7 @@ func (ix *IdxView) SaveCSV(filename gi.FileName, delim Delims, headers bool) err
 		return err
 	}
 	bw := bufio.NewWriter(fp)
-	err := ix.WriteCSV(bw, delim, headers)
+	err = ix.WriteCSV(bw, delim, headers)
 	bw.Flush()
 	return err
 }
