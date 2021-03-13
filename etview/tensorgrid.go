@@ -151,6 +151,10 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 		mv, _ := strconv.ParseFloat(op, 32)
 		td.DimExtra = float32(mv)
 	}
+	if op, has := tsr.MetaData("font-size"); has {
+		mv, _ := strconv.ParseFloat(op, 32)
+		td.FontSize = float32(mv)
+	}
 }
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
