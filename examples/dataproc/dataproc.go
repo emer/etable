@@ -14,7 +14,6 @@ import (
 	"github.com/emer/etable/split"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gimain"
-	"gonum.org/v1/plot"
 )
 
 // this is the stub main for gogi that calls our actual mainrun function, at end of file
@@ -109,8 +108,6 @@ func OpenGUI() {
 
 	gi.SetAppName("dataproc")
 	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://github.com/emer/etable">etable on GitHub</a>.</p>`)
-
-	plot.DefaultFont = "Helvetica"
 
 	win := gi.NewMainWindow("dataproc", "eTable Data Processing Demo", width, height)
 

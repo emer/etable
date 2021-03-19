@@ -22,6 +22,7 @@ import (
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 	"gonum.org/v1/plot"
+	"gonum.org/v1/plot/font"
 )
 
 // Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
@@ -57,7 +58,7 @@ func (pl *Plot2D) CopyFieldsFrom(frm interface{}) {
 func (pl *Plot2D) Defaults() {
 	pl.Params.Plot = pl
 	pl.Params.Defaults()
-	plot.DefaultFont = "Helvetica"
+	plot.DefaultFont = font.Font{Typeface: "Liberation", Variant: "Sans"}
 }
 
 // SetTable sets the table to view and updates view

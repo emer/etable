@@ -23,7 +23,7 @@ import (
 
 // GenPlotBar generates a Bar plot, setting GPlot variable
 func (pl *Plot2D) GenPlotBar() {
-	plt, _ := plot.New() // note: not clear how to re-use, due to newtablexynames
+	plt := plot.New() // note: not clear how to re-use, due to newtablexynames
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()

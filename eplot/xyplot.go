@@ -23,17 +23,17 @@ import (
 
 // GenPlotXY generates an XY (lines, points) plot, setting GPlot variable
 func (pl *Plot2D) GenPlotXY() {
-	plt, _ := plot.New() // todo: not clear how to re-use, due to newtablexynames
+	plt := plot.New() // todo: not clear how to re-use, due to newtablexynames
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
 
-	plt.Title.Color = gi.Prefs.Colors.Font
-	plt.Legend.Color = gi.Prefs.Colors.Font
+	// plt.Title.Color = gi.Prefs.Colors.Font
+	// plt.Legend.Color = gi.Prefs.Colors.Font
 	plt.X.Color = gi.Prefs.Colors.Font
 	plt.Y.Color = gi.Prefs.Colors.Font
-	plt.X.Label.Color = gi.Prefs.Colors.Font
-	plt.Y.Label.Color = gi.Prefs.Colors.Font
+	// plt.X.Label.Color = gi.Prefs.Colors.Font
+	// plt.Y.Label.Color = gi.Prefs.Colors.Font
 	plt.X.Tick.Color = gi.Prefs.Colors.Font
 	plt.Y.Tick.Color = gi.Prefs.Colors.Font
 
