@@ -222,7 +222,7 @@ func (tg *TensorGrid) MouseEvent() {
 		switch {
 		case me.Button == mouse.Right && me.Action == mouse.Press:
 			giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
-		case me.Button == mouse.Left && me.Action == mouse.Press:
+		case me.Button == mouse.Left && me.Action == mouse.DoubleClick:
 			me.SetProcessed()
 			tgv.OpenTensorView()
 		}
@@ -271,18 +271,22 @@ func (tg *TensorGrid) EnsureColorMap() {
 	}
 	if tg.Map == nil {
 		ok := false
-		tg.Map, ok = giv.StdColorMaps[string(tg.Disp.ColorMap)]
+		tg.Map, ok = giv.AvailColorMaps[string(tg.Disp.ColorMap)]
 		if !ok {
 			tg.Disp.ColorMap = ""
 			tg.Disp.Defaults()
 		}
-		tg.Map = giv.StdColorMaps[string(tg.Disp.ColorMap)]
+		tg.Map = giv.AvailColorMaps[string(tg.Disp.ColorMap)]
 	}
 }
 
 func (tg *TensorGrid) Color(val float64) (norm float64, clr gist.Color) {
-	norm = tg.Disp.Range.ClipNormVal(val)
-	clr = tg.Map.Map(norm)
+	if tg.Map.Indexed {
+		clr = tg.Map.MapIndex(int(val))
+	} else {
+		norm = tg.Disp.Range.ClipNormVal(val)
+		clr = tg.Map.Map(norm)
+	}
 	return
 }
 
