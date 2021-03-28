@@ -349,7 +349,7 @@ func (tv *TensorView) LayoutHeader() {
 
 // UpdateSliceGrid updates grid display -- robust to any time calling
 func (tv *TensorView) UpdateSliceGrid() {
-	if tv.Tensor == nil {
+	if tv.Tensor == nil || tv.Tensor.Len() == 0 {
 		return
 	}
 	sz := tv.UpdtSliceSize()
