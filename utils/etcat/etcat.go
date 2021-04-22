@@ -15,6 +15,7 @@ import (
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
+	"github.com/goki/ki/ints"
 )
 
 var (
@@ -30,7 +31,7 @@ func main() {
 	var help bool
 	var avg bool
 	flag.BoolVar(&help, "help", false, "if true, report usage info")
-	flag.BoolVar(&avg, "avg", false, "if true, files must have same cols and rows, outputs average of any float-type columns across files")
+	flag.BoolVar(&avg, "avg", false, "if true, files must have same cols (ideally rows too, though not necessary), outputs average of any float-type columns across files")
 	flag.StringVar(&Output, "output", "", "name of output file -- stdout if not specified")
 	flag.StringVar(&Output, "o", "", "name of output file -- stdout if not specified")
 	flag.BoolVar(&Delete, "delete", false, "if true, delete the source files after cat -- careful!")
@@ -116,25 +117,44 @@ func AvgCat(files []string) {
 	ot := dts[0].Clone()
 	ot.SetMetaData("precision", strconv.Itoa(LogPrec))
 	nr := ot.Rows
+	rns := make([]int, nr)
+	for _, dt := range dts {
+		dnr := dt.Rows
+		mx := ints.MinInt(dnr, nr)
+		for ri := 0; ri < mx; ri++ {
+			rns[ri]++
+		}
+	}
 	for ci, cl := range ot.Cols {
 		if cl.DataType() != etensor.FLOAT32 && cl.DataType() != etensor.FLOAT64 {
 			continue
 		}
+		_, cells := cl.RowCellSize()
 		for di, dt := range dts {
 			if di == 0 {
 				continue
 			}
 			dc := dt.Cols[ci]
-			for ri := 0; ri < nr; ri++ {
-				cv := cl.FloatVal1D(ri)
-				cv += dc.FloatVal1D(ri)
-				cl.SetFloat1D(ri, cv)
+			dnr := dt.Rows
+			mx := ints.MinInt(dnr, nr)
+			for ri := 0; ri < mx; ri++ {
+				si := ri * cells
+				for j := 0; j < cells; j++ {
+					ci := si + j
+					cv := cl.FloatVal1D(ci)
+					cv += dc.FloatVal1D(ci)
+					cl.SetFloat1D(ci, cv)
+				}
 			}
 		}
 		for ri := 0; ri < nr; ri++ {
-			cv := cl.FloatVal1D(ri)
-			cv /= float64(nt)
-			cl.SetFloat1D(ri, cv)
+			si := ri * cells
+			for j := 0; j < cells; j++ {
+				ci := si + j
+				cv := cl.FloatVal1D(ci)
+				cv /= float64(rns[ri])
+				cl.SetFloat1D(ci, cv)
+			}
 		}
 	}
 	ot.SaveCSV(gi.FileName(Output), etable.Tab, etable.Headers)
