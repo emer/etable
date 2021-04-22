@@ -42,3 +42,5 @@ The following packages are included:
 
 * `minmax` is home of basic Min / Max range struct, and `norm` has lots of good functions for computing standard norms and normalizing vectors.
 
+* `utils` has various table-related utility command-line utility tools, including `etcat` which combines multiple table files into one file, including option for averaging column data.
+

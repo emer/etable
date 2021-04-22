@@ -14,8 +14,8 @@ import (
 	"github.com/goki/gi/gi"
 )
 
-// SaveCSV writes a tensor to a comma-separated-values (CSV) file (where comma = any delimiter,
-// specified in the delim arg).
+// SaveCSV writes a tensor to a comma-separated-values (CSV) file
+// (where comma = any delimiter, specified in the delim arg).
 // Outer-most dims are rows in the file, and inner-most is column --
 // Reading just grabs all values and doesn't care about shape.
 func SaveCSV(tsr Tensor, filename gi.FileName, delim rune) error {
@@ -29,8 +29,9 @@ func SaveCSV(tsr Tensor, filename gi.FileName, delim rune) error {
 	return nil
 }
 
-// OpenCSV reads a tensor from a comma-separated-values (CSV) file (where comma = any delimiter,
-// specified in the delim arg), using the Go standard encoding/csv reader conforming
+// OpenCSV reads a tensor from a comma-separated-values (CSV) file
+// (where comma = any delimiter, specified in the delim arg),
+// using the Go standard encoding/csv reader conforming
 // to the official CSV standard.
 // Reads all values and assigns as many as fit.
 func OpenCSV(tsr Tensor, filename gi.FileName, delim rune) error {
@@ -46,8 +47,8 @@ func OpenCSV(tsr Tensor, filename gi.FileName, delim rune) error {
 //////////////////////////////////////////////////////////////////////////
 // WriteCSV
 
-// WriteCSV writes a tensor to a comma-separated-values (CSV) file (where comma = any delimiter,
-//  specified in the delim arg).
+// WriteCSV writes a tensor to a comma-separated-values (CSV) file
+// (where comma = any delimiter, specified in the delim arg).
 // Outer-most dims are rows in the file, and inner-most is column --
 // Reading just grabs all values and doesn't care about shape.
 func WriteCSV(tsr Tensor, w io.Writer, delim rune) error {
@@ -82,8 +83,9 @@ func WriteCSV(tsr Tensor, w io.Writer, delim rune) error {
 	return nil
 }
 
-// ReadCSV reads a tensor from a comma-separated-values (CSV) file (where comma = any delimiter,
-// specified in the delim arg), using the Go standard encoding/csv reader conforming
+// ReadCSV reads a tensor from a comma-separated-values (CSV) file
+// (where comma = any delimiter, specified in the delim arg),
+// using the Go standard encoding/csv reader conforming
 // to the official CSV standard.
 // Reads all values and assigns as many as fit.
 func ReadCSV(tsr Tensor, r io.Reader, delim rune) error {
