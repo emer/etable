@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"github.com/chewxy/math32"
+	"github.com/goki/mat32"
 )
 
 ///////////////////////////////////////////
@@ -22,10 +22,10 @@ func Abs32(a, b []float32) float32 {
 	ss := float32(0)
 	for i, av := range a {
 		bv := b[i]
-		if math32.IsNaN(av) || math32.IsNaN(bv) {
+		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
 			continue
 		}
-		ss += math32.Abs(av - bv)
+		ss += mat32.Abs(av - bv)
 	}
 	return ss
 }
@@ -60,7 +60,7 @@ func Hamming32(a, b []float32) float32 {
 	ss := float32(0)
 	for i, av := range a {
 		bv := b[i]
-		if math32.IsNaN(av) || math32.IsNaN(bv) {
+		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
 			continue
 		}
 		if av != bv {

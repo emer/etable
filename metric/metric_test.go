@@ -8,14 +8,14 @@ import (
 	"math"
 	"testing"
 
-	"github.com/chewxy/math32"
+	"github.com/goki/mat32"
 )
 
 func TestAll(t *testing.T) {
 	a64 := []float64{.5, .2, .1, .7, math.NaN(), .5}
 	b64 := []float64{.2, .5, .1, .7, 0, .2}
 
-	a32 := []float32{.5, .2, .1, .7, math32.NaN(), .5}
+	a32 := []float32{.5, .2, .1, .7, mat32.NaN(), .5}
 	b32 := []float32{.2, .5, .1, .7, 0, .2}
 
 	ss := SumSquares64(a64, b64)

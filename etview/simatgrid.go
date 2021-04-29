@@ -5,7 +5,6 @@
 package etview
 
 import (
-	"github.com/chewxy/math32"
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/simat"
 	"github.com/goki/gi/gi"
@@ -157,11 +156,11 @@ func (tg *SimMatGrid) Size2D(iter int) {
 		frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 		fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 		tg.Disp.ToDots(&tg.Sty.UnContext)
-		max := float32(math32.Max(frw, fcl))
+		max := float32(mat32.Max(frw, fcl))
 		gsz := tg.Disp.TotPrefSize.Dots / max
-		gsz = math32.Max(gsz, tg.Disp.GridMinSize.Dots)
-		gsz = math32.Max(gsz, txtsz)
-		gsz = math32.Min(gsz, tg.Disp.GridMaxSize.Dots)
+		gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
+		gsz = mat32.Max(gsz, txtsz)
+		gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
 		tg.Size2DFromWH(tg.rowMaxSz.X+LabelSpace+gsz*float32(cols), tg.colMaxSz.Y+LabelSpace+gsz*float32(rows))
 	}
 }

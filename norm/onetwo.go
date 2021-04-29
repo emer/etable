@@ -7,7 +7,7 @@ package norm
 import (
 	"math"
 
-	"github.com/chewxy/math32"
+	"github.com/goki/mat32"
 )
 
 ///////////////////////////////////////////
@@ -18,10 +18,10 @@ import (
 func L132(a []float32) float32 {
 	ss := float32(0)
 	for _, av := range a {
-		if math32.IsNaN(av) {
+		if mat32.IsNaN(av) {
 			continue
 		}
-		ss += math32.Abs(av)
+		ss += mat32.Abs(av)
 	}
 	return ss
 }
@@ -48,7 +48,7 @@ func SumSquares32(a []float32) float32 {
 	n := len(a)
 	if n < 2 {
 		if n == 1 {
-			return math32.Abs(a[0])
+			return mat32.Abs(a[0])
 		}
 		return 0
 	}
@@ -57,10 +57,10 @@ func SumSquares32(a []float32) float32 {
 		sumSquares float32 = 1
 	)
 	for _, v := range a {
-		if v == 0 || math32.IsNaN(v) {
+		if v == 0 || mat32.IsNaN(v) {
 			continue
 		}
-		absxi := math32.Abs(v)
+		absxi := mat32.Abs(v)
 		if scale < absxi {
 			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
 			scale = absxi
@@ -68,8 +68,8 @@ func SumSquares32(a []float32) float32 {
 			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
 		}
 	}
-	if math32.IsInf(scale, 1) {
-		return math32.Inf(1)
+	if mat32.IsInf(scale, 1) {
+		return mat32.Inf(1)
 	}
 	return scale * scale * sumSquares
 }
@@ -115,7 +115,7 @@ func L232(a []float32) float32 {
 	n := len(a)
 	if n < 2 {
 		if n == 1 {
-			return math32.Abs(a[0])
+			return mat32.Abs(a[0])
 		}
 		return 0
 	}
@@ -124,10 +124,10 @@ func L232(a []float32) float32 {
 		sumSquares float32 = 1
 	)
 	for _, v := range a {
-		if v == 0 || math32.IsNaN(v) {
+		if v == 0 || mat32.IsNaN(v) {
 			continue
 		}
-		absxi := math32.Abs(v)
+		absxi := mat32.Abs(v)
 		if scale < absxi {
 			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
 			scale = absxi
@@ -135,10 +135,10 @@ func L232(a []float32) float32 {
 			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
 		}
 	}
-	if math32.IsInf(scale, 1) {
-		return math32.Inf(1)
+	if mat32.IsInf(scale, 1) {
+		return mat32.Inf(1)
 	}
-	return scale * math32.Sqrt(sumSquares)
+	return scale * mat32.Sqrt(sumSquares)
 }
 
 // L264 computes the square-root of sum-of-squares of vector, i.e., the L2 norm.

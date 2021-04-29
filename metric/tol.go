@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"github.com/chewxy/math32"
+	"github.com/goki/mat32"
 )
 
 ///////////////////////////////////////////
@@ -21,10 +21,10 @@ func Tolerance32(a, b []float32, tol float32) {
 	}
 	for i, av := range a {
 		bv := b[i]
-		if math32.IsNaN(av) || math32.IsNaN(bv) {
+		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
 			continue
 		}
-		if math32.Abs(av-bv) <= tol {
+		if mat32.Abs(av-bv) <= tol {
 			a[i] = bv
 		}
 	}

@@ -7,8 +7,8 @@ package norm
 import (
 	"math"
 
-	"github.com/chewxy/math32"
 	"github.com/goki/ki/kit"
+	"github.com/goki/mat32"
 )
 
 ///////////////////////////////////////////
@@ -85,7 +85,7 @@ func Unit64(a []float64) {
 // MultVec32 multiplies vector elements by scalar
 func MultVec32(a []float32, val float32) {
 	for i, av := range a {
-		if math32.IsNaN(av) {
+		if mat32.IsNaN(av) {
 			continue
 		}
 		a[i] *= val
@@ -108,7 +108,7 @@ func MultVec64(a []float64, val float64) {
 // AddVec32 adds scalar to vector
 func AddVec32(a []float32, val float32) {
 	for i, av := range a {
-		if math32.IsNaN(av) {
+		if mat32.IsNaN(av) {
 			continue
 		}
 		a[i] += val
@@ -132,7 +132,7 @@ func AddVec64(a []float64, val float64) {
 // to the high value, and everything below the low threshold is set to the low value.
 func Thresh32(a []float32, hi bool, hiThr float32, lo bool, loThr float32) {
 	for i, av := range a {
-		if math32.IsNaN(av) {
+		if mat32.IsNaN(av) {
 			continue
 		}
 		if hi && av > hiThr {
@@ -167,7 +167,7 @@ func Thresh64(a []float64, hi bool, hiThr float64, lo bool, loThr float64) {
 // to the high value, and everything below to the low value.
 func Binarize32(a []float32, thr, hiVal, loVal float32) {
 	for i, av := range a {
-		if math32.IsNaN(av) {
+		if mat32.IsNaN(av) {
 			continue
 		}
 		if av >= thr {

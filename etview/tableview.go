@@ -13,7 +13,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/chewxy/math32"
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
@@ -28,6 +27,7 @@ import (
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
+	"github.com/goki/mat32"
 	"github.com/goki/pi/filecat"
 )
 
@@ -435,7 +435,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 	if tv.Sty.Font.Face == nil {
 		girl.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
 	}
-	tv.RowHeight = math32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
+	tv.RowHeight = mat32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
 
 	mvp := tv.ViewportSafe()
 	if mvp != nil && mvp.HasFlag(int(gi.VpFlagPrefSizing)) {
@@ -447,7 +447,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		if sgHt == 0 {
 			return false
 		}
-		tv.VisRows = int(math32.Floor(sgHt / tv.RowHeight))
+		tv.VisRows = int(mat32.Floor(sgHt / tv.RowHeight))
 	}
 	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
 
