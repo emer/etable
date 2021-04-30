@@ -28,14 +28,16 @@ func (pl *Plot2D) GenPlotXY() {
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
 
-	// plt.Title.Color = gi.Prefs.Colors.Font
-	// plt.Legend.Color = gi.Prefs.Colors.Font
+	plt.Title.TextStyle.Color = gi.Prefs.Colors.Font
+	plt.Legend.TextStyle.Color = gi.Prefs.Colors.Font
 	plt.X.Color = gi.Prefs.Colors.Font
 	plt.Y.Color = gi.Prefs.Colors.Font
-	// plt.X.Label.Color = gi.Prefs.Colors.Font
-	// plt.Y.Label.Color = gi.Prefs.Colors.Font
+	plt.X.Label.TextStyle.Color = gi.Prefs.Colors.Font
+	plt.Y.Label.TextStyle.Color = gi.Prefs.Colors.Font
 	plt.X.Tick.Color = gi.Prefs.Colors.Font
 	plt.Y.Tick.Color = gi.Prefs.Colors.Font
+	plt.X.Tick.Label.Color = gi.Prefs.Colors.Font
+	plt.Y.Tick.Label.Color = gi.Prefs.Colors.Font
 
 	plt.BackgroundColor = nil
 
