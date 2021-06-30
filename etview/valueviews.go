@@ -165,7 +165,7 @@ func (vv *TensorValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 	if vv.This().(giv.ValueView).IsInactive() {
 		inact = true
 	}
-	TensorViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
+	TensorGridDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////

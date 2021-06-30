@@ -323,17 +323,43 @@ func (tg *TensorGrid) RenderTensor() {
 	tsr := tg.Tensor
 
 	if tg.Disp.Image {
-		posx := int(pos.X)
-		posy := int(pos.Y)
 		ysz := tsr.Dim(0)
 		xsz := tsr.Dim(1)
 		nclr := 1
+		outclr := false // outer dimension is color
 		if tsr.NumDims() == 3 {
-			nclr = tsr.Dim(2)
+			if tsr.Dim(0) == 3 || tsr.Dim(0) == 4 {
+				outclr = true
+				ysz = tsr.Dim(1)
+				xsz = tsr.Dim(2)
+				nclr = tsr.Dim(0)
+			} else {
+				nclr = tsr.Dim(2)
+			}
 		}
+		tsz := mat32.Vec2{float32(xsz), float32(ysz)}
+		gsz := sz.Div(tsz)
 		for y := 0; y < ysz; y++ {
 			for x := 0; x < xsz; x++ {
-				if nclr > 1 {
+				ey := y
+				if !tg.Disp.TopZero {
+					ey = (ysz - 1) - y
+				}
+				switch {
+				case outclr:
+					var r, g, b, a float64
+					a = 1
+					r = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{0, y, x}))
+					g = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{1, y, x}))
+					b = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{2, y, x}))
+					if nclr > 3 {
+						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{3, y, x}))
+					}
+					cr := mat32.Vec2{float32(x), float32(ey)}
+					pr := pos.Add(cr.Mul(gsz))
+					pc.StrokeStyle.Color.Color.SetFloat64(r, g, b, a)
+					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Color)
+				case nclr > 1:
 					var r, g, b, a float64
 					a = 1
 					r = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 0}))
@@ -342,12 +368,16 @@ func (tg *TensorGrid) RenderTensor() {
 					if nclr > 3 {
 						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 3}))
 					}
+					cr := mat32.Vec2{float32(x), float32(ey)}
+					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color.Color.SetFloat64(r, g, b, a)
-					pc.SetPixel(rs, posx+x, posy+y)
-				} else {
+					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Color)
+				default:
 					val := tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x}))
+					cr := mat32.Vec2{float32(x), float32(ey)}
+					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color.Color.SetFloat64(val, val, val, 1)
-					pc.SetPixel(rs, posx+x, posy+y)
+					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Color)
 				}
 			}
 		}
