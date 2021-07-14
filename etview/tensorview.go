@@ -157,20 +157,25 @@ func (tv *TensorView) RowWidgetNs() (nWidgPerRow, idxOff int) {
 // ConfigSliceGrid configures the SliceGrid for the current slice
 // this is only called by global Config and updates are guarded by that
 func (tv *TensorView) ConfigSliceGrid() {
+	sg := tv.SliceFrame()
+	updt := sg.UpdateStart()
+	defer sg.UpdateEnd(updt)
+
+	sgf := tv.This().(giv.SliceViewer).SliceGrid()
+	if sgf != nil {
+		sgf.DeleteChildren(ki.DestroyKids)
+	}
+
 	if tv.Tensor == nil {
 		return
 	}
 
-	sz := tv.UpdtSliceSize()
+	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
 	if sz == 0 {
 		return
 	}
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
-
-	sg := tv.SliceFrame()
-	updt := sg.UpdateStart()
-	defer sg.UpdateEnd(updt)
 
 	sg.Lay = gi.LayoutVert
 	sg.SetMinPrefWidth(units.NewCh(20))
@@ -196,7 +201,7 @@ func (tv *TensorView) ConfigSliceGrid() {
 	gconfig.Add(gi.KiT_ScrollBar, "scrollbar")
 	gl.ConfigChildren(gconfig) // covered by above
 
-	sgf := tv.SliceGrid()
+	sgf = tv.This().(giv.SliceViewer).SliceGrid()
 	sgf.Lay = gi.LayoutGrid
 	sgf.Stripes = gi.RowStripes
 	sgf.SetMinPrefHeight(units.NewEm(10))
@@ -220,8 +225,6 @@ func (tv *TensorView) ConfigSliceGrid() {
 	sgh.ConfigChildren(hcfg)
 
 	// at this point, we make one dummy row to get size of widgets
-
-	sgf.DeleteChildren(true)
 	sgf.Kids = make(ki.Slice, nWidgPerRow)
 
 	itxt := fmt.Sprintf("%05d", 0)
@@ -264,14 +267,25 @@ func (tv *TensorView) ConfigSliceGrid() {
 // LayoutSliceGrid does the proper layout of slice grid depending on allocated size
 // returns true if UpdateSliceGrid should be called after this
 func (tv *TensorView) LayoutSliceGrid() bool {
-	sg := tv.SliceGrid()
-	if tv.Tensor == nil {
-		sg.DeleteChildren(true)
+	sg := tv.This().(giv.SliceViewer).SliceGrid()
+	if sg == nil {
 		return false
 	}
-	sz := tv.UpdtSliceSize()
+
+	updt := sg.UpdateStart()
+	defer sg.UpdateEnd(updt)
+
+	if tv.Tensor == nil {
+		sg.DeleteChildren(ki.DestroyKids)
+		return false
+	}
+
+	tv.ViewMuLock()
+	defer tv.ViewMuUnlock()
+
+	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
 	if sz == 0 {
-		sg.DeleteChildren(true)
+		sg.DeleteChildren(ki.DestroyKids)
 		return false
 	}
 
@@ -300,10 +314,8 @@ func (tv *TensorView) LayoutSliceGrid() bool {
 
 	nWidg := nWidgPerRow * tv.DispRows
 
-	updt := sg.UpdateStart()
-	defer sg.UpdateEnd(updt)
 	if tv.Values == nil || sg.NumChildren() != nWidg {
-		sg.DeleteChildren(true)
+		sg.DeleteChildren(ki.DestroyKids)
 
 		tv.Values = make([]giv.ValueView, tv.NCols*tv.DispRows)
 		sg.Kids = make(ki.Slice, nWidg)
@@ -349,18 +361,10 @@ func (tv *TensorView) LayoutHeader() {
 
 // UpdateSliceGrid updates grid display -- robust to any time calling
 func (tv *TensorView) UpdateSliceGrid() {
-	if tv.Tensor == nil || tv.Tensor.Len() == 0 {
+	sg := tv.This().(giv.SliceViewer).SliceGrid()
+	if sg == nil {
 		return
 	}
-	sz := tv.UpdtSliceSize()
-	if sz == 0 {
-		return
-	}
-	sg := tv.SliceGrid()
-	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
-
-	nWidgPerRow, idxOff := tv.RowWidgetNs()
-	nWidg := nWidgPerRow * tv.DispRows
 
 	wupdt := tv.TopUpdateStart()
 	defer tv.TopUpdateEnd(wupdt)
@@ -368,20 +372,33 @@ func (tv *TensorView) UpdateSliceGrid() {
 	updt := sg.UpdateStart()
 	defer sg.UpdateEnd(updt)
 
+	if tv.Tensor == nil || tv.Tensor.Len() == 0 {
+		sg.DeleteChildren(ki.DestroyKids)
+		return
+	}
+
+	tv.ViewMuLock()
+	defer tv.ViewMuUnlock()
+
+	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
+	if sz == 0 {
+		sg.DeleteChildren(ki.DestroyKids)
+		return
+	}
+
+	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
+
+	nWidgPerRow, idxOff := tv.RowWidgetNs()
+	nWidg := nWidgPerRow * tv.DispRows
+
 	if tv.Values == nil || sg.NumChildren() != nWidg { // shouldn't happen..
+		tv.ViewMuUnlock()
 		tv.LayoutSliceGrid()
+		tv.ViewMuLock()
 		nWidg = nWidgPerRow * tv.DispRows
 	}
 
-	if sz > tv.DispRows {
-		sb := tv.ScrollBar()
-		tv.StartIdx = int(sb.Value)
-		lastSt := sz - tv.DispRows
-		tv.StartIdx = ints.MinInt(lastSt, tv.StartIdx)
-		tv.StartIdx = ints.MaxInt(0, tv.StartIdx)
-	} else {
-		tv.StartIdx = 0
-	}
+	tv.UpdateStartIdx()
 
 	for ri := 0; ri < tv.DispRows; ri++ {
 		ridx := ri * nWidgPerRow
