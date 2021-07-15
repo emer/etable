@@ -118,16 +118,17 @@ var TableViewProps = ki.Props{
 
 // UpdateTable updates view of Table -- regenerates indexes and calls Update
 func (tv *TableView) UpdateTable() {
-	if !tv.This().(gi.Node2D).IsVisible() {
-		return
-	}
 	if tv.Table != nil {
 		tv.Table.Sequential()
-		if tv.SortIdx >= 0 {
-			tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
-		}
 	}
 	tv.Update()
+}
+
+// SortIfNeeded sort table if sorting set
+func (tv *TableView) SortIfNeeded() {
+	if tv.SortIdx >= 0 {
+		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
+	}
 }
 
 // IsConfiged returns true if the widget is fully configured
@@ -413,10 +414,6 @@ func (tv *TableView) ConfigSliceGrid() {
 		tv.Table.Table.SetNumRows(0) // revert
 	}
 
-	if tv.SortIdx >= 0 {
-		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
-	}
-
 	tv.ConfigScroll()
 }
 
@@ -541,6 +538,8 @@ func (tv *TableView) UpdateSliceGrid() {
 		sg.DeleteChildren(ki.DestroyKids)
 		return
 	}
+
+	tv.SortIfNeeded()
 
 	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
 
