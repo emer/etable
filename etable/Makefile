@@ -16,7 +16,7 @@ clean:
 	$(GOCLEAN)
 	
 # NOTE: MUST update version number here prior to running 'make release'
-VERS=v1.0.30
+VERS=v1.0.31
 PACKAGE=etable
 GIT_COMMIT=`git rev-parse --short HEAD`
 VERS_DATE=`date -u +%Y-%m-%d\ %H:%M`
