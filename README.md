@@ -10,7 +10,7 @@ The e-name derives from the `emergent` neural network simulation framework, but 
 
 See `examples/dataproc` for a full demo of how to use this system for data analysis, paralleling the example in 	[Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
 
-See [Wiki](https://github.com/emer/etable/wiki) for how-to documentation, etc.
+See [Wiki](https://github.com/emer/etable/wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
 
 As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [GoKi Naming Convention](https://github.com/goki/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
 
@@ -43,4 +43,95 @@ The following packages are included:
 * `minmax` is home of basic Min / Max range struct, and `norm` has lots of good functions for computing standard norms and normalizing vectors.
 
 * `utils` has various table-related utility command-line utility tools, including `etcat` which combines multiple table files into one file, including option for averaging column data.
+
+# Cheat Sheet
+
+`et` is the etable pointer variable for examples below:
+
+## Table Access
+
+Scalar columns:
+
+```Go
+val := et.CellFloat("ColName", row)
+```
+
+```Go
+str := et.CellString("ColName", row)
+```
+
+Tensor (higher-dimensional) columns:
+
+```Go
+tsr := et.CellTensor("ColName", row) // entire tensor at cell (a row-level SubSpace of column tensor)
+```
+
+```Go
+val := et.CellTensorFloat1D("ColName", row, cellidx) // idx is 1D index into cell tensor
+```
+
+## Set Table Value
+
+```Go
+et.SetCellFloat("ColName", row, val)
+```
+
+```Go
+et.SetCellString("ColName", row, str)
+```
+
+Tensor (higher-dimensional) columns:
+
+```Go
+et.SetCellTensor("ColName", row, tsr) // set entire tensor at cell 
+```
+
+```Go
+et.SetCellTensorFloat1D("ColName", row, cellidx, val) // idx is 1D index into cell tensor
+```
+
+## Index Views (Sort, Filter, etc)
+
+The [IdxView](https://godoc.org/github.com/emer/etable/etable#IdxView) provides a list of row-wise indexes into a table, and Sorting, Filtering and Splitting all operate on this index view without changing the underlying table data, for maximum efficiency and flexibility.
+
+```Go
+ix := etable.NewIdxView(et) // new view with all rows
+```
+
+### Sort
+
+```Go
+ix.SortColName("Name", etable.Ascending) // etable.Ascending or etable.Descending
+SortedTable := ix.NewTable() // turn an IdxView back into a new Table organized in order of indexes
+```
+
+or:
+
+```Go
+nmcl := et.ColByName("Name") // nmcl is an etensor of the Name column, cached
+ix.Sort(func(t *Table, i, j int) bool {
+	return nmcl.StringVal1D(i) < nmcl.StringVal1D(j)
+})
+```
+
+### Filter
+
+```Go
+nmcl := et.ColByName("Name") // column we're filtering on
+ix.Filter(func(t *Table, row int) bool {
+	// filter return value is for what to *keep* (=true), not exclude
+	// here we keep any row with a name that contains the string "in"
+	return strings.Contains(nmcl.StringVal1D(row), "in")
+})
+```
+
+### Splits ("pivot tables" etc)
+
+Create a table of mean values of "Data" column grouped by unique entries in "Name" column, resulting table will be called "DataMean"
+
+```Go
+byNm := split.GroupBy(ix, []string{"Name"}) // column name(s) to group by
+split.Agg(byNm, "Data", agg.AggMean) // 
+gps := byNm.AggsToTable(etable.AddAggName) // etable.AddAggName or etable.ColNameOnly for naming cols
+```
 

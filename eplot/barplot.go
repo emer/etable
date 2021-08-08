@@ -10,6 +10,7 @@ import (
 	"math"
 
 	"github.com/emer/etable/etable"
+	"github.com/emer/etable/minmax"
 	"github.com/emer/etable/split"
 	"github.com/goki/gi/gist"
 	"github.com/goki/ki/ints"
@@ -73,10 +74,10 @@ func (pl *Plot2D) GenPlotBar() {
 			nys++
 		}
 		if cp.Range.FixMin {
-			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
+			plt.Y.Min = cp.Range.Min
 		}
 		if cp.Range.FixMax {
-			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
+			plt.Y.Max = cp.Range.Max
 		}
 	}
 
@@ -117,7 +118,7 @@ func (pl *Plot2D) GenPlotBar() {
 			}
 			for ii := 0; ii < nidx; ii++ {
 				idx := stidx + ii
-				xy, _ := NewTableXYName(lview, xi, xp.TensorIdx, cp.Col, idx)
+				xy, _ := NewTableXYName(lview, xi, xp.TensorIdx, cp.Col, idx, cp.Range)
 				if xy == nil {
 					continue
 				}
@@ -146,7 +147,7 @@ func (pl *Plot2D) GenPlotBar() {
 				}
 				var bar *ErrBarChart
 				if ec >= 0 {
-					exy, _ := NewTableXY(lview, ec, 0, ec, 0)
+					exy, _ := NewTableXY(lview, ec, 0, ec, 0, minmax.Range64{})
 					bar, err = NewErrBarChart(xy, exy)
 					if err != nil {
 						log.Println(err)
@@ -179,7 +180,7 @@ func (pl *Plot2D) GenPlotBar() {
 		firstXY.Table = xview
 		n := xview.Len()
 		for _, cp := range strCols {
-			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx, firstXY.YRange)
 			xy.LblCol = xy.YCol
 			xy.YCol = firstXY.YCol
 			xy.YIdx = firstXY.YIdx

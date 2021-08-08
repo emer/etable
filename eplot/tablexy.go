@@ -26,27 +26,27 @@ type TableXY struct {
 	XIdx, YIdx     int             `desc:"the indexes of the element within each tensor cell if cells are n-dimensional, respectively"`
 	LblCol         int             `desc:"the column to use for returning a label using Label interface -- for string cols"`
 	ErrCol         int             `desc:"the column to use for returning errorbars (+/- given value) -- if YCol is tensor then this must also be a tensor and given YIdx used"`
-	XRange         minmax.Range64
+	YRange         minmax.Range64  `desc:"range constraints on Y values"`
 }
 
 // NewTableXY returns a new XY plot view onto the given IdxView of etable.Table (makes a copy),
 // from given column indexes, and tensor indexes within each cell.
 // Column indexes are enforced to be valid, with an error message if they are not.
-func NewTableXY(dt *etable.IdxView, xcol, xtsrIdx, ycol, ytsrIdx int) (*TableXY, error) {
-	txy := &TableXY{Table: dt.Clone(), XCol: xcol, YCol: ycol, XIdx: xtsrIdx, YIdx: ytsrIdx}
+func NewTableXY(dt *etable.IdxView, xcol, xtsrIdx, ycol, ytsrIdx int, yrng minmax.Range64) (*TableXY, error) {
+	txy := &TableXY{Table: dt.Clone(), XCol: xcol, YCol: ycol, XIdx: xtsrIdx, YIdx: ytsrIdx, YRange: yrng}
 	return txy, txy.Validate()
 }
 
 // NewTableXYName returns a new XY plot view onto the given IdxView of etable.Table (makes a copy),
 // from given column name and tensor indexes within each cell.
 // Column indexes are enforced to be valid, with an error message if they are not.
-func NewTableXYName(dt *etable.IdxView, xi, xtsrIdx int, ycol string, ytsrIdx int) (*TableXY, error) {
+func NewTableXYName(dt *etable.IdxView, xi, xtsrIdx int, ycol string, ytsrIdx int, yrng minmax.Range64) (*TableXY, error) {
 	yi, err := dt.Table.ColIdxTry(ycol)
 	if err != nil {
 		log.Println(err)
 		return nil, err
 	}
-	txy := &TableXY{Table: dt.Clone(), XCol: xi, YCol: yi, XIdx: xtsrIdx, YIdx: ytsrIdx}
+	txy := &TableXY{Table: dt.Clone(), XCol: xi, YCol: yi, XIdx: xtsrIdx, YIdx: ytsrIdx, YRange: yrng}
 	return txy, txy.Validate()
 }
 
@@ -82,12 +82,18 @@ func (txy *TableXY) Validate() error {
 	return nil
 }
 
-// FilterVals removes items with NaN values, and out of X range
+// FilterVals removes items with NaN values, and out of Y range
 func (txy *TableXY) FilterVals() {
 	txy.Table.Filter(func(et *etable.Table, row int) bool {
 		xv := txy.TRowXValue(row)
 		yv := txy.TRowValue(row)
 		if math.IsNaN(yv) || math.IsNaN(xv) {
+			return false
+		}
+		if txy.YRange.FixMin && yv < txy.YRange.Min {
+			return false
+		}
+		if txy.YRange.FixMax && yv > txy.YRange.Max {
 			return false
 		}
 		return true

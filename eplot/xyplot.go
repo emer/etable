@@ -81,10 +81,10 @@ func (pl *Plot2D) GenPlotXY() {
 			nys++
 		}
 		if cp.Range.FixMin {
-			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
+			plt.Y.Min = cp.Range.Min
 		}
 		if cp.Range.FixMax {
-			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
+			plt.Y.Max = cp.Range.Max
 		}
 	}
 
@@ -123,7 +123,7 @@ func (pl *Plot2D) GenPlotXY() {
 					idx := stidx + ii
 					tix := lview.Clone()
 					tix.Idxs = tix.Idxs[stRow:edRow]
-					xy, _ := NewTableXYName(tix, xi, xp.TensorIdx, cp.Col, idx)
+					xy, _ := NewTableXYName(tix, xi, xp.TensorIdx, cp.Col, idx, cp.Range)
 					if xy == nil {
 						continue
 					}
@@ -187,7 +187,7 @@ func (pl *Plot2D) GenPlotXY() {
 	}
 	if firstXY != nil && len(strCols) > 0 {
 		for _, cp := range strCols {
-			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx)
+			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx, firstXY.YRange)
 			xy.LblCol = xy.YCol
 			xy.YCol = firstXY.YCol
 			xy.YIdx = firstXY.YIdx

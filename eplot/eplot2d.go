@@ -304,11 +304,11 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 	lim := false
 	if xp.Range.FixMin {
 		lim = true
-		plt.X.Min = math.Min(plt.X.Min, xp.Range.Min)
+		plt.X.Min = xp.Range.Min
 	}
 	if xp.Range.FixMax {
 		lim = true
-		plt.X.Max = math.Max(plt.X.Max, xp.Range.Max)
+		plt.X.Max = xp.Range.Max
 	}
 	if xc.NumDims() > 1 {
 		sz = xc.Len() / xc.Dim(0)
