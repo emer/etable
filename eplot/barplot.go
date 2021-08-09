@@ -74,10 +74,10 @@ func (pl *Plot2D) GenPlotBar() {
 			nys++
 		}
 		if cp.Range.FixMin {
-			plt.Y.Min = cp.Range.Min
+			plt.Y.Min = math.Min(plt.Y.Min, cp.Range.Min)
 		}
 		if cp.Range.FixMax {
-			plt.Y.Max = cp.Range.Max
+			plt.Y.Max = math.Max(plt.Y.Max, cp.Range.Max)
 		}
 	}
 
