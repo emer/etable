@@ -120,6 +120,7 @@ var TableViewProps = ki.Props{
 func (tv *TableView) UpdateTable() {
 	if tv.Table != nil {
 		tv.Table.Sequential()
+		tv.SortIfNeeded()
 	}
 	tv.Update()
 }
@@ -539,8 +540,6 @@ func (tv *TableView) UpdateSliceGrid() {
 		return
 	}
 
-	tv.SortIfNeeded()
-
 	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
 
 	tv.TsrDispToDots()
@@ -802,6 +801,8 @@ func (tv *TableView) SliceNewAt(idx int) {
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
 
+	tv.SliceNewAtSel(idx)
+
 	tv.Table.InsertRows(idx, 1)
 
 	if tv.TmpSave != nil {
@@ -827,7 +828,7 @@ func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
 	updt := tv.UpdateStart()
 	defer tv.UpdateEnd(updt)
 
-	delete(tv.SelectedIdxs, idx)
+	tv.SliceDeleteAtSel(idx)
 
 	tv.Table.DeleteRows(idx, 1)
 
