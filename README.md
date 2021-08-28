@@ -1,8 +1,9 @@
 # etable: DataTable / DataFrame structure in Go
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/emer/etable)](https://goreportcard.com/report/github.com/emer/etable)
-[![GoDoc](https://godoc.org/github.com/emer/etable?status.svg)](https://godoc.org/github.com/emer/etable)
-[![Travis](https://travis-ci.com/emer/etable.svg?branch=master)](https://travis-ci.com/emer/etable)
+[![Go Reference](https://pkg.go.dev/badge/github.com/emer/etable.svg)](https://pkg.go.dev/github.com/emer/etable)
+[![CI](https://github.com/emer/etable/actions/workflows/ci.yml/badge.svg)](https://github.com/emer/etable/actions/workflows/ci.yml)
+[![Codecov](https://codecov.io/gh/emer/etable/branch/master/graph/badge.svg?token=Hw5cInAxY3)](https://codecov.io/gh/emer/etable)
 
  **etable** (or eTable) provides a DataTable / DataFrame structure in Go (golang), similar to [pandas](https://pandas.pydata.org/) and [xarray](http://xarray.pydata.org/en/stable/) in Python, and [Apache Arrow Table](https://github.com/apache/arrow/tree/master/go/arrow/array/table.go), using `etensor` n-dimensional columns aligned by common outermost row dimension.
 
