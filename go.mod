@@ -1,6 +1,6 @@
 module github.com/emer/etable
 
-go 1.13
+go 1.15
 
 require (
 	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75 // indirect

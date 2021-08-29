@@ -131,7 +131,7 @@ func (txy *TableXY) TRowValue(row int) float64 {
 
 // Value returns the y value at given row in table view
 func (txy *TableXY) Value(row int) float64 {
-	if txy.Table == nil || txy.Table.Table == nil {
+	if txy.Table == nil || txy.Table.Table == nil || row >= txy.Table.Len() {
 		return 0
 	}
 	trow := txy.Table.Idxs[row] // true table row
@@ -180,7 +180,7 @@ func (txy *TableXY) TRowXValue(row int) float64 {
 
 // XValue returns an x value at given row in table view
 func (txy *TableXY) XValue(row int) float64 {
-	if txy.Table == nil || txy.Table.Table == nil {
+	if txy.Table == nil || txy.Table.Table == nil || row >= txy.Table.Len() {
 		return 0
 	}
 	trow := txy.Table.Idxs[row] // true table row
@@ -215,7 +215,7 @@ func (txy *TableXY) XY(row int) (x, y float64) {
 
 // Label returns a label for given row in table, using plotter.Labeler interface
 func (txy *TableXY) Label(row int) string {
-	if txy.Table == nil || txy.Table.Table == nil {
+	if txy.Table == nil || txy.Table.Table == nil || row >= txy.Table.Len() {
 		return ""
 	}
 	trow := txy.Table.Idxs[row] // true table row
@@ -224,7 +224,7 @@ func (txy *TableXY) Label(row int) string {
 
 // YError returns a error bars using ploter.YErrorer interface
 func (txy *TableXY) YError(row int) (float64, float64) {
-	if txy.Table == nil || txy.Table.Table == nil {
+	if txy.Table == nil || txy.Table.Table == nil || row >= txy.Table.Len() {
 		return 0, 0
 	}
 	trow := txy.Table.Idxs[row] // true table row
