@@ -137,11 +137,7 @@ func (pl *Plot2D) GenPlotXY() {
 					if nleg >= 1 {
 						cidx := yidx*nleg + li
 						clr, _ = gist.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
-						//if nys > 1 {
 						lbl = leg + " " + lbl
-						//} else {
-						//	lbl = leg
-						//}
 					}
 					if nidx > 1 {
 						clr, _ = gist.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
