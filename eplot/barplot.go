@@ -104,7 +104,7 @@ func (pl *Plot2D) GenPlotBar() {
 		for li := 0; li < nleg; li++ {
 			lview := xview
 			leg := ""
-			if nleg > 1 {
+			if lsplit != nil && len(lsplit.Values) > li {
 				leg = lsplit.Values[li][0]
 				lview = lsplit.Splits[li]
 			}
@@ -128,14 +128,12 @@ func (pl *Plot2D) GenPlotBar() {
 				}
 				lbl := cp.Label()
 				clr := cp.Color
+				if leg != "" {
+					lbl = leg + " " + lbl
+				}
 				if nleg > 1 {
 					cidx := yidx*nleg + li
 					clr, _ = gist.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
-					if nys > 1 {
-						lbl = leg + " " + lbl
-					} else {
-						lbl = leg
-					}
 				}
 				if nidx > 1 {
 					clr, _ = gist.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)

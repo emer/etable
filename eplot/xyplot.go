@@ -104,7 +104,7 @@ func (pl *Plot2D) GenPlotXY() {
 		for li := 0; li < nleg; li++ {
 			lview := xview
 			leg := ""
-			if nleg >= 1 {
+			if lsplit != nil && len(lsplit.Values) > li {
 				leg = lsplit.Values[li][0]
 				lview = lsplit.Splits[li]
 				_, _, xbreaks, _ = pl.PlotXAxis(plt, lview)
@@ -134,10 +134,12 @@ func (pl *Plot2D) GenPlotXY() {
 					var lns *plotter.Line
 					lbl := cp.Label()
 					clr := cp.Color
-					if nleg >= 1 {
+					if leg != "" {
+						lbl = leg + " " + lbl
+					}
+					if nleg > 1 {
 						cidx := yidx*nleg + li
 						clr, _ = gist.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
-						lbl = leg + " " + lbl
 					}
 					if nidx > 1 {
 						clr, _ = gist.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
