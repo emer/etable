@@ -119,13 +119,21 @@ func (tv *TensorView) SliceFrame() *gi.Frame {
 
 // GridLayout returns the SliceGrid grid-layout widget, with grid and scrollbar
 func (tv *TensorView) GridLayout() *gi.Layout {
-	return tv.SliceFrame().ChildByName("grid-lay", 0).(*gi.Layout)
+	gl := tv.SliceFrame().ChildByName("grid-lay", 1)
+	if gl == nil {
+		return nil
+	}
+	return gl.(*gi.Layout)
 }
 
 // SliceGrid returns the SliceGrid grid frame widget, which contains all the
 // fields and values, within SliceFrame
 func (tv *TensorView) SliceGrid() *gi.Frame {
-	return tv.GridLayout().ChildByName("grid", 0).(*gi.Frame)
+	gl := tv.GridLayout()
+	if gl == nil {
+		return nil
+	}
+	return gl.ChildByName("grid", 0).(*gi.Frame)
 }
 
 // ScrollBar returns the SliceGrid scrollbar

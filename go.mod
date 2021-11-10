@@ -1,14 +1,14 @@
 module github.com/emer/etable
 
-go 1.13
+go 1.15
 
 require (
-	github.com/ajstarks/svgo v0.0.0-20210406150507-75cfd577ce75 // indirect
-	github.com/apache/arrow/go/arrow v0.0.0-20210429081429-939195183657
-	github.com/goki/gi v1.2.10
-	github.com/goki/ki v1.1.3
+	github.com/ajstarks/svgo v0.0.0-20210927141636-6d70534b1098 // indirect
+	github.com/apache/arrow/go/arrow v0.0.0-20211022090848-03faa67fb219
+	github.com/goki/gi v1.2.15
+	github.com/goki/ki v1.1.4
 	github.com/goki/mat32 v1.0.9
-	github.com/goki/pi v1.0.14
-	gonum.org/v1/gonum v0.9.1
-	gonum.org/v1/plot v0.9.0
+	github.com/goki/pi v1.0.15
+	gonum.org/v1/gonum v0.9.3
+	gonum.org/v1/plot v0.10.0
 )
