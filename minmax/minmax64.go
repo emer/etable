@@ -107,7 +107,8 @@ func (mr *F64) ProjVal(val float64) float64 {
 	return mr.Min + (val * mr.Range())
 }
 
-// ClipVal clips given value within Min / Max rangee
+// ClipVal clips given value within Min / Max range
+// Note: a NaN will remain as a NaN
 func (mr *F64) ClipVal(val float64) float64 {
 	if val < mr.Min {
 		return mr.Min
@@ -119,6 +120,7 @@ func (mr *F64) ClipVal(val float64) float64 {
 }
 
 // ClipNormVal clips then normalizes given value within 0-1
+// Note: a NaN will remain as a NaN
 func (mr *F64) ClipNormVal(val float64) float64 {
 	if val < mr.Min {
 		return 0

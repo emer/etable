@@ -4,7 +4,9 @@
 
 package minmax
 
-import "math"
+import (
+	"math"
+)
 
 // F32 represents a min / max range for float32 values.
 // Supports clipping, renormalizing, etc
@@ -104,7 +106,8 @@ func (mr *F32) ProjVal(val float32) float32 {
 	return mr.Min + (val * mr.Range())
 }
 
-// ClipVal clips given value within Min / Max rangee
+// ClipVal clips given value within Min / Max range
+// Note: a NaN will remain as a NaN
 func (mr *F32) ClipVal(val float32) float32 {
 	if val < mr.Min {
 		return mr.Min
@@ -116,6 +119,7 @@ func (mr *F32) ClipVal(val float32) float32 {
 }
 
 // ClipNormVal clips then normalizes given value within 0-1
+// Note: a NaN will remain as a NaN
 func (mr *F32) ClipNormVal(val float32) float32 {
 	if val < mr.Min {
 		return 0

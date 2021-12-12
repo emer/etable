@@ -91,6 +91,16 @@ et.SetCellTensor("ColName", row, tsr) // set entire tensor at cell
 et.SetCellTensorFloat1D("ColName", row, cellidx, val) // idx is 1D index into cell tensor
 ```
 
+## Find Value(s) in Column
+
+Returns all rows where value matches given value, in string form (any number will convert to a string)
+
+```Go
+rows := et.RowsByString("ColName", "value", etable.Contains, etable.IgnoreCase)
+```
+
+Other options are `etable.Equals` instead of `Contains` to search for an exact full string, and `etable.UseCase` if case should be used instead of ignored.
+
 ## Index Views (Sort, Filter, etc)
 
 The [IdxView](https://godoc.org/github.com/emer/etable/etable#IdxView) provides a list of row-wise indexes into a table, and Sorting, Filtering and Splitting all operate on this index view without changing the underlying table data, for maximum efficiency and flexibility.
