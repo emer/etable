@@ -179,6 +179,14 @@ func (dt *Table) DeleteColIdx(idx int) {
 	dt.UpdateColNameMap()
 }
 
+// DeleteAll deletes all columns -- full reset
+func (dt *Table) DeleteAll() {
+	dt.Cols = nil
+	dt.ColNames = nil
+	dt.Rows = 0
+	dt.ColNameMap = nil
+}
+
 // AddRows adds n rows to each of the columns
 func (dt *Table) AddRows(n int) {
 	dt.SetNumRows(dt.Rows + n)
