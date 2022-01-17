@@ -589,13 +589,31 @@ func (pl *Plot2D) ColsConfig() {
 			})
 			ca.SetText(cp.Col)
 			ca.Data = ci
-			ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-				caa := send.(*gi.Action)
-				idx := caa.Data.(int)
-				cpp := pll.Cols[idx]
-				giv.StructViewDialog(pl.ViewportSafe(), cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
-			})
+			ca.MakeMenuFunc = func(g ki.Ki, m *gi.Menu) {
+				if len(*m) == 3 {
+					return
+				}
+				m.AddAction(gi.ActOpts{Name: "set-x", Label: "Set X Axis", Data: ci}, pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+					caa := send.(*gi.Action) // this action is menu action
+					idx := caa.Data.(int)
+					cpp := pl.Cols[idx]
+					pl.Params.XAxisCol = cpp.Col
+					pl.Update()
+				})
+				m.AddAction(gi.ActOpts{Name: "set-legend", Label: "Set Legend", Data: ci}, pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+					caa := send.(*gi.Action) // this action is menu action
+					idx := caa.Data.(int)
+					cpp := pl.Cols[idx]
+					pl.Params.LegendCol = cpp.Col
+					pl.Update()
+				})
+				m.AddAction(gi.ActOpts{Name: "edit", Label: "Edit", Data: ci}, pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+					caa := send.(*gi.Action)
+					idx := caa.Data.(int)
+					cpp := pl.Cols[idx]
+					giv.StructViewDialog(pl.ViewportSafe(), cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
+				})
+			}
 		}
 	}
 	vl.UpdateEnd(updt)
