@@ -339,6 +339,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 		})
 	}
 	if pl.Params.NegXDraw {
+		xbreaks = append(xbreaks, xview.Len())
 		return
 	}
 	lastx := -math.MaxFloat64

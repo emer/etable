@@ -55,7 +55,10 @@ func (pl *Plot2D) GenPlotXY() {
 		if err != nil {
 			log.Println("eplot.LegendCol: " + err.Error())
 		} else {
-			xview.SortColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending) // make it fit!
+			err = xview.SortStableColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending)
+			if err != nil {
+				log.Println(err)
+			}
 			lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
 			nleg = ints.MaxInt(lsplit.Len(), 1)
 		}

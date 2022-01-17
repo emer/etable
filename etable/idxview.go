@@ -215,7 +215,7 @@ func (ix *IdxView) SortCols(colIdxs []int, ascending bool) {
 				if ascending {
 					if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
 						return true
-					} else if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+					} else if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				} else {
@@ -237,6 +237,8 @@ func (ix *IdxView) SortCols(colIdxs []int, ascending bool) {
 // SortStable stably sorts the indexes into our Table using given Less function.
 // The Less function operates directly on row numbers into the Table
 // as these row numbers have already been projected through the indexes.
+// It is *essential* that it always returns false when the two are equal
+// for the stable function to actually work.
 func (ix *IdxView) SortStable(lessFunc func(et *Table, i, j int) bool) {
 	ix.lessFunc = lessFunc
 	sort.Stable(ix)
@@ -327,7 +329,7 @@ func (ix *IdxView) SortStableCols(colIdxs []int, ascending bool) {
 				if ascending {
 					if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
 						return true
-					} else if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+					} else if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				} else {
