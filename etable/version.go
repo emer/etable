@@ -3,7 +3,7 @@
 package etable
 
 const (
-	Version     = "v1.0.40"
-	GitCommit   = "316a02f"          // the commit JUST BEFORE the release
-	VersionDate = "2022-01-17 09:48" // UTC
+	Version     = "v1.0.41"
+	GitCommit   = "f631540"          // the commit JUST BEFORE the release
+	VersionDate = "2022-01-17 12:22" // UTC
 )
