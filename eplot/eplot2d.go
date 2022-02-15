@@ -781,4 +781,4 @@ var Plot2DProps = ki.Props{
 }
 
 // these are the plot color names to use in order for successive lines -- feel free to choose your own!
-var PlotColorNames = []string{"black", "red", "blue", "ForestGreen", "purple", "orange", "brown", "chartreuse", "navy", "cyan", "magenta", "tan", "salmon", "yellow", "SkyBlue", "pink"}
+var PlotColorNames = []string{"black", "red", "blue", "ForestGreen", "purple", "orange", "brown", "chartreuse", "navy", "cyan", "magenta", "tan", "salmon", "goldenrod", "SkyBlue", "pink"}
