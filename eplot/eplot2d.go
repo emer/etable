@@ -472,6 +472,8 @@ func (pl *Plot2D) ColsUpdate() {
 
 // SetAllCols turns all Cols on or off (except X axis)
 func (pl *Plot2D) SetAllCols(on bool) {
+	updt := pl.UpdateStart()
+	defer pl.UpdateEnd(updt)
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i < NColsHeader {
@@ -492,6 +494,9 @@ func (pl *Plot2D) SetAllCols(on bool) {
 
 // SetColsByName turns cols On or Off if their name contains given string
 func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
+	updt := pl.UpdateStart()
+	defer pl.UpdateEnd(updt)
+
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i < NColsHeader {
@@ -556,12 +561,13 @@ func (pl *Plot2D) ColsConfig() {
 		ca := cl.Child(1).(*gi.Action)
 		if i == 0 {
 			cb.SetChecked(false)
-			cb.Tooltip = "click to turn all columns on or off"
+			cb.Tooltip = "click to turn all columns off"
 			cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 				if sig == int64(gi.ButtonToggled) {
 					pll := recv.Embed(KiT_Plot2D).(*Plot2D)
 					cbb := send.(*gi.CheckBox)
-					pll.SetAllCols(cbb.IsChecked())
+					cbb.SetChecked(false)
+					pll.SetAllCols(false)
 				}
 			})
 			ca.SetText("Select Cols")

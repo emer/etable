@@ -43,7 +43,7 @@ func main() {
 
 	sort.StringSlice(files).Sort()
 
-	if !avg && Output != "" {
+	if Output != "" {
 		OutFile, err := os.Create(Output)
 		if err != nil {
 			fmt.Println("Error creating output file:", err)
@@ -67,6 +67,7 @@ func main() {
 	OutWriter.Flush()
 }
 
+// RawCat concatenates all data in one big file
 func RawCat(files []string) {
 	for fi, fn := range files {
 		fp, err := os.Open(fn)
@@ -99,8 +100,10 @@ func RawCat(files []string) {
 	}
 }
 
+// AvgCat computes average across all runs
 func AvgCat(files []string) {
 	dts := make([]*etable.Table, 0, len(files))
+	maxRows := 0
 	for _, fn := range files {
 		dt := &etable.Table{}
 		err := dt.OpenCSV(gi.FileName(fn), etable.Tab)
@@ -108,19 +111,21 @@ func AvgCat(files []string) {
 			fmt.Println("Error opening file: ", err)
 			continue
 		}
+		maxRows = ints.MaxInt(maxRows, dt.Rows)
 		dts = append(dts, dt)
 	}
 	nt := len(dts)
-	if nt == 0 {
+	if nt == 0 || maxRows == 0 {
 		return
 	}
 	ot := dts[0].Clone()
 	ot.SetMetaData("precision", strconv.Itoa(LogPrec))
-	nr := ot.Rows
-	rns := make([]int, nr)
+
+	// N samples per row
+	rns := make([]int, maxRows)
 	for _, dt := range dts {
 		dnr := dt.Rows
-		mx := ints.MinInt(dnr, nr)
+		mx := ints.MinInt(dnr, maxRows)
 		for ri := 0; ri < mx; ri++ {
 			rns[ri]++
 		}
@@ -136,7 +141,7 @@ func AvgCat(files []string) {
 			}
 			dc := dt.Cols[ci]
 			dnr := dt.Rows
-			mx := ints.MinInt(dnr, nr)
+			mx := ints.MinInt(dnr, maxRows)
 			for ri := 0; ri < mx; ri++ {
 				si := ri * cells
 				for j := 0; j < cells; j++ {
@@ -147,7 +152,7 @@ func AvgCat(files []string) {
 				}
 			}
 		}
-		for ri := 0; ri < nr; ri++ {
+		for ri := 0; ri < maxRows; ri++ {
 			si := ri * cells
 			for j := 0; j < cells; j++ {
 				ci := si + j
