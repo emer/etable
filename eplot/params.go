@@ -5,6 +5,8 @@
 package eplot
 
 import (
+	"strings"
+
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
@@ -24,10 +26,10 @@ type PlotParams struct {
 	NegXDraw   bool      `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
 	Scale      float64   `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
 	XAxisCol   string    `desc:"what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values."`
+	LegendCol  string    `desc:"optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"`
+	XAxisRot   float64   `desc:"rotation of the X Axis labels, in degrees"`
 	XAxisLabel string    `desc:"optional label to use for XAxis instead of column name"`
 	YAxisLabel string    `desc:"optional label to use for YAxis -- if empty, first column name is used"`
-	XAxisRot   float64   `desc:"rotation of the X Axis labels, in degrees"`
-	LegendCol  string    `desc:"optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"`
 	Plot       *Plot2D   `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
@@ -64,19 +66,71 @@ func (pp *PlotParams) CopyFrom(fr *PlotParams) {
 
 // FmMeta sets plot params from meta data
 func (pp *PlotParams) FmMeta(dt *etable.Table) {
-	if op, has := dt.MetaData["lines"]; has {
+	pp.FmMetaMap(dt.MetaData)
+}
+
+// MetaMapLower tries meta data access by lower-case version of key too
+func MetaMapLower(meta map[string]string, key string) (string, bool) {
+	vl, has := meta[key]
+	if has {
+		return vl, has
+	}
+	vl, has = meta[strings.ToLower(key)]
+	return vl, has
+}
+
+// FmMetaMap sets plot params from meta data map
+func (pp *PlotParams) FmMetaMap(meta map[string]string) {
+	if typ, has := MetaMapLower(meta, "Type"); has {
+		pp.Type.FromString(typ)
+	}
+	if op, has := MetaMapLower(meta, "Lines"); has {
 		if op == "+" || op == "true" {
 			pp.Lines = true
 		} else {
 			pp.Lines = false
 		}
 	}
-	if op, has := dt.MetaData["points"]; has {
+	if op, has := MetaMapLower(meta, "Points"); has {
 		if op == "+" || op == "true" {
 			pp.Points = true
 		} else {
 			pp.Points = false
 		}
+	}
+	if lw, has := MetaMapLower(meta, "LineWidth"); has {
+		pp.LineWidth, _ = kit.ToFloat(lw)
+	}
+	if ps, has := MetaMapLower(meta, "PointSize"); has {
+		pp.PointSize, _ = kit.ToFloat(ps)
+	}
+	if bw, has := MetaMapLower(meta, "BarWidth"); has {
+		pp.BarWidth, _ = kit.ToFloat(bw)
+	}
+	if op, has := MetaMapLower(meta, "NegXDraw"); has {
+		if op == "+" || op == "true" {
+			pp.NegXDraw = true
+		} else {
+			pp.NegXDraw = false
+		}
+	}
+	if scl, has := MetaMapLower(meta, "Scale"); has {
+		pp.Scale, _ = kit.ToFloat(scl)
+	}
+	if xc, has := MetaMapLower(meta, "XAxisCol"); has {
+		pp.XAxisCol = xc
+	}
+	if lc, has := MetaMapLower(meta, "LegendCol"); has {
+		pp.LegendCol = lc
+	}
+	if xrot, has := MetaMapLower(meta, "XAxisRot"); has {
+		pp.XAxisRot, _ = kit.ToFloat(xrot)
+	}
+	if lb, has := MetaMapLower(meta, "XAxisLabel"); has {
+		pp.XAxisLabel = lb
+	}
+	if lb, has := MetaMapLower(meta, "YAxisLabel"); has {
+		pp.YAxisLabel = lb
 	}
 }
 
