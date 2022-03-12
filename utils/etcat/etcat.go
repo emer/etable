@@ -119,6 +119,7 @@ func AvgCat(files []string) {
 		return
 	}
 	ot := dts[0].Clone()
+	ot.SetNumRows(maxRows)
 	ot.SetMetaData("precision", strconv.Itoa(LogPrec))
 
 	// N samples per row
