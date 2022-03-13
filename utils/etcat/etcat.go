@@ -12,10 +12,9 @@ import (
 	"sort"
 	"strconv"
 
+	"github.com/emer/etable/agg"
 	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
-	"github.com/goki/ki/ints"
 )
 
 var (
@@ -103,7 +102,6 @@ func RawCat(files []string) {
 // AvgCat computes average across all runs
 func AvgCat(files []string) {
 	dts := make([]*etable.Table, 0, len(files))
-	maxRows := 0
 	for _, fn := range files {
 		dt := &etable.Table{}
 		err := dt.OpenCSV(gi.FileName(fn), etable.Tab)
@@ -111,57 +109,9 @@ func AvgCat(files []string) {
 			fmt.Println("Error opening file: ", err)
 			continue
 		}
-		maxRows = ints.MaxInt(maxRows, dt.Rows)
 		dts = append(dts, dt)
 	}
-	nt := len(dts)
-	if nt == 0 || maxRows == 0 {
-		return
-	}
-	ot := dts[0].Clone()
-	ot.SetNumRows(maxRows)
-	ot.SetMetaData("precision", strconv.Itoa(LogPrec))
-
-	// N samples per row
-	rns := make([]int, maxRows)
-	for _, dt := range dts {
-		dnr := dt.Rows
-		mx := ints.MinInt(dnr, maxRows)
-		for ri := 0; ri < mx; ri++ {
-			rns[ri]++
-		}
-	}
-	for ci, cl := range ot.Cols {
-		if cl.DataType() != etensor.FLOAT32 && cl.DataType() != etensor.FLOAT64 {
-			continue
-		}
-		_, cells := cl.RowCellSize()
-		for di, dt := range dts {
-			if di == 0 {
-				continue
-			}
-			dc := dt.Cols[ci]
-			dnr := dt.Rows
-			mx := ints.MinInt(dnr, maxRows)
-			for ri := 0; ri < mx; ri++ {
-				si := ri * cells
-				for j := 0; j < cells; j++ {
-					ci := si + j
-					cv := cl.FloatVal1D(ci)
-					cv += dc.FloatVal1D(ci)
-					cl.SetFloat1D(ci, cv)
-				}
-			}
-		}
-		for ri := 0; ri < maxRows; ri++ {
-			si := ri * cells
-			for j := 0; j < cells; j++ {
-				ci := si + j
-				cv := cl.FloatVal1D(ci)
-				cv /= float64(rns[ri])
-				cl.SetFloat1D(ci, cv)
-			}
-		}
-	}
-	ot.SaveCSV(gi.FileName(Output), etable.Tab, etable.Headers)
+	avgdt := agg.MeanTables(dts)
+	avgdt.SetMetaData("precision", strconv.Itoa(LogPrec))
+	avgdt.SaveCSV(gi.FileName(Output), etable.Tab, etable.Headers)
 }
