@@ -9,6 +9,7 @@ import (
 	"image"
 	"log"
 	"math"
+	"path/filepath"
 	"strings"
 
 	"github.com/emer/etable/etable"
@@ -142,6 +143,16 @@ func (pl *Plot2D) SavePNG(fname gi.FileName) {
 func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) {
 	pl.Table.SaveCSV(fname, delim, etable.Headers)
 	pl.DataFile = fname
+}
+
+// SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save
+// Any extension is removed and appropriate extensions are added
+func (pl *Plot2D) SaveAll(fname gi.FileName) {
+	fn := string(fname)
+	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
+	pl.SaveCSV(gi.FileName(fn+".tsv"), etable.Tab)
+	pl.SavePNG(gi.FileName(fn + ".png"))
+	pl.SaveSVG(gi.FileName(fn + ".svg"))
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
@@ -664,22 +675,27 @@ func (pl *Plot2D) ToolbarConfig() {
 			giv.StructViewDialog(pl.ViewportSafe(), &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
 		})
 	tbar.AddSeparator("file")
-	tbar.AddAction(gi.ActOpts{Label: "Save SVG...", Icon: "file-save", Tooltip: "save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc"}, pl.This(),
+	savemen := tbar.AddAction(gi.ActOpts{Label: "Save...", Icon: "file-save"}, nil, nil)
+	savemen.Menu.AddAction(gi.ActOpts{Label: "Save SVG...", Icon: "file-save", Tooltip: "save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SaveSVG", pl.ViewportSafe())
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Save PNG...", Icon: "file-save", Tooltip: "save plot to a .png file, capturing the exact bits you currently see as the render"}, pl.This(),
+	savemen.Menu.AddAction(gi.ActOpts{Label: "Save PNG...", Icon: "file-save", Tooltip: "save plot to a .png file, capturing the exact bits you currently see as the render"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "SavePNG", pl.ViewportSafe())
 		})
-	tbar.AddSeparator("img")
+	savemen.Menu.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl, "SaveCSV", pl.ViewportSafe())
+		})
+	savemen.Menu.AddSeparator("img")
+	savemen.Menu.AddAction(gi.ActOpts{Label: "Save All...", Icon: "file-save", Tooltip: "Save a .png, .svg, and .tsv of the data"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			giv.CallMethod(pl, "SaveAll", pl.ViewportSafe())
+		})
 	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "Open CSV-formatted data -- also recognizes emergent-style headers"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.CallMethod(pl, "OpenCSV", pl.ViewportSafe())
-		})
-	tbar.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveCSV", pl.ViewportSafe())
 		})
 	tbar.AddSeparator("filt")
 	tbar.AddAction(gi.ActOpts{Label: "Filter...", Icon: "search", Tooltip: "filter rows of data being plotted by values in given column name, using string representation, with exclude, contains and ignore case options"}, pl.This(),
@@ -740,6 +756,17 @@ var Plot2DProps = ki.Props{
 			"Args": ki.PropSlice{
 				{"File Name", ki.Props{
 					"ext": ".png",
+				}},
+			},
+		}},
+		{"SaveAll", ki.Props{
+			"label": "Save All...",
+			"desc":  "save plot to SVG, PNG, and TSV files",
+			"icon":  "file-save",
+			"Args": ki.PropSlice{
+				{"File Name", ki.Props{
+					"default-field": "SVGFile",
+					"ext":           ".svg",
 				}},
 			},
 		}},
