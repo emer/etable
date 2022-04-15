@@ -69,6 +69,16 @@ func (tsr *Int) Value(i []int) int    { j := tsr.Offset(i); return tsr.Values[j]
 func (tsr *Int) Value1D(i int) int    { return tsr.Values[i] }
 func (tsr *Int) Set(i []int, val int) { j := tsr.Offset(i); tsr.Values[j] = val }
 func (tsr *Int) Set1D(i int, val int) { tsr.Values[i] = val }
+func (tsr *Int) AddScalar(i []int, val int) int {
+	j := tsr.Offset(i)
+	tsr.Values[j] += val
+	return tsr.Values[j]
+}
+func (tsr *Int) MulScalar(i []int, val int) int {
+	j := tsr.Offset(i)
+	tsr.Values[j] *= val
+	return tsr.Values[j]
+}
 
 // IsNull returns true if the given index has been flagged as a Null
 // (undefined, not present) value
