@@ -109,7 +109,15 @@ func AvgCat(files []string) {
 			fmt.Println("Error opening file: ", err)
 			continue
 		}
+		if dt.Rows == 0 {
+			fmt.Printf("File %v empty\n", fn)
+			continue
+		}
 		dts = append(dts, dt)
+	}
+	if len(dts) == 0 {
+		fmt.Println("No files or files are empty, exiting")
+		return
 	}
 	avgdt := agg.MeanTables(dts)
 	avgdt.SetMetaData("precision", strconv.Itoa(LogPrec))
