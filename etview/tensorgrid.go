@@ -10,6 +10,7 @@ import (
 
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/minmax"
+	"github.com/goki/gi/colormap"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
@@ -159,9 +160,9 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
 type TensorGrid struct {
 	gi.WidgetBase
-	Tensor etensor.Tensor `desc:"the tensor that we view"`
-	Disp   TensorDisp     `desc:"display options"`
-	Map    *giv.ColorMap  `desc:"the actual colormap"`
+	Tensor   etensor.Tensor `desc:"the tensor that we view"`
+	Disp     TensorDisp     `desc:"display options"`
+	ColorMap *colormap.Map  `desc:"the actual colormap"`
 }
 
 var KiT_TensorGrid = kit.Types.AddType(&TensorGrid{}, nil)
@@ -265,26 +266,26 @@ func (tg *TensorGrid) Size2D(iter int) {
 
 // EnsureColorMap makes sure there is a valid color map that matches specified name
 func (tg *TensorGrid) EnsureColorMap() {
-	if tg.Map != nil && tg.Map.Name != string(tg.Disp.ColorMap) {
-		tg.Map = nil
+	if tg.ColorMap != nil && tg.ColorMap.Name != string(tg.Disp.ColorMap) {
+		tg.ColorMap = nil
 	}
-	if tg.Map == nil {
+	if tg.ColorMap == nil {
 		ok := false
-		tg.Map, ok = giv.AvailColorMaps[string(tg.Disp.ColorMap)]
+		tg.ColorMap, ok = colormap.AvailMaps[string(tg.Disp.ColorMap)]
 		if !ok {
 			tg.Disp.ColorMap = ""
 			tg.Disp.Defaults()
 		}
-		tg.Map = giv.AvailColorMaps[string(tg.Disp.ColorMap)]
+		tg.ColorMap = colormap.AvailMaps[string(tg.Disp.ColorMap)]
 	}
 }
 
 func (tg *TensorGrid) Color(val float64) (norm float64, clr gist.Color) {
-	if tg.Map.Indexed {
-		clr = tg.Map.MapIndex(int(val))
+	if tg.ColorMap.Indexed {
+		clr = tg.ColorMap.MapIndex(int(val))
 	} else {
 		norm = tg.Disp.Range.ClipNormVal(val)
-		clr = tg.Map.Map(norm)
+		clr = tg.ColorMap.Map(norm)
 	}
 	return
 }
