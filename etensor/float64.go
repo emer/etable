@@ -517,7 +517,21 @@ func (tsr *Float64) Symmetric() (r int) {
 		return 0
 	}
 	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
-		log.Println("etensor Symmatrics gonum Matrix call made on Tensor that is not symmetric")
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
+// SymmetricDim returns the number of rows/columns in the matrix.
+func (tsr *Float64) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
 		return 0
 	}
 	return tsr.Dim(nd - 1)

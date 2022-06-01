@@ -531,6 +531,21 @@ func (tsr *Int64) Symmetric() (r int) {
 	return tsr.Dim(nd - 1)
 }
 
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Int64) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
 // SetMetaData sets a key=value meta data (stored as a map[string]string).
 // For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
 // min, max set fixed min / max values, background=color
@@ -1071,6 +1086,21 @@ func (tsr *Uint64) Symmetric() (r int) {
 	}
 	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
 		log.Println("etensor Symmatrics gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Uint64) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
 		return 0
 	}
 	return tsr.Dim(nd - 1)
@@ -1621,6 +1651,21 @@ func (tsr *Int32) Symmetric() (r int) {
 	return tsr.Dim(nd - 1)
 }
 
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Int32) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
 // SetMetaData sets a key=value meta data (stored as a map[string]string).
 // For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
 // min, max set fixed min / max values, background=color
@@ -2161,6 +2206,21 @@ func (tsr *Uint32) Symmetric() (r int) {
 	}
 	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
 		log.Println("etensor Symmatrics gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Uint32) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
 		return 0
 	}
 	return tsr.Dim(nd - 1)
@@ -2711,6 +2771,21 @@ func (tsr *Float32) Symmetric() (r int) {
 	return tsr.Dim(nd - 1)
 }
 
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Float32) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
 // SetMetaData sets a key=value meta data (stored as a map[string]string).
 // For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
 // min, max set fixed min / max values, background=color
@@ -3251,6 +3326,21 @@ func (tsr *Int16) Symmetric() (r int) {
 	}
 	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
 		log.Println("etensor Symmatrics gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Int16) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
 		return 0
 	}
 	return tsr.Dim(nd - 1)
@@ -3801,6 +3891,21 @@ func (tsr *Uint16) Symmetric() (r int) {
 	return tsr.Dim(nd - 1)
 }
 
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Uint16) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
 // SetMetaData sets a key=value meta data (stored as a map[string]string).
 // For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
 // min, max set fixed min / max values, background=color
@@ -4346,6 +4451,21 @@ func (tsr *Int8) Symmetric() (r int) {
 	return tsr.Dim(nd - 1)
 }
 
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Int8) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
 // SetMetaData sets a key=value meta data (stored as a map[string]string).
 // For TensorGrid display: top-zero=+/-, odd-row=+/-, image=+/-,
 // min, max set fixed min / max values, background=color
@@ -4886,6 +5006,21 @@ func (tsr *Uint8) Symmetric() (r int) {
 	}
 	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
 		log.Println("etensor Symmatrics gonum Matrix call made on Tensor that is not symmetric")
+		return 0
+	}
+	return tsr.Dim(nd - 1)
+}
+
+// SymmetricDim is the gonum/mat.Matrix interface method for returning the dimensionality of a symmetric
+// 2D Matrix.  Logs error if called on non-symmetric matrix.
+func (tsr *Uint8) SymmetricDim() int {
+	nd := tsr.NumDims()
+	if nd < 2 {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor with dims < 2")
+		return 0
+	}
+	if tsr.Dim(nd-2) != tsr.Dim(nd-1) {
+		log.Println("etensor Symmetric gonum Matrix call made on Tensor that is not symmetric")
 		return 0
 	}
 	return tsr.Dim(nd - 1)
