@@ -231,9 +231,11 @@ func (pl *Plot2D) GoUpdatePlot() {
 	sv := pl.SVGPlot()
 	updt := sv.UpdateStart()
 	pl.GenPlot()
+	pl.InPlot = true // block extra update in this UAE
 	mvp.UnblockUpdates()
 	sv.UpdateEnd(updt)
 	pl.UpdateEnd(plupdt)
+	pl.InPlot = false
 }
 
 // Update updates the display based on current state of table.
