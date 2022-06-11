@@ -4,7 +4,7 @@ go 1.18
 
 require (
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40
-	github.com/goki/gi v1.3.3
+	github.com/goki/gi v1.3.4
 	github.com/goki/ki v1.1.8
 	github.com/goki/mat32 v1.0.12
 	github.com/goki/pi v1.0.18
