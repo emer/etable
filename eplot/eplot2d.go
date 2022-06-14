@@ -284,10 +284,14 @@ func (pl *Plot2D) GenPlot() {
 	}
 	pl.InPlot = true
 	sv := pl.SVGPlot()
-	if pl.Table == nil || pl.Table.Table == nil || pl.Table.Len() == 0 {
+	if pl.Table == nil || pl.Table.Table == nil || pl.Table.Table.Rows == 0 || pl.Table.Len() == 0 {
 		sv.DeleteChildren(ki.DestroyKids)
 		pl.InPlot = false
 		return
+	}
+	lsti := pl.Table.Idxs[pl.Table.Len()-1]
+	if lsti >= pl.Table.Table.Rows { // out of date
+		pl.Table.Sequential()
 	}
 	pl.GPlot = nil
 	switch pl.Params.Type {
