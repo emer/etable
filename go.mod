@@ -4,10 +4,10 @@ go 1.18
 
 require (
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40
-	github.com/goki/gi v1.3.5
+	github.com/goki/gi v1.3.7
 	github.com/goki/ki v1.1.8
 	github.com/goki/mat32 v1.0.12
-	github.com/goki/pi v1.0.18
+	github.com/goki/pi v1.0.20
 	gonum.org/v1/gonum v0.11.0
 	gonum.org/v1/plot v0.11.0
 )
@@ -37,9 +37,9 @@ require (
 	github.com/goki/freetype v0.0.0-20220119013949-7a161fd3728c // indirect
 	github.com/goki/go-difflib v1.2.1 // indirect
 	github.com/goki/kigen v1.0.0 // indirect
-	github.com/goki/prof v0.0.0-20180502205428-54bc71b5d09b // indirect
+	github.com/goki/prof v1.0.0 // indirect
 	github.com/goki/vci v1.0.1 // indirect
-	github.com/goki/vgpu v1.0.4 // indirect
+	github.com/goki/vgpu v1.0.5 // indirect
 	github.com/goki/vulkan v0.0.0-20220512102541-6e89b8ce8542 // indirect
 	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/gorilla/css v1.0.0 // indirect
@@ -51,10 +51,10 @@ require (
 	github.com/srwiley/scanx v0.0.0-20190309010443-e94503791388 // indirect
 	golang.org/x/exp v0.0.0-20220518171630-0b5c67f07fdf // indirect
 	golang.org/x/image v0.0.0-20220413100746-70e8d0d3baa9 // indirect
-	golang.org/x/mod v0.6.0-dev.0.20220106191415-9b9b3d81d5e3 // indirect
+	golang.org/x/mod v0.6.0-dev.0.20220419223038-86c51ed26bb4 // indirect
 	golang.org/x/net v0.0.0-20220531201128-c960675eff93 // indirect
 	golang.org/x/sys v0.0.0-20220520151302-bc2c85ada10a // indirect
 	golang.org/x/text v0.3.7 // indirect
-	golang.org/x/tools v0.1.10 // indirect
+	golang.org/x/tools v0.1.11 // indirect
 	golang.org/x/xerrors v0.0.0-20220517211312-f3a8303e98df // indirect
 )
