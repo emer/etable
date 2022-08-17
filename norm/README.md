@@ -7,7 +7,6 @@ Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/norm)
 * DivNorm does divisive normalization of elements
 * SubNorm does subtractive normalization of elements
 * ZScore subtracts the mean and divides by the standard deviation
-* Abs performs absolute-value on all elements, including for a tensor.
+* Abs performs absolute-value on all elements (e.g., use prior to tsragg to produce Mean of Abs vals etc).
 
-TODO: add Abs!
 

@@ -7,6 +7,7 @@ package norm
 import (
 	"math"
 
+	"github.com/emer/etable/etensor"
 	"github.com/goki/mat32"
 )
 
@@ -28,4 +29,14 @@ func Abs64(a []float64) {
 		}
 		a[i] = math.Abs(av)
 	}
+}
+
+// TensorAbs32 applies the Abs function to each element in given tensor
+func TensorAbs32(a *etensor.Float32) {
+	Abs32(a.Values)
+}
+
+// TensorAbs64 applies the Abs function to each element in given tensor
+func TensorAbs64(a *etensor.Float64) {
+	Abs64(a.Values)
 }
