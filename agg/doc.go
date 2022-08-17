@@ -10,5 +10,8 @@ at any level of aggregation from etensor on up.
 The main functions use names to specify columns, and *Idx and *Try versions
 are available that operate on column indexes and return errors, respectively.
 
+See tsragg package for functions that operate directly on a etensor.Tensor
+without the indexview indirection.
+
 */
 package agg

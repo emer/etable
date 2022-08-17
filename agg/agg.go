@@ -16,7 +16,7 @@ import (
 type IdxViewAggFuncIdx func(ix *etable.IdxView, colIdx int) []float64
 
 // IdxViewAggFunc is an aggregation function operating on IdxView, taking a column name arg
-type IdxViewAggFunc func(ix *etable.IdxView, colIdx int) []float64
+type IdxViewAggFunc func(ix *etable.IdxView, colNm string) []float64
 
 // IdxViewAggFuncTry is an aggregation function operating on IdxView, taking a column name arg,
 // returning an error message

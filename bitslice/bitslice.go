@@ -3,7 +3,7 @@
 // license that can be found in the LICENSE file.
 
 // Package bitslice implements a simple slice-of-bits using a []byte slice for storage.
-// used for efficient storage of binary data, such as projection connectivity patterns.
+// used for efficient storage of boolean data, such as projection connectivity patterns.
 package bitslice
 
 import "fmt"
