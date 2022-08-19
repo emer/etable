@@ -16,7 +16,6 @@ import (
 	"strings"
 
 	"github.com/emer/etable/etensor"
-	"github.com/goki/gi/gi"
 	"github.com/goki/ki/kit"
 )
 
@@ -71,7 +70,7 @@ const (
 // If headers = true then generate C++ emergent-tyle column headers.
 // These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
-func (dt *Table) SaveCSV(filename gi.FileName, delim Delims, headers bool) error {
+func (dt *Table) SaveCSV(filename string, delim Delims, headers bool) error {
 	fp, err := os.Create(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -89,7 +88,7 @@ func (dt *Table) SaveCSV(filename gi.FileName, delim Delims, headers bool) error
 // If headers = true then generate C++ emergent-tyle column headers.
 // These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
-func (ix *IdxView) SaveCSV(filename gi.FileName, delim Delims, headers bool) error {
+func (ix *IdxView) SaveCSV(filename string, delim Delims, headers bool) error {
 	fp, err := os.Create(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -111,7 +110,7 @@ func (ix *IdxView) SaveCSV(filename gi.FileName, delim Delims, headers bool) err
 // information for tensor dimensionality.
 // If the table DOES have existing columns, then those are used robustly
 // for whatever information fits from each row of the file.
-func (dt *Table) OpenCSV(filename gi.FileName, delim Delims) error {
+func (dt *Table) OpenCSV(filename string, delim Delims) error {
 	fp, err := os.Open(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -130,7 +129,7 @@ func (dt *Table) OpenCSV(filename gi.FileName, delim Delims) error {
 // information for tensor dimensionality.
 // If the table DOES have existing columns, then those are used robustly
 // for whatever information fits from each row of the file.
-func (ix *IdxView) OpenCSV(filename gi.FileName, delim Delims) error {
+func (ix *IdxView) OpenCSV(filename string, delim Delims) error {
 	fp, err := os.Open(string(filename))
 	defer fp.Close()
 	if err != nil {

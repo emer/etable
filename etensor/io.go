@@ -10,15 +10,13 @@ import (
 	"log"
 	"os"
 	"strconv"
-
-	"github.com/goki/gi/gi"
 )
 
 // SaveCSV writes a tensor to a comma-separated-values (CSV) file
 // (where comma = any delimiter, specified in the delim arg).
 // Outer-most dims are rows in the file, and inner-most is column --
 // Reading just grabs all values and doesn't care about shape.
-func SaveCSV(tsr Tensor, filename gi.FileName, delim rune) error {
+func SaveCSV(tsr Tensor, filename string, delim rune) error {
 	fp, err := os.Create(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -34,7 +32,7 @@ func SaveCSV(tsr Tensor, filename gi.FileName, delim rune) error {
 // using the Go standard encoding/csv reader conforming
 // to the official CSV standard.
 // Reads all values and assigns as many as fit.
-func OpenCSV(tsr Tensor, filename gi.FileName, delim rune) error {
+func OpenCSV(tsr Tensor, filename string, delim rune) error {
 	fp, err := os.Open(string(filename))
 	defer fp.Close()
 	if err != nil {
