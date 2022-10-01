@@ -14,7 +14,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/apache/arrow/go/arrow"
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
@@ -5067,32 +5066,33 @@ func (tsr *Uint8) CopyMetaData(frm Tensor) {
 // New returns a new Tensor of given type, using our Type specifier which is
 // isomorphic with arrow.Type
 func New(dtype Type, shape, strides []int, names []string) Tensor {
-	aty := arrow.Type(dtype)
-	switch aty {
-	case arrow.FLOAT64:
-		return NewFloat64(shape, strides, names)
-	case arrow.INT64:
-		return NewInt64(shape, strides, names)
-	case arrow.UINT64:
-		return NewUint64(shape, strides, names)
-	case arrow.INT32:
-		return NewInt32(shape, strides, names)
-	case arrow.UINT32:
-		return NewUint32(shape, strides, names)
-	case arrow.FLOAT32:
-		return NewFloat32(shape, strides, names)
-	case arrow.INT16:
-		return NewInt16(shape, strides, names)
-	case arrow.UINT16:
-		return NewUint16(shape, strides, names)
-	case arrow.INT8:
-		return NewInt8(shape, strides, names)
-	case arrow.UINT8:
-		return NewUint8(shape, strides, names)
-	case arrow.STRING:
-		return NewString(shape, strides, names)
-	case arrow.BOOL:
+	switch dtype {
+	case BOOL:
 		return NewBits(shape, strides, names)
+	case INT64:
+		return NewInt64(shape, strides, names)
+	case UINT64:
+		return NewUint64(shape, strides, names)
+	case INT32:
+		return NewInt32(shape, strides, names)
+	case UINT32:
+		return NewUint32(shape, strides, names)
+	case FLOAT32:
+		return NewFloat32(shape, strides, names)
+	case INT16:
+		return NewInt16(shape, strides, names)
+	case UINT16:
+		return NewUint16(shape, strides, names)
+	case INT8:
+		return NewInt8(shape, strides, names)
+	case UINT8:
+		return NewUint8(shape, strides, names)
+	case FLOAT64:
+		return NewFloat64(shape, strides, names)
+	case STRING:
+		return NewString(shape, strides, names)
+	case INT:
+		return NewInt(shape, strides, names)
 	}
 	return nil
 }

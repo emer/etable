@@ -588,18 +588,19 @@ func (tsr *{{.Name}}) 	CopyMetaData(frm Tensor) {
 // New returns a new Tensor of given type, using our Type specifier which is
 // isomorphic with arrow.Type
 func New(dtype Type, shape, strides []int, names []string) Tensor {
-	aty := arrow.Type(dtype)
-	switch aty {
-	case arrow.FLOAT64:
-		return NewFloat64(shape, strides, names)
+	switch dtype {
+	case BOOL:
+		return NewBits(shape, strides, names)
 {{- range .In}}
-	case arrow.{{.DataType}}:
+	case {{.DataType}}:
 		return New{{.Name}}(shape, strides, names)
 {{- end}}
-	case arrow.STRING:
+	case FLOAT64:
+		return NewFloat64(shape, strides, names)
+	case STRING:
 		return NewString(shape, strides, names)
-	case arrow.BOOL:
-		return NewBits(shape, strides, names)
+	case INT:
+		return NewInt(shape, strides, names)
 	}
 	return nil
 }
