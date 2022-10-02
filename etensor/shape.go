@@ -139,6 +139,30 @@ func (sh *Shape) Dim(i int) int { return sh.Shp[i] }
 // DimName returns the name of given dimension.
 func (sh *Shape) DimName(i int) string { return sh.Nms[i] }
 
+// DimIdxByNameTry returns the index of the given dimension name.
+// and an error if name not found.
+func (sh *Shape) DimIdxByNameTry(name string) (int, error) {
+	for i, nm := range sh.Nms {
+		if nm == name {
+			return i, nil
+		}
+	}
+	return -1, fmt.Errorf("etensor.Shape:DimIdxByNameTry -- dimension name not found: %s", name)
+}
+
+// DimIdxByName returns the index of the given dimension name.
+// returns -1 if not found.
+func (sh *Shape) DimIdxByName(name string) int {
+	idx, _ := sh.DimIdxByNameTry(name)
+	return idx
+}
+
+// DimByName returns the size of given dimension, specified by name.
+// will crash if name not found -- use DimIdxByNameTry if not sure.
+func (sh *Shape) DimByName(name string) int {
+	return sh.Dim(sh.DimIdxByName(name))
+}
+
 // IsContiguous returns true if shape is either row or column major
 func (sh *Shape) IsContiguous() bool {
 	return sh.IsRowMajor() || sh.IsColMajor()
@@ -218,6 +242,18 @@ func (sh *Shape) Offset(index []int) int {
 		offset += v * sh.Strd[i]
 	}
 	return offset
+}
+
+// OffsetByName returns the "flat" 1D array index into an element at the given n-dimensional index
+// using given list of names to order the indexes.  Both names and index must be same length which
+// is the dimensionality of the shape -- none of that is checked.
+func (sh *Shape) OffsetByName(names []string, index []int) int {
+	oidx := CopyInts(index)
+	for i, nm := range names {
+		idx := sh.DimIdxByName(nm)
+		oidx[idx] = index[i]
+	}
+	return sh.Offset(oidx)
 }
 
 // Index returns the n-dimensional index from a "flat" 1D array index.  Only works for RowMajor
