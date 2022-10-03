@@ -288,6 +288,7 @@ func init() {
 	EmerHdrTypeToChar[etensor.INT32] = '|'
 	EmerHdrTypeToChar[etensor.UINT32] = '|'
 	EmerHdrTypeToChar[etensor.UINT64] = '|'
+	EmerHdrTypeToChar[etensor.INT] = '|'
 }
 
 // EmerColType parses the column header for type information using the emergent naming convention
