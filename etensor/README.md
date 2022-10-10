@@ -36,3 +36,5 @@ go generate
 
 The `go generate` updates type_string using the `goki` version of stringer.
 
+Note that the `float64.go`, `int.go`, `string.go` and `bits.go` types have some amount of custom code relative to the `numeric.gen.go.tmpl` template, and thus must be updated manually with any changes.
+
