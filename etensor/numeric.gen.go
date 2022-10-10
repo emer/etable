@@ -52,7 +52,7 @@ func NewInt64Shape(shape *Shape, vals []int64) *Int64 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewInt64Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]int64, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -612,7 +612,7 @@ func NewUint64Shape(shape *Shape, vals []uint64) *Uint64 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewUint64Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]uint64, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -1172,7 +1172,7 @@ func NewInt32Shape(shape *Shape, vals []int32) *Int32 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewInt32Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]int32, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -1732,7 +1732,7 @@ func NewUint32Shape(shape *Shape, vals []uint32) *Uint32 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewUint32Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]uint32, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -2292,7 +2292,7 @@ func NewFloat32Shape(shape *Shape, vals []float32) *Float32 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewFloat32Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]float32, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -2852,7 +2852,7 @@ func NewInt16Shape(shape *Shape, vals []int16) *Int16 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewInt16Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]int16, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -3412,7 +3412,7 @@ func NewUint16Shape(shape *Shape, vals []uint16) *Uint16 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewUint16Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]uint16, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -3972,7 +3972,7 @@ func NewInt8Shape(shape *Shape, vals []int8) *Int8 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewInt8Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]int8, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -4532,7 +4532,7 @@ func NewUint8Shape(shape *Shape, vals []uint8) *Uint8 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewUint8Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]uint8, tsr.Len())
 		} else {
 			tsr.Values = vals

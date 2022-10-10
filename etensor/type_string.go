@@ -2,12 +2,7 @@
 
 package etensor
 
-import (
-	"errors"
-	"strconv"
-)
-
-var _ = errors.New("dummy error")
+import "strconv"
 
 func _() {
 	// An "invalid array index" compiler error signifies that the constant values have changed.
@@ -39,14 +34,4 @@ func (i Type) String() string {
 		return "Type(" + strconv.FormatInt(int64(i), 10) + ")"
 	}
 	return _Type_name[_Type_index[i]:_Type_index[i+1]]
-}
-
-func (i *Type) FromString(s string) error {
-	for j := 0; j < len(_Type_index)-1; j++ {
-		if s == _Type_name[_Type_index[j]:_Type_index[j+1]] {
-			*i = Type(j)
-			return nil
-		}
-	}
-	return errors.New("String: " + s + " is not a valid option for type: Type")
 }
