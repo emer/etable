@@ -51,7 +51,7 @@ func New{{.Name}}Shape(shape *Shape, vals []{{or .Type}}) *{{.Name}} {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.New{{.Name}}Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]{{or .Type}}, tsr.Len())
 		} else {
 			tsr.Values = vals
@@ -293,7 +293,7 @@ func (tsr *{{.Name}}) CopyFrom(frm Tensor) {
 func (tsr *{{.Name}}) 	CopyShapeFrom(frm Tensor) {
 	tsr.SetShape(frm.Shapes(), frm.Strides(), frm.DimNames())
 }
-	
+
 // CopyCellsFrom copies given range of values from other tensor into this tensor,
 // using flat 1D indexes: to = starting index in this Tensor to start copying into,
 // start = starting index on from Tensor to start copying from, and n = number of
@@ -418,7 +418,7 @@ func (tsr *{{.Name}}) SubSpaceTry(offs []int) (Tensor, error) {
 func (tsr *{{.Name}}) Label() string {
 	return fmt.Sprintf("{{.Name}}: %s", tsr.Shape.String())
 }
-	
+
 // String satisfies the fmt.Stringer interface for string of tensor data
 func (tsr *{{.Name}}) String() string {
 	str := tsr.Label()
@@ -442,7 +442,7 @@ func (tsr *{{.Name}}) String() string {
 	}
 	return b.String()
 }
-	
+
 // ToArrow returns the apache arrow equivalent of the tensor
 func (tsr *{{.Name}}) ToArrow() *tensor.{{.Name}} {
 	bld := array.New{{.Name}}Builder(memory.DefaultAllocator)
