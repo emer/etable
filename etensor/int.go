@@ -52,7 +52,7 @@ func NewIntShape(shape *Shape, vals []int) *Int {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewIntShape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]int, tsr.Len())
 		} else {
 			tsr.Values = vals

@@ -18,23 +18,14 @@ The `Shape` of the tensor is a distinct struct that the tensor embeds, supportin
 
 ## Updating generated code
 
-The `Makefile` has a `generate` target that does this:
-
-```sh
-tmpl -i -data=numeric.tmpldata numeric.gen.go.tmpl
-```
-
-Where `tmpl` is from github.com/apache/arrow/go/arrow/_tools/tmpl -- go install there to get it on your path -- not needed for regular builds, only if you are changing the template.
-
-Here's code to do the full update:
+Run the following:
 
 ```sh
 go install github.com/goki/stringer@latest github.com/apache/arrow/go/arrow/_tools/tmpl@latest
-PATH=$GOROOT/bin:$PATH make generate
+PATH=$(go env GOPATH)/bin:$PATH make generate
 go generate
 ```
 
 The `go generate` updates type_string using the `goki` version of stringer.
 
 Note that the `float64.go`, `int.go`, `string.go` and `bits.go` types have some amount of custom code relative to the `numeric.gen.go.tmpl` template, and thus must be updated manually with any changes.
-

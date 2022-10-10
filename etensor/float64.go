@@ -50,7 +50,7 @@ func NewFloat64Shape(shape *Shape, vals []float64) *Float64 {
 	tsr.CopyShape(shape)
 	if vals != nil {
 		if len(vals) != tsr.Len() {
-			log.Printf("etensor.New*Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
+			log.Printf("etensor.NewFloat64Shape: length of provided vals: %d not proper length: %d", len(vals), tsr.Len())
 			tsr.Values = make([]float64, tsr.Len())
 		} else {
 			tsr.Values = vals
