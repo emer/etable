@@ -4,8 +4,11 @@
 
 package minmax
 
-import (
-	"math"
+//gosl: start minmax
+
+const (
+	MaxFloat32 float32 = 3.402823466e+38
+	MinFloat32 float32 = 1.175494351e-38
 )
 
 // F32 represents a min / max range for float32 values.
@@ -17,13 +20,15 @@ type F32 struct {
 
 // Set sets the min and max values
 func (mr *F32) Set(min, max float32) {
-	mr.Min, mr.Max = min, max
+	mr.Min = min
+	mr.Max = max
 }
 
 // SetInfinity sets the Min to +MaxFloat, Max to -MaxFloat -- suitable for
 // iteratively calling Fit*InRange
 func (mr *F32) SetInfinity() {
-	mr.Min, mr.Max = math.MaxFloat32, -math.MaxFloat32
+	mr.Min = MaxFloat32
+	mr.Max = -MaxFloat32
 }
 
 // IsValid returns true if Min <= Max
@@ -55,7 +60,7 @@ func (mr *F32) Range() float32 {
 func (mr *F32) Scale() float32 {
 	r := mr.Range()
 	if r != 0 {
-		return 1 / r
+		return 1.0 / r
 	}
 	return 0
 }
@@ -63,21 +68,6 @@ func (mr *F32) Scale() float32 {
 // Midpoint returns point halfway between Min and Max
 func (mr *F32) Midpoint() float32 {
 	return 0.5 * (mr.Max + mr.Min)
-}
-
-// FitInRange adjusts our Min, Max to fit within those of other F32
-// returns true if we had to adjust to fit.
-func (mr *F32) FitInRange(oth F32) bool {
-	adj := false
-	if oth.Min < mr.Min {
-		mr.Min = oth.Min
-		adj = true
-	}
-	if oth.Max > mr.Max {
-		mr.Max = oth.Max
-		adj = true
-	}
-	return adj
 }
 
 // FitValInRange adjusts our Min, Max to fit given value within Min, Max range
@@ -128,4 +118,21 @@ func (mr *F32) ClipNormVal(val float32) float32 {
 		return 1
 	}
 	return mr.NormVal(val)
+}
+
+//gosl: end minmax
+
+// FitInRange adjusts our Min, Max to fit within those of other F32
+// returns true if we had to adjust to fit.
+func (mr *F32) FitInRange(oth F32) bool {
+	adj := false
+	if oth.Min < mr.Min {
+		mr.Min = oth.Min
+		adj = true
+	}
+	if oth.Max > mr.Max {
+		mr.Max = oth.Max
+		adj = true
+	}
+	return adj
 }

@@ -7,7 +7,12 @@ Package minmax provides basic minimum / maximum values for float32 and float64
 */
 package minmax
 
-import "math"
+//gosl: start minmax
+
+const (
+	MaxFloat64 float64 = 1.7976931348623158e+308
+	MinFloat64 float64 = 2.2250738585072014e-308
+)
 
 // F64 represents a min / max range for float64 values.
 // Supports clipping, renormalizing, etc
@@ -18,13 +23,15 @@ type F64 struct {
 
 // Set sets the min and max values
 func (mr *F64) Set(min, max float64) {
-	mr.Min, mr.Max = min, max
+	mr.Min = min
+	mr.Max = max
 }
 
 // SetInfinity sets the Min to +MaxFloat, Max to -MaxFloat -- suitable for
 // iteratively calling Fit*InRange
 func (mr *F64) SetInfinity() {
-	mr.Min, mr.Max = math.MaxFloat64, -math.MaxFloat64
+	mr.Min = MaxFloat64
+	mr.Max = -MaxFloat64
 }
 
 // IsValid returns true if Min <= Max
@@ -64,21 +71,6 @@ func (mr *F64) Scale() float64 {
 // Midpoint returns point halfway between Min and Max
 func (mr *F64) Midpoint() float64 {
 	return 0.5 * (mr.Max + mr.Min)
-}
-
-// FitInRange adjusts our Min, Max to fit within those of other F64
-// returns true if we had to adjust to fit.
-func (mr *F64) FitInRange(oth F64) bool {
-	adj := false
-	if oth.Min < mr.Min {
-		mr.Min = oth.Min
-		adj = true
-	}
-	if oth.Max > mr.Max {
-		mr.Max = oth.Max
-		adj = true
-	}
-	return adj
 }
 
 // FitValInRange adjusts our Min, Max to fit given value within Min, Max range
@@ -129,4 +121,21 @@ func (mr *F64) ClipNormVal(val float64) float64 {
 		return 1
 	}
 	return mr.NormVal(val)
+}
+
+//gosl: end minmax
+
+// FitInRange adjusts our Min, Max to fit within those of other F64
+// returns true if we had to adjust to fit.
+func (mr *F64) FitInRange(oth F64) bool {
+	adj := false
+	if oth.Min < mr.Min {
+		mr.Min = oth.Min
+		adj = true
+	}
+	if oth.Max > mr.Max {
+		mr.Max = oth.Max
+		adj = true
+	}
+	return adj
 }

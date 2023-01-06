@@ -4,15 +4,15 @@
 
 package minmax
 
-import "math"
+//gosl: start minmax
 
 // AvgMax holds average and max statistics
 type AvgMax32 struct {
 	Avg    float32
 	Max    float32
-	MaxIdx int     `desc:"index of max item"`
 	Sum    float32 `desc:"sum for computing average"`
-	N      int     `desc:"number of items in sum"`
+	MaxIdx int32   `desc:"index of max item"`
+	N      int32   `desc:"number of items in sum"`
 }
 
 // Init initializes prior to new updates
@@ -20,7 +20,7 @@ func (am *AvgMax32) Init() {
 	am.Avg = 0
 	am.Sum = 0
 	am.N = 0
-	am.Max = -math.MaxFloat32
+	am.Max = -MaxFloat32
 	am.MaxIdx = -1
 }
 
@@ -30,7 +30,7 @@ func (am *AvgMax32) UpdateVal(val float32, idx int) {
 	am.N++
 	if val > am.Max {
 		am.Max = val
-		am.MaxIdx = idx
+		am.MaxIdx = int32(idx)
 	}
 }
 
@@ -70,9 +70,9 @@ func (am *AvgMax32) CalcAvg() {
 type AvgMax64 struct {
 	Avg    float64
 	Max    float64
-	MaxIdx int     `desc:"index of max item"`
 	Sum    float64 `desc:"sum for computing average"`
-	N      int     `desc:"number of items in sum"`
+	MaxIdx int32   `desc:"index of max item"`
+	N      int32   `desc:"number of items in sum"`
 }
 
 // Init initializes prior to new updates
@@ -80,7 +80,7 @@ func (am *AvgMax64) Init() {
 	am.Avg = 0
 	am.Sum = 0
 	am.N = 0
-	am.Max = -math.MaxFloat64
+	am.Max = -MaxFloat64
 	am.MaxIdx = -1
 }
 
@@ -90,7 +90,7 @@ func (am *AvgMax64) UpdateVal(val float64, idx int) {
 	am.N++
 	if val > am.Max {
 		am.Max = val
-		am.MaxIdx = idx
+		am.MaxIdx = int32(idx)
 	}
 }
 
@@ -122,3 +122,5 @@ func (am *AvgMax64) CalcAvg() {
 		am.Max = am.Avg // prevents Max from being -MaxFloat..
 	}
 }
+
+//gosl: end minmax
