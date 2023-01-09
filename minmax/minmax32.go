@@ -16,6 +16,8 @@ const (
 type F32 struct {
 	Min float32
 	Max float32
+
+	pad, pad1 float32 // for gpu use
 }
 
 // Set sets the min and max values
