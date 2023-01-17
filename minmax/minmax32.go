@@ -6,18 +6,13 @@ package minmax
 
 //gosl: start minmax
 
-const (
-	MaxFloat32 float32 = 3.402823466e+38
-	MinFloat32 float32 = 1.175494351e-38
-)
-
 // F32 represents a min / max range for float32 values.
 // Supports clipping, renormalizing, etc
 type F32 struct {
 	Min float32
 	Max float32
 
-	pad, pad1 float32 // for gpu use
+	pad, pad1 int32 // for gpu use
 }
 
 // Set sets the min and max values

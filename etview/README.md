@@ -4,6 +4,12 @@ Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/etview)
 
 `etview` provides GUI Views of `etable.Table` and `etensor.Tensor` structures using the [GoGi](https://github.com/goki/gi) View framework, as GoGi Widgets.
 
+Add this to `import` to get these views to be registered with the GoGi ValueView system:
+
+```Go
+	_ "github.com/emer/etable/etview" // include to get gui views
+```
+
 * `TableView` provides a row-and-column tabular GUI interface, similar to a spreadsheet, for viewing and editing Table data.  Any higher-dimensional tensor columns are shown as TensorGrid elements that can be clicked to open a TensorView editor with actual numeric values in a similar spreadsheet-like GUI.
 
 * `TensorView` provides a spreadsheet-like GUI for viewing and editing tensor data.

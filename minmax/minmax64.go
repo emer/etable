@@ -7,8 +7,6 @@ Package minmax provides basic minimum / maximum values for float32 and float64
 */
 package minmax
 
-//gosl: start minmax
-
 const (
 	MaxFloat64 float64 = 1.7976931348623158e+308
 	MinFloat64 float64 = 2.2250738585072014e-308
@@ -122,8 +120,6 @@ func (mr *F64) ClipNormVal(val float64) float64 {
 	}
 	return mr.NormVal(val)
 }
-
-//gosl: end minmax
 
 // FitInRange adjusts our Min, Max to fit within those of other F64
 // returns true if we had to adjust to fit.
