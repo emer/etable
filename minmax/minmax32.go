@@ -4,6 +4,8 @@
 
 package minmax
 
+import "fmt"
+
 //gosl: start minmax
 
 // F32 represents a min / max range for float32 values.
@@ -118,6 +120,10 @@ func (mr *F32) ClipNormVal(val float32) float32 {
 }
 
 //gosl: end minmax
+
+func (mr *F32) String() string {
+	return fmt.Sprintf("{%g %g}", mr.Min, mr.Max)
+}
 
 // FitInRange adjusts our Min, Max to fit within those of other F32
 // returns true if we had to adjust to fit.

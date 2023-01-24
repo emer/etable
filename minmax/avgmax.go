@@ -4,6 +4,8 @@
 
 package minmax
 
+import "fmt"
+
 //gosl: start minmax
 
 const (
@@ -32,12 +34,22 @@ func (am *AvgMax32) Init() {
 }
 
 // UpdateVal updates stats from given value
-func (am *AvgMax32) UpdateVal(val float32, idx int) {
+func (am *AvgMax32) UpdateVal(val float32, idx int32) {
 	am.Sum += val
 	am.N++
 	if val > am.Max {
 		am.Max = val
-		am.MaxIdx = int32(idx)
+		am.MaxIdx = idx
+	}
+}
+
+// UpdateFromOther updates these values from other AvgMax32 values
+func (am *AvgMax32) UpdateFromOther(oSum, oMax float32, oN, oMaxIdx int32) {
+	am.Sum += oSum
+	am.N += oN
+	if oMax > am.Max {
+		am.Max = oMax
+		am.MaxIdx = oMaxIdx
 	}
 }
 
@@ -53,8 +65,13 @@ func (am *AvgMax32) CalcAvg() {
 
 //gosl: end minmax
 
-// UpdateFrom updates these values from other AvgMax32
+func (am *AvgMax32) String() string {
+	return fmt.Sprintf("{Avg: %g, Max: %g, Sum: %g, MaxIdx: %d, N: %d}", am.Avg, am.Max, am.Sum, am.MaxIdx, am.N)
+}
+
+// UpdateFrom updates these values from other AvgMax32 values
 func (am *AvgMax32) UpdateFrom(oth *AvgMax32) {
+	am.UpdateFromOther(oth.Sum, oth.Max, oth.N, oth.MaxIdx)
 	am.Sum += oth.Sum
 	am.N += oth.N
 	if oth.Max > am.Max {
@@ -65,11 +82,7 @@ func (am *AvgMax32) UpdateFrom(oth *AvgMax32) {
 
 // CopyFrom copies from other AvgMax32
 func (am *AvgMax32) CopyFrom(oth *AvgMax32) {
-	am.Avg = oth.Avg
-	am.Max = oth.Max
-	am.MaxIdx = oth.MaxIdx
-	am.Sum = oth.Sum
-	am.N = oth.N
+	*am = *oth
 }
 
 ///////////////////////////////////////////////////////////////////////////
