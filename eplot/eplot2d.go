@@ -467,6 +467,7 @@ func (pl *Plot2D) ColsListUpdate() {
 		} else {
 			cp.IsString = false
 		}
+		cp.FmMetaMap(pl.Table.Table.MetaData)
 		pl.Cols[ci] = cp
 		clri += inc
 	}

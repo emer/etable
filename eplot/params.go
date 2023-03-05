@@ -189,6 +189,63 @@ func (cp *ColParams) Label() string {
 	return cp.Col
 }
 
+// FmMetaMap sets plot params from meta data map
+func (cp *ColParams) FmMetaMap(meta map[string]string) {
+	if _, has := MetaMapLower(meta, cp.Col+":On"); has {
+		cp.On = true
+	}
+	if _, has := MetaMapLower(meta, cp.Col+":Off"); has {
+		cp.On = false
+	}
+	if op, has := MetaMapLower(meta, cp.Col+":FixMin"); has {
+		if op == "+" || op == "true" {
+			cp.Range.FixMin = true
+		} else {
+			cp.Range.FixMin = false
+		}
+	}
+	if op, has := MetaMapLower(meta, cp.Col+":FixMax"); has {
+		if op == "+" || op == "true" {
+			cp.Range.FixMax = true
+		} else {
+			cp.Range.FixMax = false
+		}
+	}
+	if op, has := MetaMapLower(meta, cp.Col+":FloatMin"); has {
+		if op == "+" || op == "true" {
+			cp.Range.FixMin = false
+		} else {
+			cp.Range.FixMin = true
+		}
+	}
+	if op, has := MetaMapLower(meta, cp.Col+":FloatMax"); has {
+		if op == "+" || op == "true" {
+			cp.Range.FixMax = false
+		} else {
+			cp.Range.FixMax = true
+		}
+	}
+	if vl, has := MetaMapLower(meta, cp.Col+":Max"); has {
+		cp.Range.Max, _ = kit.ToFloat(vl)
+	}
+	if vl, has := MetaMapLower(meta, cp.Col+":Min"); has {
+		cp.Range.Min, _ = kit.ToFloat(vl)
+	}
+	if lb, has := MetaMapLower(meta, cp.Col+":Color"); has {
+		cp.ColorName = gi.ColorName(lb)
+	}
+	if lb, has := MetaMapLower(meta, cp.Col+":Label"); has {
+		cp.Lbl = lb
+	}
+	if lb, has := MetaMapLower(meta, cp.Col+":ErrCol"); has {
+		cp.ErrCol = lb
+	}
+	if vl, has := MetaMapLower(meta, cp.Col+":TensorIdx"); has {
+		iv, _ := kit.ToInt(vl)
+		cp.TensorIdx = int(iv)
+	}
+}
+
 // PlotTypes are different types of plots
 type PlotTypes int32
 
