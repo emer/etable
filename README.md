@@ -9,7 +9,7 @@
 
 The e-name derives from the `emergent` neural network simulation framework, but `e` is also extra-dimensional, extended, electric, easy-to-use -- all good stuff.. :)
 
-See `examples/dataproc` for a full demo of how to use this system for data analysis, paralleling the example in 	[Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
+See [examples/dataproc](examples/dataproc) for a full demo of how to use this system for data analysis, paralleling the example in 	[Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
 
 See [Wiki](https://github.com/emer/etable/wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
 
@@ -17,7 +17,7 @@ As a general convention, it is safest, clearest, and quite fast to access column
 
 The following packages are included:
 
-* `bitslice` is a Go slice of bytes `[]byte` that has methods for setting individual bits, as if it was a slice of bools, while being 8x more memory efficient.  This is used for encoding null entries in  `etensor`, and as a Tensor of bool / bits there as well, and is generally very useful for binary (boolean) data.
+* [bitslice](bitslice) is a Go slice of bytes `[]byte` that has methods for setting individual bits, as if it was a slice of bools, while being 8x more memory efficient.  This is used for encoding null entries in  `etensor`, and as a Tensor of bool / bits there as well, and is generally very useful for binary (boolean) data.
 
 * `etensor` is a Tensor (n-dimensional array) object.  `etensor.Tensor` is an interface that applies to many different type-specific instances, such as `etensor.Float32`.  A tensor is just a `etensor.Shape` plus a slice holding the specific data type.  Our tensor is based directly on the [Apache Arrow](https://github.com/apache/arrow/tree/master/go) project's tensor, and it fully interoperates with it.  Arrow tensors are designed to be read-only, and we needed some extra support to make our `etable.Table` work well, so we had to roll our own.  Our tensors also interoperate fully with Gonum's 2D-specific Matrix type for the 2D case.
 
