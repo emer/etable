@@ -136,13 +136,22 @@ ix.Filter(func(t *Table, row int) bool {
 })
 ```
 
-### Splits ("pivot tables" etc)
+### Splits ("pivot tables" etc), Aggregation
 
-Create a table of mean values of "Data" column grouped by unique entries in "Name" column, resulting table will be called "DataMean"
+Create a table of mean values of "Data" column grouped by unique entries in "Name" column, resulting table will be called "DataMean":
 
 ```Go
 byNm := split.GroupBy(ix, []string{"Name"}) // column name(s) to group by
 split.Agg(byNm, "Data", agg.AggMean) // 
 gps := byNm.AggsToTable(etable.AddAggName) // etable.AddAggName or etable.ColNameOnly for naming cols
+```
+
+Describe (basic stats) all columns in a table:
+
+```Go
+ix := etable.NewIdxView(et) // new view with all rows
+desc := agg.DescAll(ix) // summary stats of all columns
+// get value at given column name (from original table), row "Mean"
+mean := desc.CellFloat("ColNm", desc.RowsByString("Agg", "Mean", etable.Equals, etable.UseCase)[0])
 ```
 
