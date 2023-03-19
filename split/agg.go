@@ -49,6 +49,18 @@ func AggTry(spl *etable.Splits, colNm string, aggTyp agg.Aggs) (*etable.SplitAgg
 	return AggIdx(spl, colIdx, aggTyp), nil
 }
 
+// AggAllNumericCols performs aggregation using given standard aggregation function across
+// all splits, for all number-valued columns in the table.
+func AggAllNumericCols(spl *etable.Splits, aggTyp agg.Aggs) {
+	dt := spl.Table()
+	for ci, cl := range dt.Cols {
+		if !cl.DataType().IsNumeric() {
+			continue
+		}
+		AggIdx(spl, ci, aggTyp)
+	}
+}
+
 ///////////////////////////////////////////////////
 //   Desc
 

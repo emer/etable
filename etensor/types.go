@@ -67,6 +67,13 @@ const (
 	TypeN = INT + 1
 )
 
+func (tp Type) IsNumeric() bool {
+	if (tp >= UINT8 && tp <= FLOAT64) || tp == INT {
+		return true
+	}
+	return false
+}
+
 //go:generate stringer -type=Type
 
 var KiT_Type = kit.Enums.AddEnum(TypeN, kit.NotBitFlag, nil)
