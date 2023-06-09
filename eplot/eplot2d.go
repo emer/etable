@@ -473,6 +473,13 @@ func (pl *Plot2D) ColsListUpdate() {
 	}
 }
 
+// ColsFmMetaMap updates all the column settings from given meta map
+func (pl *Plot2D) ColsFmMetaMap(meta map[string]string) {
+	for _, cp := range pl.Cols {
+		cp.FmMetaMap(meta)
+	}
+}
+
 // ColsUpdate updates the display toggles for all the cols
 func (pl *Plot2D) ColsUpdate() {
 	vl := pl.ColsLay()

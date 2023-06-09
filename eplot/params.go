@@ -191,11 +191,19 @@ func (cp *ColParams) Label() string {
 
 // FmMetaMap sets plot params from meta data map
 func (cp *ColParams) FmMetaMap(meta map[string]string) {
-	if _, has := MetaMapLower(meta, cp.Col+":On"); has {
-		cp.On = true
+	if op, has := MetaMapLower(meta, cp.Col+":On"); has {
+		if op == "+" || op == "true" || op == "" {
+			cp.On = true
+		} else {
+			cp.On = false
+		}
 	}
-	if _, has := MetaMapLower(meta, cp.Col+":Off"); has {
-		cp.On = false
+	if op, has := MetaMapLower(meta, cp.Col+":Off"); has {
+		if op == "+" || op == "true" || op == "" {
+			cp.On = false
+		} else {
+			cp.On = true
+		}
 	}
 	if op, has := MetaMapLower(meta, cp.Col+":FixMin"); has {
 		if op == "+" || op == "true" {
