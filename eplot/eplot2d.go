@@ -14,6 +14,7 @@ import (
 
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
+	"github.com/emer/etable/etview"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
@@ -687,6 +688,10 @@ func (pl *Plot2D) ToolbarConfig() {
 	tbar.AddAction(gi.ActOpts{Label: "Config...", Icon: "gear", Tooltip: "set parameters that control display (font size etc)"}, pl.This(),
 		func(recv, send ki.Ki, sig int64, data interface{}) {
 			giv.StructViewDialog(pl.ViewportSafe(), &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
+		})
+	tbar.AddAction(gi.ActOpts{Label: "Table...", Icon: "edit", Tooltip: "open a TableView window of the data"}, pl.This(),
+		func(recv, send ki.Ki, sig int64, data interface{}) {
+			etview.TableViewDialog(pl.ViewportSafe(), pl.Table.Table, giv.DlgOpts{Title: pl.Nm + " Data"}, nil, nil)
 		})
 	tbar.AddSeparator("file")
 	savemen := tbar.AddAction(gi.ActOpts{Label: "Save...", Icon: "file-save"}, nil, nil)

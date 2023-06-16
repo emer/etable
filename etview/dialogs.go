@@ -5,13 +5,11 @@
 package etview
 
 import (
-	"github.com/emer/etable/eplot"
 	"github.com/emer/etable/etable"
 	"github.com/emer/etable/etensor"
 	"github.com/emer/etable/simat"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
-	"github.com/goki/gi/units"
 	"github.com/goki/ki/ki"
 )
 
@@ -137,41 +135,6 @@ func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, 
 	dlg.UpdateEndNoSig(true)
 	dlg.Open(0, 0, avp, func() {
 		giv.MainMenuView(smat, dlg.Win, dlg.Win.MainMenu)
-	})
-	return dlg
-}
-
-// Plot2DDialog is for viewing an eplot.Plot2D --
-// optionally connects to given signal receiving object and function for
-// dialog signals (nil to ignore)
-// gopy:interface=handle
-func Plot2DDialog(avp *gi.Viewport2D, plot *eplot.Plot2D, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Dialog {
-	if plot == nil || plot.Table == nil {
-		return nil
-	}
-
-	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel)
-
-	frame := dlg.Frame()
-	_, prIdx := dlg.PromptWidget(frame)
-
-	clplot := plot.Clone().(*eplot.Plot2D)
-	frame.InsertChild(clplot, prIdx+1)
-	clplot.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
-	if opts.Inactive {
-		clplot.SetInactive()
-	}
-	clplot.SetStretchMaxHeight()
-	clplot.SetStretchMaxWidth()
-
-	if recv != nil && dlgFunc != nil {
-		dlg.DialogSig.Connect(recv, dlgFunc)
-	}
-	dlg.SetProp("min-width", units.NewEm(60))
-	dlg.SetProp("min-height", units.NewEm(30))
-	dlg.UpdateEndNoSig(true)
-	dlg.Open(0, 0, avp, func() {
-		giv.MainMenuView(clplot, dlg.Win, dlg.Win.MainMenu)
 	})
 	return dlg
 }

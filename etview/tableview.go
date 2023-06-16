@@ -996,13 +996,16 @@ func (tv *TableView) Style2D() {
 	tv.TsrDispToDots()
 }
 
+func (tv *TableView) NeedsDoubleReRender() bool {
+	return true
+}
+
 func (tv *TableView) Layout2D(parBBox image.Rectangle, iter int) bool {
 	redo := tv.Frame.Layout2D(parBBox, iter)
 	if !tv.IsConfiged() {
 		return redo
 	}
 	tv.LayoutHeader()
-	tv.SliceHeader().Layout2D(parBBox, iter)
 	return redo
 }
 
