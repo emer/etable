@@ -9,7 +9,7 @@
 
 The e-name derives from the `emergent` neural network simulation framework, but `e` is also extra-dimensional, extended, electric, easy-to-use -- all good stuff.. :)
 
-See [examples/dataproc](examples/dataproc) for a full demo of how to use this system for data analysis, paralleling the example in 	[Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
+See [examples/dataproc](examples/dataproc) for a full demo of how to use this system for data analysis, paralleling the example in [Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
 
 See [Wiki](https://github.com/emer/etable/wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
 
@@ -154,4 +154,8 @@ desc := agg.DescAll(ix) // summary stats of all columns
 // get value at given column name (from original table), row "Mean"
 mean := desc.CellFloat("ColNm", desc.RowsByString("Agg", "Mean", etable.Equals, etable.UseCase)[0])
 ```
+
+# Developer info
+
+The visualization tools use the [GoGi][https://github.com/goki/gi] GUI and the struct fields use the `desc` tag for documentation.  Use the modified `goimports` tool to auto-update standard comments based on these tags: https://goki.dev/docs/general/structfieldcomments/
 
