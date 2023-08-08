@@ -157,5 +157,5 @@ mean := desc.CellFloat("ColNm", desc.RowsByString("Agg", "Mean", etable.Equals, 
 
 # Developer info
 
-The visualization tools use the [GoGi][https://github.com/goki/gi] GUI and the struct fields use the `desc` tag for documentation.  Use the modified `goimports` tool to auto-update standard comments based on these tags: https://goki.dev/docs/general/structfieldcomments/
+The visualization tools use the [GoGi](https://github.com/goki/gi) GUI and the struct fields use the `desc` tag for documentation.  Use the modified `goimports` tool to auto-update standard comments based on these tags: https://goki.dev/docs/general/structfieldcomments/
 
