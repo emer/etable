@@ -34,12 +34,24 @@ import (
 // etview.TableView provides a GUI interface for etable.Table's
 type TableView struct {
 	giv.SliceViewBase
-	Table      *etable.IdxView     `desc:"the idx view of the table that we're a view of"`
-	TsrDisp    TensorDisp          `desc:"overall display options for tensor display"`
+
+	// the idx view of the table that we're a view of
+	Table *etable.IdxView `desc:"the idx view of the table that we're a view of"`
+
+	// overall display options for tensor display
+	TsrDisp TensorDisp `desc:"overall display options for tensor display"`
+
+	// per column tensor display
 	ColTsrDisp map[int]*TensorDisp `desc:"per column tensor display"`
-	NCols      int                 `inactive:"+" desc:"number of columns in table (as of last update)"`
-	SortIdx    int                 `desc:"current sort index"`
-	SortDesc   bool                `desc:"whether current sort order is descending"`
+
+	// number of columns in table (as of last update)
+	NCols int `inactive:"+" desc:"number of columns in table (as of last update)"`
+
+	// current sort index
+	SortIdx int `desc:"current sort index"`
+
+	// whether current sort order is descending
+	SortDesc bool `desc:"whether current sort order is descending"`
 }
 
 var KiT_TableView = kit.Types.AddType(&TableView{}, TableViewProps)

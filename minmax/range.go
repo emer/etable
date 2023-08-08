@@ -6,8 +6,14 @@ package minmax
 
 // Range32 represents a range of values for plotting, where the min or max can optionally be fixed
 type Range32 struct {
-	F32    `desc:"Min and Max range values"`
+
+	// Min and Max range values
+	F32 `desc:"Min and Max range values"`
+
+	// fix the minimum end of the range
 	FixMin bool `desc:"fix the minimum end of the range"`
+
+	// fix the maximum end of the range
 	FixMax bool `desc:"fix the maximum end of the range"`
 }
 
@@ -33,8 +39,14 @@ func (rr *Range32) Range() float32 {
 
 // Range64 represents a range of values for plotting, where the min or max can optionally be fixed
 type Range64 struct {
-	F64    `desc:"Min and Max range values"`
+
+	// Min and Max range values
+	F64 `desc:"Min and Max range values"`
+
+	// fix the minimum end of the range
 	FixMin bool `desc:"fix the minimum end of the range"`
+
+	// fix the maximum end of the range
 	FixMax bool `desc:"fix the maximum end of the range"`
 }
 

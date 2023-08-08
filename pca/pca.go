@@ -16,9 +16,15 @@ import (
 // PCA computes the eigenvalue decomposition of a square similarity matrix,
 // typically generated using the correlation metric.
 type PCA struct {
-	Covar   *etensor.Float64 `view:"no-inline" desc:"the covariance matrix computed on original data, which is then eigen-factored"`
+
+	// [view: no-inline] the covariance matrix computed on original data, which is then eigen-factored
+	Covar *etensor.Float64 `view:"no-inline" desc:"the covariance matrix computed on original data, which is then eigen-factored"`
+
+	// [view: no-inline] the eigenvectors, in same size as Covar - each eigenvector is a column in this 2D square matrix, ordered *lowest* to *highest* across the columns -- i.e., maximum eigenvector is the last column
 	Vectors *etensor.Float64 `view:"no-inline" desc:"the eigenvectors, in same size as Covar - each eigenvector is a column in this 2D square matrix, ordered *lowest* to *highest* across the columns -- i.e., maximum eigenvector is the last column"`
-	Values  []float64        `view:"no-inline" desc:"the eigenvalues, ordered *lowest* to *highest*"`
+
+	// [view: no-inline] the eigenvalues, ordered *lowest* to *highest*
+	Values []float64 `view:"no-inline" desc:"the eigenvalues, ordered *lowest* to *highest*"`
 }
 
 func (pca *PCA) Init() {

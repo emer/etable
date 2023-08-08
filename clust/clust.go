@@ -17,11 +17,21 @@ import (
 
 // Node is one node in the cluster
 type Node struct {
-	Idx     int     `desc:"index into original distance matrix -- only valid for for terminal leaves"`
-	Dist    float64 `desc:"distance for this node -- how far apart were all the kids from each other when this node was created -- is 0 for leaf nodes"`
+
+	// index into original distance matrix -- only valid for for terminal leaves
+	Idx int `desc:"index into original distance matrix -- only valid for for terminal leaves"`
+
+	// distance for this node -- how far apart were all the kids from each other when this node was created -- is 0 for leaf nodes
+	Dist float64 `desc:"distance for this node -- how far apart were all the kids from each other when this node was created -- is 0 for leaf nodes"`
+
+	// total aggregate distance from parents -- the X axis offset at which our cluster starts
 	ParDist float64 `desc:"total aggregate distance from parents -- the X axis offset at which our cluster starts"`
-	Y       float64 `desc:"y-axis value for this node -- if a parent, it is the average of its kids Y's, otherwise it counts down"`
-	Kids    []*Node `desc:"child nodes under this one"`
+
+	// y-axis value for this node -- if a parent, it is the average of its kids Y's, otherwise it counts down
+	Y float64 `desc:"y-axis value for this node -- if a parent, it is the average of its kids Y's, otherwise it counts down"`
+
+	// child nodes under this one
+	Kids []*Node `desc:"child nodes under this one"`
 }
 
 // IsLeaf returns true if node is a leaf of the tree with no kids

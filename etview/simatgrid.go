@@ -26,6 +26,8 @@ const LabelSpace = float32(8)
 // with tensor values as a grid of colored squares, and labels for rows, cols
 type SimMatGrid struct {
 	TensorGrid
+
+	// the similarity / distance matrix
 	SimMat      *simat.SimMat `desc:"the similarity / distance matrix"`
 	rowMaxSz    mat32.Vec2    // maximum label size
 	rowMinBlank int           // minimum number of blank rows

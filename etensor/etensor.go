@@ -28,7 +28,6 @@ type EvalFunc func(idx int, val float64) float64
 // 2D subspace within a higher-dimensional space -- typically you'll want to call SubSpace
 // to get a 2D subspace of the higher-dimensional Tensor (SubSpace is not part of interface
 // as it returns the specific type, but is defined for all Tensor types).
-//
 type Tensor interface {
 	mat.Matrix
 

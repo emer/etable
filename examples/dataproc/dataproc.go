@@ -46,7 +46,8 @@ var GpDecade *etable.Table
 
 // AnalyzePlanets analyzes planets.csv data following some of the examples
 // given here, using pandas:
-// 	https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html
+//
+//	https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html
 func AnalyzePlanets() {
 	Planets = etable.NewTable("planets")
 	Planets.OpenCSV("./planets.csv", etable.Comma)

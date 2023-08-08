@@ -20,13 +20,27 @@ import (
 // Also satisfies the plotter.Labeler interface for labels attached to a line, and
 // plotter.YErrorer for error bars.
 type TableXY struct {
-	Table          *etable.IdxView `desc:"the index view of data table to plot from"`
-	XCol, YCol     int             `desc:"the indexes of the tensor columns to use for the X and Y data, respectively"`
-	XRowSz, YRowSz int             `desc:"numer of elements in each row of data -- 1 for scalar, > 1 for multi-dimensional"`
-	XIdx, YIdx     int             `desc:"the indexes of the element within each tensor cell if cells are n-dimensional, respectively"`
-	LblCol         int             `desc:"the column to use for returning a label using Label interface -- for string cols"`
-	ErrCol         int             `desc:"the column to use for returning errorbars (+/- given value) -- if YCol is tensor then this must also be a tensor and given YIdx used"`
-	YRange         minmax.Range64  `desc:"range constraints on Y values"`
+
+	// the index view of data table to plot from
+	Table *etable.IdxView `desc:"the index view of data table to plot from"`
+
+	// the indexes of the tensor columns to use for the X and Y data, respectively
+	XCol, YCol int `desc:"the indexes of the tensor columns to use for the X and Y data, respectively"`
+
+	// numer of elements in each row of data -- 1 for scalar, > 1 for multi-dimensional
+	XRowSz, YRowSz int `desc:"numer of elements in each row of data -- 1 for scalar, > 1 for multi-dimensional"`
+
+	// the indexes of the element within each tensor cell if cells are n-dimensional, respectively
+	XIdx, YIdx int `desc:"the indexes of the element within each tensor cell if cells are n-dimensional, respectively"`
+
+	// the column to use for returning a label using Label interface -- for string cols
+	LblCol int `desc:"the column to use for returning a label using Label interface -- for string cols"`
+
+	// the column to use for returning errorbars (+/- given value) -- if YCol is tensor then this must also be a tensor and given YIdx used
+	ErrCol int `desc:"the column to use for returning errorbars (+/- given value) -- if YCol is tensor then this must also be a tensor and given YIdx used"`
+
+	// range constraints on Y values
+	YRange minmax.Range64 `desc:"range constraints on Y values"`
 }
 
 // NewTableXY returns a new XY plot view onto the given IdxView of etable.Table (makes a copy),

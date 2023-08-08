@@ -15,11 +15,17 @@ const (
 
 // AvgMax holds average and max statistics
 type AvgMax32 struct {
-	Avg    float32
-	Max    float32
-	Sum    float32 `desc:"sum for computing average"`
-	MaxIdx int32   `desc:"index of max item"`
-	N      int32   `desc:"number of items in sum"`
+	Avg float32
+	Max float32
+
+	// sum for computing average
+	Sum float32 `desc:"sum for computing average"`
+
+	// index of max item
+	MaxIdx int32 `desc:"index of max item"`
+
+	// number of items in sum
+	N int32 `desc:"number of items in sum"`
 
 	pad, pad1, pad2 int32
 }
@@ -90,11 +96,17 @@ func (am *AvgMax32) CopyFrom(oth *AvgMax32) {
 
 // AvgMax holds average and max statistics
 type AvgMax64 struct {
-	Avg    float64
-	Max    float64
-	Sum    float64 `desc:"sum for computing average"`
-	MaxIdx int32   `desc:"index of max item"`
-	N      int32   `desc:"number of items in sum"`
+	Avg float64
+	Max float64
+
+	// sum for computing average
+	Sum float64 `desc:"sum for computing average"`
+
+	// index of max item
+	MaxIdx int32 `desc:"index of max item"`
+
+	// number of items in sum
+	N int32 `desc:"number of items in sum"`
 }
 
 // Init initializes prior to new updates

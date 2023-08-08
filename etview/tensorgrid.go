@@ -24,26 +24,56 @@ import (
 
 // TensorLayout are layout options for displaying tensors
 type TensorLayout struct {
-	OddRow  bool `desc:"even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension"`
+
+	// even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension
+	OddRow bool `desc:"even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension"`
+
+	// if true, then the Y=0 coordinate is displayed from the top-down; otherwise the Y=0 coordinate is displayed from the bottom up, which is typical for emergent network patterns.
 	TopZero bool `desc:"if true, then the Y=0 coordinate is displayed from the top-down; otherwise the Y=0 coordinate is displayed from the bottom up, which is typical for emergent network patterns."`
-	Image   bool `desc:"display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image"`
+
+	// display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image
+	Image bool `desc:"display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image"`
 }
 
 // TensorDisp are options for displaying tensors
 type TensorDisp struct {
 	TensorLayout
-	Range       minmax.Range64   `view:"inline" desc:"range to plot"`
-	MinMax      minmax.F64       `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
-	ColorMap    giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
-	Background  gist.Color       `desc:"background color"`
-	GridFill    float32          `min:"0.1" max:"1" step:"0.1" def:"0.9,1" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
-	DimExtra    float32          `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries, as a proportion of total grid size"`
-	BotRtSpace  units.Value      `desc:"extra space to add at bottom of grid -- needed when included in TableView for example"`
-	GridMinSize units.Value      `desc:"minimum size for grid squares -- they will never be smaller than this"`
-	GridMaxSize units.Value      `desc:"maximum size for grid squares -- they will never be larger than this"`
-	TotPrefSize units.Value      `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
-	FontSize    float32          `desc:"font size in standard point units for labels (e.g., SimMat)"`
-	GridView    *TensorGrid      `copy:"-" json:"-" xml:"-" view:"-" desc:"our gridview, for update method"`
+
+	// [view: inline] range to plot
+	Range minmax.Range64 `view:"inline" desc:"range to plot"`
+
+	// [view: inline] if not using fixed range, this is the actual range of data
+	MinMax minmax.F64 `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
+
+	// the name of the color map to use in translating values to colors
+	ColorMap giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
+
+	// background color
+	Background gist.Color `desc:"background color"`
+
+	// [def: 0.9,1] [min: 0.1] [max: 1] [step: 0.1] what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc
+	GridFill float32 `min:"0.1" max:"1" step:"0.1" def:"0.9,1" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
+
+	// [def: 0.1,0.3] [min: 0] [max: 1] [step: 0.02] amount of extra space to add at dimension boundaries, as a proportion of total grid size
+	DimExtra float32 `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries, as a proportion of total grid size"`
+
+	// extra space to add at bottom of grid -- needed when included in TableView for example
+	BotRtSpace units.Value `desc:"extra space to add at bottom of grid -- needed when included in TableView for example"`
+
+	// minimum size for grid squares -- they will never be smaller than this
+	GridMinSize units.Value `desc:"minimum size for grid squares -- they will never be smaller than this"`
+
+	// maximum size for grid squares -- they will never be larger than this
+	GridMaxSize units.Value `desc:"maximum size for grid squares -- they will never be larger than this"`
+
+	// total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints
+	TotPrefSize units.Value `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
+
+	// font size in standard point units for labels (e.g., SimMat)
+	FontSize float32 `desc:"font size in standard point units for labels (e.g., SimMat)"`
+
+	// [view: -] our gridview, for update method
+	GridView *TensorGrid `copy:"-" json:"-" xml:"-" view:"-" desc:"our gridview, for update method"`
 }
 
 var KiT_TensorDisp = kit.Types.AddType(&TensorDisp{}, TensorDispProps)
@@ -160,9 +190,15 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
 type TensorGrid struct {
 	gi.WidgetBase
-	Tensor   etensor.Tensor `desc:"the tensor that we view"`
-	Disp     TensorDisp     `desc:"display options"`
-	ColorMap *colormap.Map  `desc:"the actual colormap"`
+
+	// the tensor that we view
+	Tensor etensor.Tensor `desc:"the tensor that we view"`
+
+	// display options
+	Disp TensorDisp `desc:"display options"`
+
+	// the actual colormap
+	ColorMap *colormap.Map `desc:"the actual colormap"`
 }
 
 var KiT_TensorGrid = kit.Types.AddType(&TensorGrid{}, nil)

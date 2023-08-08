@@ -38,8 +38,14 @@ type FilterFunc func(et *Table, row int) bool
 // IdxView views on a table can also be organized together as Splits
 // of the table rows, e.g., by grouping values along a given column.
 type IdxView struct {
-	Table    *Table   `desc:"Table that we are an indexed view onto"`
-	Idxs     []int    `desc:"current indexes into Table"`
+
+	// Table that we are an indexed view onto
+	Table *Table `desc:"Table that we are an indexed view onto"`
+
+	// current indexes into Table
+	Idxs []int `desc:"current indexes into Table"`
+
+	// [view: -] current Less function used in sorting
 	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-" desc:"current Less function used in sorting"`
 }
 

@@ -16,21 +16,51 @@ import (
 
 // PlotParams are parameters for overall plot
 type PlotParams struct {
-	Title      string    `desc:"optional title at top of plot"`
-	Type       PlotTypes `desc:"type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional"`
-	Lines      bool      `desc:"plot lines"`
-	Points     bool      `desc:"plot points with symbols"`
-	LineWidth  float64   `desc:"width of lines"`
-	PointSize  float64   `desc:"size of points"`
-	BarWidth   float64   `min:"0.01" max:"1" desc:"width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default"`
-	NegXDraw   bool      `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
-	Scale      float64   `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
-	XAxisCol   string    `desc:"what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values."`
-	LegendCol  string    `desc:"optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"`
-	XAxisRot   float64   `desc:"rotation of the X Axis labels, in degrees"`
-	XAxisLabel string    `desc:"optional label to use for XAxis instead of column name"`
-	YAxisLabel string    `desc:"optional label to use for YAxis -- if empty, first column name is used"`
-	Plot       *Plot2D   `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
+
+	// optional title at top of plot
+	Title string `desc:"optional title at top of plot"`
+
+	// type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional
+	Type PlotTypes `desc:"type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional"`
+
+	// plot lines
+	Lines bool `desc:"plot lines"`
+
+	// plot points with symbols
+	Points bool `desc:"plot points with symbols"`
+
+	// width of lines
+	LineWidth float64 `desc:"width of lines"`
+
+	// size of points
+	PointSize float64 `desc:"size of points"`
+
+	// [min: 0.01] [max: 1] width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default
+	BarWidth float64 `min:"0.01" max:"1" desc:"width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default"`
+
+	// draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn
+	NegXDraw bool `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
+
+	// [def: 2] overall scaling factor -- the larger the number, the larger the fonts are relative to the graph
+	Scale float64 `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
+
+	// what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values.
+	XAxisCol string `desc:"what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values."`
+
+	// optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables
+	LegendCol string `desc:"optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"`
+
+	// rotation of the X Axis labels, in degrees
+	XAxisRot float64 `desc:"rotation of the X Axis labels, in degrees"`
+
+	// optional label to use for XAxis instead of column name
+	XAxisLabel string `desc:"optional label to use for XAxis instead of column name"`
+
+	// optional label to use for YAxis -- if empty, first column name is used
+	YAxisLabel string `desc:"optional label to use for YAxis -- if empty, first column name is used"`
+
+	// [view: -] our plot, for update method
+	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -136,18 +166,42 @@ func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 
 // ColParams are parameters for plotting one column of data
 type ColParams struct {
-	On        bool           `desc:"plot this column"`
-	Col       string         `desc:"name of column we're plotting"`
-	Range     minmax.Range64 `desc:"effective range of data to plot -- either end can be fixed"`
-	FullRange minmax.F64     `desc:"full actual range of data -- only valid if specifically computed"`
-	ColorName gi.ColorName   `desc:"if non-empty, color is set by this name"`
-	Color     gist.Color     `desc:"color to use in plotting the line"`
-	NTicks    int            `desc:"desired number of ticks"`
-	Lbl       string         `desc:"if non-empty, this is an alternative label to use in plotting"`
-	TensorIdx int            `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines"`
-	ErrCol    string         `desc:"specifies a column containing error bars for this column"`
-	IsString  bool           `inactive:"+" desc:"if true this is a string column -- plots as labels"`
-	Plot      *Plot2D        `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
+
+	// plot this column
+	On bool `desc:"plot this column"`
+
+	// name of column we're plotting
+	Col string `desc:"name of column we're plotting"`
+
+	// effective range of data to plot -- either end can be fixed
+	Range minmax.Range64 `desc:"effective range of data to plot -- either end can be fixed"`
+
+	// full actual range of data -- only valid if specifically computed
+	FullRange minmax.F64 `desc:"full actual range of data -- only valid if specifically computed"`
+
+	// if non-empty, color is set by this name
+	ColorName gi.ColorName `desc:"if non-empty, color is set by this name"`
+
+	// color to use in plotting the line
+	Color gist.Color `desc:"color to use in plotting the line"`
+
+	// desired number of ticks
+	NTicks int `desc:"desired number of ticks"`
+
+	// if non-empty, this is an alternative label to use in plotting
+	Lbl string `desc:"if non-empty, this is an alternative label to use in plotting"`
+
+	// if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines
+	TensorIdx int `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines"`
+
+	// specifies a column containing error bars for this column
+	ErrCol string `desc:"specifies a column containing error bars for this column"`
+
+	// if true this is a string column -- plots as labels
+	IsString bool `inactive:"+" desc:"if true this is a string column -- plots as labels"`
+
+	// [view: -] our plot, for update method
+	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
 }
 
 // Defaults sets defaults if nil vals present

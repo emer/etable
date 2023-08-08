@@ -22,9 +22,15 @@ import "fmt"
 // systems in terms of underlying memory -- just in the order of indexes used to access
 // this memory.
 type Shape struct {
-	Shp  []int    `desc:"shape is size per dimension"`
-	Strd []int    `tableview:"-" view:"-" desc:"stride is offset per dimension"`
-	Nms  []string `tableview:"-" view:"-" desc:"names of each dimension"`
+
+	// shape is size per dimension
+	Shp []int `desc:"shape is size per dimension"`
+
+	// [view: -] [tableview: -] stride is offset per dimension
+	Strd []int `tableview:"-" view:"-" desc:"stride is offset per dimension"`
+
+	// [view: -] [tableview: -] names of each dimension
+	Nms []string `tableview:"-" view:"-" desc:"names of each dimension"`
 }
 
 // NewShape returns a new shape object initialized with params.

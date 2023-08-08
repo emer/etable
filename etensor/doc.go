@@ -8,11 +8,11 @@ Package etensor provides a basic set of tensor data structures
 and intercompatible with those structures.
 
 The primary differences are:
-* pure simple unidimensional Go slice used as the backing data array, auto allocated
-* fully modifiable data -- arrow is designed to be read-only
-* Shape struct is fully usable separate from the tensor data
-* Everything exported, e.g., Offset method on Shape
-* int used instead of int64 to make everything easier -- target platforms
-  are all 64bit and have 64bit int in Go by default
+  - pure simple unidimensional Go slice used as the backing data array, auto allocated
+  - fully modifiable data -- arrow is designed to be read-only
+  - Shape struct is fully usable separate from the tensor data
+  - Everything exported, e.g., Offset method on Shape
+  - int used instead of int64 to make everything easier -- target platforms
+    are all 64bit and have 64bit int in Go by default
 */
 package etensor

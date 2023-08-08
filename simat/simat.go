@@ -15,9 +15,15 @@ import (
 // SimMat is a similarity / distance matrix with additional row and column
 // labels for display purposes.
 type SimMat struct {
-	Mat  etensor.Tensor `desc:"the similarity / distance matrix (typically an etensor.Float64)"`
-	Rows []string       `desc:"labels for the rows -- blank rows trigger generation of grouping lines"`
-	Cols []string       `desc:"labels for the columns -- blank columns trigger generation of grouping lines"`
+
+	// the similarity / distance matrix (typically an etensor.Float64)
+	Mat etensor.Tensor `desc:"the similarity / distance matrix (typically an etensor.Float64)"`
+
+	// labels for the rows -- blank rows trigger generation of grouping lines
+	Rows []string `desc:"labels for the rows -- blank rows trigger generation of grouping lines"`
+
+	// labels for the columns -- blank columns trigger generation of grouping lines
+	Cols []string `desc:"labels for the columns -- blank columns trigger generation of grouping lines"`
 }
 
 // Init initializes SimMat with default Matrix and nil rows, cols

@@ -30,13 +30,27 @@ import (
 // Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
 type Plot2D struct {
 	gi.Layout
-	Table    *etable.IdxView `desc:"the idxview of the table that we're plotting"`
-	Params   PlotParams      `desc:"the overall plot parameters"`
-	Cols     []*ColParams    `desc:"the parameters for each column of the table"`
-	GPlot    *plot.Plot      `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
-	SVGFile  gi.FileName     `desc:"current svg file"`
-	DataFile gi.FileName     `desc:"current csv data file"`
-	InPlot   bool            `inactive:"+" desc:"currently doing a plot"`
+
+	// the idxview of the table that we're plotting
+	Table *etable.IdxView `desc:"the idxview of the table that we're plotting"`
+
+	// the overall plot parameters
+	Params PlotParams `desc:"the overall plot parameters"`
+
+	// the parameters for each column of the table
+	Cols []*ColParams `desc:"the parameters for each column of the table"`
+
+	// the gonum plot that actually does the plotting -- always save the last one generated
+	GPlot *plot.Plot `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
+
+	// current svg file
+	SVGFile gi.FileName `desc:"current svg file"`
+
+	// current csv data file
+	DataFile gi.FileName `desc:"current csv data file"`
+
+	// currently doing a plot
+	InPlot bool `inactive:"+" desc:"currently doing a plot"`
 }
 
 var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)

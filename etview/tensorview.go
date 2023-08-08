@@ -26,9 +26,15 @@ import (
 // using a tabular rows-and-columns interface
 type TensorView struct {
 	giv.SliceViewBase
+
+	// the tensor that we're a view of
 	Tensor etensor.Tensor `desc:"the tensor that we're a view of"`
-	TsrLay TensorLayout   `desc:"layout config of the tensor"`
-	NCols  int            `inactive:"+" desc:"number of columns in table (as of last update)"`
+
+	// layout config of the tensor
+	TsrLay TensorLayout `desc:"layout config of the tensor"`
+
+	// number of columns in table (as of last update)
+	NCols int `inactive:"+" desc:"number of columns in table (as of last update)"`
 }
 
 var KiT_TensorView = kit.Types.AddType(&TensorView{}, TensorViewProps)
