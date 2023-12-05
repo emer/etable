@@ -7,7 +7,7 @@ package agg
 import (
 	"math"
 
-	"github.com/emer/etable/etable"
+	"goki.dev/etable/v2/etable"
 )
 
 // Every standard Agg method in this file follows one of these signatures:

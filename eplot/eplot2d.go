@@ -12,9 +12,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etensor"
-	"github.com/emer/etable/etview"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gist"
 	"github.com/goki/gi/giv"
@@ -23,6 +20,9 @@ import (
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/etensor"
+	"goki.dev/etable/v2/etview"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/font"
 )

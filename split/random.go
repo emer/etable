@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/emer/etable/etable"
+	"goki.dev/etable/v2/etable"
 	"gonum.org/v1/gonum/floats"
 )
 

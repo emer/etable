@@ -1,6 +1,6 @@
 # etable
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2)
 
 `etable` provides the etable.Table structure which provides a DataTable or DataFrame data representation, which is a collection of columnar data all having the same number of rows.
 
@@ -14,7 +14,7 @@ Native support is provided for basic CSV, TSV I/O, including the C++ emergent st
 
 The `etable.IdxView` is an indexed view into a Table, which is used for all data-processing operations such as Sort, Filter, Split (group), and for aggregating data as in a pivot-table.
 
-See [agg](https://github.com/emer/etable/tree/master/agg) package for aggregation functions that operate on the `IdxView` to perform standard aggregation operations such as Sum, Mean, etc, and [split](https://github.com/emer/etable/tree/master/split) for pivot table support.
+See [agg](https://goki.dev/etable/v2/tree/master/agg) package for aggregation functions that operate on the `IdxView` to perform standard aggregation operations such as Sum, Mean, etc, and [split](https://goki.dev/etable/v2/tree/master/split) for pivot table support.
 
 Other relevant examples of DataTable-like structures:
 * https://github.com/apache/arrow/tree/master/go/arrow Table

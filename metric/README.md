@@ -1,6 +1,6 @@
 # metric
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/metric)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/metric)
 
 `metric` provides various similarity / distance metrics for comparing floating-point vectors. All functions have 32 and 64 bit variants, and skip NaN's (often used for missing) and will panic if the lengths of the two slices are unequal (no error return).
 

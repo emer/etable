@@ -1,6 +1,6 @@
 # eplot
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/eplot)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/eplot)
 
 eplot provides an interactive, graphical plotting utility for etable data, as a GoGi Widget, with multiple Y axis values and options for XY vs. Bar plots.
 

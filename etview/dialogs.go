@@ -5,12 +5,12 @@
 package etview
 
 import (
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etensor"
-	"github.com/emer/etable/simat"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/giv"
 	"github.com/goki/ki/ki"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/etensor"
+	"goki.dev/etable/v2/simat"
 )
 
 // TensorViewDialog is for editing an etensor.Tensor using a TensorView --

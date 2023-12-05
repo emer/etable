@@ -5,9 +5,9 @@
 package agg
 
 import (
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/etensor"
 )
 
 // MeanTables returns an etable.Table with the mean values across all float

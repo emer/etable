@@ -5,7 +5,7 @@
 package norm
 
 import (
-	"github.com/emer/etable/etensor"
+	"goki.dev/etable/v2/etensor"
 )
 
 ///////////////////////////////////////////

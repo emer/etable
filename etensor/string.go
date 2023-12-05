@@ -12,8 +12,8 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/emer/etable/bitslice"
 	"github.com/goki/ki/ints"
+	"goki.dev/etable/v2/bitslice"
 	"gonum.org/v1/gonum/mat"
 )
 

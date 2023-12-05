@@ -1,6 +1,6 @@
 # pca
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/pca)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/pca)
 
 This performs principal component's analysis and associated covariance matrix computations, operating on `etable.Table` or `etensor.Tensor` data, using the [gonum](https://github.com/gonum/gonum) matrix interface.
 

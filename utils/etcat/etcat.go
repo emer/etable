@@ -12,9 +12,9 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/emer/etable/agg"
-	"github.com/emer/etable/etable"
 	"github.com/goki/gi/gi"
+	"goki.dev/etable/v2/agg"
+	"goki.dev/etable/v2/etable"
 )
 
 var (

@@ -8,7 +8,7 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/emer/etable/etable"
+	"goki.dev/etable/v2/etable"
 )
 
 // QuantilesIdx returns the given quantile(s) of non-Null, non-NaN elements in given

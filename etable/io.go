@@ -15,9 +15,9 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/ki/kit"
+	"goki.dev/etable/v2/etensor"
 )
 
 // Delim are standard CSV delimiter options (Tab, Comma, Space)

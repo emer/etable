@@ -12,8 +12,8 @@ package tsragg
 import (
 	"math"
 
-	"github.com/emer/etable/agg"
-	"github.com/emer/etable/etensor"
+	"goki.dev/etable/v2/agg"
+	"goki.dev/etable/v2/etensor"
 )
 
 // Count returns the count of non-Null, non-NaN elements in given Tensor.

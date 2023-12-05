@@ -7,11 +7,11 @@ package eplot
 import (
 	"strings"
 
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gist"
 	"github.com/goki/ki/kit"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/minmax"
 )
 
 // PlotParams are parameters for overall plot

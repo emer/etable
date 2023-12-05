@@ -1,6 +1,6 @@
 # convolve
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/convolve)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/convolve)
 
 `convolve.Slice32` operates on `[]float32` data, convolving data with a kernel, while `convolve.Slice64` operates on `[]float64` data.
 

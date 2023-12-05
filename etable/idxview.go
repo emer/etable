@@ -12,10 +12,10 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 	"github.com/goki/ki/sliceclone"
+	"goki.dev/etable/v2/etensor"
 )
 
 // LessFunc is a function used for sort comparisons that returns

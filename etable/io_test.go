@@ -9,7 +9,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/emer/etable/etensor"
+	"goki.dev/etable/v2/etensor"
 )
 
 func TestEmerHeaders(t *testing.T) {

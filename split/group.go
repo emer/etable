@@ -7,8 +7,8 @@ package split
 import (
 	"log"
 
-	"github.com/emer/etable/etable"
 	"github.com/goki/ki/sliceclone"
+	"goki.dev/etable/v2/etable"
 )
 
 // All returns a single "split" with all of the rows in given view

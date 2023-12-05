@@ -9,10 +9,10 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/emer/etable/etensor"
-	"github.com/emer/etable/norm"
-	"github.com/emer/etable/simat"
 	"github.com/goki/ki/indent"
+	"goki.dev/etable/v2/etensor"
+	"goki.dev/etable/v2/norm"
+	"goki.dev/etable/v2/simat"
 )
 
 // Node is one node in the cluster

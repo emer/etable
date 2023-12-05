@@ -9,9 +9,9 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/sliceclone"
+	"goki.dev/etable/v2/etensor"
 )
 
 // SplitAgg contains aggregation results for splits

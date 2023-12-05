@@ -13,8 +13,6 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etensor"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/girl"
 	"github.com/goki/gi/gist"
@@ -29,6 +27,8 @@ import (
 	"github.com/goki/ki/kit"
 	"github.com/goki/mat32"
 	"github.com/goki/pi/filecat"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/etensor"
 )
 
 // etview.TableView provides a GUI interface for etable.Table's

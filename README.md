@@ -1,8 +1,8 @@
 # etable: DataTable / DataFrame structure in Go
 
-[![Go Report Card](https://goreportcard.com/badge/github.com/emer/etable)](https://goreportcard.com/report/github.com/emer/etable)
-[![Go Reference](https://pkg.go.dev/badge/github.com/emer/etable.svg)](https://pkg.go.dev/github.com/emer/etable)
-[![CI](https://github.com/emer/etable/actions/workflows/ci.yml/badge.svg)](https://github.com/emer/etable/actions/workflows/ci.yml)
+[![Go Report Card](https://goreportcard.com/badge/goki.dev/etable/v2)](https://goreportcard.com/report/goki.dev/etable/v2)
+[![Go Reference](https://pkg.go.dev/badge/goki.dev/etable/v2.svg)](https://pkg.go.dev/goki.dev/etable/v2)
+[![CI](https://goki.dev/etable/v2/actions/workflows/ci.yml/badge.svg)](https://goki.dev/etable/v2/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/emer/etable/branch/master/graph/badge.svg?token=Hw5cInAxY3)](https://codecov.io/gh/emer/etable)
 
  **etable** (or eTable) provides a DataTable / DataFrame structure in Go (golang), similar to [pandas](https://pandas.pydata.org/) and [xarray](http://xarray.pydata.org/en/stable/) in Python, and [Apache Arrow Table](https://github.com/apache/arrow/tree/master/go/arrow/array/table.go), using `etensor` n-dimensional columns aligned by common outermost row dimension.
@@ -11,7 +11,7 @@ The e-name derives from the `emergent` neural network simulation framework, but 
 
 See [examples/dataproc](examples/dataproc) for a full demo of how to use this system for data analysis, paralleling the example in [Python Data Science](https://jakevdp.github.io/PythonDataScienceHandbook/03.08-aggregation-and-grouping.html) using pandas, to see directly how that translates into this framework.
 
-See [Wiki](https://github.com/emer/etable/wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
+See [Wiki](https://goki.dev/etable/v2/wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
 
 As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [GoKi Naming Convention](https://github.com/goki/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
 
@@ -103,7 +103,7 @@ Other options are `etable.Equals` instead of `Contains` to search for an exact f
 
 ## Index Views (Sort, Filter, etc)
 
-The [IdxView](https://godoc.org/github.com/emer/etable/etable#IdxView) provides a list of row-wise indexes into a table, and Sorting, Filtering and Splitting all operate on this index view without changing the underlying table data, for maximum efficiency and flexibility.
+The [IdxView](https://godoc.org/goki.dev/etable/v2/etable#IdxView) provides a list of row-wise indexes into a table, and Sorting, Filtering and Splitting all operate on this index view without changing the underlying table data, for maximum efficiency and flexibility.
 
 ```Go
 ix := etable.NewIdxView(et) // new view with all rows

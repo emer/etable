@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/emer/etable/etable"
 	"github.com/goki/ki/kit"
+	"goki.dev/etable/v2/etable"
 )
 
 // Aggs is a list of different standard aggregation functions, which can be used

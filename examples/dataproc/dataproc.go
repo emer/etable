@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/emer/etable/agg"
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/etview"
-	"github.com/emer/etable/split"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gimain"
+	"goki.dev/etable/v2/agg"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/etview"
+	"goki.dev/etable/v2/split"
 )
 
 // this is the stub main for gogi that calls our actual mainrun function, at end of file
@@ -108,7 +108,7 @@ func OpenGUI() {
 	height := 768
 
 	gi.SetAppName("dataproc")
-	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://github.com/emer/etable">etable on GitHub</a>.</p>`)
+	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`)
 
 	win := gi.NewMainWindow("dataproc", "eTable Data Processing Demo", width, height)
 

@@ -10,10 +10,10 @@ import (
 	"math"
 	"strings"
 
-	"github.com/emer/etable/etensor"
 	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
+	"goki.dev/etable/v2/etensor"
 )
 
 // etable.Table is the emer DataTable structure, containing columns of etensor tensors.

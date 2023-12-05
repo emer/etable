@@ -172,7 +172,7 @@ class Sim(pygiv.ClassViewObj):
         height = 1200
 
         gi.SetAppName("pyet")
-        gi.SetAppAbout('testing of converting etable data between Go and Python. See <a href="https://github.com/emer/etable/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>')
+        gi.SetAppAbout('testing of converting etable data between Go and Python. See <a href="https://goki.dev/etable/v2/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>')
 
         win = gi.NewMainWindow("pyet", "PyEt Testing", width, height)
         ss.Win = win

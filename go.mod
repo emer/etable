@@ -1,4 +1,4 @@
-module github.com/emer/etable
+module goki.dev/etable/v2
 
 go 1.18
 

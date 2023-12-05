@@ -1,6 +1,6 @@
 # norm
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/norm)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/norm)
 
 `norm` provides normalization and norm metric computations, e.g., L2 = sqrt of sum of squares of a vector.  The basic functions operate on either `[]float32` or `[]float64` data, but Tensor versions are available too.
 

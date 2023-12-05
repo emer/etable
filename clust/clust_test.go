@@ -8,9 +8,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/emer/etable/etable"
-	"github.com/emer/etable/metric"
-	"github.com/emer/etable/simat"
+	"goki.dev/etable/v2/etable"
+	"goki.dev/etable/v2/metric"
+	"goki.dev/etable/v2/simat"
 )
 
 func TestClust(t *testing.T) {

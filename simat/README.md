@@ -1,6 +1,6 @@
 # simat
 
-Docs: [GoDoc](https://pkg.go.dev/github.com/emer/etable/simat)
+Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/simat)
 
 `simat` provides similarity / distance matrix functions that create a `SimMat` matrix from Tensor or Table data.  Any metric function defined in metric package (or user-created) can be used.
 

@@ -8,8 +8,6 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/emer/etable/etensor"
-	"github.com/emer/etable/minmax"
 	"github.com/goki/gi/colormap"
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gist"
@@ -20,6 +18,8 @@ import (
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 	"github.com/goki/mat32"
+	"goki.dev/etable/v2/etensor"
+	"goki.dev/etable/v2/minmax"
 )
 
 // TensorLayout are layout options for displaying tensors
