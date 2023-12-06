@@ -19,13 +19,13 @@ type AvgMax32 struct {
 	Max float32
 
 	// sum for computing average
-	Sum float32 `desc:"sum for computing average"`
+	Sum float32
 
 	// index of max item
-	MaxIdx int32 `desc:"index of max item"`
+	MaxIdx int32
 
 	// number of items in sum
-	N int32 `desc:"number of items in sum"`
+	N int32
 
 	pad, pad1, pad2 int32
 }
@@ -100,13 +100,13 @@ type AvgMax64 struct {
 	Max float64
 
 	// sum for computing average
-	Sum float64 `desc:"sum for computing average"`
+	Sum float64
 
 	// index of max item
-	MaxIdx int32 `desc:"index of max item"`
+	MaxIdx int32
 
 	// number of items in sum
-	N int32 `desc:"number of items in sum"`
+	N int32
 }
 
 // Init initializes prior to new updates

@@ -5,17 +5,13 @@
 package etview
 
 import (
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/girl"
-	"github.com/goki/gi/gist"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/oswin"
-	"github.com/goki/gi/oswin/mouse"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/simat"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/girl/paint"
+	"goki.dev/girl/styles"
+	"goki.dev/girl/units"
+	"goki.dev/ki/v2"
 	"goki.dev/mat32/v2"
 )
 
@@ -23,20 +19,18 @@ const LabelSpace = float32(8)
 
 // SimMatGrid is a widget that displays a similarity / distance matrix
 // with tensor values as a grid of colored squares, and labels for rows, cols
-type SimMatGrid struct {
+type SimMatGrid struct { //gti:add
 	TensorGrid
 
 	// the similarity / distance matrix
-	SimMat      *simat.SimMat `desc:"the similarity / distance matrix"`
-	rowMaxSz    mat32.Vec2    // maximum label size
-	rowMinBlank int           // minimum number of blank rows
-	rowNGps     int           // number of groups in row (non-blank after blank)
-	colMaxSz    mat32.Vec2    // maximum label size
-	colMinBlank int           // minimum number of blank cols
-	colNGps     int           // number of groups in col (non-blank after blank)
+	SimMat      *simat.SimMat
+	rowMaxSz    mat32.Vec2 // maximum label size
+	rowMinBlank int        // minimum number of blank rows
+	rowNGps     int        // number of groups in row (non-blank after blank)
+	colMaxSz    mat32.Vec2 // maximum label size
+	colMinBlank int        // minimum number of blank cols
+	colNGps     int        // number of groups in col (non-blank after blank)
 }
-
-var KiT_SimMatGrid = kit.Types.AddType(&SimMatGrid{}, nil)
 
 // AddNewSimMatGrid adds a new tensor grid to given parent node, with given name.
 func AddNewSimMatGrid(parent ki.Ki, name string, smat *simat.SimMat) *SimMatGrid {
@@ -71,17 +65,17 @@ func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) {
 
 // MouseEvent handles button MouseEvent
 func (tg *SimMatGrid) MouseEvent() {
-	tg.ConnectEvent(oswin.MouseEvent, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
-		me := d.(*mouse.Event)
-		tgv := retg.(*SimMatGrid)
-		switch {
-		case me.Button == mouse.Right && me.Action == mouse.Press:
-			giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "SimMatGrid Display Options", Ok: true, Cancel: true}, nil, nil)
-		case me.Button == mouse.Left && me.Action == mouse.Press:
-			me.SetProcessed()
-			tgv.OpenTensorView()
-		}
-	})
+	// tg.ConnectEvent(event.Mouse, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
+	// 	me := d.(*mouse.Event)
+	// 	tgv := retg.(*SimMatGrid)
+	// 	switch {
+	// 	case me.Button == mouse.Right && me.Action == mouse.Press:
+	// 		giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "SimMatGrid Display Options", Ok: true, Cancel: true}, nil, nil)
+	// 	case me.Button == mouse.Left && me.Action == mouse.Press:
+	// 		me.SetProcessed()
+	// 		tgv.OpenTensorView()
+	// 	}
+	// })
 }
 
 func (tg *SimMatGrid) ConnectEvents2D() {
@@ -124,7 +118,7 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 		}
 	}
 	minBlank = min(minBlank, curblk)
-	tr := girl.Text{}
+	tr := paint.Text{}
 	if col {
 		tr.SetStringRot90(lbs[mxi], &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
 	} else {
@@ -199,9 +193,9 @@ func (tg *SimMatGrid) RenderSimMat() {
 	epos.Y += tg.colMaxSz.Y + LabelSpace
 	nr := len(tg.SimMat.Rows)
 	mx := min(nr, rows)
-	tr := girl.Text{}
+	tr := paint.Text{}
 	txsty := tg.Sty.Text
-	txsty.AlignV = gist.AlignTop
+	txsty.AlignV = styles.Start
 	ygp := 0
 	prvyblk := false
 	for y := 0; y < mx; y++ {

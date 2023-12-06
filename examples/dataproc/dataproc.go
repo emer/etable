@@ -8,12 +8,12 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/gimain"
 	"goki.dev/etable/v2/agg"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etview"
 	"goki.dev/etable/v2/split"
+	"goki.dev/goki/gi/v2/gi"
+	"goki.dev/goki/gi/v2/gimain"
 )
 
 // this is the stub main for gogi that calls our actual mainrun function, at end of file

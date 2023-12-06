@@ -10,16 +10,16 @@ import "goki.dev/etable/v2/etensor"
 type Column struct {
 
 	// name of column -- must be unique for a table
-	Name string `desc:"name of column -- must be unique for a table"`
+	Name string
 
 	// data type, using etensor types which are isomorphic with arrow.Type
-	Type etensor.Type `desc:"data type, using etensor types which are isomorphic with arrow.Type"`
+	Type etensor.Type
 
 	// shape of a single cell in the column (i.e., without the row dimension) -- for scalars this is nil -- tensor column will add the outer row dimension to this shape
-	CellShape []int `desc:"shape of a single cell in the column (i.e., without the row dimension) -- for scalars this is nil -- tensor column will add the outer row dimension to this shape"`
+	CellShape []int
 
 	// names of the dimensions within the CellShape -- 'Row' will be added to outer dimension
-	DimNames []string `desc:"names of the dimensions within the CellShape -- 'Row' will be added to outer dimension"`
+	DimNames []string
 }
 
 // Schema specifies all of the columns of a table, sufficient to create the table

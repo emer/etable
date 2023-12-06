@@ -9,7 +9,7 @@ import (
 	"log"
 	"math"
 
-	"github.com/goki/gi/gist"
+	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
 	"goki.dev/etable/v2/split"
@@ -132,10 +132,10 @@ func (pl *Plot2D) GenPlotBar() {
 				}
 				if nleg > 1 {
 					cidx := yidx*nleg + li
-					clr, _ = gist.ColorFromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
+					clr, _ = colors.FromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
 				}
 				if nidx > 1 {
-					clr, _ = gist.ColorFromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+					clr, _ = colors.FromString(PlotColorNames[idx%len(PlotColorNames)], nil)
 					lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 				}
 				ec := -1

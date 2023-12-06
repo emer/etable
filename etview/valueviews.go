@@ -7,70 +7,54 @@ package etview
 import (
 	"reflect"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/simat"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/units"
+	"goki.dev/ki/v2"
+	"goki.dev/laser"
 )
 
 func init() {
-	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Float32{})), func() giv.ValueView {
-		vv := &TensorValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Float32{})), func() giv.Value {
+		return &TensorValue{}
 	})
-	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Float64{})), func() giv.ValueView {
-		vv := &TensorValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Float64{})), func() giv.Value {
+		return &TensorValue{}
 	})
-	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Int64{})), func() giv.ValueView {
-		vv := &TensorValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Int64{})), func() giv.Value {
+		return &TensorValue{}
 	})
-	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.Int32{})), func() giv.ValueView {
-		vv := &TensorValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Int32{})), func() giv.Value {
+		return &TensorValue{}
 	})
-	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(etensor.String{})), func() giv.ValueView {
-		vv := &TensorValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.String{})), func() giv.Value {
+		return &TensorValue{}
 	})
-	giv.ValueViewMapAdd(kit.LongTypeName(etable.KiT_Table), func() giv.ValueView {
-		vv := &TableValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(etable.KiT_Table), func() giv.Value {
+		return &TableValue{}
 	})
-	giv.ValueViewMapAdd(kit.LongTypeName(reflect.TypeOf(simat.SimMat{})), func() giv.ValueView {
-		vv := &SimMatValueView{}
-		ki.InitNode(vv)
-		return vv
+	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(simat.SimMat{})), func() giv.Value {
+		return &SimMatValue{}
 	})
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//  TensorGridValueView
+//  TensorGridValue
 
-// TensorGridValueView manages a TensorGrid view of an etensor.Tensor
-type TensorGridValueView struct {
-	giv.ValueViewBase
+// TensorGridValue manages a TensorGrid view of an etensor.Tensor
+type TensorGridValue struct {
+	giv.ValueBase
 }
 
-var KiT_TensorGridValueView = kit.Types.AddType(&TensorGridValueView{}, nil)
-
-func (vv *TensorGridValueView) WidgetType() reflect.Type {
+func (vv *TensorGridValue) WidgetType() reflect.Type {
 	vv.WidgetTyp = KiT_TensorGrid
 	return vv.WidgetTyp
 }
 
-func (vv *TensorGridValueView) UpdateWidget() {
+func (vv *TensorGridValue) UpdateWidget() {
 	if vv.Widget == nil {
 		return
 	}
@@ -80,7 +64,7 @@ func (vv *TensorGridValueView) UpdateWidget() {
 	tg.UpdateSig()
 }
 
-func (vv *TensorGridValueView) ConfigWidget(widg gi.Node2D) {
+func (vv *TensorGridValue) ConfigWidget(widg gi.Node2D) {
 	vv.Widget = widg
 	tg := vv.Widget.(*TensorGrid)
 	tsr := vv.Value.Interface().(etensor.Tensor)
@@ -88,40 +72,38 @@ func (vv *TensorGridValueView) ConfigWidget(widg gi.Node2D) {
 	vv.UpdateWidget()
 }
 
-func (vv *TensorGridValueView) HasAction() bool {
+func (vv *TensorGridValue) HasAction() bool {
 	return false
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//  TensorValueView
+//  TensorValue
 
-// TensorValueView presents a button that pulls up the TensorView viewer for an etensor.Tensor
-type TensorValueView struct {
-	giv.ValueViewBase
+// TensorValue presents a button that pulls up the TensorView viewer for an etensor.Tensor
+type TensorValue struct {
+	giv.ValueBase
 }
 
-var KiT_TensorValueView = kit.Types.AddType(&TensorValueView{}, nil)
-
-func (vv *TensorValueView) WidgetType() reflect.Type {
+func (vv *TensorValue) WidgetType() reflect.Type {
 	vv.WidgetTyp = gi.KiT_Action
 	return vv.WidgetTyp
 }
 
-func (vv *TensorValueView) UpdateWidget() {
+func (vv *TensorValue) UpdateWidget() {
 	if vv.Widget == nil {
 		return
 	}
 	ac := vv.Widget.(*gi.Action)
-	npv := kit.NonPtrValue(vv.Value)
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(npv) {
+	npv := laser.NonPtrValue(vv.Value)
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
 		ac.SetText("nil")
 	} else {
-		// opv := kit.OnePtrUnderlyingValue(vv.Value)
+		// opv := laser.OnePtrUnderlyingValue(vv.Value)
 		ac.SetText("etensor.Tensor")
 	}
 }
 
-func (vv *TensorValueView) ConfigWidget(widg gi.Node2D) {
+func (vv *TensorValue) ConfigWidget(widg gi.Node2D) {
 	vv.Widget = widg
 	ac := vv.Widget.(*gi.Action)
 	ac.Tooltip, _ = vv.Tag("desc")
@@ -129,22 +111,22 @@ func (vv *TensorValueView) ConfigWidget(widg gi.Node2D) {
 	ac.SetProp("margin", units.NewPx(2))
 	ac.SetProp("border-radius", units.NewPx(4))
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-		vvv, _ := recv.Embed(KiT_TensorValueView).(*TensorValueView)
+		vvv, _ := recv.Embed(KiT_TensorValue).(*TensorValue)
 		ac := vvv.Widget.(*gi.Action)
 		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }
 
-func (vv *TensorValueView) HasAction() bool {
+func (vv *TensorValue) HasAction() bool {
 	return true
 }
 
-func (vv *TensorValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+func (vv *TensorValue) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(laser.NonPtrValue(vv.Value)) {
 		return
 	}
-	opv := kit.OnePtrUnderlyingValue(vv.Value)
+	opv := laser.OnePtrUnderlyingValue(vv.Value)
 	et := opv.Interface().(etensor.Tensor)
 	if et == nil {
 		return
@@ -156,37 +138,35 @@ func (vv *TensorValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 	}
 	desc, _ := vv.Tag("desc")
 	_, inact := vv.Tag("inactive")
-	if vv.This().(giv.ValueView).IsInactive() {
+	if vv.This().(giv.Value).IsInactive() {
 		inact = true
 	}
 	TensorGridDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//  TableValueView
+//  TableValue
 
-// TableValueView presents a button that pulls up the TableView viewer for an etable.Table
-type TableValueView struct {
-	giv.ValueViewBase
+// TableValue presents a button that pulls up the TableView viewer for an etable.Table
+type TableValue struct {
+	giv.ValueBase
 }
 
-var KiT_TableValueView = kit.Types.AddType(&TableValueView{}, nil)
-
-func (vv *TableValueView) WidgetType() reflect.Type {
+func (vv *TableValue) WidgetType() reflect.Type {
 	vv.WidgetTyp = gi.KiT_Action
 	return vv.WidgetTyp
 }
 
-func (vv *TableValueView) UpdateWidget() {
+func (vv *TableValue) UpdateWidget() {
 	if vv.Widget == nil {
 		return
 	}
 	ac := vv.Widget.(*gi.Action)
-	npv := kit.NonPtrValue(vv.Value)
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(npv) {
+	npv := laser.NonPtrValue(vv.Value)
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
 		ac.SetText("nil")
 	} else {
-		opv := kit.OnePtrUnderlyingValue(vv.Value)
+		opv := laser.OnePtrUnderlyingValue(vv.Value)
 		et := opv.Interface().(*etable.Table)
 		if et != nil {
 			if nm, has := et.MetaData["name"]; has {
@@ -198,7 +178,7 @@ func (vv *TableValueView) UpdateWidget() {
 	}
 }
 
-func (vv *TableValueView) ConfigWidget(widg gi.Node2D) {
+func (vv *TableValue) ConfigWidget(widg gi.Node2D) {
 	vv.Widget = widg
 	ac := vv.Widget.(*gi.Action)
 	ac.Tooltip, _ = vv.Tag("desc")
@@ -206,22 +186,22 @@ func (vv *TableValueView) ConfigWidget(widg gi.Node2D) {
 	ac.SetProp("margin", units.NewPx(2))
 	ac.SetProp("border-radius", units.NewPx(4))
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-		vvv, _ := recv.Embed(KiT_TableValueView).(*TableValueView)
+		vvv, _ := recv.Embed(KiT_TableValue).(*TableValue)
 		ac := vvv.Widget.(*gi.Action)
 		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }
 
-func (vv *TableValueView) HasAction() bool {
+func (vv *TableValue) HasAction() bool {
 	return true
 }
 
-func (vv *TableValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+func (vv *TableValue) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(laser.NonPtrValue(vv.Value)) {
 		return
 	}
-	opv := kit.OnePtrUnderlyingValue(vv.Value)
+	opv := laser.OnePtrUnderlyingValue(vv.Value)
 	et := opv.Interface().(*etable.Table)
 	if et == nil {
 		return
@@ -236,37 +216,35 @@ func (vv *TableValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Rec
 		desc += " " + td
 	}
 	_, inact := et.MetaData["read-only"]
-	if vv.This().(giv.ValueView).IsInactive() {
+	if vv.This().(giv.Value).IsInactive() {
 		inact = true
 	}
 	TableViewDialog(vp, et, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////
-//  SimMatValueView
+//  SimMatValue
 
-// SimMatValueView presents a button that pulls up the SimMatGridView viewer for an etable.Table
-type SimMatValueView struct {
-	giv.ValueViewBase
+// SimMatValue presents a button that pulls up the SimMatGridView viewer for an etable.Table
+type SimMatValue struct {
+	giv.ValueBase
 }
 
-var KiT_SimMatValueView = kit.Types.AddType(&SimMatValueView{}, nil)
-
-func (vv *SimMatValueView) WidgetType() reflect.Type {
+func (vv *SimMatValue) WidgetType() reflect.Type {
 	vv.WidgetTyp = gi.KiT_Action
 	return vv.WidgetTyp
 }
 
-func (vv *SimMatValueView) UpdateWidget() {
+func (vv *SimMatValue) UpdateWidget() {
 	if vv.Widget == nil {
 		return
 	}
 	ac := vv.Widget.(*gi.Action)
-	npv := kit.NonPtrValue(vv.Value)
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(npv) {
+	npv := laser.NonPtrValue(vv.Value)
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
 		ac.SetText("nil")
 	} else {
-		opv := kit.OnePtrUnderlyingValue(vv.Value)
+		opv := laser.OnePtrUnderlyingValue(vv.Value)
 		smat := opv.Interface().(*simat.SimMat)
 		if smat != nil && smat.Mat != nil {
 			if nm, has := smat.Mat.MetaData("name"); has {
@@ -280,7 +258,7 @@ func (vv *SimMatValueView) UpdateWidget() {
 	}
 }
 
-func (vv *SimMatValueView) ConfigWidget(widg gi.Node2D) {
+func (vv *SimMatValue) ConfigWidget(widg gi.Node2D) {
 	vv.Widget = widg
 	ac := vv.Widget.(*gi.Action)
 	ac.Tooltip, _ = vv.Tag("desc")
@@ -288,22 +266,22 @@ func (vv *SimMatValueView) ConfigWidget(widg gi.Node2D) {
 	ac.SetProp("margin", units.NewPx(2))
 	ac.SetProp("border-radius", units.NewPx(4))
 	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-		vvv, _ := recv.Embed(KiT_SimMatValueView).(*SimMatValueView)
+		vvv, _ := recv.Embed(KiT_SimMatValue).(*SimMatValue)
 		ac := vvv.Widget.(*gi.Action)
 		vvv.Activate(ac.ViewportSafe(), nil, nil)
 	})
 	vv.UpdateWidget()
 }
 
-func (vv *SimMatValueView) HasAction() bool {
+func (vv *SimMatValue) HasAction() bool {
 	return true
 }
 
-func (vv *SimMatValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(kit.NonPtrValue(vv.Value)) {
+func (vv *SimMatValue) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.RecvFunc) {
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(laser.NonPtrValue(vv.Value)) {
 		return
 	}
-	opv := kit.OnePtrUnderlyingValue(vv.Value)
+	opv := laser.OnePtrUnderlyingValue(vv.Value)
 	smat := opv.Interface().(*simat.SimMat)
 	if smat == nil || smat.Mat == nil {
 		return
@@ -318,7 +296,7 @@ func (vv *SimMatValueView) Activate(vp *gi.Viewport2D, recv ki.Ki, dlgFunc ki.Re
 		desc += " " + td
 	}
 	_, inact := smat.Mat.MetaData("read-only")
-	if vv.This().(giv.ValueView).IsInactive() {
+	if vv.This().(giv.Value).IsInactive() {
 		inact = true
 	}
 	SimMatGridDialog(vp, smat, giv.DlgOpts{Title: tynm, Prompt: desc, TmpSave: vv.TmpSave, Inactive: inact}, recv, dlgFunc)

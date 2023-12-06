@@ -9,38 +9,31 @@ import (
 	"image"
 	"reflect"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/girl"
-	"github.com/goki/gi/gist"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/oswin/mimedata"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etensor"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/paint"
+	"goki.dev/girl/styles"
+	"goki.dev/girl/units"
+	"goki.dev/goosi/mimedata"
+	"goki.dev/ki/v2"
+	"goki.dev/laser"
 	"goki.dev/mat32/v2"
 )
 
 // etview.TensorView provides a GUI interface for etable.Tensor's
 // using a tabular rows-and-columns interface
-type TensorView struct {
+type TensorView struct { //gti:add
 	giv.SliceViewBase
 
 	// the tensor that we're a view of
-	Tensor etensor.Tensor `desc:"the tensor that we're a view of"`
+	Tensor etensor.Tensor
 
 	// layout config of the tensor
-	TsrLay TensorLayout `desc:"layout config of the tensor"`
+	TsrLay TensorLayout
 
 	// number of columns in table (as of last update)
-	NCols int `inactive:"+" desc:"number of columns in table (as of last update)"`
-}
-
-var KiT_TensorView = kit.Types.AddType(&TensorView{}, TensorViewProps)
-
-// AddNewTensorView adds a new tableview to given parent node, with given name.
-func AddNewTensorView(parent ki.Ki, name string) *TensorView {
-	return parent.AddNewChild(KiT_TensorView, name).(*TensorView)
+	NCols int `inactive:"+"`
 }
 
 // check for interface impl
@@ -65,11 +58,11 @@ func (tv *TensorView) SetTensor(tsr etensor.Tensor, tmpSave giv.ValueView) {
 	}
 	tv.ShowIndex = true
 	if sidxp, err := tv.PropTry("index"); err == nil {
-		tv.ShowIndex, _ = kit.ToBool(sidxp)
+		tv.ShowIndex, _ = laser.ToBool(sidxp)
 	}
 	tv.InactKeyNav = true
 	if siknp, err := tv.PropTry("inact-key-nav"); err == nil {
-		tv.InactKeyNav, _ = kit.ToBool(siknp)
+		tv.InactKeyNav, _ = laser.ToBool(siknp)
 	}
 	tv.TmpSave = tmpSave
 	tv.Config()
@@ -99,7 +92,7 @@ func (tv *TensorView) IsConfiged() bool {
 func (tv *TensorView) Config() {
 	tv.Lay = gi.LayoutVert
 	tv.SetProp("spacing", gi.StdDialogVSpaceUnits)
-	config := kit.TypeAndNameList{}
+	config := ki.Config{}
 	config.Add(gi.KiT_ToolBar, "toolbar")
 	config.Add(gi.KiT_Frame, "frame")
 	mods, updt := tv.ConfigChildren(config)
@@ -192,24 +185,24 @@ func (tv *TensorView) ConfigSliceGrid() {
 
 	sg.Lay = gi.LayoutVert
 	sg.SetMinPrefWidth(units.NewCh(20))
-	sg.SetProp("overflow", gist.OverflowScroll) // this still gives it true size during PrefSize
-	sg.SetStretchMax()                          // for this to work, ALL layers above need it too
+	sg.SetProp("overflow", styles.OverflowScroll) // this still gives it true size during PrefSize
+	sg.SetStretchMax()                            // for this to work, ALL layers above need it too
 
-	sgcfg := kit.TypeAndNameList{}
+	sgcfg := ki.Config{}
 	sgcfg.Add(gi.KiT_ToolBar, "header")
 	sgcfg.Add(gi.KiT_Layout, "grid-lay")
 	sg.ConfigChildren(sgcfg)
 
 	sgh := tv.SliceHeader()
 	sgh.Lay = gi.LayoutHoriz
-	sgh.SetProp("overflow", gist.OverflowHidden) // no scrollbars!
+	sgh.SetProp("overflow", styles.OverflowHidden) // no scrollbars!
 	sgh.SetProp("spacing", 0)
 	// sgh.SetStretchMaxWidth()
 
 	gl := tv.GridLayout()
 	gl.Lay = gi.LayoutHoriz
 	gl.SetStretchMax() // for this to work, ALL layers above need it too
-	gconfig := kit.TypeAndNameList{}
+	gconfig := ki.Config{}
 	gconfig.Add(gi.KiT_Frame, "grid")
 	gconfig.Add(gi.KiT_ScrollBar, "scrollbar")
 	gl.ConfigChildren(gconfig) // covered by above
@@ -220,10 +213,10 @@ func (tv *TensorView) ConfigSliceGrid() {
 	sgf.SetMinPrefHeight(units.NewEm(10))
 	sgf.SetStretchMax() // for this to work, ALL layers above need it too
 	sgf.SetProp("columns", nWidgPerRow)
-	sgf.SetProp("overflow", gist.OverflowScroll) // this still gives it true size during PrefSize
+	sgf.SetProp("overflow", styles.OverflowScroll) // this still gives it true size during PrefSize
 
 	// Configure Header
-	hcfg := kit.TypeAndNameList{}
+	hcfg := ki.Config{}
 	if tv.ShowIndex {
 		hcfg.Add(gi.KiT_Label, "head-idx")
 	}
@@ -307,7 +300,7 @@ func (tv *TensorView) LayoutSliceGrid() bool {
 		tv.RowHeight = sg.GridData[gi.Row][0].AllocSize + sg.Spacing.Dots
 	}
 	if tv.Sty.Font.Face == nil {
-		girl.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
+		paint.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
 	}
 	tv.RowHeight = mat32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
 
@@ -514,8 +507,8 @@ func (tv *TensorView) UpdateSliceGrid() {
 							rsi = (tvv.SliceSize - 1) - rsi
 						}
 						col := vvv.Prop("tv-col").(int)
-						npv := kit.NonPtrValue(vvv.Value)
-						fv, ok := kit.ToFloat(npv.Interface())
+						npv := laser.NonPtrValue(vvv.Value)
+						fv, ok := laser.ToFloat(npv.Interface())
 						if ok {
 							etensor.Prjn2DSet(tvv.Tensor, tvv.TsrLay.OddRow, rsi, col, fv)
 							tvv.ViewSig.Emit(tvv.This(), 0, nil)

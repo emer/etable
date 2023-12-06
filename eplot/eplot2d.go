@@ -4,6 +4,8 @@
 
 package eplot
 
+//go:generate goki generate
+
 import (
 	"fmt"
 	"image"
@@ -12,54 +14,44 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/gist"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/svg"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/etview"
+	"goki.dev/girl/styles"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/giv"
+	"goki.dev/ki/v2"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/font"
 )
 
 // Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
-type Plot2D struct {
+type Plot2D struct { //goki:add
 	gi.Layout
 
 	// the idxview of the table that we're plotting
-	Table *etable.IdxView `desc:"the idxview of the table that we're plotting"`
+	Table *etable.IdxView
 
 	// the overall plot parameters
-	Params PlotParams `desc:"the overall plot parameters"`
+	Params PlotParams
 
 	// the parameters for each column of the table
-	Cols []*ColParams `desc:"the parameters for each column of the table"`
+	Cols []*ColParams
 
 	// the gonum plot that actually does the plotting -- always save the last one generated
-	GPlot *plot.Plot `desc:"the gonum plot that actually does the plotting -- always save the last one generated"`
+	GPlot *plot.Plot
 
 	// current svg file
-	SVGFile gi.FileName `desc:"current svg file"`
+	SVGFile gi.FileName
 
 	// current csv data file
-	DataFile gi.FileName `desc:"current csv data file"`
+	DataFile gi.FileName
 
 	// currently doing a plot
-	InPlot bool `inactive:"+" desc:"currently doing a plot"`
+	InPlot bool `inactive:"+"`
 }
 
-var KiT_Plot2D = kit.Types.AddType(&Plot2D{}, Plot2DProps)
-
-// AddNewPlot2D adds a new Plot2D to given parent node, with given name.
-func AddNewPlot2D(parent ki.Ki, name string) *Plot2D {
-	return parent.AddNewChild(KiT_Plot2D, name).(*Plot2D)
-}
-
-func (pl *Plot2D) CopyFieldsFrom(frm interface{}) {
+func (pl *Plot2D) CopyFieldsFrom(frm any) {
 	fr := frm.(*Plot2D)
 	pl.Layout.CopyFieldsFrom(&fr.Layout)
 	pl.Params.CopyFrom(&fr.Params)
@@ -70,10 +62,26 @@ func (pl *Plot2D) CopyFieldsFrom(frm interface{}) {
 	}
 }
 
-func (pl *Plot2D) Defaults() {
+func (pl *Plot2D) OnInit() {
 	pl.Params.Plot = pl
 	pl.Params.Defaults()
 	plot.DefaultFont = font.Font{Typeface: "Liberation", Variant: "Sans"}
+	pl.Style(func(s *styles.Style) {
+		s.Direction = styles.Row
+		// s.StdDialogVSpaceUnits
+	})
+	// plot
+	// play.Lay = gi.LayoutHoriz
+	// play.SetProp("max-width", -1)
+	// play.SetProp("max-height", -1)
+	// play.SetProp("spacing", gi.StdDialogVSpaceUnits)
+
+	// cols
+	// vl.Lay = gi.LayoutVert
+	// vl.SetProp("spacing", 0)
+	// vl.SetProp("vertical-align", gist.AlignTop)
+	// vl.SetMinPrefHeight(units.NewEm(5)) // get separate scroll on cols
+	// vl.SetStretchMaxHeight()
 }
 
 // SetTable sets the table to view and updates view
@@ -81,7 +89,7 @@ func (pl *Plot2D) SetTable(tab *etable.Table) {
 	pl.Defaults()
 	pl.Table = etable.NewIdxView(tab)
 	// pl.Cols = nil // todo: is this necessary!?
-	pl.Config()
+	pl.ConfigPlot()
 }
 
 // SetTableView sets the idxview of table to view and updates view
@@ -89,7 +97,7 @@ func (pl *Plot2D) SetTableView(tab *etable.IdxView) {
 	pl.Defaults()
 	pl.Table = tab
 	pl.Cols = nil
-	pl.Config()
+	pl.ConfigPlot()
 }
 
 // ColParamsTry returns the current column parameters by name (to access by index, just use Cols directly)
@@ -205,53 +213,6 @@ func (pl *Plot2D) XLabel() string {
 	return "X"
 }
 
-// GoUpdate updates the display based on current state of table.
-// This version must be used when called from another goroutine
-// does proper blocking to synchronize with updating in the main
-// goroutine.
-func (pl *Plot2D) GoUpdate() {
-	if pl == nil || pl.This() == nil {
-		return
-	}
-	if pl.Table == nil || pl.Table.Table == nil {
-		return
-	}
-	pl.Table.Sequential()
-	pl.GoUpdatePlot()
-}
-
-// GoUpdatePlot updates the display based on current IdxView into table.
-// This version must be used when called from another goroutine
-// does proper blocking to synchronize with updating in the main
-// goroutine.
-func (pl *Plot2D) GoUpdatePlot() {
-	if pl == nil || pl.This() == nil {
-		return
-	}
-	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
-		return
-	}
-	mvp := pl.ViewportSafe()
-	if mvp.IsUpdatingNode() { // already updating -- don't add to it
-		return
-	}
-
-	mvp.BlockUpdates()
-	plupdt := false
-	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
-		plupdt = pl.UpdateStart()
-		pl.Config()
-	}
-	sv := pl.SVGPlot()
-	updt := sv.UpdateStart()
-	pl.GenPlot()
-	pl.InPlot = true // block extra update in this UAE
-	mvp.UnblockUpdates()
-	sv.UpdateEnd(updt)
-	pl.UpdateEnd(plupdt)
-	pl.InPlot = false
-}
-
 // Update updates the display based on current state of table.
 // Calls Sequential method on etable.IdxView to view entire current table.
 // This version can only be called within main goroutine for
@@ -279,9 +240,6 @@ func (pl *Plot2D) UpdatePlot() {
 	}
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
 		pl.Config()
-	}
-	if pl.ViewportSafe().IsUpdatingNode() { // already updating -- don't add to it
-		return
 	}
 	pl.GenPlot()
 }
@@ -391,64 +349,27 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 	return
 }
 
-// Config configures the overall view widget
-func (pl *Plot2D) Config() {
-	pl.Lay = gi.LayoutVert
-	pl.Defaults()
+// ConfigPlot configures the overall view widget
+func (pl *Plot2D) ConfigPlot() {
 	pl.Params.FmMeta(pl.Table.Table)
-	pl.SetProp("spacing", gi.StdDialogVSpaceUnits)
-	config := kit.TypeAndNameList{}
-	config.Add(gi.KiT_ToolBar, "tbar")
-	config.Add(gi.KiT_Layout, "plot")
-	mods, updt := pl.ConfigChildren(config)
-	if !mods {
-		updt = pl.UpdateStart()
+	if !pl.HasChildren() {
+		pl.AddDefaultTopAppBar()
+		gi.NewFrame(pl, "cols")
+		gi.NewSVG(pl, "plot")
 	}
-
-	play := pl.PlotLay()
-	play.Lay = gi.LayoutHoriz
-	play.SetProp("max-width", -1)
-	play.SetProp("max-height", -1)
-	play.SetProp("spacing", gi.StdDialogVSpaceUnits)
-
-	vncfg := kit.TypeAndNameList{}
-	vncfg.Add(gi.KiT_Frame, "cols")
-	vncfg.Add(svg.KiT_Editor, "plot")
-	play.ConfigChildren(vncfg) // won't do update b/c of above updt
+	updt := pl.UpdateStart()
+	defer pl.UpdateEndLayout(updt)
 
 	pl.ColsConfig()
 	pl.PlotConfig()
-	pl.ToolbarConfig()
-
-	pl.UpdateEnd(updt)
-}
-
-// IsConfiged returns true if widget is fully configured
-func (pl *Plot2D) IsConfiged() bool {
-	if len(pl.Kids) == 0 {
-		return false
-	}
-	ppl := pl.PlotLay()
-	if len(ppl.Kids) == 0 {
-		return false
-	}
-	return true
-}
-
-func (pl *Plot2D) Toolbar() *gi.ToolBar {
-	return pl.ChildByName("tbar", 0).(*gi.ToolBar)
-}
-
-func (pl *Plot2D) PlotLay() *gi.Layout {
-	return pl.ChildByName("plot", 1).(*gi.Layout)
-}
-
-func (pl *Plot2D) SVGPlot() *svg.Editor {
-	return pl.PlotLay().ChildByName("plot", 1).(*svg.Editor)
 }
 
 func (pl *Plot2D) ColsLay() *gi.Frame {
-	return pl.PlotLay().ChildByName("cols", 0).(*gi.Frame)
+	return pl.ChildByName("cols", 0).(*gi.Frame)
+}
+
+func (pl *Plot2D) SVGPlot() *gi.SVG {
+	return pl.ChildByName("plot", 1).(*gi.SVG)
 }
 
 const NColsHeader = 2
@@ -560,108 +481,56 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
 // ColsConfig configures the column gui buttons
 func (pl *Plot2D) ColsConfig() {
 	vl := pl.ColsLay()
-	vl.SetReRenderAnchor()
-	vl.Lay = gi.LayoutVert
-	vl.SetProp("spacing", 0)
-	vl.SetProp("vertical-align", gist.AlignTop)
-	vl.SetMinPrefHeight(units.NewEm(5)) // get separate scroll on cols
-	vl.SetStretchMaxHeight()
 	pl.ColsListUpdate()
+	vl.DeleteChildren(true)
 	if len(pl.Cols) == 0 {
-		vl.DeleteChildren(true)
 		return
 	}
-	config := kit.TypeAndNameList{}
-	config.Add(gi.KiT_Layout, "sel-cols")
-	config.Add(gi.KiT_Separator, "sep")
-	for _, cn := range pl.Cols {
-		config.Add(gi.KiT_Layout, cn.Col)
-	}
-	mods, updt := vl.ConfigChildren(config)
-	if !mods {
-		updt = vl.UpdateStart()
-	}
-	clcfg := kit.TypeAndNameList{}
-	clcfg.Add(gi.KiT_CheckBox, "on")
-	clcfg.Add(gi.KiT_Action, "col")
+	sc := gi.NewLayout(vl, "sel-cols")
+	sw := gi.NewSwitch(sc, "on").SetTooltip("Toggle off all columns").
+		OnChanged(func(e events.Event) {
+			sw.SetChecked(false)
+			pl.SetAllCols(false)
+		})
+	bt := gi.NewButton(sc, "col").SetText("Select Cols").
+		SetTooltip("click to select columns based on column name").
+		OnClick(func(e events.Event) {
+			giv.CallFunc(pl, pl.SetColsByName)
+		})
+	gi.NewSeparator(vl, "sep").SetHoriz(true)
 
-	for i, cli := range *vl.Children() {
-		if i == 1 {
-			sp := cli.(*gi.Separator)
-			sp.Horiz = true
-			continue
-		}
-		cl := cli.(*gi.Layout)
-		cl.Lay = gi.LayoutHoriz
-		cl.ConfigChildren(clcfg)
-		cl.SetProp("margin", 0)
-		cl.SetProp("max-width", -1)
-		cb := cl.Child(0).(*gi.CheckBox)
-		ca := cl.Child(1).(*gi.Action)
-		if i == 0 {
-			cb.SetChecked(false)
-			cb.Tooltip = "click to turn all columns off"
-			cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				if sig == int64(gi.ButtonToggled) {
-					pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-					cbb := send.(*gi.CheckBox)
-					cbb.SetChecked(false)
-					pll.SetAllCols(false)
-				}
+	for _, cp := range pl.Cols {
+		cp.Plot = pl
+		cl := gi.NewLayout(vl, cn.Col.Name)
+		cl.Style(func(s *styles.Style) {
+			s.Direction = styles.Row
+			s.Grow.Set(1, 0)
+		})
+		sw := gi.NewSwitch(cl, "on").SetTooltip("toggle plot on").
+			OnChanged(func(e events.Event) {
+				cp.On = sw.IsChecked()
+				pl.Update()
 			})
-			ca.SetText("Select Cols")
-			ca.Tooltip = "click to select columns based on column name"
-			ca.ActionSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-				giv.CallMethod(pll, "SetColsByName", pll.ViewportSafe())
+		sw.SetChecked(cp.On)
+		bt := gi.NewButton(cl, "col").SetText(cp.Col).
+			OnClick(func(e events.Event) {
 			})
-		} else {
-			ci := i - NColsHeader
-			cp := pl.Cols[ci]
-			cp.Plot = pl
-
-			cb.SetChecked(cp.On)
-			cb.SetProp("idx", ci)
-			cb.ButtonSig.Connect(pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				if sig == int64(gi.ButtonToggled) {
-					pll := recv.Embed(KiT_Plot2D).(*Plot2D)
-					cbb := send.(*gi.CheckBox)
-					idx := cb.Prop("idx").(int)
-					cpp := pll.Cols[idx]
-					cpp.On = cbb.IsChecked()
-					pll.Update()
-				}
+		bt.SetMenu(func(m *gi.Scene) {
+			gi.NewButton(m, "set-x").SetText("Set X Axis").OnClick(func(e events.Event) {
+				pl.Params.XAxisCol = cp.Col
+				pl.Update()
 			})
-			ca.SetText(cp.Col)
-			ca.Data = ci
-			ca.MakeMenuFunc = func(g ki.Ki, m *gi.Menu) {
-				if len(*m) == 3 {
-					return
-				}
-				m.AddAction(gi.ActOpts{Name: "set-x", Label: "Set X Axis", Data: ci}, pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					caa := send.(*gi.Action) // this action is menu action
-					idx := caa.Data.(int)
-					cpp := pl.Cols[idx]
-					pl.Params.XAxisCol = cpp.Col
-					pl.Update()
-				})
-				m.AddAction(gi.ActOpts{Name: "set-legend", Label: "Set Legend", Data: ci}, pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					caa := send.(*gi.Action) // this action is menu action
-					idx := caa.Data.(int)
-					cpp := pl.Cols[idx]
-					pl.Params.LegendCol = cpp.Col
-					pl.Update()
-				})
-				m.AddAction(gi.ActOpts{Name: "edit", Label: "Edit", Data: ci}, pl.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					caa := send.(*gi.Action)
-					idx := caa.Data.(int)
-					cpp := pl.Cols[idx]
-					giv.StructViewDialog(pl.ViewportSafe(), cpp, giv.DlgOpts{Title: "ColParams"}, nil, nil)
-				})
-			}
-		}
+			gi.NewButton(m, "set-legend").SetText("Set Legend").OnClick(func(e events.Event) {
+				pl.Params.LegendCol = cpp.Col
+				pl.Update()
+			})
+			gi.NewButton(m, "edit").SetText("Edit").OnClick(func(e events.Event) {
+				d := gi.NewBody().AddTitle("Col Params")
+				NewStructView(d).SetStruct(cp)
+				d.NewFullDialog(tv).Run()
+			})
+		})
 	}
-	vl.UpdateEnd(updt)
 }
 
 // PlotConfig configures the PlotView
@@ -674,93 +543,101 @@ func (pl *Plot2D) PlotConfig() {
 	sv.SetStretchMax()
 }
 
-func (pl *Plot2D) ToolbarConfig() {
+func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
 	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
-	tbar := pl.Toolbar()
-	if len(tbar.Kids) != 0 || pl.ViewportSafe() == nil {
-		return
-	}
-
-	tbar.SetStretchMaxWidth()
-	tbar.AddAction(gi.ActOpts{Icon: "pan", Tooltip: "return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
+	gi.NewButton(tb).SetIcon(icons.Pan).
+		SetTooltip("return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)").OnClick(func(e events.Event) {
 			fmt.Printf("this will select pan mode\n")
 		})
-	tbar.AddAction(gi.ActOpts{Icon: "arrow", Tooltip: "turn on select mode for selecting units and layers with mouse clicks"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
+	gi.NewButton(tb).SetIcon(icons.Arrow).
+		SetTooltip(turn on select mode for selecting units and layers with mouse clicks").
+		OnClick(func(e events.Event) {
 			fmt.Printf("this will select select mode\n")
 		})
-	tbar.AddSeparator("ctrl")
-	tbar.AddAction(gi.ActOpts{Label: "Update", Icon: "update", Tooltip: "update fully redraws display, reflecting any new settings etc"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			pl.Config()
+	gi.NewSeparator(tb)
+	gi.NewButton(tb).SetLabel("Update").SetIcon(icons.Update).
+		SetTooltip("update fully redraws display, reflecting any new settings etc").
+		OnClick(func(e events.Event) {
+			pl.ConfigPlot()
 			pl.Update()
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Config...", Icon: "gear", Tooltip: "set parameters that control display (font size etc)"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.StructViewDialog(pl.ViewportSafe(), &pl.Params, giv.DlgOpts{Title: pl.Nm + " Params"}, nil, nil)
+	gi.NewButton(tb).SetLabel("Config...").SetIcon(icons.Gear).
+		SetTooltip("set parameters that control display (font size etc)").
+		OnClick(func(e events.Event) {
+			d := gi.NewBody().AddTitle(pl.Nm + " Params")
+			NewStructView(d).SetStruct(&pl.Params)
+			d.NewFullDialog(tv).Run()
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Table...", Icon: "edit", Tooltip: "open a TableView window of the data"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
+	gi.NewButton(tb).SetLabel("Table...").SetIcon(icons.Edit).
+		SetTooltip("open a TableView window of the data").
+		OnClick(func(e events.Event) {
 			etview.TableViewDialog(pl.ViewportSafe(), pl.Table.Table, giv.DlgOpts{Title: pl.Nm + " Data"}, nil, nil)
 		})
-	tbar.AddSeparator("file")
-	savemen := tbar.AddAction(gi.ActOpts{Label: "Save...", Icon: "file-save"}, nil, nil)
-	savemen.Menu.AddAction(gi.ActOpts{Label: "Save SVG...", Icon: "file-save", Tooltip: "save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveSVG", pl.ViewportSafe())
+	gi.NewSeparator(tb)
+	
+	gi.NewButton(tb).SetLabel("Save...").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
+	gi.NewButton(m).SetText("Save SVG...").SetIcon(icons.Save).
+		SetTooltip("save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc").OnClick(func(e events.Event) {
+			giv.CallFunc(pl, pl.SaveSVG)
 		})
-	savemen.Menu.AddAction(gi.ActOpts{Label: "Save PNG...", Icon: "file-save", Tooltip: "save plot to a .png file, capturing the exact bits you currently see as the render"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SavePNG", pl.ViewportSafe())
+	gi.NewButton(m).SetText("Save PNG...").SetIcon(icons.Save).
+		SetTooltip("save plot to a .png file, capturing the exact bits you currently see as the render").
+		OnClick(func(e events.Event) {
+			giv.CallFunc(pl, "SavePNG")
 		})
-	savemen.Menu.AddAction(gi.ActOpts{Label: "Save CSV...", Icon: "file-save", Tooltip: "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveCSV", pl.ViewportSafe())
+	gi.NewButton(m).SetText("Save CSV...").SetIcon(icons.Save).
+		SetTooltip("Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data").
+		OnClick(func(e events.Event) {
+			giv.CallFunc(pl, "SaveCSV")
 		})
-	savemen.Menu.AddSeparator("img")
-	savemen.Menu.AddAction(gi.ActOpts{Label: "Save All...", Icon: "file-save", Tooltip: "Save a .png, .svg, and .tsv of the data"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "SaveAll", pl.ViewportSafe())
+	gi.NewSeparator(m)
+	gi.NewButton(m).SetText("Save All...").SetIcon(icons.Save).
+		SetTooltip("Save a .png, .svg, and .tsv of the data").
+		OnClick(func(e events.Event) {
+			giv.CallFunc(pl, "SaveAll")
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Open CSV...", Icon: "file-open", Tooltip: "Open CSV-formatted data -- also recognizes emergent-style headers"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl, "OpenCSV", pl.ViewportSafe())
+	})
+	gi.NewButton(tb).SetLabel("Open CSV...").SetIcon(icons.Open).
+	 SetTooltip("Open CSV-formatted data -- also recognizes emergent-style headers").
+		OnClick(func(e events.Event) {
+			giv.CallFunc(pl, "OpenCSV")
 		})
-	tbar.AddSeparator("filt")
-	tbar.AddAction(gi.ActOpts{Label: "Filter...", Icon: "search", Tooltip: "filter rows of data being plotted by values in given column name, using string representation, with exclude, contains and ignore case options"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl.Table, "FilterColName", pl.ViewportSafe())
+	gi.NewSeparator(tb)
+	gi.NewButton(tb).SetLabel("Filter...").SetIcon(icons.Search).
+		SetTooltip("filter rows of data being plotted by values in given column name, using string representation, with exclude, contains and ignore case options").
+		OnClick(func(e events.Event) {
+			giv.CallFunc(pl.Table, "FilterColName")
 		})
-	tbar.AddAction(gi.ActOpts{Label: "Unfilter", Icon: "search", Tooltip: "plot all rows in the table (undo any filtering )"}, pl.This(),
-		func(recv, send ki.Ki, sig int64, data interface{}) {
-			giv.CallMethod(pl.Table, "Sequential", pl.ViewportSafe())
+	gi.NewButton(tb).SetLabel("Unfilter").SetIcon(icons.Search).
+		SetTooltip("plot all rows in the table (undo any filtering )".
+		OnClick(func(e events.Event) {
+			giv.CallFuncd(pl.Table, "Sequential")
 		})
-
 }
 
-func (pl *Plot2D) Style2D() {
-	pl.Layout.Style2D()
-	pl.ToolbarConfig() // safe
-	if !pl.IsConfiged() && pl.Table != nil && pl.Table.Table != nil {
-		pl.Config()
-	}
-	if pl.IsConfiged() {
-		pl.ColsUpdate()
-	}
-}
+// func (pl *Plot2D) Style2D() {
+// 	pl.Layout.Style2D()
+// 	pl.ToolbarConfig() // safe
+// 	if !pl.IsConfiged() && pl.Table != nil && pl.Table.Table != nil {
+// 		pl.Config()
+// 	}
+// 	if pl.IsConfiged() {
+// 		pl.ColsUpdate()
+// 	}
+// }
 
-func (pl *Plot2D) Layout2D(parBBox image.Rectangle, iter int) bool {
-	redo := pl.Layout.Layout2D(parBBox, iter)
-	mvp := pl.ViewportSafe()
-	if pl.IsConfiged() && !pl.InPlot && mvp != nil { // note: for tabs, not full re-rend
-		pl.GenPlot() // only if visible; this is recursive
-	}
-	return redo
-}
+// func (pl *Plot2D) Layout2D(parBBox image.Rectangle, iter int) bool {
+// 	redo := pl.Layout.Layout2D(parBBox, iter)
+// 	mvp := pl.ViewportSafe()
+// 	if pl.IsConfiged() && !pl.InPlot && mvp != nil { // note: for tabs, not full re-rend
+// 		pl.GenPlot() // only if visible; this is recursive
+// 	}
+// 	return redo
+// }
 
+/*
 var Plot2DProps = ki.Props{
 	"max-width":  -1,
 	"max-height": -1,
@@ -844,6 +721,7 @@ var Plot2DProps = ki.Props{
 		}},
 	},
 }
+*/
 
 // these are the plot color names to use in order for successive lines -- feel free to choose your own!
 var PlotColorNames = []string{"black", "red", "blue", "ForestGreen", "purple", "orange", "brown", "chartreuse", "navy", "cyan", "magenta", "tan", "salmon", "goldenrod", "SkyBlue", "pink"}

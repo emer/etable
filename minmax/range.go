@@ -8,13 +8,13 @@ package minmax
 type Range32 struct {
 
 	// Min and Max range values
-	F32 `desc:"Min and Max range values"`
+	F32
 
 	// fix the minimum end of the range
-	FixMin bool `desc:"fix the minimum end of the range"`
+	FixMin bool
 
 	// fix the maximum end of the range
-	FixMax bool `desc:"fix the maximum end of the range"`
+	FixMax bool
 }
 
 // SetMin sets a fixed min value
@@ -41,13 +41,13 @@ func (rr *Range32) Range() float32 {
 type Range64 struct {
 
 	// Min and Max range values
-	F64 `desc:"Min and Max range values"`
+	F64
 
 	// fix the minimum end of the range
-	FixMin bool `desc:"fix the minimum end of the range"`
+	FixMin bool
 
 	// fix the maximum end of the range
-	FixMax bool `desc:"fix the maximum end of the range"`
+	FixMax bool
 }
 
 // SetMin sets a fixed min value

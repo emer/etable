@@ -5,78 +5,75 @@
 package etview
 
 import (
+	"image/color"
 	"log"
 	"strconv"
 
-	"github.com/goki/gi/colormap"
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/gist"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/oswin"
-	"github.com/goki/gi/oswin/mouse"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
+	"goki.dev/colors/colormap"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/minmax"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/units"
+	"goki.dev/goosi"
+	"goki.dev/goosi/events"
+	"goki.dev/ki/v2"
 	"goki.dev/mat32/v2"
 )
 
 // TensorLayout are layout options for displaying tensors
-type TensorLayout struct {
+type TensorLayout struct { //gti:add
 
 	// even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension
-	OddRow bool `desc:"even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension"`
+	OddRow bool
 
 	// if true, then the Y=0 coordinate is displayed from the top-down; otherwise the Y=0 coordinate is displayed from the bottom up, which is typical for emergent network patterns.
-	TopZero bool `desc:"if true, then the Y=0 coordinate is displayed from the top-down; otherwise the Y=0 coordinate is displayed from the bottom up, which is typical for emergent network patterns."`
+	TopZero bool
 
 	// display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image
-	Image bool `desc:"display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image"`
+	Image bool
 }
 
 // TensorDisp are options for displaying tensors
-type TensorDisp struct {
+type TensorDisp struct { //gti:add
 	TensorLayout
 
-	// [view: inline] range to plot
-	Range minmax.Range64 `view:"inline" desc:"range to plot"`
+	// range to plot
+	Range minmax.Range64 `view:"inline"`
 
-	// [view: inline] if not using fixed range, this is the actual range of data
-	MinMax minmax.F64 `view:"inline" desc:"if not using fixed range, this is the actual range of data"`
+	// if not using fixed range, this is the actual range of data
+	MinMax minmax.F64 `view:"inline"`
 
 	// the name of the color map to use in translating values to colors
-	ColorMap giv.ColorMapName `desc:"the name of the color map to use in translating values to colors"`
+	ColorMap giv.ColorMapName
 
 	// background color
-	Background gist.Color `desc:"background color"`
+	Background color.Color
 
-	// [def: 0.9,1] [min: 0.1] [max: 1] [step: 0.1] what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc
-	GridFill float32 `min:"0.1" max:"1" step:"0.1" def:"0.9,1" desc:"what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"`
+	// what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc
+	GridFill float32 `min:"0.1" max:"1" step:"0.1" def:"0.9,1"`
 
-	// [def: 0.1,0.3] [min: 0] [max: 1] [step: 0.02] amount of extra space to add at dimension boundaries, as a proportion of total grid size
-	DimExtra float32 `min:"0" max:"1" step:"0.02" def:"0.1,0.3" desc:"amount of extra space to add at dimension boundaries, as a proportion of total grid size"`
+	// amount of extra space to add at dimension boundaries, as a proportion of total grid size
+	DimExtra float32 `min:"0" max:"1" step:"0.02" def:"0.1,0.3"`
 
 	// extra space to add at bottom of grid -- needed when included in TableView for example
-	BotRtSpace units.Value `desc:"extra space to add at bottom of grid -- needed when included in TableView for example"`
+	BotRtSpace units.Value
 
 	// minimum size for grid squares -- they will never be smaller than this
-	GridMinSize units.Value `desc:"minimum size for grid squares -- they will never be smaller than this"`
+	GridMinSize units.Value
 
 	// maximum size for grid squares -- they will never be larger than this
-	GridMaxSize units.Value `desc:"maximum size for grid squares -- they will never be larger than this"`
+	GridMaxSize units.Value
 
 	// total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints
-	TotPrefSize units.Value `desc:"total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints"`
+	TotPrefSize units.Value
 
 	// font size in standard point units for labels (e.g., SimMat)
-	FontSize float32 `desc:"font size in standard point units for labels (e.g., SimMat)"`
+	FontSize float32
 
-	// [view: -] our gridview, for update method
-	GridView *TensorGrid `copy:"-" json:"-" xml:"-" view:"-" desc:"our gridview, for update method"`
+	// our gridview, for update method
+	GridView *TensorGrid `copy:"-" json:"-" xml:"-" view:"-"`
 }
-
-var KiT_TensorDisp = kit.Types.AddType(&TensorDisp{}, TensorDispProps)
 
 // Defaults sets defaults for values that are at nonsensical initial values
 func (td *TensorDisp) Defaults() {
@@ -188,20 +185,18 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 }
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
-type TensorGrid struct {
+type TensorGrid struct { //gti:add
 	gi.WidgetBase
 
 	// the tensor that we view
-	Tensor etensor.Tensor `desc:"the tensor that we view"`
+	Tensor etensor.Tensor
 
 	// display options
-	Disp TensorDisp `desc:"display options"`
+	Disp TensorDisp
 
 	// the actual colormap
-	ColorMap *colormap.Map `desc:"the actual colormap"`
+	ColorMap *colormap.Map
 }
-
-var KiT_TensorGrid = kit.Types.AddType(&TensorGrid{}, nil)
 
 // AddNewTensorGrid adds a new tensor grid to given parent node, with given name.
 func AddNewTensorGrid(parent ki.Ki, name string, tsr etensor.Tensor) *TensorGrid {
@@ -252,13 +247,13 @@ func (tg *TensorGrid) OpenTensorView() {
 
 // MouseEvent handles button MouseEvent
 func (tg *TensorGrid) MouseEvent() {
-	tg.ConnectEvent(oswin.MouseEvent, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
-		me := d.(*mouse.Event)
+	tg.ConnectEvent(goosi.MouseEvent, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
+		me := d.(*events.Mouse)
 		tgv := retg.(*TensorGrid)
 		switch {
-		case me.Button == mouse.Right && me.Action == mouse.Press:
+		case me.Button == events.Right && me.Action == events.Press:
 			giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
-		case me.Button == mouse.Left && me.Action == mouse.DoubleClick:
+		case me.Button == events.Left && me.Action == events.DoubleClick:
 			me.SetProcessed()
 			tgv.OpenTensorView()
 		}
@@ -316,7 +311,7 @@ func (tg *TensorGrid) EnsureColorMap() {
 	}
 }
 
-func (tg *TensorGrid) Color(val float64) (norm float64, clr gist.Color) {
+func (tg *TensorGrid) Color(val float64) (norm float64, clr color.Color) {
 	if tg.ColorMap.Indexed {
 		clr = tg.ColorMap.MapIndex(int(val))
 	} else {

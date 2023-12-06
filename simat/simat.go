@@ -17,13 +17,13 @@ import (
 type SimMat struct {
 
 	// the similarity / distance matrix (typically an etensor.Float64)
-	Mat etensor.Tensor `desc:"the similarity / distance matrix (typically an etensor.Float64)"`
+	Mat etensor.Tensor
 
 	// labels for the rows -- blank rows trigger generation of grouping lines
-	Rows []string `desc:"labels for the rows -- blank rows trigger generation of grouping lines"`
+	Rows []string
 
 	// labels for the columns -- blank columns trigger generation of grouping lines
-	Cols []string `desc:"labels for the columns -- blank columns trigger generation of grouping lines"`
+	Cols []string
 }
 
 // Init initializes SimMat with default Matrix and nil rows, cols

@@ -24,13 +24,13 @@ import "fmt"
 type Shape struct {
 
 	// shape is size per dimension
-	Shp []int `desc:"shape is size per dimension"`
+	Shp []int
 
-	// [view: -] [tableview: -] stride is offset per dimension
-	Strd []int `tableview:"-" view:"-" desc:"stride is offset per dimension"`
+	// stride is offset per dimension
+	Strd []int `tableview:"-" view:"-"`
 
-	// [view: -] [tableview: -] names of each dimension
-	Nms []string `tableview:"-" view:"-" desc:"names of each dimension"`
+	// names of each dimension
+	Nms []string `tableview:"-" view:"-"`
 }
 
 // NewShape returns a new shape object initialized with params.

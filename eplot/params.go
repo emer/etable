@@ -5,62 +5,63 @@
 package eplot
 
 import (
+	"image/color"
 	"strings"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/gist"
 	"github.com/goki/ki/kit"
+	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
+	"goki.dev/goki/gi/v2/gi"
 )
 
 // PlotParams are parameters for overall plot
 type PlotParams struct {
 
 	// optional title at top of plot
-	Title string `desc:"optional title at top of plot"`
+	Title string
 
 	// type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional
-	Type PlotTypes `desc:"type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional"`
+	Type PlotTypes
 
 	// plot lines
-	Lines bool `desc:"plot lines"`
+	Lines bool
 
 	// plot points with symbols
-	Points bool `desc:"plot points with symbols"`
+	Points bool
 
 	// width of lines
-	LineWidth float64 `desc:"width of lines"`
+	LineWidth float64
 
 	// size of points
-	PointSize float64 `desc:"size of points"`
+	PointSize float64
 
-	// [min: 0.01] [max: 1] width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default
-	BarWidth float64 `min:"0.01" max:"1" desc:"width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default"`
+	// width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default
+	BarWidth float64 `min:"0.01" max:"1"`
 
 	// draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn
-	NegXDraw bool `desc:"draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"`
+	NegXDraw bool
 
-	// [def: 2] overall scaling factor -- the larger the number, the larger the fonts are relative to the graph
-	Scale float64 `def:"2" desc:"overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"`
+	// overall scaling factor -- the larger the number, the larger the fonts are relative to the graph
+	Scale float64 `def:"2"`
 
 	// what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values.
-	XAxisCol string `desc:"what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values."`
+	XAxisCol string
 
 	// optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables
-	LegendCol string `desc:"optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"`
+	LegendCol string
 
 	// rotation of the X Axis labels, in degrees
-	XAxisRot float64 `desc:"rotation of the X Axis labels, in degrees"`
+	XAxisRot float64
 
 	// optional label to use for XAxis instead of column name
-	XAxisLabel string `desc:"optional label to use for XAxis instead of column name"`
+	XAxisLabel string
 
 	// optional label to use for YAxis -- if empty, first column name is used
-	YAxisLabel string `desc:"optional label to use for YAxis -- if empty, first column name is used"`
+	YAxisLabel string
 
-	// [view: -] our plot, for update method
-	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
+	// our plot, for update method
+	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -168,40 +169,40 @@ func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 type ColParams struct {
 
 	// plot this column
-	On bool `desc:"plot this column"`
+	On bool
 
 	// name of column we're plotting
-	Col string `desc:"name of column we're plotting"`
+	Col string
 
 	// effective range of data to plot -- either end can be fixed
-	Range minmax.Range64 `desc:"effective range of data to plot -- either end can be fixed"`
+	Range minmax.Range64
 
 	// full actual range of data -- only valid if specifically computed
-	FullRange minmax.F64 `desc:"full actual range of data -- only valid if specifically computed"`
+	FullRange minmax.F64
 
 	// if non-empty, color is set by this name
-	ColorName gi.ColorName `desc:"if non-empty, color is set by this name"`
+	ColorName gi.ColorName
 
 	// color to use in plotting the line
-	Color gist.Color `desc:"color to use in plotting the line"`
+	Color color.Color
 
 	// desired number of ticks
-	NTicks int `desc:"desired number of ticks"`
+	NTicks int
 
 	// if non-empty, this is an alternative label to use in plotting
-	Lbl string `desc:"if non-empty, this is an alternative label to use in plotting"`
+	Lbl string
 
 	// if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines
-	TensorIdx int `desc:"if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines"`
+	TensorIdx int
 
 	// specifies a column containing error bars for this column
-	ErrCol string `desc:"specifies a column containing error bars for this column"`
+	ErrCol string
 
 	// if true this is a string column -- plots as labels
-	IsString bool `inactive:"+" desc:"if true this is a string column -- plots as labels"`
+	IsString bool `inactive:"+"`
 
-	// [view: -] our plot, for update method
-	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-" desc:"our plot, for update method"`
+	// our plot, for update method
+	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -229,7 +230,7 @@ func (cp *ColParams) CopyFrom(fr *ColParams) {
 // UpdateVals update derived values e.g., color from color name
 func (cp *ColParams) UpdateVals() {
 	if cp.ColorName != "" {
-		clr, err := gist.ColorFromString(string(cp.ColorName), nil)
+		clr, err := colors.FromString(string(cp.ColorName), nil)
 		if err == nil {
 			cp.Color = clr
 		}

@@ -7,11 +7,11 @@ package eplot
 import (
 	"reflect"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
+	"goki.dev/goki/gi/v2/gi"
+	"goki.dev/goki/gi/v2/giv"
+	"goki.dev/goki/gi/v2/units"
+	"goki.dev/goki/ki/v2"
 )
 
 func init() {
@@ -67,7 +67,7 @@ func (vv *Plot2DValueView) ConfigWidget(widg gi.Node2D) {
 	ac.SetProp("padding", units.NewPx(2))
 	ac.SetProp("margin", units.NewPx(2))
 	ac.SetProp("border-radius", units.NewPx(4))
-	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+	ac.ActionSig.ConnectOnly(vv.This(), func(recv, send ki.Ki, sig int64, data any) {
 		vvv, _ := recv.Embed(KiT_Plot2DValueView).(*Plot2DValueView)
 		ac := vvv.Widget.(*gi.Action)
 		vvv.Activate(ac.ViewportSafe(), nil, nil)

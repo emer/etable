@@ -13,51 +13,43 @@ import (
 	"reflect"
 	"strings"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/gi/girl"
-	"github.com/goki/gi/gist"
-	"github.com/goki/gi/giv"
-	"github.com/goki/gi/oswin"
-	"github.com/goki/gi/oswin/cursor"
-	"github.com/goki/gi/oswin/mimedata"
-	"github.com/goki/gi/oswin/mouse"
-	"github.com/goki/gi/units"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
-	"github.com/goki/pi/filecat"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
+	"goki.dev/fi"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/paint"
+	"goki.dev/girl/units"
+	"goki.dev/goosi"
+	"goki.dev/goosi/cursor"
+	"goki.dev/goosi/events"
+	"goki.dev/goosi/mimedata"
+	"goki.dev/ki/v2"
+	"goki.dev/laser"
 	"goki.dev/mat32/v2"
 )
 
 // etview.TableView provides a GUI interface for etable.Table's
-type TableView struct {
+type TableView struct { //git:add
 	giv.SliceViewBase
 
 	// the idx view of the table that we're a view of
-	Table *etable.IdxView `desc:"the idx view of the table that we're a view of"`
+	Table *etable.IdxView
 
 	// overall display options for tensor display
-	TsrDisp TensorDisp `desc:"overall display options for tensor display"`
+	TsrDisp TensorDisp
 
 	// per column tensor display
-	ColTsrDisp map[int]*TensorDisp `desc:"per column tensor display"`
+	ColTsrDisp map[int]*TensorDisp
 
 	// number of columns in table (as of last update)
-	NCols int `inactive:"+" desc:"number of columns in table (as of last update)"`
+	NCols int `inactive:"+"`
 
 	// current sort index
-	SortIdx int `desc:"current sort index"`
+	SortIdx int
 
 	// whether current sort order is descending
-	SortDesc bool `desc:"whether current sort order is descending"`
-}
-
-var KiT_TableView = kit.Types.AddType(&TableView{}, TableViewProps)
-
-// AddNewTableView adds a new tableview to given parent node, with given name.
-func AddNewTableView(parent ki.Ki, name string) *TableView {
-	return parent.AddNewChild(KiT_TableView, name).(*TableView)
+	SortDesc bool
 }
 
 // check for interface impl
@@ -109,23 +101,23 @@ func (tv *TableView) TableConfig() {
 	tv.SetFullReRender()
 	tv.ShowIndex = true
 	if sidxp, err := tv.PropTry("index"); err == nil {
-		tv.ShowIndex, _ = kit.ToBool(sidxp)
+		tv.ShowIndex, _ = laser.ToBool(sidxp)
 	}
 	tv.InactKeyNav = true
 	if siknp, err := tv.PropTry("inact-key-nav"); err == nil {
-		tv.InactKeyNav, _ = kit.ToBool(siknp)
+		tv.InactKeyNav, _ = laser.ToBool(siknp)
 	}
 	tv.Config()
 	tv.UpdateEnd(updt)
 }
 
-var TableViewProps = ki.Props{
-	"EnumType:Flag":    gi.KiT_NodeFlags,
-	"background-color": &gi.Prefs.Colors.Background,
-	"color":            &gi.Prefs.Colors.Font,
-	"max-width":        -1,
-	"max-height":       -1,
-}
+// var TableViewProps = ki.Props{
+// 	"EnumType:Flag":    gi.KiT_NodeFlags,
+// 	"background-color": &gi.Prefs.Colors.Background,
+// 	"color":            &gi.Prefs.Colors.Font,
+// 	"max-width":        -1,
+// 	"max-height":       -1,
+// }
 
 // UpdateTable updates view of Table -- regenerates indexes and calls Update
 func (tv *TableView) UpdateTable() {
@@ -159,7 +151,7 @@ func (tv *TableView) IsConfiged() bool {
 func (tv *TableView) Config() {
 	tv.Lay = gi.LayoutVert
 	tv.SetProp("spacing", gi.StdDialogVSpaceUnits)
-	config := kit.TypeAndNameList{}
+	config := ki.Config{}
 	config.Add(gi.KiT_ToolBar, "toolbar")
 	config.Add(gi.KiT_Frame, "frame")
 	mods, updt := tv.ConfigChildren(config)
@@ -265,27 +257,27 @@ func (tv *TableView) ConfigSliceGrid() {
 
 	sg.Lay = gi.LayoutVert
 	sg.SetMinPrefWidth(units.NewCh(20))
-	sg.SetProp("overflow", gist.OverflowScroll) // this still gives it true size during PrefSize
-	sg.SetStretchMax()                          // for this to work, ALL layers above need it too
-	sg.SetProp("border-width", 0)
-	sg.SetProp("margin", 0)
-	sg.SetProp("padding", 0)
+	// sg.SetProp("overflow", styles.OverflowScroll) // this still gives it true size during PrefSize
+	// sg.SetStretchMax()                          // for this to work, ALL layers above need it too
+	// sg.SetProp("border-width", 0)
+	// sg.SetProp("margin", 0)
+	// sg.SetProp("padding", 0)
 
-	sgcfg := kit.TypeAndNameList{}
+	sgcfg := ki.Config{}
 	sgcfg.Add(gi.KiT_ToolBar, "header")
 	sgcfg.Add(gi.KiT_Layout, "grid-lay")
 	sg.ConfigChildren(sgcfg)
 
 	sgh := tv.SliceHeader()
 	sgh.Lay = gi.LayoutHoriz
-	sgh.SetProp("overflow", gist.OverflowHidden) // no scrollbars!
+	sgh.SetProp("overflow", styles.OverflowHidden) // no scrollbars!
 	sgh.SetProp("spacing", 0)
 	// sgh.SetStretchMaxWidth()
 
 	gl := tv.GridLayout()
 	gl.Lay = gi.LayoutHoriz
 	gl.SetStretchMax() // for this to work, ALL layers above need it too
-	gconfig := kit.TypeAndNameList{}
+	gconfig := ki.Config{}
 	gconfig.Add(gi.KiT_Frame, "grid")
 	gconfig.Add(gi.KiT_ScrollBar, "scrollbar")
 	gl.ConfigChildren(gconfig) // covered by above
@@ -296,12 +288,12 @@ func (tv *TableView) ConfigSliceGrid() {
 	sgf.SetMinPrefHeight(units.NewEm(10))
 	sgf.SetStretchMax() // for this to work, ALL layers above need it too
 	sgf.SetProp("columns", nWidgPerRow)
-	sgf.SetProp("overflow", gist.OverflowScroll) // this still gives it true size during PrefSize
+	sgf.SetProp("overflow", styles.OverflowScroll) // this still gives it true size during PrefSize
 	// this causes sizing / layout to fail, esp on window resize etc:
 	// sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
 
 	// Configure Header
-	hcfg := kit.TypeAndNameList{}
+	hcfg := ki.Config{}
 	if tv.ShowIndex {
 		hcfg.Add(gi.KiT_Action, "head-idx")
 	}
@@ -459,7 +451,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		tv.RowHeight = sg.GridData[gi.Row][0].AllocSize + sg.Spacing.Dots
 	}
 	if tv.Sty.Font.Face == nil {
-		girl.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
+		paint.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
 	}
 	tv.RowHeight = mat32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
 
@@ -622,8 +614,8 @@ func (tv *TableView) UpdateSliceGrid() {
 							vvv := send.(giv.ValueView).AsValueViewBase()
 							row := vvv.Prop("tv-row").(int)
 							col := vvv.Prop("tv-col").(int)
-							npv := kit.NonPtrValue(vvv.Value)
-							sv := kit.ToString(npv.Interface())
+							npv := laser.NonPtrValue(vvv.Value)
+							sv := laser.ToString(npv.Interface())
 							tvv.Table.Table.SetCellStringIdx(col, tvv.Table.Idxs[tvv.StartIdx+row], sv)
 							tvv.ViewSig.Emit(tvv.This(), 0, nil)
 						})
@@ -641,8 +633,8 @@ func (tv *TableView) UpdateSliceGrid() {
 								vvv := send.(giv.ValueView).AsValueViewBase()
 								row := vvv.Prop("tv-row").(int)
 								col := vvv.Prop("tv-col").(int)
-								npv := kit.NonPtrValue(vvv.Value)
-								fv, ok := kit.ToFloat(npv.Interface())
+								npv := laser.NonPtrValue(vvv.Value)
+								fv, ok := laser.ToFloat(npv.Interface())
 								if ok {
 									tvv.Table.Table.SetCellFloatIdx(col, tvv.Table.Idxs[tvv.StartIdx+row], fv)
 									tvv.ViewSig.Emit(tvv.This(), 0, nil)
@@ -699,7 +691,7 @@ func (tv *TableView) UpdateSliceGrid() {
 				wb := widg.AsWidget()
 				if wb != nil {
 					wb.SetProp("tv-row", ri)
-					wb.SetProp("vertical-align", gist.AlignTop)
+					wb.SetProp("vertical-align", styles.AlignTop)
 					wb.ClearSelected()
 					wb.WidgetSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
 						if sig == int64(gi.WidgetSelected) {
@@ -859,8 +851,8 @@ func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
 // SortSliceAction sorts the slice for given field index -- toggles ascending
 // vs. descending if already sorting on this dimension
 func (tv *TableView) SortSliceAction(fldIdx int) {
-	oswin.TheApp.Cursor(tv.ParentWindow().OSWin).Push(cursor.Wait)
-	defer oswin.TheApp.Cursor(tv.ParentWindow().OSWin).Pop()
+	goosi.TheApp.Cursor(tv.ParentWindow().OSWin).Push(cursor.Wait)
+	defer goosi.TheApp.Cursor(tv.ParentWindow().OSWin).Pop()
 
 	wupdt := tv.TopUpdateStart()
 	defer tv.TopUpdateEnd(wupdt)
@@ -1103,7 +1095,7 @@ func (tv *TableView) SelectRowWidgets(row int, sel bool) {
 //    Copy / Cut / Paste
 
 func (tv *TableView) MimeDataType() string {
-	return filecat.DataCsv
+	return fi.DataCsv
 }
 
 // CopySelToMime copies selected rows to mime data
@@ -1123,7 +1115,7 @@ func (tv *TableView) CopySelToMime() mimedata.Mimes {
 	var b bytes.Buffer
 	ix.WriteCSV(&b, etable.Tab, etable.Headers)
 	md := mimedata.NewTextBytes(b.Bytes())
-	md[0].Type = filecat.DataCsv
+	md[0].Type = fi.DataCsv
 	return md
 }
 
@@ -1131,7 +1123,7 @@ func (tv *TableView) CopySelToMime() mimedata.Mimes {
 func (tv *TableView) FromMimeData(md mimedata.Mimes) [][]string {
 	var recs [][]string
 	for _, d := range md {
-		if d.Type == filecat.DataCsv {
+		if d.Type == fi.DataCsv {
 			b := bytes.NewBuffer(d.Data)
 			cr := csv.NewReader(b)
 			cr.Comma = etable.Tab.Rune()
@@ -1185,7 +1177,7 @@ func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	tv.UpdateEnd(updt)
-	tv.SelectIdxAction(idx, mouse.SelectOne)
+	tv.SelectIdxAction(idx, events.SelectOne)
 }
 
 func (tv *TableView) ItemCtxtMenu(idx int) {

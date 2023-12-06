@@ -19,20 +19,20 @@ import (
 // All tensors MUST have RowMajor stride layout!
 type Table struct { //git:add
 
-	// [view: no-inline] columns of data, as etensor.Tensor tensors
-	Cols []etensor.Tensor `view:"no-inline" desc:"columns of data, as etensor.Tensor tensors"`
+	// columns of data, as etensor.Tensor tensors
+	Cols []etensor.Tensor `view:"no-inline"`
 
 	// the names of the columns
-	ColNames []string `desc:"the names of the columns"`
+	ColNames []string
 
 	// number of rows, which is enforced to be the size of the outer-most dimension of the column tensors
-	Rows int `inactive:"+" desc:"number of rows, which is enforced to be the size of the outer-most dimension of the column tensors"`
+	Rows int `inactive:"+"`
 
-	// [view: -] the map of column names to column numbers
-	ColNameMap map[string]int `view:"-" desc:"the map of column names to column numbers"`
+	// the map of column names to column numbers
+	ColNameMap map[string]int `view:"-"`
 
 	// misc meta data for the table.  We use lower-case key names following the struct tag convention:  name = name of table; desc = description; read-only = gui is read-only; precision = n for precision to write out floats in csv.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc = description of the column contents, which is shown as tooltip in the etview.TableView, and :width for width of a column
-	MetaData map[string]string `desc:"misc meta data for the table.  We use lower-case key names following the struct tag convention:  name = name of table; desc = description; read-only = gui is read-only; precision = n for precision to write out floats in csv.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc = description of the column contents, which is shown as tooltip in the etview.TableView, and :width for width of a column"`
+	MetaData map[string]string
 }
 
 // NumRows returns the number of rows (arrow / dframe api)

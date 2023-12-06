@@ -18,22 +18,22 @@ import (
 type SVD struct {
 
 	// type of SVD to run: SVDNone is the most efficient if you only need the values which are always computed.  Otherwise, SVDThin is the next most efficient for getting approximate vectors
-	Kind mat.SVDKind `desc:"type of SVD to run: SVDNone is the most efficient if you only need the values which are always computed.  Otherwise, SVDThin is the next most efficient for getting approximate vectors"`
+	Kind mat.SVDKind
 
-	// [def: 0.01] condition value -- minimum normalized eigenvalue to return in values
-	Cond float64 `def:"0.01" desc:"condition value -- minimum normalized eigenvalue to return in values"`
+	// condition value -- minimum normalized eigenvalue to return in values
+	Cond float64 `def:"0.01"`
 
 	// the rank (count) of singular values greater than Cond
-	Rank int `desc:"the rank (count) of singular values greater than Cond"`
+	Rank int
 
-	// [view: no-inline] the covariance matrix computed on original data, which is then eigen-factored
-	Covar *etensor.Float64 `view:"no-inline" desc:"the covariance matrix computed on original data, which is then eigen-factored"`
+	// the covariance matrix computed on original data, which is then eigen-factored
+	Covar *etensor.Float64 `view:"no-inline"`
 
-	// [view: no-inline] the eigenvectors, in same size as Covar - each eigenvector is a column in this 2D square matrix, ordered *lowest* to *highest* across the columns -- i.e., maximum eigenvector is the last column
-	Vectors *etensor.Float64 `view:"no-inline" desc:"the eigenvectors, in same size as Covar - each eigenvector is a column in this 2D square matrix, ordered *lowest* to *highest* across the columns -- i.e., maximum eigenvector is the last column"`
+	// the eigenvectors, in same size as Covar - each eigenvector is a column in this 2D square matrix, ordered *lowest* to *highest* across the columns -- i.e., maximum eigenvector is the last column
+	Vectors *etensor.Float64 `view:"no-inline"`
 
-	// [view: no-inline] the eigenvalues, ordered *lowest* to *highest*
-	Values []float64 `view:"no-inline" desc:"the eigenvalues, ordered *lowest* to *highest*"`
+	// the eigenvalues, ordered *lowest* to *highest*
+	Values []float64 `view:"no-inline"`
 }
 
 func (svd *SVD) Init() {

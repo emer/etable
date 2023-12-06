@@ -38,13 +38,13 @@ type FilterFunc func(et *Table, row int) bool
 type IdxView struct { //git:add
 
 	// Table that we are an indexed view onto
-	Table *Table `desc:"Table that we are an indexed view onto"`
+	Table *Table
 
 	// current indexes into Table
-	Idxs []int `desc:"current indexes into Table"`
+	Idxs []int
 
-	// [view: -] current Less function used in sorting
-	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-" desc:"current Less function used in sorting"`
+	// current Less function used in sorting
+	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-"`
 }
 
 // NewIdxView returns a new IdxView based on given table, initialized with sequential idxes

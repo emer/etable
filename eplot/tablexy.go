@@ -22,25 +22,25 @@ import (
 type TableXY struct {
 
 	// the index view of data table to plot from
-	Table *etable.IdxView `desc:"the index view of data table to plot from"`
+	Table *etable.IdxView
 
 	// the indexes of the tensor columns to use for the X and Y data, respectively
-	XCol, YCol int `desc:"the indexes of the tensor columns to use for the X and Y data, respectively"`
+	XCol, YCol int
 
 	// numer of elements in each row of data -- 1 for scalar, > 1 for multi-dimensional
-	XRowSz, YRowSz int `desc:"numer of elements in each row of data -- 1 for scalar, > 1 for multi-dimensional"`
+	XRowSz, YRowSz int
 
 	// the indexes of the element within each tensor cell if cells are n-dimensional, respectively
-	XIdx, YIdx int `desc:"the indexes of the element within each tensor cell if cells are n-dimensional, respectively"`
+	XIdx, YIdx int
 
 	// the column to use for returning a label using Label interface -- for string cols
-	LblCol int `desc:"the column to use for returning a label using Label interface -- for string cols"`
+	LblCol int
 
 	// the column to use for returning errorbars (+/- given value) -- if YCol is tensor then this must also be a tensor and given YIdx used
-	ErrCol int `desc:"the column to use for returning errorbars (+/- given value) -- if YCol is tensor then this must also be a tensor and given YIdx used"`
+	ErrCol int
 
 	// range constraints on Y values
-	YRange minmax.Range64 `desc:"range constraints on Y values"`
+	YRange minmax.Range64
 }
 
 // NewTableXY returns a new XY plot view onto the given IdxView of etable.Table (makes a copy),

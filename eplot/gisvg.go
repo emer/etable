@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/goki/gi/svg"
+	"goki.dev/goki/gi/v2/svg"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
