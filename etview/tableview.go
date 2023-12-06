@@ -22,13 +22,12 @@ import (
 	"github.com/goki/gi/oswin/mimedata"
 	"github.com/goki/gi/oswin/mouse"
 	"github.com/goki/gi/units"
-	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
-	"github.com/goki/mat32"
 	"github.com/goki/pi/filecat"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
+	"goki.dev/mat32/v2"
 )
 
 // etview.TableView provides a GUI interface for etable.Table's
@@ -466,7 +465,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 
 	mvp := tv.ViewportSafe()
 	if mvp != nil && mvp.HasFlag(int(gi.VpFlagPrefSizing)) {
-		tv.VisRows = ints.MinInt(gi.LayoutPrefMaxRows, tv.SliceSize)
+		tv.VisRows = min(gi.LayoutPrefMaxRows, tv.SliceSize)
 		tv.LayoutHeight = float32(tv.VisRows) * tv.RowHeight
 	} else {
 		sgHt := tv.AvailHeight()
@@ -476,7 +475,7 @@ func (tv *TableView) LayoutSliceGrid() bool {
 		}
 		tv.VisRows = int(mat32.Floor(sgHt / tv.RowHeight))
 	}
-	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
+	tv.DispRows = min(tv.SliceSize, tv.VisRows)
 
 	nWidg := nWidgPerRow * tv.DispRows
 
@@ -552,7 +551,7 @@ func (tv *TableView) UpdateSliceGrid() {
 		return
 	}
 
-	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
+	tv.DispRows = min(tv.SliceSize, tv.VisRows)
 
 	tv.TsrDispToDots()
 

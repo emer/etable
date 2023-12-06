@@ -15,11 +15,10 @@ import (
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/oswin/mimedata"
 	"github.com/goki/gi/units"
-	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
-	"github.com/goki/mat32"
 	"goki.dev/etable/v2/etensor"
+	"goki.dev/mat32/v2"
 )
 
 // etview.TensorView provides a GUI interface for etable.Tensor's
@@ -314,7 +313,7 @@ func (tv *TensorView) LayoutSliceGrid() bool {
 
 	mvp := tv.ViewportSafe()
 	if mvp != nil && mvp.HasFlag(int(gi.VpFlagPrefSizing)) {
-		tv.VisRows = ints.MinInt(gi.LayoutPrefMaxRows, tv.SliceSize)
+		tv.VisRows = min(gi.LayoutPrefMaxRows, tv.SliceSize)
 		tv.LayoutHeight = float32(tv.VisRows) * tv.RowHeight
 	} else {
 		sgHt := tv.AvailHeight()
@@ -324,7 +323,7 @@ func (tv *TensorView) LayoutSliceGrid() bool {
 		}
 		tv.VisRows = int(mat32.Floor(sgHt / tv.RowHeight))
 	}
-	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
+	tv.DispRows = min(tv.SliceSize, tv.VisRows)
 
 	nWidg := nWidgPerRow * tv.DispRows
 
@@ -400,7 +399,7 @@ func (tv *TensorView) UpdateSliceGrid() {
 		return
 	}
 
-	tv.DispRows = ints.MinInt(tv.SliceSize, tv.VisRows)
+	tv.DispRows = min(tv.SliceSize, tv.VisRows)
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nWidg := nWidgPerRow * tv.DispRows

@@ -10,7 +10,6 @@ import (
 	"math"
 
 	"github.com/goki/gi/gist"
-	"github.com/goki/ki/ints"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
 	"goki.dev/etable/v2/split"
@@ -50,7 +49,7 @@ func (pl *Plot2D) GenPlotBar() {
 		} else {
 			xview.SortColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending) // make it fit!
 			lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
-			nleg = ints.MaxInt(lsplit.Len(), 1)
+			nleg = max(lsplit.Len(), 1)
 		}
 	}
 
@@ -122,7 +121,7 @@ func (pl *Plot2D) GenPlotBar() {
 				if xy == nil {
 					continue
 				}
-				maxx = ints.MaxInt(maxx, lview.Len())
+				maxx = max(maxx, lview.Len())
 				if firstXY == nil {
 					firstXY = xy
 				}

@@ -4,21 +4,20 @@
 
 package etable
 
+//go:generate goki generate
+
 import (
 	"fmt"
 	"log"
 	"math"
 	"strings"
 
-	"github.com/goki/ki/ints"
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etensor"
 )
 
 // etable.Table is the emer DataTable structure, containing columns of etensor tensors.
 // All tensors MUST have RowMajor stride layout!
-type Table struct {
+type Table struct { //git:add
 
 	// [view: no-inline] columns of data, as etensor.Tensor tensors
 	Cols []etensor.Tensor `view:"no-inline" desc:"columns of data, as etensor.Tensor tensors"`
@@ -35,8 +34,6 @@ type Table struct {
 	// misc meta data for the table.  We use lower-case key names following the struct tag convention:  name = name of table; desc = description; read-only = gui is read-only; precision = n for precision to write out floats in csv.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc = description of the column contents, which is shown as tooltip in the etview.TableView, and :width for width of a column
 	MetaData map[string]string `desc:"misc meta data for the table.  We use lower-case key names following the struct tag convention:  name = name of table; desc = description; read-only = gui is read-only; precision = n for precision to write out floats in csv.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc = description of the column contents, which is shown as tooltip in the etview.TableView, and :width for width of a column"`
 }
-
-var KiT_Table = kit.Types.AddType(&Table{}, TableProps)
 
 // NumRows returns the number of rows (arrow / dframe api)
 func (dt *Table) NumRows() int {
@@ -168,7 +165,7 @@ func (dt *Table) AddCol(tsr etensor.Tensor, name string) error {
 	dt.Cols = append(dt.Cols, tsr)
 	dt.ColNames = append(dt.ColNames, name)
 	dt.UpdateColNameMap()
-	rows := ints.MaxInt(1, dt.Rows)
+	rows := max(1, dt.Rows)
 	tsr.SetNumRows(rows)
 	return nil
 }
@@ -207,7 +204,7 @@ func (dt *Table) AddRows(n int) {
 // if rows = 0 then effective number of rows in tensors is 1, as this dim cannot be 0
 func (dt *Table) SetNumRows(rows int) {
 	dt.Rows = rows // can be 0
-	rows = ints.MaxInt(1, rows)
+	rows = max(1, rows)
 	for _, tsr := range dt.Cols {
 		tsr.SetNumRows(rows)
 	}
@@ -222,7 +219,7 @@ func (dt *Table) SetFromSchema(sc Schema, rows int) {
 	dt.Cols = make([]etensor.Tensor, nc)
 	dt.ColNames = make([]string, nc)
 	dt.Rows = rows // can be 0
-	rows = ints.MaxInt(1, rows)
+	rows = max(1, rows)
 	for i := range dt.Cols {
 		cl := &sc[i]
 		dt.ColNames[i] = cl.Name
@@ -701,7 +698,7 @@ func (dt *Table) SetCellTensorIdx(col, row int, val etensor.Tensor) bool {
 	ct := dt.Cols[col]
 	_, csz := ct.RowCellSize()
 	st := row * csz
-	sz := ints.MinInt(csz, val.Len())
+	sz := min(csz, val.Len())
 	if ct.DataType() == etensor.STRING {
 		for j := 0; j < sz; j++ {
 			ct.SetString1D(st+j, val.StringVal1D(j))
@@ -808,7 +805,7 @@ func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpR
 		_, cpsz := cpct.RowCellSize()
 		st := row * sz
 		cst := cpRow * cpsz
-		msz := ints.MinInt(sz, cpsz)
+		msz := min(sz, cpsz)
 		if ct.DataType() == etensor.STRING {
 			for j := 0; j < msz; j++ {
 				ct.SetString1D(st+j, cpct.StringVal1D(cst+j))
@@ -825,6 +822,9 @@ func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpR
 //////////////////////////////////////////////////////////////////////////////////////
 //  Table props for gui
 
+// todo:
+
+/*
 var TableProps = ki.Props{
 	"ToolBar": ki.PropSlice{
 		{"AddRows", ki.Props{
@@ -877,3 +877,4 @@ var TableProps = ki.Props{
 		}},
 	},
 }
+*/

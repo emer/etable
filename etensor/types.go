@@ -4,9 +4,10 @@
 
 package etensor
 
+//go:generate goki generate
+
 import (
 	"github.com/apache/arrow/go/arrow"
-	"github.com/goki/ki/kit"
 )
 
 // Type is a logical type -- the subset supported by etable.
@@ -16,7 +17,7 @@ import (
 // or another data type (e.g. a timestamp encoded as an int64).
 // Note that we need the unconventional CAPS names b/c regular CamelCase is taken
 // by the tensor type itself.
-type Type int
+type Type int32 //enums:enum
 
 const (
 	// Null type having no physical storage
@@ -63,8 +64,6 @@ const (
 
 	// INT is a Signed 64-bit little-endian integer -- should only use on 64bit machines!
 	INT Type = STRING + 1
-
-	TypeN = INT + 1
 )
 
 func (tp Type) IsNumeric() bool {
@@ -73,10 +72,3 @@ func (tp Type) IsNumeric() bool {
 	}
 	return false
 }
-
-//go:generate stringer -type=Type
-
-var KiT_Type = kit.Enums.AddEnum(TypeN, kit.NotBitFlag, nil)
-
-func (ev Type) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *Type) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }

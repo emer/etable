@@ -4,17 +4,18 @@
 
 package agg
 
+//go:generate goki generate
+
 import (
 	"fmt"
 	"strings"
 
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etable"
 )
 
 // Aggs is a list of different standard aggregation functions, which can be used
 // to choose an aggregation function
-type Aggs int
+type Aggs int32 //enums:enum
 
 const (
 	// Count of number of elements
@@ -64,16 +65,7 @@ const (
 
 	// SumSq sum of squares
 	AggSumSq
-
-	AggsN
 )
-
-//go:generate stringer -type=Aggs
-
-var KiT_Aggs = kit.Enums.AddEnum(AggsN, kit.NotBitFlag, nil)
-
-func (ev Aggs) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *Aggs) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
 
 // AggsName returns the name of the Aggs varaible without the Agg prefix..
 func AggsName(ag Aggs) string {

@@ -15,20 +15,12 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goki/gi/gi"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etensor"
+	"goki.dev/gi/v2/gi"
 )
 
 // Delim are standard CSV delimiter options (Tab, Comma, Space)
-type Delims int32
-
-//go:generate stringer -type=Delims
-
-var KiT_Delims = kit.Enums.AddEnum(DelimsN, kit.NotBitFlag, nil)
-
-func (ev Delims) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *Delims) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
+type Delims int32 //enums:enum
 
 const (
 	// Tab is the tab rune delimiter, for TSV tab separated values
@@ -42,8 +34,6 @@ const (
 
 	// Detect is used during reading a file -- reads the first line and detects tabs or commas
 	Detect
-
-	DelimsN
 )
 
 func (dl Delims) Rune() rune {

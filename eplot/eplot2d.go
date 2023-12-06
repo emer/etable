@@ -17,7 +17,6 @@ import (
 	"github.com/goki/gi/giv"
 	"github.com/goki/gi/svg"
 	"github.com/goki/gi/units"
-	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etable"
@@ -65,7 +64,7 @@ func (pl *Plot2D) CopyFieldsFrom(frm interface{}) {
 	pl.Layout.CopyFieldsFrom(&fr.Layout)
 	pl.Params.CopyFrom(&fr.Params)
 	pl.SetTableView(fr.Table)
-	mx := ints.MinInt(len(pl.Cols), len(fr.Cols))
+	mx := min(len(pl.Cols), len(fr.Cols))
 	for i := 0; i < mx; i++ {
 		pl.Cols[i].CopyFrom(fr.Cols[i])
 	}

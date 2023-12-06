@@ -5,7 +5,6 @@
 package agg
 
 import (
-	"github.com/goki/ki/ints"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 )
@@ -35,7 +34,7 @@ func MeanTables(dts []*etable.Table) *etable.Table {
 	rns := make([]int, maxRows)
 	for _, dt := range dts {
 		dnr := dt.Rows
-		mx := ints.MinInt(dnr, maxRows)
+		mx := min(dnr, maxRows)
 		for ri := 0; ri < mx; ri++ {
 			rns[ri]++
 		}
@@ -51,7 +50,7 @@ func MeanTables(dts []*etable.Table) *etable.Table {
 			}
 			dc := dt.Cols[ci]
 			dnr := dt.Rows
-			mx := ints.MinInt(dnr, maxRows)
+			mx := min(dnr, maxRows)
 			for ri := 0; ri < mx; ri++ {
 				si := ri * cells
 				for j := 0; j < cells; j++ {

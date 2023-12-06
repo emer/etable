@@ -12,7 +12,6 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goki/ki/ints"
 	"goki.dev/etable/v2/bitslice"
 	"gonum.org/v1/gonum/mat"
 )
@@ -150,7 +149,7 @@ func (tsr *String) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *String) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = Float64ToString(vals[j])
 	}
@@ -252,7 +251,7 @@ func (tsr *String) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = frm.StringVal1D(i)
 		if frm.IsNull1D(i) {
@@ -311,7 +310,7 @@ func (tsr *String) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	cln := tsr.Len()
 	crows := tsr.Dim(0)
 	inln := 1

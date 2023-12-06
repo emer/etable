@@ -17,9 +17,9 @@ import (
 	"github.com/goki/gi/units"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
-	"github.com/goki/mat32"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/minmax"
+	"goki.dev/mat32/v2"
 )
 
 // TensorLayout are layout options for displaying tensors

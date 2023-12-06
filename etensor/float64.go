@@ -15,9 +15,8 @@ import (
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
-	"github.com/goki/ki/ints"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/bitslice"
+	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -121,7 +120,10 @@ func (tsr *Float64) SetNull1D(i int, nul bool) {
 func (tsr *Float64) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Float64) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = float64(val) }
 
-func (tsr *Float64) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Float64) StringVal(i []int) string {
+	j := tsr.Offset(i)
+	return laser.ToString(tsr.Values[j])
+}
 func (tsr *Float64) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -155,7 +157,7 @@ func (tsr *Float64) SetFloats(vals []float64) {
 	copy(tsr.Values, vals) // diff: blit from values directly
 }
 
-func (tsr *Float64) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Float64) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Float64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = float64(fv)
@@ -164,7 +166,7 @@ func (tsr *Float64) SetString1D(off int, val string) {
 
 func (tsr *Float64) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Float64) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -272,7 +274,7 @@ func (tsr *Float64) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = float64(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -331,7 +333,7 @@ func (tsr *Float64) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows

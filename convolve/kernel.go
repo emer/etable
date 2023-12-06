@@ -7,7 +7,7 @@ package convolve
 import (
 	"math"
 
-	"github.com/goki/mat32"
+	"goki.dev/mat32/v2"
 )
 
 // GaussianKernel32 returns a normalized gaussian kernel for smoothing

@@ -15,9 +15,8 @@ import (
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
-	"github.com/goki/ki/ints"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/bitslice"
+	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -123,7 +122,7 @@ func (tsr *Int) SetNull1D(i int, nul bool) {
 func (tsr *Int) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int(val) }
 
-func (tsr *Int) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Int) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Int) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -156,13 +155,13 @@ func (tsr *Int) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Int) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = int(vals[j])
 	}
 }
 
-func (tsr *Int) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Int) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Int) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int(fv)
@@ -171,7 +170,7 @@ func (tsr *Int) SetString1D(off int, val string) {
 
 func (tsr *Int) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -279,7 +278,7 @@ func (tsr *Int) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = int(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -338,7 +337,7 @@ func (tsr *Int) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows

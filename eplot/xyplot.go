@@ -11,7 +11,6 @@ import (
 
 	"github.com/goki/gi/gi"
 	"github.com/goki/gi/gist"
-	"github.com/goki/ki/ints"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/split"
@@ -60,7 +59,7 @@ func (pl *Plot2D) GenPlotXY() {
 				log.Println(err)
 			}
 			lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
-			nleg = ints.MaxInt(lsplit.Len(), 1)
+			nleg = max(lsplit.Len(), 1)
 		}
 	}
 

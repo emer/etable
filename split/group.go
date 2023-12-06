@@ -6,8 +6,8 @@ package split
 
 import (
 	"log"
+	"slices"
 
-	"github.com/goki/ki/sliceclone"
 	"goki.dev/etable/v2/etable"
 )
 
@@ -98,7 +98,7 @@ func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits 
 		if nv == 0 {
 			nv = len(sv)
 		}
-		funvals[rw] = sliceclone.String(sv)
+		funvals[rw] = slices.Clone(sv)
 	}
 
 	srt := ix.Clone()

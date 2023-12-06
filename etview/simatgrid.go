@@ -12,12 +12,11 @@ import (
 	"github.com/goki/gi/oswin"
 	"github.com/goki/gi/oswin/mouse"
 	"github.com/goki/gi/units"
-	"github.com/goki/ki/ints"
 	"github.com/goki/ki/ki"
 	"github.com/goki/ki/kit"
-	"github.com/goki/mat32"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/simat"
+	"goki.dev/mat32/v2"
 )
 
 const LabelSpace = float32(8)
@@ -115,7 +114,7 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 				ngps++
 			}
 			if i > 0 {
-				minBlank = ints.MinInt(minBlank, curblk)
+				minBlank = min(minBlank, curblk)
 			}
 			curblk = 0
 			if l > mx {
@@ -124,7 +123,7 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 			}
 		}
 	}
-	minBlank = ints.MinInt(minBlank, curblk)
+	minBlank = min(minBlank, curblk)
 	tr := girl.Text{}
 	if col {
 		tr.SetStringRot90(lbs[mxi], &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
@@ -199,7 +198,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 	epos := pos
 	epos.Y += tg.colMaxSz.Y + LabelSpace
 	nr := len(tg.SimMat.Rows)
-	mx := ints.MinInt(nr, rows)
+	mx := min(nr, rows)
 	tr := girl.Text{}
 	txsty := tg.Sty.Text
 	txsty.AlignV = gist.AlignTop
@@ -227,7 +226,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 	epos = pos
 	epos.X += tg.rowMaxSz.X + LabelSpace
 	nc := len(tg.SimMat.Cols)
-	mx = ints.MinInt(nc, cols)
+	mx = min(nc, cols)
 	xgp := 0
 	prvxblk := false
 	for x := 0; x < mx; x++ {

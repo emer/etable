@@ -6,11 +6,10 @@ package etable
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
-	"github.com/goki/ki/ints"
-	"github.com/goki/ki/sliceclone"
 	"goki.dev/etable/v2/etensor"
 )
 
@@ -101,10 +100,10 @@ func (spl *Splits) New(dt *Table, values []string, rows ...int) *IdxView {
 	ix := &IdxView{Table: dt}
 	spl.Splits = append(spl.Splits, ix)
 	if len(rows) > 0 {
-		ix.Idxs = append(ix.Idxs, sliceclone.Int(rows)...)
+		ix.Idxs = append(ix.Idxs, slices.Clone(rows)...)
 	}
 	if len(values) > 0 {
-		spl.Values = append(spl.Values, sliceclone.String(values))
+		spl.Values = append(spl.Values, slices.Clone(values))
 	} else {
 		spl.Values = append(spl.Values, nil)
 	}
@@ -118,7 +117,7 @@ func (spl *Splits) New(dt *Table, values []string, rows ...int) *IdxView {
 func (spl *Splits) ByValue(values []string) []int {
 	var matches []int
 	for si, sn := range spl.Values {
-		sz := ints.MinInt(len(sn), len(values))
+		sz := min(len(sn), len(values))
 		match := true
 		for j := 0; j < sz; j++ {
 			if values[j] == "" {
@@ -254,7 +253,7 @@ func (spl *Splits) ExtractLevels(levels []int) (*Splits, error) {
 		if diff || curIx == nil {
 			curIx = ss.Splits[si]
 			copy(lstVals, curVals)
-			ss.Values[si] = sliceclone.String(curVals)
+			ss.Values[si] = slices.Clone(curVals)
 		} else {
 			curIx.Idxs = append(curIx.Idxs, ss.Splits[si].Idxs...) // absorb
 			ss.Delete(si)
@@ -282,7 +281,7 @@ func (sa *SplitAgg) CopyFrom(osa *SplitAgg) {
 	if nags > 0 {
 		sa.Aggs = make([][]float64, nags)
 		for si := range osa.Aggs {
-			sa.Aggs[si] = sliceclone.Float64(osa.Aggs[si])
+			sa.Aggs[si] = slices.Clone(osa.Aggs[si])
 		}
 	}
 }
@@ -300,9 +299,9 @@ func (spl *Splits) CopyFrom(osp *Splits) {
 	spl.Values = make([][]string, len(osp.Values))
 	for si := range osp.Splits {
 		spl.Splits[si] = osp.Splits[si].Clone()
-		spl.Values[si] = sliceclone.String(osp.Values[si])
+		spl.Values[si] = slices.Clone(osp.Values[si])
 	}
-	spl.Levels = sliceclone.String(osp.Levels)
+	spl.Levels = slices.Clone(osp.Levels)
 
 	nag := len(osp.Aggs)
 	if nag > 0 {

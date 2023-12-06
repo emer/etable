@@ -4,10 +4,10 @@
 
 package clust
 
+//go:generate goki generate
+
 import (
 	"math"
-
-	"github.com/goki/ki/kit"
 )
 
 // DistFunc is a clustering distance function that evaluates aggregate distance
@@ -94,7 +94,7 @@ func ContrastDist(aix, bix []int, ntot int, maxd float64, smat []float64) float6
 }
 
 // StdDists are standard clustering distance functions
-type StdDists int
+type StdDists int32 //enums:enum
 
 const (
 	// Min is the minimum-distance or single-linkage weighting function
@@ -108,16 +108,7 @@ const (
 
 	// Contrast computes maxd + (average within distance - average between distance)
 	Contrast
-
-	StdDistsN
 )
-
-//go:generate stringer -type=StdDists
-
-var KiT_StdDists = kit.Enums.AddEnum(StdDistsN, kit.NotBitFlag, nil)
-
-func (ev StdDists) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *StdDists) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
 
 // StdFunc returns a standard distance function as specified
 func StdFunc(std StdDists) DistFunc {

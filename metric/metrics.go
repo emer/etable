@@ -2,9 +2,9 @@
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
-package metric
+//go:generate goki generate
 
-import "github.com/goki/ki/kit"
+package metric
 
 // Func32 is a distance / similarity metric operating on slices of float32 numbers
 type Func32 func(a, b []float32) float32
@@ -37,16 +37,7 @@ const (
 	Covariance
 	Correlation
 	Cosine
-
-	StdMetricsN
 )
-
-//go:generate stringer -type=StdMetrics
-
-var KiT_StdMetrics = kit.Enums.AddEnum(StdMetricsN, kit.NotBitFlag, nil)
-
-func (ev StdMetrics) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *StdMetrics) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
 
 // Increasing returns true if the distance metric is such that metric
 // values increase as a function of distance (e.g., Euclidean)

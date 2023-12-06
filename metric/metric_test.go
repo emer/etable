@@ -8,7 +8,7 @@ import (
 	"math"
 	"testing"
 
-	"github.com/goki/mat32"
+	"goki.dev/mat32/v2"
 )
 
 func TestAll(t *testing.T) {

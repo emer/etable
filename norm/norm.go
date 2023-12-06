@@ -4,11 +4,12 @@
 
 package norm
 
+//go:generate goki generate
+
 import (
 	"math"
 
-	"github.com/goki/ki/kit"
-	"github.com/goki/mat32"
+	"goki.dev/mat32/v2"
 )
 
 ///////////////////////////////////////////
@@ -200,7 +201,7 @@ type Func32 func(a []float32) float32
 type Func64 func(a []float64) float64
 
 // StdNorms are standard norm functions, including stats
-type StdNorms int
+type StdNorms int32 //enums:enum
 
 const (
 	L1 StdNorms = iota
@@ -215,16 +216,7 @@ const (
 	MaxAbs
 	Min
 	MinAbs
-
-	StdNormsN
 )
-
-//go:generate stringer -type=StdNorms
-
-var KiT_StdNorms = kit.Enums.AddEnum(StdNormsN, kit.NotBitFlag, nil)
-
-func (ev StdNorms) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *StdNorms) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
 
 // StdFunc32 returns a standard norm function as specified
 func StdFunc32(std StdNorms) Func32 {

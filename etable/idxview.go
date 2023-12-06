@@ -9,12 +9,10 @@ import (
 	"log"
 	"math"
 	"math/rand"
+	"slices"
 	"sort"
 	"strings"
 
-	"github.com/goki/ki/ki"
-	"github.com/goki/ki/kit"
-	"github.com/goki/ki/sliceclone"
 	"goki.dev/etable/v2/etensor"
 )
 
@@ -37,7 +35,7 @@ type FilterFunc func(et *Table, row int) bool
 // indexed order, call the NewTable method.
 // IdxView views on a table can also be organized together as Splits
 // of the table rows, e.g., by grouping values along a given column.
-type IdxView struct {
+type IdxView struct { //git:add
 
 	// Table that we are an indexed view onto
 	Table *Table `desc:"Table that we are an indexed view onto"`
@@ -48,8 +46,6 @@ type IdxView struct {
 	// [view: -] current Less function used in sorting
 	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-" desc:"current Less function used in sorting"`
 }
-
-var KiT_IdxView = kit.Types.AddType(&IdxView{}, IdxViewProps)
 
 // NewIdxView returns a new IdxView based on given table, initialized with sequential idxes
 func NewIdxView(et *Table) *IdxView {
@@ -472,7 +468,7 @@ func (ix *IdxView) Clone() *IdxView {
 // CopyFrom copies from given other IdxView (we have our own unique copy of indexes)
 func (ix *IdxView) CopyFrom(oix *IdxView) {
 	ix.Table = oix.Table
-	ix.Idxs = sliceclone.Int(oix.Idxs)
+	ix.Idxs = slices.Clone(oix.Idxs)
 }
 
 // AddRows adds n rows to end of underlying Table, and to the indexes in this view
@@ -573,6 +569,10 @@ func (ix *IdxView) Swap(i, j int) {
 	ix.Idxs[i], ix.Idxs[j] = ix.Idxs[j], ix.Idxs[i]
 }
 
+/*
+
+todo:
+
 var IdxViewProps = ki.Props{
 	"ToolBar": ki.PropSlice{
 		{"AddRows", ki.Props{
@@ -649,3 +649,4 @@ var IdxViewProps = ki.Props{
 		}},
 	},
 }
+*/

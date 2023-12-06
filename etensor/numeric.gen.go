@@ -18,8 +18,7 @@ import (
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
 	"goki.dev/etable/v2/bitslice"
-	"github.com/goki/ki/ints"
-	"github.com/goki/ki/kit"
+	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -123,7 +122,7 @@ func (tsr *Int64) SetNull1D(i int, nul bool) {
 func (tsr *Int64) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int64) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int64(val) }
 
-func (tsr *Int64) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Int64) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Int64) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -156,13 +155,13 @@ func (tsr *Int64) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Int64) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = int64(vals[j])
 	}
 }
 
-func (tsr *Int64) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Int64) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Int64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int64(fv)
@@ -171,7 +170,7 @@ func (tsr *Int64) SetString1D(off int, val string) {
 
 func (tsr *Int64) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int64) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -279,7 +278,7 @@ func (tsr *Int64) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = int64(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -338,7 +337,7 @@ func (tsr *Int64) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -683,7 +682,10 @@ func (tsr *Uint64) SetNull1D(i int, nul bool) {
 func (tsr *Uint64) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint64) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint64(val) }
 
-func (tsr *Uint64) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Uint64) StringVal(i []int) string {
+	j := tsr.Offset(i)
+	return laser.ToString(tsr.Values[j])
+}
 func (tsr *Uint64) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -716,13 +718,13 @@ func (tsr *Uint64) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Uint64) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = uint64(vals[j])
 	}
 }
 
-func (tsr *Uint64) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Uint64) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Uint64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint64(fv)
@@ -731,7 +733,7 @@ func (tsr *Uint64) SetString1D(off int, val string) {
 
 func (tsr *Uint64) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint64) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -839,7 +841,7 @@ func (tsr *Uint64) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = uint64(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -898,7 +900,7 @@ func (tsr *Uint64) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -1243,7 +1245,7 @@ func (tsr *Int32) SetNull1D(i int, nul bool) {
 func (tsr *Int32) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int32) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int32(val) }
 
-func (tsr *Int32) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Int32) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Int32) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -1276,13 +1278,13 @@ func (tsr *Int32) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Int32) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = int32(vals[j])
 	}
 }
 
-func (tsr *Int32) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Int32) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Int32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int32(fv)
@@ -1291,7 +1293,7 @@ func (tsr *Int32) SetString1D(off int, val string) {
 
 func (tsr *Int32) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int32) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1399,7 +1401,7 @@ func (tsr *Int32) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = int32(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -1458,7 +1460,7 @@ func (tsr *Int32) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -1803,7 +1805,10 @@ func (tsr *Uint32) SetNull1D(i int, nul bool) {
 func (tsr *Uint32) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint32) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint32(val) }
 
-func (tsr *Uint32) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Uint32) StringVal(i []int) string {
+	j := tsr.Offset(i)
+	return laser.ToString(tsr.Values[j])
+}
 func (tsr *Uint32) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -1836,13 +1841,13 @@ func (tsr *Uint32) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Uint32) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = uint32(vals[j])
 	}
 }
 
-func (tsr *Uint32) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Uint32) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Uint32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint32(fv)
@@ -1851,7 +1856,7 @@ func (tsr *Uint32) SetString1D(off int, val string) {
 
 func (tsr *Uint32) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint32) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1959,7 +1964,7 @@ func (tsr *Uint32) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = uint32(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -2018,7 +2023,7 @@ func (tsr *Uint32) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -2363,7 +2368,10 @@ func (tsr *Float32) SetNull1D(i int, nul bool) {
 func (tsr *Float32) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Float32) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = float32(val) }
 
-func (tsr *Float32) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Float32) StringVal(i []int) string {
+	j := tsr.Offset(i)
+	return laser.ToString(tsr.Values[j])
+}
 func (tsr *Float32) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -2396,13 +2404,13 @@ func (tsr *Float32) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Float32) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = float32(vals[j])
 	}
 }
 
-func (tsr *Float32) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Float32) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Float32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = float32(fv)
@@ -2411,7 +2419,7 @@ func (tsr *Float32) SetString1D(off int, val string) {
 
 func (tsr *Float32) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Float32) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2519,7 +2527,7 @@ func (tsr *Float32) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = float32(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -2578,7 +2586,7 @@ func (tsr *Float32) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -2923,7 +2931,7 @@ func (tsr *Int16) SetNull1D(i int, nul bool) {
 func (tsr *Int16) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int16) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int16(val) }
 
-func (tsr *Int16) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Int16) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Int16) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -2956,13 +2964,13 @@ func (tsr *Int16) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Int16) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = int16(vals[j])
 	}
 }
 
-func (tsr *Int16) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Int16) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Int16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int16(fv)
@@ -2971,7 +2979,7 @@ func (tsr *Int16) SetString1D(off int, val string) {
 
 func (tsr *Int16) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int16) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -3079,7 +3087,7 @@ func (tsr *Int16) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = int16(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -3138,7 +3146,7 @@ func (tsr *Int16) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -3483,7 +3491,10 @@ func (tsr *Uint16) SetNull1D(i int, nul bool) {
 func (tsr *Uint16) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint16) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint16(val) }
 
-func (tsr *Uint16) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Uint16) StringVal(i []int) string {
+	j := tsr.Offset(i)
+	return laser.ToString(tsr.Values[j])
+}
 func (tsr *Uint16) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -3516,13 +3527,13 @@ func (tsr *Uint16) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Uint16) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = uint16(vals[j])
 	}
 }
 
-func (tsr *Uint16) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Uint16) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Uint16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint16(fv)
@@ -3531,7 +3542,7 @@ func (tsr *Uint16) SetString1D(off int, val string) {
 
 func (tsr *Uint16) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint16) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -3639,7 +3650,7 @@ func (tsr *Uint16) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = uint16(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -3698,7 +3709,7 @@ func (tsr *Uint16) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -4043,7 +4054,7 @@ func (tsr *Int8) SetNull1D(i int, nul bool) {
 func (tsr *Int8) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int8) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int8(val) }
 
-func (tsr *Int8) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Int8) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Int8) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -4076,13 +4087,13 @@ func (tsr *Int8) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Int8) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = int8(vals[j])
 	}
 }
 
-func (tsr *Int8) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Int8) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Int8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int8(fv)
@@ -4091,7 +4102,7 @@ func (tsr *Int8) SetString1D(off int, val string) {
 
 func (tsr *Int8) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int8) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -4199,7 +4210,7 @@ func (tsr *Int8) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = int8(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -4258,7 +4269,7 @@ func (tsr *Int8) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows
@@ -4603,7 +4614,7 @@ func (tsr *Uint8) SetNull1D(i int, nul bool) {
 func (tsr *Uint8) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint8) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint8(val) }
 
-func (tsr *Uint8) StringVal(i []int) string { j := tsr.Offset(i); return kit.ToString(tsr.Values[j]) }
+func (tsr *Uint8) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Uint8) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -4636,13 +4647,13 @@ func (tsr *Uint8) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Uint8) SetFloats(vals []float64) {
-	sz := ints.MinInt(len(tsr.Values), len(vals))
+	sz := min(len(tsr.Values), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values[j] = uint8(vals[j])
 	}
 }
 
-func (tsr *Uint8) StringVal1D(off int) string { return kit.ToString(tsr.Values[off]) }
+func (tsr *Uint8) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Uint8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint8(fv)
@@ -4651,7 +4662,7 @@ func (tsr *Uint8) SetString1D(off int, val string) {
 
 func (tsr *Uint8) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values[row*sz+cell])
+	return laser.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint8) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -4759,7 +4770,7 @@ func (tsr *Uint8) CopyFrom(frm Tensor) {
 		}
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values[i] = uint8(frm.FloatVal1D(i))
 		if frm.IsNull1D(i) {
@@ -4818,7 +4829,7 @@ func (tsr *Uint8) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	_, cells := tsr.RowCellSize()
 	nln := rows * cells
 	tsr.Shape.Shp[0] = rows

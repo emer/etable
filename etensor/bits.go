@@ -11,9 +11,8 @@ import (
 	"strings"
 
 	"github.com/apache/arrow/go/arrow"
-	"github.com/goki/ki/ints"
-	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/bitslice"
+	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -100,11 +99,11 @@ func (tsr *Bits) SetFloat(i []int, val float64) {
 
 func (tsr *Bits) StringVal(i []int) string {
 	j := tsr.Offset(i)
-	return kit.ToString(tsr.Values.Index(j))
+	return laser.ToString(tsr.Values.Index(j))
 }
 
 func (tsr *Bits) SetString(i []int, val string) {
-	if bv, ok := kit.ToBool(val); ok {
+	if bv, err := laser.ToBool(val); err == nil {
 		j := tsr.Offset(i)
 		tsr.Values.Set(j, bv)
 	}
@@ -136,28 +135,28 @@ func (tsr *Bits) Floats(flt *[]float64) {
 
 // SetFloats sets tensor values from a []float64 slice (copies values).
 func (tsr *Bits) SetFloats(vals []float64) {
-	sz := ints.MinInt(tsr.Len(), len(vals))
+	sz := min(tsr.Len(), len(vals))
 	for j := 0; j < sz; j++ {
 		tsr.Values.Set(j, Float64ToBool(vals[j]))
 	}
 }
 
 func (tsr *Bits) StringVal1D(off int) string {
-	return kit.ToString(tsr.Values.Index(off))
+	return laser.ToString(tsr.Values.Index(off))
 }
 
 func (tsr *Bits) SetString1D(off int, val string) {
-	if bv, ok := kit.ToBool(val); ok {
+	if bv, err := laser.ToBool(val); err == nil {
 		tsr.Values.Set(off, bv)
 	}
 }
 
 func (tsr *Bits) StringValRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return kit.ToString(tsr.Values.Index(row*sz + cell))
+	return laser.ToString(tsr.Values.Index(row*sz + cell))
 }
 func (tsr *Bits) SetStringRowCell(row, cell int, val string) {
-	if bv, ok := kit.ToBool(val); ok {
+	if bv, err := laser.ToBool(val); err == nil {
 		_, sz := tsr.RowCellSize()
 		tsr.Values.Set(row*sz+cell, bv)
 	}
@@ -240,7 +239,7 @@ func (tsr *Bits) CopyFrom(frm Tensor) {
 		copy(tsr.Values, fsm.Values)
 		return
 	}
-	sz := ints.MinInt(len(tsr.Values), frm.Len())
+	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
 		tsr.Values.Set(i, Float64ToBool(frm.FloatVal1D(i)))
 	}
@@ -281,7 +280,7 @@ func (tsr *Bits) SetNumRows(rows int) {
 	if !tsr.IsRowMajor() {
 		return
 	}
-	rows = ints.MaxInt(1, rows) // must be > 0
+	rows = max(1, rows) // must be > 0
 	cln := tsr.Len()
 	crows := tsr.Dim(0)
 	inln := cln / crows // length of inner dims
