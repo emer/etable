@@ -179,8 +179,12 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	if et == nil {
 		return nil
 	}
+	updt := tv.UpdateStart()
+	defer tv.UpdateEndLayout(updt)
+
 	tv.Table = etable.NewIdxView(et)
 
+	tv.This().(giv.SliceViewer).UpdtSliceSize()
 	tv.SetFlag(false, giv.SliceViewConfiged)
 	tv.StartIdx = 0
 	tv.VisRows = tv.MinRows
@@ -200,11 +204,12 @@ func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 	if ix == nil {
 		return tv
 	}
-	tv.Table = ix.Clone() // always copy
-
 	updt := tv.UpdateStart()
 	defer tv.UpdateEndLayout(updt)
 
+	tv.Table = ix.Clone() // always copy
+
+	tv.This().(giv.SliceViewer).UpdtSliceSize()
 	tv.SetFlag(false, giv.SliceViewConfiged)
 	tv.StartIdx = 0
 	tv.VisRows = tv.MinRows
@@ -371,7 +376,7 @@ func (tv *TableView) ConfigRows() {
 	sg.DeleteChildren(ki.DestroyKids)
 	tv.Values = nil
 
-	if tv.IsNil() {
+	if tv.Table == nil {
 		return
 	}
 
@@ -524,7 +529,7 @@ func (tv *TableView) UpdateWidgets() {
 		if si < len(tv.Table.Idxs) {
 			ixi = tv.Table.Idxs[si]
 		}
-		invis := tv.ConfigIter > 2 && si >= tv.SliceSize
+		invis := si >= tv.SliceSize
 
 		var idxlab *gi.Label
 		if tv.Is(giv.SliceViewShowIndex) {
@@ -668,7 +673,7 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 func (tv *TableView) SliceNewAt(idx int) {
 	tv.ViewMuLock()
 	updt := tv.UpdateStart()
-	defer tv.UpdateEndRender(updt)
+	defer tv.UpdateEndLayout(updt)
 
 	tv.SliceNewAtSel(idx)
 
