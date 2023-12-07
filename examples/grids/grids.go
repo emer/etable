@@ -28,8 +28,8 @@ func app() {
 
 	tv := gi.NewTabs(b)
 
-	nt := tv.NewTab("First")
-	nt = tv.NewTab("Patterns")
+	// nt := tv.NewTab("First")
+	nt := tv.NewTab("Patterns")
 	etview.NewTableView(nt).SetTable(pats)
 
 	b.NewWindow().Run().Wait()

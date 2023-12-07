@@ -120,8 +120,8 @@ func (tg *SimMatGrid) RenderSimMat() {
 	}
 	tg.EnsureColorMap()
 	tg.UpdateRange()
-	rs, pc, _ := tg.RenderLock()
-	defer tg.RenderUnlock(rs)
+	pc, _ := tg.RenderLock()
+	defer tg.RenderUnlock()
 
 	pos := tg.Geom.Pos.Content
 	sz := tg.Geom.Size.Actual.Content
@@ -130,7 +130,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 	effsz.X -= tg.rowMaxSz.X + LabelSpace
 	effsz.Y -= tg.colMaxSz.Y + LabelSpace
 
-	pc.FillBoxColor(rs, pos, sz, tg.Styles.BackgroundColor.Solid)
+	pc.FillBoxColor(pos, sz, tg.Styles.BackgroundColor.Solid)
 
 	tsr := tg.SimMat.Mat
 
@@ -168,7 +168,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 		tr.LayoutStdLR(&txsty, fr, &tg.Styles.UnContext, tg.rowMaxSz)
 		cr := mat32.Vec2{0, float32(y) + yex}
 		pr := epos.Add(cr.Mul(gsz))
-		tr.Render(rs, pr)
+		tr.Render(pc, pr)
 	}
 
 	// Render Cols
@@ -192,7 +192,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 		tr.SetStringRot90(lb, fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0)
 		cr := mat32.Vec2{float32(x) + xex, 0}
 		pr := epos.Add(cr.Mul(gsz))
-		tr.Render(rs, pr)
+		tr.Render(pc, pr)
 	}
 
 	pos.X += tg.rowMaxSz.X + LabelSpace
@@ -224,7 +224,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			cr := mat32.Vec2{float32(x) + xex, float32(y) + yex}
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
-			pc.FillBoxColor(rs, pr, ssz, clr)
+			pc.FillBoxColor(pr, ssz, clr)
 			if len(xlb) == 0 {
 				prvxblk = true
 			}

@@ -297,14 +297,14 @@ func (tg *TensorGrid) RenderTensor() {
 	tg.EnsureColorMap()
 	tg.UpdateRange()
 
-	rs, pc, _ := tg.RenderLock()
-	defer tg.RenderUnlock(rs)
+	pc, _ := tg.RenderLock()
+	defer tg.RenderUnlock()
 
 	pos := tg.Geom.Pos.Content
 	sz := tg.Geom.Size.Actual.Content
 	// sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
 
-	pc.FillBoxColor(rs, pos, sz, tg.Styles.BackgroundColor.Solid)
+	pc.FillBoxColor(pos, sz, tg.Styles.BackgroundColor.Solid)
 
 	tsr := tg.Tensor
 
@@ -344,7 +344,7 @@ func (tg *TensorGrid) RenderTensor() {
 					cr := mat32.Vec2{float32(x), float32(ey)}
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color.Solid = colors.FromFloat64(r, g, b, a)
-					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Solid)
+					pc.FillBoxColor(pr, gsz, pc.StrokeStyle.Color.Solid)
 				case nclr > 1:
 					var r, g, b, a float64
 					a = 1
@@ -357,13 +357,13 @@ func (tg *TensorGrid) RenderTensor() {
 					cr := mat32.Vec2{float32(x), float32(ey)}
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color.Solid = colors.FromFloat64(r, g, b, a)
-					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Solid)
+					pc.FillBoxColor(pr, gsz, pc.StrokeStyle.Color.Solid)
 				default:
 					val := tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x}))
 					cr := mat32.Vec2{float32(x), float32(ey)}
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color.Solid = colors.FromFloat64(val, val, val, 1)
-					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Solid)
+					pc.FillBoxColor(pr, gsz, pc.StrokeStyle.Color.Solid)
 				}
 			}
 		}
@@ -396,7 +396,7 @@ func (tg *TensorGrid) RenderTensor() {
 			cr := mat32.Vec2{float32(x) + xex, float32(y) + yex}
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
-			pc.FillBoxColor(rs, pr, ssz, clr)
+			pc.FillBoxColor(pr, ssz, clr)
 		}
 	}
 }
