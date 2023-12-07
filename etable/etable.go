@@ -17,7 +17,7 @@ import (
 
 // etable.Table is the emer DataTable structure, containing columns of etensor tensors.
 // All tensors MUST have RowMajor stride layout!
-type Table struct { //git:add
+type Table struct { //gti:add
 
 	// columns of data, as etensor.Tensor tensors
 	Cols []etensor.Tensor `view:"no-inline"`

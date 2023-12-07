@@ -35,7 +35,7 @@ type FilterFunc func(et *Table, row int) bool
 // indexed order, call the NewTable method.
 // IdxView views on a table can also be organized together as Splits
 // of the table rows, e.g., by grouping values along a given column.
-type IdxView struct { //git:add
+type IdxView struct { //gti:add
 
 	// Table that we are an indexed view onto
 	Table *Table
@@ -76,7 +76,7 @@ func (ix *IdxView) DeleteInvalid() {
 }
 
 // Sequential sets indexes to sequential row-wise indexes into table
-func (ix *IdxView) Sequential() {
+func (ix *IdxView) Sequential() { //gti:add
 	if ix.Table == nil || ix.Table.Rows <= 0 {
 		ix.Idxs = nil
 		return
@@ -366,7 +366,7 @@ func (ix *IdxView) Filter(filterFunc func(et *Table, row int) bool) {
 // Use named args for greater clarity.
 // Only valid for 1-dimensional columns.
 // Returns error if column name not found.
-func (ix *IdxView) FilterColName(colNm string, str string, exclude, contains, ignoreCase bool) error {
+func (ix *IdxView) FilterColName(colNm string, str string, exclude, contains, ignoreCase bool) error { //gti:add
 	ci, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		log.Println(err)

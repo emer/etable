@@ -13,6 +13,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/etview"
@@ -80,6 +81,7 @@ func (pl *Plot2D) OnInit() {
 				s.Direction = styles.Column
 				s.Grow.Set(0, 1)
 				s.Overflow.Y = styles.OverflowAuto
+				s.BackgroundColor.SetSolid(colors.Scheme.SurfaceContainer)
 			})
 		case "plot":
 			w.Style(func(s *styles.Style) {
