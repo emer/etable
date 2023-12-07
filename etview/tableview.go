@@ -68,6 +68,8 @@ func (tv *TableView) OnInit() {
 func (tv *TableView) TableViewInit() {
 	tv.SortIdx = -1
 	tv.MinRows = 4
+	tv.ColTsrDisp = make(map[int]*TensorDisp)
+	tv.ColTsrBlank = make(map[int]*etensor.Float64)
 	tv.SetFlag(false, giv.SliceViewSelectMode)
 	tv.SetFlag(true, giv.SliceViewShowIndex)
 	tv.SetFlag(true, giv.SliceViewReadOnlyKeyNav)

@@ -16,7 +16,6 @@ import (
 	"goki.dev/gi/v2/gimain"
 )
 
-// this is the stub main for gogi that calls our actual mainrun function, at end of file
 func main() { gimain.Run(app) }
 
 // Planets is raw data
