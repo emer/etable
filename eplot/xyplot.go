@@ -9,10 +9,11 @@ import (
 	"log"
 	"math"
 
+	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/split"
-	"goki.dev/gi/v2/gi"
+	"goki.dev/grr"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -26,16 +27,18 @@ func (pl *Plot2D) GenPlotXY() {
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
 
-	plt.Title.TextStyle.Color = gi.Prefs.Colors.Font
-	plt.Legend.TextStyle.Color = gi.Prefs.Colors.Font
-	plt.X.Color = gi.Prefs.Colors.Font
-	plt.Y.Color = gi.Prefs.Colors.Font
-	plt.X.Label.TextStyle.Color = gi.Prefs.Colors.Font
-	plt.Y.Label.TextStyle.Color = gi.Prefs.Colors.Font
-	plt.X.Tick.Color = gi.Prefs.Colors.Font
-	plt.Y.Tick.Color = gi.Prefs.Colors.Font
-	plt.X.Tick.Label.Color = gi.Prefs.Colors.Font
-	plt.Y.Tick.Label.Color = gi.Prefs.Colors.Font
+	clr := colors.Scheme.Primary.Base
+
+	plt.Title.TextStyle.Color = clr
+	plt.Legend.TextStyle.Color = clr
+	plt.X.Color = clr
+	plt.Y.Color = clr
+	plt.X.Label.TextStyle.Color = clr
+	plt.Y.Label.TextStyle.Color = clr
+	plt.X.Tick.Color = clr
+	plt.Y.Tick.Color = clr
+	plt.X.Tick.Label.Color = clr
+	plt.Y.Tick.Label.Color = clr
 
 	plt.BackgroundColor = nil
 
@@ -140,10 +143,10 @@ func (pl *Plot2D) GenPlotXY() {
 					}
 					if nleg > 1 {
 						cidx := yidx*nleg + li
-						clr, _ = color.FromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
+						clr = grr.Log1(colors.FromString(PlotColorNames[cidx%len(PlotColorNames)], nil))
 					}
 					if nidx > 1 {
-						clr, _ = color.FromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+						clr = grr.Log1(colors.FromString(PlotColorNames[idx%len(PlotColorNames)], nil))
 						lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 					}
 					if pl.Params.Lines && pl.Params.Points {

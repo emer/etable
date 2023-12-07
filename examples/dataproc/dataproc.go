@@ -106,6 +106,8 @@ func app() {
 
 	b := gi.NewBody()
 
+	b.AddDefaultTopAppBar()
+
 	tv := gi.NewTabs(b)
 
 	nt := tv.NewTab("Planets Data")

@@ -8,7 +8,6 @@ package eplot
 
 import (
 	"fmt"
-	"image"
 	"log"
 	"math"
 	"path/filepath"
@@ -17,29 +16,33 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/etview"
-	"goki.dev/girl/styles"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/states"
+	"goki.dev/girl/styles"
+	"goki.dev/girl/units"
+	"goki.dev/goosi/events"
+	"goki.dev/icons"
 	"goki.dev/ki/v2"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/font"
 )
 
 // Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
-type Plot2D struct { //goki:add
+type Plot2D struct { //gti:add
 	gi.Layout
 
 	// the idxview of the table that we're plotting
-	Table *etable.IdxView
+	Table *etable.IdxView `set:"-"`
 
 	// the overall plot parameters
 	Params PlotParams
 
 	// the parameters for each column of the table
-	Cols []*ColParams
+	Cols []*ColParams `set:"-"`
 
 	// the gonum plot that actually does the plotting -- always save the last one generated
-	GPlot *plot.Plot
+	GPlot *plot.Plot `set:"-" edit:"-" json:"-" xml:"-"`
 
 	// current svg file
 	SVGFile gi.FileName
@@ -48,7 +51,7 @@ type Plot2D struct { //goki:add
 	DataFile gi.FileName
 
 	// currently doing a plot
-	InPlot bool `inactive:"+"`
+	InPlot bool `set:"-" edit:"-" json:"-" xml:"-"`
 }
 
 func (pl *Plot2D) CopyFieldsFrom(frm any) {
@@ -68,7 +71,22 @@ func (pl *Plot2D) OnInit() {
 	plot.DefaultFont = font.Font{Typeface: "Liberation", Variant: "Sans"}
 	pl.Style(func(s *styles.Style) {
 		s.Direction = styles.Row
-		// s.StdDialogVSpaceUnits
+		s.Grow.Set(1, 1)
+	})
+	pl.OnWidgetAdded(func(w gi.Widget) {
+		switch w.PathFrom(pl) {
+		case "cols":
+			w.Style(func(s *styles.Style) {
+				s.Direction = styles.Column
+				s.Grow.Set(0, 1)
+				s.Overflow.Y = styles.OverflowAuto
+			})
+		case "plot":
+			w.Style(func(s *styles.Style) {
+				s.Min.Set(units.Em(30))
+				s.Grow.Set(1, 1)
+			})
+		}
 	})
 	// plot
 	// play.Lay = gi.LayoutHoriz
@@ -86,7 +104,6 @@ func (pl *Plot2D) OnInit() {
 
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) {
-	pl.Defaults()
 	pl.Table = etable.NewIdxView(tab)
 	// pl.Cols = nil // todo: is this necessary!?
 	pl.ConfigPlot()
@@ -94,7 +111,6 @@ func (pl *Plot2D) SetTable(tab *etable.Table) {
 
 // SetTableView sets the idxview of table to view and updates view
 func (pl *Plot2D) SetTableView(tab *etable.IdxView) {
-	pl.Defaults()
 	pl.Table = tab
 	pl.Cols = nil
 	pl.ConfigPlot()
@@ -157,8 +173,8 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 
 // SavePNG saves the current plot to a png, capturing current render
 func (pl *Plot2D) SavePNG(fname gi.FileName) {
-	sv := pl.SVGPlot()
-	sv.SavePNG(string(fname))
+	// sv := pl.SVGPlot()
+	// sv.SavePNG(string(fname))
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
@@ -353,7 +369,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 func (pl *Plot2D) ConfigPlot() {
 	pl.Params.FmMeta(pl.Table.Table)
 	if !pl.HasChildren() {
-		pl.AddDefaultTopAppBar()
+		// pl.AddDefaultTopAppBar()
 		gi.NewFrame(pl, "cols")
 		gi.NewSVG(pl, "plot")
 	}
@@ -425,8 +441,8 @@ func (pl *Plot2D) ColsUpdate() {
 		ci := i - NColsHeader
 		cp := pl.Cols[ci]
 		cl := cli.(*gi.Layout)
-		cb := cl.Child(0).(*gi.CheckBox)
-		cb.SetChecked(cp.On)
+		sw := cl.Child(0).(*gi.Switch)
+		sw.SetChecked(cp.On)
 	}
 }
 
@@ -446,8 +462,8 @@ func (pl *Plot2D) SetAllCols(on bool) {
 		}
 		cp.On = on
 		cl := cli.(*gi.Layout)
-		cb := cl.Child(0).(*gi.CheckBox)
-		cb.SetChecked(cp.On)
+		sw := cl.Child(0).(*gi.Switch)
+		sw.SetChecked(cp.On)
 	}
 	pl.Update()
 }
@@ -472,8 +488,8 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
 		}
 		cp.On = on
 		cl := cli.(*gi.Layout)
-		cb := cl.Child(0).(*gi.CheckBox)
-		cb.SetChecked(cp.On)
+		sw := cl.Child(0).(*gi.Switch)
+		sw.SetChecked(cp.On)
 	}
 	pl.Update()
 }
@@ -487,12 +503,12 @@ func (pl *Plot2D) ColsConfig() {
 		return
 	}
 	sc := gi.NewLayout(vl, "sel-cols")
-	sw := gi.NewSwitch(sc, "on").SetTooltip("Toggle off all columns").
-		OnChanged(func(e events.Event) {
-			sw.SetChecked(false)
-			pl.SetAllCols(false)
-		})
-	bt := gi.NewButton(sc, "col").SetText("Select Cols").
+	sw := gi.NewSwitch(sc, "on").SetTooltip("Toggle off all columns")
+	sw.OnChange(func(e events.Event) {
+		sw.SetChecked(false)
+		pl.SetAllCols(false)
+	})
+	gi.NewButton(sc, "col").SetText("Select Cols").SetType(gi.ButtonAction).
 		SetTooltip("click to select columns based on column name").
 		OnClick(func(e events.Event) {
 			giv.CallFunc(pl, pl.SetColsByName)
@@ -500,34 +516,33 @@ func (pl *Plot2D) ColsConfig() {
 	gi.NewSeparator(vl, "sep").SetHoriz(true)
 
 	for _, cp := range pl.Cols {
+		cp := cp
 		cp.Plot = pl
-		cl := gi.NewLayout(vl, cn.Col.Name)
+		cl := gi.NewLayout(vl, cp.Col)
 		cl.Style(func(s *styles.Style) {
 			s.Direction = styles.Row
-			s.Grow.Set(1, 0)
+			s.Grow.Set(0, 0)
 		})
-		sw := gi.NewSwitch(cl, "on").SetTooltip("toggle plot on").
-			OnChanged(func(e events.Event) {
-				cp.On = sw.IsChecked()
-				pl.Update()
-			})
-		sw.SetChecked(cp.On)
-		bt := gi.NewButton(cl, "col").SetText(cp.Col).
-			OnClick(func(e events.Event) {
-			})
+		sw := gi.NewSwitch(cl, "on").SetTooltip("toggle plot on")
+		sw.OnChange(func(e events.Event) {
+			cp.On = sw.StateIs(states.Checked)
+			pl.Update()
+		})
+		sw.SetState(cp.On, states.Checked)
+		bt := gi.NewButton(cl, "col").SetText(cp.Col).SetType(gi.ButtonAction)
 		bt.SetMenu(func(m *gi.Scene) {
 			gi.NewButton(m, "set-x").SetText("Set X Axis").OnClick(func(e events.Event) {
 				pl.Params.XAxisCol = cp.Col
 				pl.Update()
 			})
 			gi.NewButton(m, "set-legend").SetText("Set Legend").OnClick(func(e events.Event) {
-				pl.Params.LegendCol = cpp.Col
+				pl.Params.LegendCol = cp.Col
 				pl.Update()
 			})
 			gi.NewButton(m, "edit").SetText("Edit").OnClick(func(e events.Event) {
 				d := gi.NewBody().AddTitle("Col Params")
-				NewStructView(d).SetStruct(cp)
-				d.NewFullDialog(tv).Run()
+				giv.NewStructView(d).SetStruct(cp)
+				d.NewFullDialog(pl).Run()
 			})
 		})
 	}
@@ -535,85 +550,85 @@ func (pl *Plot2D) ColsConfig() {
 
 // PlotConfig configures the PlotView
 func (pl *Plot2D) PlotConfig() {
-	sv := pl.SVGPlot()
-	sv.InitScale()
-
-	sv.Fill = true
-	sv.SetProp("background-color", &gi.Prefs.Colors.Background)
-	sv.SetStretchMax()
+	// sv := pl.SVGPlot()
+	// sv.InitScale()
+	// sv.Fill = true
+	// sv.SetProp("background-color", &gi.Prefs.Colors.Background)
 }
 
 func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
 	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
-	gi.NewButton(tb).SetIcon(icons.Pan).
+	gi.NewButton(tb).SetIcon(icons.PanTool).
 		SetTooltip("return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)").OnClick(func(e events.Event) {
-			fmt.Printf("this will select pan mode\n")
-		})
-	gi.NewButton(tb).SetIcon(icons.Arrow).
-		SetTooltip(turn on select mode for selecting units and layers with mouse clicks").
+		fmt.Printf("this will select pan mode\n")
+	})
+	gi.NewButton(tb).SetIcon(icons.ArrowForward).
+		SetTooltip("turn on select mode for selecting units and layers with mouse clicks").
 		OnClick(func(e events.Event) {
 			fmt.Printf("this will select select mode\n")
 		})
 	gi.NewSeparator(tb)
-	gi.NewButton(tb).SetLabel("Update").SetIcon(icons.Update).
+	gi.NewButton(tb).SetText("Update").SetIcon(icons.Update).
 		SetTooltip("update fully redraws display, reflecting any new settings etc").
 		OnClick(func(e events.Event) {
 			pl.ConfigPlot()
 			pl.Update()
 		})
-	gi.NewButton(tb).SetLabel("Config...").SetIcon(icons.Gear).
+	gi.NewButton(tb).SetText("Config...").SetIcon(icons.Settings).
 		SetTooltip("set parameters that control display (font size etc)").
 		OnClick(func(e events.Event) {
 			d := gi.NewBody().AddTitle(pl.Nm + " Params")
-			NewStructView(d).SetStruct(&pl.Params)
-			d.NewFullDialog(tv).Run()
+			giv.NewStructView(d).SetStruct(&pl.Params)
+			d.NewFullDialog(pl).Run()
 		})
-	gi.NewButton(tb).SetLabel("Table...").SetIcon(icons.Edit).
+	gi.NewButton(tb).SetText("Table...").SetIcon(icons.Edit).
 		SetTooltip("open a TableView window of the data").
 		OnClick(func(e events.Event) {
-			etview.TableViewDialog(pl.ViewportSafe(), pl.Table.Table, giv.DlgOpts{Title: pl.Nm + " Data"}, nil, nil)
+			d := gi.NewBody().AddTitle(pl.Nm + " Data")
+			etview.NewTableView(d).SetTable(pl.Table.Table)
+			d.NewFullDialog(pl).Run()
 		})
 	gi.NewSeparator(tb)
-	
-	gi.NewButton(tb).SetLabel("Save...").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
-	gi.NewButton(m).SetText("Save SVG...").SetIcon(icons.Save).
-		SetTooltip("save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc").OnClick(func(e events.Event) {
+
+	gi.NewButton(tb).SetText("Save...").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
+		gi.NewButton(m).SetText("Save SVG...").SetIcon(icons.Save).
+			SetTooltip("save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc").OnClick(func(e events.Event) {
 			giv.CallFunc(pl, pl.SaveSVG)
 		})
-	gi.NewButton(m).SetText("Save PNG...").SetIcon(icons.Save).
-		SetTooltip("save plot to a .png file, capturing the exact bits you currently see as the render").
-		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, "SavePNG")
-		})
-	gi.NewButton(m).SetText("Save CSV...").SetIcon(icons.Save).
-		SetTooltip("Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data").
-		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, "SaveCSV")
-		})
-	gi.NewSeparator(m)
-	gi.NewButton(m).SetText("Save All...").SetIcon(icons.Save).
-		SetTooltip("Save a .png, .svg, and .tsv of the data").
-		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, "SaveAll")
-		})
+		gi.NewButton(m).SetText("Save PNG...").SetIcon(icons.Save).
+			SetTooltip("save plot to a .png file, capturing the exact bits you currently see as the render").
+			OnClick(func(e events.Event) {
+				giv.CallFunc(pl, "SavePNG")
+			})
+		gi.NewButton(m).SetText("Save CSV...").SetIcon(icons.Save).
+			SetTooltip("Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data").
+			OnClick(func(e events.Event) {
+				giv.CallFunc(pl, "SaveCSV")
+			})
+		gi.NewSeparator(m)
+		gi.NewButton(m).SetText("Save All...").SetIcon(icons.Save).
+			SetTooltip("Save a .png, .svg, and .tsv of the data").
+			OnClick(func(e events.Event) {
+				giv.CallFunc(pl, "SaveAll")
+			})
 	})
-	gi.NewButton(tb).SetLabel("Open CSV...").SetIcon(icons.Open).
-	 SetTooltip("Open CSV-formatted data -- also recognizes emergent-style headers").
+	gi.NewButton(tb).SetText("Open CSV...").SetIcon(icons.Open).
+		SetTooltip("Open CSV-formatted data -- also recognizes emergent-style headers").
 		OnClick(func(e events.Event) {
 			giv.CallFunc(pl, "OpenCSV")
 		})
 	gi.NewSeparator(tb)
-	gi.NewButton(tb).SetLabel("Filter...").SetIcon(icons.Search).
+	gi.NewButton(tb).SetText("Filter...").SetIcon(icons.Search).
 		SetTooltip("filter rows of data being plotted by values in given column name, using string representation, with exclude, contains and ignore case options").
 		OnClick(func(e events.Event) {
-			giv.CallFunc(pl.Table, "FilterColName")
+			giv.CallFunc(pl, pl.Table.FilterColName)
 		})
-	gi.NewButton(tb).SetLabel("Unfilter").SetIcon(icons.Search).
-		SetTooltip("plot all rows in the table (undo any filtering )".
+	gi.NewButton(tb).SetText("Unfilter").SetIcon(icons.Search).
+		SetTooltip("plot all rows in the table (undo any filtering").
 		OnClick(func(e events.Event) {
-			giv.CallFuncd(pl.Table, "Sequential")
+			giv.CallFunc(pl, pl.Table.Sequential)
 		})
 }
 

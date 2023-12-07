@@ -9,7 +9,7 @@ import (
 	"log"
 	"os"
 
-	"goki.dev/svg"
+	"goki.dev/gi/v2/gi"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -23,8 +23,8 @@ import (
 // if called from a different goroutine, it is essential to
 // surround with BlockUpdates on Viewport as this does full
 // damage to the tree.
-func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
-	sz := svge.BBox.Size()
+func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
+	sz := svge.Geom.ContentBBox.Size()
 	if sz.X < 10 || sz.Y < 10 || scale == 0 {
 		return
 	}
@@ -42,20 +42,22 @@ func PlotViewSVG(plt *plot.Plot, svge *svg.Editor, scale float64) {
 	if _, err := c.WriteTo(&buf); err != nil {
 		log.Println(err)
 	} else {
-		svge.ReadXML(&buf)
+		svge.SVG.ReadXML(&buf)
 
-		svge.SetNormXForm()
-		svge.Scale = float32(scale)
-		svge.SetTransform()
+		svge.SVG.Norm = true
+		svge.SVG.Fill = true
+		svge.SVG.SetNormXForm()
+		// svge.Scale = float32(scale)
+		// svge.SVG.SetTransform()
 
-		svge.FullInit2DTree() // critical to enable immediate rendering
+		svge.Update()
 	}
 }
 
 // SaveSVGView saves the given gonum Plot exactly as it is rendered given GoGi svg editor widget.
 // The scale rescales the default font sizes -- 2-4 recommended.
-func SaveSVGView(fname string, plt *plot.Plot, svge *svg.Editor, scale float64) error {
-	sz := svge.BBox.Size()
+func SaveSVGView(fname string, plt *plot.Plot, svge *gi.SVG, scale float64) error {
+	sz := svge.Geom.ContentBBox.Size()
 	w := (float64(sz.X) * 72.0) / (scale * 96.0)
 	h := (float64(sz.Y) * 72.0) / (scale * 96.0)
 
@@ -85,16 +87,17 @@ func SaveSVGView(fname string, plt *plot.Plot, svge *svg.Editor, scale float64) 
 
 // StringViewSVG shows the given svg string in given GoGi svg editor widget
 // Scale to fit your window -- e.g., 2-3 depending on sizes
-func StringViewSVG(svgstr string, svge *svg.Editor, scale float64) {
+func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
 	updt := svge.UpdateStart()
-	defer svge.UpdateEnd(updt)
-	svge.SetFullReRender()
+	defer svge.UpdateEndRender(updt)
 
 	var buf bytes.Buffer
 	buf.Write([]byte(svgstr))
-	svge.ReadXML(&buf)
+	svge.SVG.ReadXML(&buf)
 
-	svge.SetNormXForm()
-	svge.Scale = float32(scale) * (svge.ParentWindow().LogicalDPI() / 96.0)
-	svge.SetTransform()
+	svge.SVG.Norm = true
+	svge.SVG.Fill = true
+	svge.SVG.SetNormXForm()
+	// svge.Scale = float32(scale) * (svge.ParentWindow().LogicalDPI() / 96.0)
+	// svge.SetTransform()
 }

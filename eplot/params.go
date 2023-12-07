@@ -113,7 +113,7 @@ func MetaMapLower(meta map[string]string, key string) (string, bool) {
 // FmMetaMap sets plot params from meta data map
 func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 	if typ, has := MetaMapLower(meta, "Type"); has {
-		pp.Type.FromString(typ)
+		pp.Type.SetString(typ)
 	}
 	if op, has := MetaMapLower(meta, "Lines"); has {
 		if op == "+" || op == "true" {
@@ -310,14 +310,7 @@ func (cp *ColParams) FmMetaMap(meta map[string]string) {
 }
 
 // PlotTypes are different types of plots
-type PlotTypes int32
-
-//go:generate stringer -type=PlotTypes
-
-var KiT_PlotTypes = kit.Enums.AddEnum(PlotTypesN, kit.NotBitFlag, nil)
-
-func (ev PlotTypes) MarshalJSON() ([]byte, error)  { return kit.EnumMarshalJSON(ev) }
-func (ev *PlotTypes) UnmarshalJSON(b []byte) error { return kit.EnumUnmarshalJSON(ev, b) }
+type PlotTypes int32 //enums:enum
 
 const (
 	// XY is a standard line / point plot
@@ -325,6 +318,4 @@ const (
 
 	// Bar plots vertical bars
 	Bar
-
-	PlotTypesN
 )
