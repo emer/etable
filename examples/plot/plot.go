@@ -26,6 +26,7 @@ func app() {
 	pl.SetTable(epc)
 	pl.Params.XAxisCol = "Epoch"
 	pl.ColParams("UnitErr").On = true
+	pl.ColsUpdate()
 	pl.Update()
 
 	b.AddTopBar(func(pw gi.Widget) {

@@ -105,7 +105,7 @@ func (pl *Plot2D) OnInit() {
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) {
 	pl.Table = etable.NewIdxView(tab)
-	// pl.Cols = nil // todo: is this necessary!?
+	pl.Cols = nil
 	pl.ConfigPlot()
 }
 
@@ -164,7 +164,7 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 }
 
 // SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
-func (pl *Plot2D) SaveSVG(fname gi.FileName) {
+func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
 	pl.Update()
 	sv := pl.SVGPlot()
 	SaveSVGView(string(fname), pl.GPlot, sv, 2)
@@ -172,20 +172,20 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) {
 }
 
 // SavePNG saves the current plot to a png, capturing current render
-func (pl *Plot2D) SavePNG(fname gi.FileName) {
+func (pl *Plot2D) SavePNG(fname gi.FileName) { //gti:add
 	// sv := pl.SVGPlot()
 	// sv.SavePNG(string(fname))
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
-func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) {
+func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) { //gti:add
 	pl.Table.SaveCSV(fname, delim, etable.Headers)
 	pl.DataFile = fname
 }
 
 // SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save
 // Any extension is removed and appropriate extensions are added
-func (pl *Plot2D) SaveAll(fname gi.FileName) {
+func (pl *Plot2D) SaveAll(fname gi.FileName) { //gti:add
 	fn := string(fname)
 	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
 	pl.SaveCSV(gi.FileName(fn+".tsv"), etable.Tab)
@@ -194,7 +194,7 @@ func (pl *Plot2D) SaveAll(fname gi.FileName) {
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
-func (pl *Plot2D) OpenCSV(fname gi.FileName, delim etable.Delims) {
+func (pl *Plot2D) OpenCSV(fname gi.FileName, delim etable.Delims) { //gti:add
 	pl.Table.Table.OpenCSV(fname, delim)
 	pl.DataFile = fname
 	pl.Config()
@@ -231,8 +231,6 @@ func (pl *Plot2D) XLabel() string {
 
 // Update updates the display based on current state of table.
 // Calls Sequential method on etable.IdxView to view entire current table.
-// This version can only be called within main goroutine for
-// window eventloop -- use GoUpdate for other-goroutine updates.
 func (pl *Plot2D) Update() {
 	if pl == nil || pl.This() == nil {
 		return
@@ -388,7 +386,7 @@ func (pl *Plot2D) SVGPlot() *gi.SVG {
 	return pl.ChildByName("plot", 1).(*gi.SVG)
 }
 
-const NColsHeader = 2
+const PlotColsHeaderN = 2
 
 // ColsListUpdate updates the list of columns
 func (pl *Plot2D) ColsListUpdate() {
@@ -435,14 +433,17 @@ func (pl *Plot2D) ColsFmMetaMap(meta map[string]string) {
 func (pl *Plot2D) ColsUpdate() {
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		if i < NColsHeader {
+		if i < PlotColsHeaderN {
 			continue
 		}
-		ci := i - NColsHeader
+		ci := i - PlotColsHeaderN
 		cp := pl.Cols[ci]
 		cl := cli.(*gi.Layout)
 		sw := cl.Child(0).(*gi.Switch)
-		sw.SetChecked(cp.On)
+		if sw.StateIs(states.Checked) != cp.On {
+			sw.SetChecked(cp.On)
+			sw.SetNeedsRender(true)
+		}
 	}
 }
 
@@ -452,10 +453,10 @@ func (pl *Plot2D) SetAllCols(on bool) {
 	defer pl.UpdateEnd(updt)
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		if i < NColsHeader {
+		if i < PlotColsHeaderN {
 			continue
 		}
-		ci := i - NColsHeader
+		ci := i - PlotColsHeaderN
 		cp := pl.Cols[ci]
 		if cp.Col == pl.Params.XAxisCol {
 			continue
@@ -475,10 +476,10 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
 
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
-		if i < NColsHeader {
+		if i < PlotColsHeaderN {
 			continue
 		}
-		ci := i - NColsHeader
+		ci := i - PlotColsHeaderN
 		cp := pl.Cols[ci]
 		if cp.Col == pl.Params.XAxisCol {
 			continue
@@ -498,6 +499,9 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
 func (pl *Plot2D) ColsConfig() {
 	vl := pl.ColsLay()
 	pl.ColsListUpdate()
+	if len(vl.Kids) == len(pl.Cols)+PlotColsHeaderN {
+		return
+	}
 	vl.DeleteChildren(true)
 	if len(pl.Cols) == 0 {
 		return
@@ -593,150 +597,17 @@ func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
 	gi.NewSeparator(tb)
 
 	gi.NewButton(tb).SetText("Save...").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
-		gi.NewButton(m).SetText("Save SVG...").SetIcon(icons.Save).
-			SetTooltip("save plot to an .svg file that can be further enhanced using a drawing editor or directly included in publications etc").OnClick(func(e events.Event) {
-			giv.CallFunc(pl, pl.SaveSVG)
-		})
-		gi.NewButton(m).SetText("Save PNG...").SetIcon(icons.Save).
-			SetTooltip("save plot to a .png file, capturing the exact bits you currently see as the render").
-			OnClick(func(e events.Event) {
-				giv.CallFunc(pl, "SavePNG")
-			})
-		gi.NewButton(m).SetText("Save CSV...").SetIcon(icons.Save).
-			SetTooltip("Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data").
-			OnClick(func(e events.Event) {
-				giv.CallFunc(pl, "SaveCSV")
-			})
+		giv.NewFuncButton(m, pl.SaveSVG).SetIcon(icons.Save)
+		giv.NewFuncButton(m, pl.SavePNG).SetIcon(icons.Save)
+		giv.NewFuncButton(m, pl.SaveCSV).SetIcon(icons.Save)
 		gi.NewSeparator(m)
-		gi.NewButton(m).SetText("Save All...").SetIcon(icons.Save).
-			SetTooltip("Save a .png, .svg, and .tsv of the data").
-			OnClick(func(e events.Event) {
-				giv.CallFunc(pl, "SaveAll")
-			})
+		giv.NewFuncButton(m, pl.SaveAll).SetIcon(icons.Save)
 	})
-	gi.NewButton(tb).SetText("Open CSV...").SetIcon(icons.Open).
-		SetTooltip("Open CSV-formatted data -- also recognizes emergent-style headers").
-		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, "OpenCSV")
-		})
+	giv.NewFuncButton(tb, pl.OpenCSV).SetIcon(icons.Open)
 	gi.NewSeparator(tb)
-	gi.NewButton(tb).SetText("Filter...").SetIcon(icons.Search).
-		SetTooltip("filter rows of data being plotted by values in given column name, using string representation, with exclude, contains and ignore case options").
-		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, pl.Table.FilterColName)
-		})
-	gi.NewButton(tb).SetText("Unfilter").SetIcon(icons.Search).
-		SetTooltip("plot all rows in the table (undo any filtering").
-		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, pl.Table.Sequential)
-		})
+	giv.NewFuncButton(tb, pl.Table.FilterColName).SetIcon(icons.Search)
+	giv.NewFuncButton(tb, pl.Table.Sequential).SetIcon(icons.Search)
 }
-
-// func (pl *Plot2D) Style2D() {
-// 	pl.Layout.Style2D()
-// 	pl.ToolbarConfig() // safe
-// 	if !pl.IsConfiged() && pl.Table != nil && pl.Table.Table != nil {
-// 		pl.Config()
-// 	}
-// 	if pl.IsConfiged() {
-// 		pl.ColsUpdate()
-// 	}
-// }
-
-// func (pl *Plot2D) Layout2D(parBBox image.Rectangle, iter int) bool {
-// 	redo := pl.Layout.Layout2D(parBBox, iter)
-// 	mvp := pl.ViewportSafe()
-// 	if pl.IsConfiged() && !pl.InPlot && mvp != nil { // note: for tabs, not full re-rend
-// 		pl.GenPlot() // only if visible; this is recursive
-// 	}
-// 	return redo
-// }
-
-/*
-var Plot2DProps = ki.Props{
-	"max-width":  -1,
-	"max-height": -1,
-	"ToolBar": ki.PropSlice{
-		{"Update", ki.Props{
-			"shortcut": "Command+U",
-			"desc":     "update graph plot",
-			"icon":     "update",
-		}},
-		{"SaveSVG", ki.Props{
-			"label": "Save SVG...",
-			"desc":  "save plot to an SVG file",
-			"icon":  "file-save",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"default-field": "SVGFile",
-					"ext":           ".svg",
-				}},
-			},
-		}},
-		{"SavePNG", ki.Props{
-			"label": "Save PNG...",
-			"desc":  "save current render of plot to PNG file",
-			"icon":  "file-save",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"ext": ".png",
-				}},
-			},
-		}},
-		{"SaveAll", ki.Props{
-			"label": "Save All...",
-			"desc":  "save plot to SVG, PNG, and TSV files",
-			"icon":  "file-save",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"default-field": "SVGFile",
-					"ext":           ".svg",
-				}},
-			},
-		}},
-		{"OpenCSV", ki.Props{
-			"label": "Open CSV File...",
-			"icon":  "file-open",
-			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"ext": ".tsv,.csv",
-				}},
-				{"Delimiter", ki.Props{
-					"default": etable.Tab,
-					"desc":    "delimiter between columns",
-				}},
-			},
-		}},
-		{"SaveCSV", ki.Props{
-			"label": "Save Data...",
-			"icon":  "file-save",
-			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"default-field": "DataFile",
-					"ext":           ".tsv,.csv",
-				}},
-				{"Delimiter", ki.Props{
-					"default": etable.Tab,
-					"desc":    "delimiter between columns",
-				}},
-			},
-		}},
-	},
-	"CallMethods": ki.PropSlice{
-		{"SetColsByName", ki.Props{
-			"desc": "Turn columns containing given string On or Off",
-			"Args": ki.PropSlice{
-				{"Name Contains", ki.Props{}},
-				{"On", ki.Props{
-					"default": true,
-				}},
-			},
-		}},
-	},
-}
-*/
 
 // these are the plot color names to use in order for successive lines -- feel free to choose your own!
 var PlotColorNames = []string{"black", "red", "blue", "ForestGreen", "purple", "orange", "brown", "chartreuse", "navy", "cyan", "magenta", "tan", "salmon", "goldenrod", "SkyBlue", "pink"}
