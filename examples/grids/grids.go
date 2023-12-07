@@ -16,18 +16,20 @@ func main() { gimain.Run(app) }
 
 func app() {
 	gi.SetAppName("dataproc")
-	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`)
+	gi.SetAppAbout(`This demonstrates tensor grid and related functionality in etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`)
 
 	pats := etable.NewTable("pats")
 	pats.SetMetaData("name", "TrainPats")
 	pats.SetMetaData("desc", "Training patterns")
+	// todo: meta data for grid size
 	grr.Log(pats.OpenCSV("random_5x5_25.tsv", etable.Tab))
 
 	b := gi.NewBody()
 
 	tv := gi.NewTabs(b)
 
-	nt := tv.NewTab("Patterns")
+	nt := tv.NewTab("First")
+	nt = tv.NewTab("Patterns")
 	etview.NewTableView(nt).SetTable(pats)
 
 	b.NewWindow().Run().Wait()

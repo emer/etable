@@ -69,7 +69,7 @@ func (vv *TensorGridValue) ConfigWidget(w gi.Widget) {
 		return
 	}
 	vv.Widget = w
-	vv.StdConfigWidget(w)
+	// vv.StdConfigWidget(w)
 	tg := vv.Widget.(*TensorGrid)
 	tsr := vv.Value.Interface().(etensor.Tensor)
 	tg.SetTensor(tsr)

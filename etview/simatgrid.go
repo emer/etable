@@ -106,12 +106,11 @@ func (tg *SimMatGrid) MinSize() mat32.Vec2 {
 	colEx = tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-	tg.Disp.ToDots(&tg.Styles.UnContext)
 	max := float32(mat32.Max(frw, fcl))
-	gsz := tg.Disp.TotPrefSize.Dots / max
-	gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
+	gsz := tg.Disp.TotPrefSize / max
+	gsz = mat32.Max(gsz, tg.Disp.GridMinSize)
 	gsz = mat32.Max(gsz, txtsz)
-	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
+	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize)
 	return mat32.Vec2{tg.rowMaxSz.X + LabelSpace + gsz*float32(cols), tg.colMaxSz.Y + LabelSpace + gsz*float32(rows)}
 }
 

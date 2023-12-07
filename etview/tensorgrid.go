@@ -16,7 +16,6 @@ import (
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/giv"
 	"goki.dev/girl/styles"
-	"goki.dev/girl/units"
 	"goki.dev/goosi/events"
 	"goki.dev/mat32/v2"
 )
@@ -53,17 +52,16 @@ type TensorDisp struct { //gti:add
 	// amount of extra space to add at dimension boundaries, as a proportion of total grid size
 	DimExtra float32 `min:"0" max:"1" step:"0.02" def:"0.1,0.3"`
 
-	// extra space to add at bottom of grid -- needed when included in TableView for example
-	BotRtSpace units.Value
-
 	// minimum size for grid squares -- they will never be smaller than this
-	GridMinSize units.Value
+	GridMinSize float32
 
 	// maximum size for grid squares -- they will never be larger than this
-	GridMaxSize units.Value
+	GridMaxSize float32
 
-	// total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints
-	TotPrefSize units.Value
+	// total preferred display size along largest dimension.
+	// grid squares will be sized to fit within this size,
+	// subject to harder GridMin / Max size constraints
+	TotPrefSize float32
 
 	// font size in standard point units for labels (e.g., SimMat)
 	FontSize float32
@@ -81,14 +79,14 @@ func (td *TensorDisp) Defaults() {
 		td.Range.SetMin(-1)
 		td.Range.SetMax(1)
 	}
-	if td.GridMinSize.Val == 0 {
-		td.GridMinSize.Px(4)
+	if td.GridMinSize == 0 {
+		td.GridMinSize = 2
 	}
-	if td.GridMaxSize.Val == 0 {
-		td.GridMaxSize.Em(2)
+	if td.GridMaxSize == 0 {
+		td.GridMaxSize = 16
 	}
-	if td.TotPrefSize.Val == 0 {
-		td.TotPrefSize.Em(20)
+	if td.TotPrefSize == 0 {
+		td.TotPrefSize = 100
 	}
 	if td.GridFill == 0 {
 		td.GridFill = 0.9
@@ -97,13 +95,6 @@ func (td *TensorDisp) Defaults() {
 	if td.FontSize == 0 {
 		td.FontSize = 24
 	}
-}
-
-func (td *TensorDisp) ToDots(uc *units.Context) {
-	td.BotRtSpace.ToDots(uc)
-	td.GridMinSize.ToDots(uc)
-	td.GridMaxSize.ToDots(uc)
-	td.TotPrefSize.ToDots(uc)
 }
 
 // FmMeta sets display options from Tensor meta-data
@@ -154,11 +145,11 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 	}
 	if op, has := tsr.MetaData("grid-min"); has {
 		mv, _ := strconv.ParseFloat(op, 32)
-		td.GridMinSize.Val = float32(mv)
+		td.GridMinSize = float32(mv)
 	}
 	if op, has := tsr.MetaData("grid-max"); has {
 		mv, _ := strconv.ParseFloat(op, 32)
-		td.GridMaxSize.Val = float32(mv)
+		td.GridMaxSize = float32(mv)
 	}
 	if op, has := tsr.MetaData("dim-extra"); has {
 		mv, _ := strconv.ParseFloat(op, 32)
@@ -169,6 +160,9 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 		td.FontSize = float32(mv)
 	}
 }
+
+////////////////////////////////////////////////////////////////////////////
+//  	TensorGrid
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
 type TensorGrid struct {
@@ -237,11 +231,6 @@ func (tg *TensorGrid) HandleTensorGridEvents() {
 	})
 }
 
-func (tg *TensorGrid) ApplyStyle() {
-	tg.WidgetBase.ApplyStyle()
-	tg.Disp.ToDots(&tg.Styles.UnContext)
-}
-
 // MinSize returns minimum size based on tensor and display settings
 func (tg *TensorGrid) MinSize() mat32.Vec2 {
 	if tg.Tensor == nil || tg.Tensor.Len() == 0 {
@@ -253,12 +242,12 @@ func (tg *TensorGrid) MinSize() mat32.Vec2 {
 	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-	tg.Disp.ToDots(&tg.Styles.UnContext)
-	max := float32(mat32.Max(frw, fcl))
-	gsz := tg.Disp.TotPrefSize.Dots / max
-	gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
-	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
-	return mat32.Vec2{gsz*float32(cols) + tg.Disp.BotRtSpace.Dots, gsz*float32(rows) + tg.Disp.BotRtSpace.Dots}
+	mx := float32(max(frw, fcl))
+	gsz := tg.Disp.TotPrefSize / mx
+	gsz = max(gsz, tg.Disp.GridMinSize)
+	gsz = min(gsz, tg.Disp.GridMaxSize)
+	gsz = max(gsz, 2)
+	return mat32.Vec2{gsz * float32(fcl), gsz * float32(frw)}
 }
 
 // EnsureColorMap makes sure there is a valid color map that matches specified name
@@ -313,7 +302,7 @@ func (tg *TensorGrid) RenderTensor() {
 
 	pos := tg.Geom.Pos.Content
 	sz := tg.Geom.Size.Actual.Content
-	sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
+	// sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
 
 	pc.FillBoxColor(rs, pos, sz, tg.Styles.BackgroundColor.Solid)
 

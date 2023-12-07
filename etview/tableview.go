@@ -68,6 +68,7 @@ func (tv *TableView) OnInit() {
 func (tv *TableView) TableViewInit() {
 	tv.SortIdx = -1
 	tv.MinRows = 4
+	tv.TsrDisp.Defaults()
 	tv.ColTsrDisp = make(map[int]*TensorDisp)
 	tv.ColTsrBlank = make(map[int]*etensor.Float64)
 	tv.SetFlag(false, giv.SliceViewSelectMode)
@@ -144,18 +145,6 @@ func (tv *TableView) TableViewInit() {
 					s.Color = colors.Scheme.Error.Base
 				})
 			case strings.HasPrefix(w.Name(), "value-"):
-				w.Style(func(s *styles.Style) {
-					fstr := strings.TrimPrefix(w.Name(), "value-")
-					dp := strings.Index(fstr, ".")
-					istr := fstr[dp+1:] // index is after .
-					fstr = fstr[:dp]    // field idx is -X.
-					idx := grr.Log1(strconv.Atoi(istr))
-					fli := grr.Log1(strconv.Atoi(fstr))
-					si := tv.StartIdx + idx
-					if si < tv.SliceSize {
-						tv.This().(giv.SliceViewer).StyleRow(w, si, fli)
-					}
-				})
 			}
 		}
 		if w.Parent().PathFrom(tv) == "header" {
@@ -765,18 +754,6 @@ func (tv *TableView) TensorDispAction(fldIdx int) {
 	giv.NewStructView(d).SetStruct(ctd)
 	d.NewFullDialog(tv).Run()
 	// tv.UpdateSliceGrid()
-}
-
-func (tv *TableView) TsrDispToDots() {
-	tv.TsrDisp.ToDots(&tv.Styles.UnContext)
-	for _, ctd := range tv.ColTsrDisp {
-		ctd.ToDots(&tv.Styles.UnContext)
-	}
-}
-
-func (tv *TableView) ApplyStyleWidget() {
-	tv.SliceViewBase.ApplyStyleWidget()
-	tv.TsrDispToDots()
 }
 
 func (tv *TableView) StyleRow(w gi.Widget, idx, fidx int) {
