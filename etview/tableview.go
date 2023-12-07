@@ -1,46 +1,48 @@
-// Copyright (c) 2019, The eTable Authors. All rights reserved.
+// Copyright (c) 2023, The GoKi Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package etview
 
+//go:generate goki generate
+
 import (
-	"bytes"
-	"encoding/csv"
 	"fmt"
 	"image"
-	"log"
 	"reflect"
+	"strconv"
 	"strings"
 
+	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
-	"goki.dev/fi"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/giv"
-	"goki.dev/girl/paint"
-	"goki.dev/girl/units"
-	"goki.dev/goosi"
-	"goki.dev/goosi/cursor"
+	"goki.dev/girl/abilities"
+	"goki.dev/girl/states"
+	"goki.dev/girl/styles"
 	"goki.dev/goosi/events"
-	"goki.dev/goosi/mimedata"
+	"goki.dev/grr"
+	"goki.dev/icons"
 	"goki.dev/ki/v2"
 	"goki.dev/laser"
-	"goki.dev/mat32/v2"
 )
 
 // etview.TableView provides a GUI interface for etable.Table's
-type TableView struct { //git:add
+type TableView struct {
 	giv.SliceViewBase
 
 	// the idx view of the table that we're a view of
-	Table *etable.IdxView
+	Table *etable.IdxView `set:"-"`
 
 	// overall display options for tensor display
 	TsrDisp TensorDisp
 
-	// per column tensor display
+	// per column tensor display params
 	ColTsrDisp map[int]*TensorDisp
+
+	// per column blank tensor values
+	ColTsrBlank map[int]*etensor.Float64
 
 	// number of columns in table (as of last update)
 	NCols int `inactive:"+"`
@@ -50,117 +52,170 @@ type TableView struct { //git:add
 
 	// whether current sort order is descending
 	SortDesc bool
+
+	//	blank values for out-of-range rows
+	BlankString string
+	BlankFloat  float64
 }
 
 // check for interface impl
 var _ giv.SliceViewer = (*TableView)(nil)
 
+func (tv *TableView) OnInit() {
+	tv.TableViewInit()
+}
+
+func (tv *TableView) TableViewInit() {
+	tv.SortIdx = -1
+	tv.MinRows = 4
+	tv.SetFlag(false, giv.SliceViewSelectMode)
+	tv.SetFlag(true, giv.SliceViewShowIndex)
+	tv.SetFlag(true, giv.SliceViewReadOnlyKeyNav)
+
+	tv.HandleSliceViewEvents()
+
+	tv.Style(func(s *styles.Style) {
+		s.SetAbilities(true, abilities.FocusWithinable)
+		s.Direction = styles.Column
+		// absorb horizontal here, vertical in view
+		s.Overflow.X = styles.OverflowAuto
+		s.Grow.Set(1, 1)
+	})
+	tv.OnWidgetAdded(func(w gi.Widget) {
+		switch w.PathFrom(tv) {
+		case "header": // slice header
+			sh := w.(*gi.Frame)
+			gi.ToolbarStyles(sh)
+			sh.Style(func(s *styles.Style) {
+				s.Grow.Set(0, 0)
+			})
+		case "grid-lay": // grid layout
+			w.Style(func(s *styles.Style) {
+				s.Grow.Set(1, 1)
+			})
+		case "grid-lay/grid": // slice grid
+			sg := w.(*giv.SliceViewGrid)
+			sg.Stripes = gi.RowStripes
+			sg.Style(func(s *styles.Style) {
+				sg.MinRows = tv.MinRows
+				s.Display = styles.Grid
+				nWidgPerRow, _ := tv.RowWidgetNs()
+				s.Columns = nWidgPerRow
+				s.Grow.Set(1, 1)
+				// baseline mins:
+				s.Min.X.Ch(20)
+				s.Min.Y.Em(6)
+			})
+		case "grid-lay/scrollbar":
+			sb := w.(*gi.Slider)
+			sb.Style(func(s *styles.Style) {
+				sb.Type = gi.SliderScrollbar
+				s.Min.X = tv.Styles.ScrollBarWidth
+				s.Grow.Set(0, 1)
+			})
+			sb.OnInput(func(e events.Event) {
+				updt := tv.UpdateStart()
+				tv.StartIdx = int(sb.Value)
+				tv.This().(giv.SliceViewer).UpdateWidgets()
+				tv.UpdateEndRender(updt)
+			})
+
+		}
+		if w.Parent().PathFrom(tv) == "grid-lay/grid" {
+			switch {
+			case strings.HasPrefix(w.Name(), "index-"):
+				w.Style(func(s *styles.Style) {
+					s.Min.X.Em(1.5)
+					s.Padding.Right.Dp(4)
+					s.Text.Align = styles.End
+					s.Min.Y.Em(1)
+					s.GrowWrap = false
+				})
+			case strings.HasPrefix(w.Name(), "add-"):
+				w.Style(func(s *styles.Style) {
+					w.(*gi.Button).SetType(gi.ButtonAction)
+					s.Color = colors.Scheme.Success.Base
+				})
+			case strings.HasPrefix(w.Name(), "del-"):
+				w.Style(func(s *styles.Style) {
+					w.(*gi.Button).SetType(gi.ButtonAction)
+					s.Color = colors.Scheme.Error.Base
+				})
+			case strings.HasPrefix(w.Name(), "value-"):
+				w.Style(func(s *styles.Style) {
+					fstr := strings.TrimPrefix(w.Name(), "value-")
+					dp := strings.Index(fstr, ".")
+					istr := fstr[dp+1:] // index is after .
+					fstr = fstr[:dp]    // field idx is -X.
+					idx := grr.Log1(strconv.Atoi(istr))
+					fli := grr.Log1(strconv.Atoi(fstr))
+					si := tv.StartIdx + idx
+					if si < tv.SliceSize {
+						tv.This().(giv.SliceViewer).StyleRow(w, si, fli)
+					}
+				})
+			}
+		}
+		if w.Parent().PathFrom(tv) == "header" {
+			w.Style(func(s *styles.Style) {
+				if hdr, ok := w.(*gi.Button); ok {
+					fli := hdr.Data.(int)
+					if fli == tv.SortIdx {
+						if tv.SortDesc {
+							hdr.SetIcon(icons.KeyboardArrowDown)
+						} else {
+							hdr.SetIcon(icons.KeyboardArrowUp)
+						}
+					}
+				}
+			})
+		}
+	})
+}
+
 // SetTable sets the source table that we are viewing, using a sequential IdxView
 // and then configures the display
-func (tv *TableView) SetTable(et *etable.Table, tmpSave giv.ValueView) {
+func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	if et == nil {
-		return
+		return nil
 	}
 	tv.Table = etable.NewIdxView(et)
-	tv.TmpSave = tmpSave
-	tv.TableConfig()
+
+	tv.SetFlag(false, giv.SliceViewConfiged)
+	tv.StartIdx = 0
+	tv.VisRows = tv.MinRows
+	if !tv.IsReadOnly() {
+		tv.SelIdx = -1
+	}
+	tv.ResetSelectedIdxs()
+	tv.SetFlag(false, giv.SliceViewSelectMode)
+	tv.ConfigIter = 0
+	tv.Update()
+	return tv
 }
 
 // SetTableView sets the source IdxView of a table (using a copy so original is not modified)
 // and then configures the display
-func (tv *TableView) SetTableView(ix *etable.IdxView, tmpSave giv.ValueView) {
+func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 	if ix == nil {
-		return
+		return tv
 	}
 	tv.Table = ix.Clone() // always copy
-	tv.TmpSave = tmpSave
-	tv.TableConfig()
-}
 
-// TableConfig does all the configuration for a new Table view
-func (tv *TableView) TableConfig() {
-	if op, has := tv.Table.Table.MetaData["read-only"]; has {
-		if op == "+" || op == "true" {
-			tv.SetInactive()
-		} else {
-			tv.ClearInactive()
-		}
-	}
-	tv.ColTsrDisp = make(map[int]*TensorDisp)
-	tv.TsrDisp.Defaults()
-	tv.TsrDisp.BotRtSpace.Set(4, units.Px)
-	if !tv.IsInactive() {
-		tv.SelectedIdx = -1
-	}
-	tv.StartIdx = 0
-	tv.SortIdx = -1
-	tv.SortDesc = false
 	updt := tv.UpdateStart()
+	defer tv.UpdateEndLayout(updt)
+
+	tv.SetFlag(false, giv.SliceViewConfiged)
+	tv.StartIdx = 0
+	tv.VisRows = tv.MinRows
+	if !tv.IsReadOnly() {
+		tv.SelIdx = -1
+	}
 	tv.ResetSelectedIdxs()
-	tv.SelectMode = false
-	tv.SetFullReRender()
-	tv.ShowIndex = true
-	if sidxp, err := tv.PropTry("index"); err == nil {
-		tv.ShowIndex, _ = laser.ToBool(sidxp)
-	}
-	tv.InactKeyNav = true
-	if siknp, err := tv.PropTry("inact-key-nav"); err == nil {
-		tv.InactKeyNav, _ = laser.ToBool(siknp)
-	}
-	tv.Config()
-	tv.UpdateEnd(updt)
-}
-
-// var TableViewProps = ki.Props{
-// 	"EnumType:Flag":    gi.KiT_NodeFlags,
-// 	"background-color": &gi.Prefs.Colors.Background,
-// 	"color":            &gi.Prefs.Colors.Font,
-// 	"max-width":        -1,
-// 	"max-height":       -1,
-// }
-
-// UpdateTable updates view of Table -- regenerates indexes and calls Update
-func (tv *TableView) UpdateTable() {
-	if tv.Table != nil {
-		tv.Table.Sequential()
-		tv.SortIfNeeded()
-	}
+	tv.SetFlag(false, giv.SliceViewSelectMode)
+	tv.ConfigIter = 0
 	tv.Update()
-}
-
-// SortIfNeeded sort table if sorting set
-func (tv *TableView) SortIfNeeded() {
-	if tv.SortIdx >= 0 {
-		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
-	}
-}
-
-// IsConfiged returns true if the widget is fully configured
-func (tv *TableView) IsConfiged() bool {
-	if len(tv.Kids) == 0 {
-		return false
-	}
-	sf := tv.SliceFrame()
-	if len(sf.Kids) == 0 {
-		return false
-	}
-	return true
-}
-
-// Config configures the view
-func (tv *TableView) Config() {
-	tv.Lay = gi.LayoutVert
-	tv.SetProp("spacing", gi.StdDialogVSpaceUnits)
-	config := ki.Config{}
-	config.Add(gi.KiT_ToolBar, "toolbar")
-	config.Add(gi.KiT_Frame, "frame")
-	mods, updt := tv.ConfigChildren(config)
-	tv.ConfigSliceGrid()
-	tv.ConfigToolbar()
-	if mods {
-		tv.SetFullReRender()
-		tv.UpdateEnd(updt)
-	}
+	return tv
 }
 
 func (tv *TableView) UpdtSliceSize() int {
@@ -170,595 +225,411 @@ func (tv *TableView) UpdtSliceSize() int {
 	return tv.SliceSize
 }
 
-// SliceFrame returns the outer frame widget, which contains all the header,
-// fields and values
-func (tv *TableView) SliceFrame() *gi.Frame {
-	return tv.ChildByName("frame", 0).(*gi.Frame)
+// Config configures the view
+func (tv *TableView) ConfigWidget() {
+	tv.ConfigTableView()
+}
+
+func (tv *TableView) ConfigTableView() {
+	if tv.Is(giv.SliceViewConfiged) {
+		tv.This().(giv.SliceViewer).UpdateWidgets()
+		return
+	}
+	updt := tv.UpdateStart()
+	tv.ConfigFrame()
+	tv.This().(giv.SliceViewer).ConfigRows()
+	tv.This().(giv.SliceViewer).UpdateWidgets()
+	tv.ConfigScroll()
+	tv.ApplyStyleTree()
+	tv.UpdateEndLayout(updt)
+}
+
+func (tv *TableView) ConfigFrame() {
+	if tv.HasChildren() {
+		return
+	}
+	tv.SetFlag(true, giv.SliceViewConfiged)
+	gi.NewFrame(tv, "header")
+	gl := gi.NewLayout(tv, "grid-lay")
+	gl.SetFlag(true, gi.LayoutNoKeys)
+	giv.NewSliceViewGrid(gl, "grid")
+	gi.NewSlider(gl, "scrollbar")
+	tv.ConfigHeader()
+}
+
+func (tv *TableView) ConfigHeader() {
+	sgh := tv.SliceHeader()
+	hcfg := ki.Config{}
+	if tv.Is(giv.SliceViewShowIndex) {
+		hcfg.Add(gi.LabelType, "head-idx")
+	}
+	for fli := 0; fli < tv.NCols; fli++ {
+		fld := tv.Table.Table.ColNames[fli]
+		labnm := "head-" + fld
+		hcfg.Add(gi.ButtonType, labnm)
+	}
+	if !tv.IsReadOnly() {
+		hcfg.Add(gi.LabelType, "head-add")
+		hcfg.Add(gi.LabelType, "head-del")
+	}
+	sgh.ConfigChildren(hcfg) // headers SHOULD be unique, but with labels..
+	_, idxOff := tv.RowWidgetNs()
+	nfld := tv.NCols
+	if tv.Is(giv.SliceViewShowIndex) {
+		lbl := sgh.Child(0).(*gi.Label)
+		lbl.Text = "Index"
+	}
+	for fli := 0; fli < nfld; fli++ {
+		fli := fli
+		field := tv.Table.Table.ColNames[fli]
+		hdr := sgh.Child(idxOff + fli).(*gi.Button)
+		hdr.SetType(gi.ButtonMenu)
+		hdr.SetText(field)
+		hdr.Data = fli
+		if fli == tv.SortIdx {
+			if tv.SortDesc {
+				hdr.SetIcon(icons.KeyboardArrowDown)
+			} else {
+				hdr.SetIcon(icons.KeyboardArrowUp)
+			}
+		}
+		hdr.Tooltip = field + " (click to sort by)"
+		hdr.OnClick(func(e events.Event) {
+			tv.SortSliceAction(fli)
+		})
+	}
+	if !tv.IsReadOnly() {
+		cidx := tv.NCols + idxOff
+		if !tv.Is(giv.SliceViewNoAdd) {
+			lbl := sgh.Child(cidx).(*gi.Label)
+			lbl.Text = "+"
+			lbl.Tooltip = "insert row"
+			cidx++
+		}
+		if !tv.Is(giv.SliceViewNoDelete) {
+			lbl := sgh.Child(cidx).(*gi.Label)
+			lbl.Text = "-"
+			lbl.Tooltip = "delete row"
+		}
+	}
 }
 
 // GridLayout returns the SliceGrid grid-layout widget, with grid and scrollbar
 func (tv *TableView) GridLayout() *gi.Layout {
-	gli := tv.SliceFrame().ChildByName("grid-lay", 0)
-	if gli == nil {
-		return nil
-	}
-	return gli.(*gi.Layout)
+	return tv.ChildByName("grid-lay", 0).(*gi.Layout)
 }
 
 // SliceGrid returns the SliceGrid grid frame widget, which contains all the
 // fields and values, within SliceFrame
-func (tv *TableView) SliceGrid() *gi.Frame {
-	gl := tv.GridLayout()
-	if gl == nil {
-		return nil
-	}
-	return gl.ChildByName("grid", 0).(*gi.Frame)
+func (tv *TableView) SliceGrid() *giv.SliceViewGrid {
+	return tv.GridLayout().ChildByName("grid", 0).(*giv.SliceViewGrid)
 }
 
 // ScrollBar returns the SliceGrid scrollbar
-func (tv *TableView) ScrollBar() *gi.ScrollBar {
-	return tv.GridLayout().ChildByName("scrollbar", 1).(*gi.ScrollBar)
+func (tv *TableView) ScrollBar() *gi.Slider {
+	return tv.GridLayout().ChildByName("scrollbar", 1).(*gi.Slider)
 }
 
-// SliceHeader returns the Toolbar header for slice grid
-func (tv *TableView) SliceHeader() *gi.ToolBar {
-	return tv.SliceFrame().Child(0).(*gi.ToolBar)
-}
-
-// ToolBar returns the toolbar widget
-func (tv *TableView) ToolBar() *gi.ToolBar {
-	return tv.ChildByName("toolbar", 0).(*gi.ToolBar)
+// SliceHeader returns the Frame header for slice grid
+func (tv *TableView) SliceHeader() *gi.Frame {
+	return tv.Child(0).(*gi.Frame)
 }
 
 // RowWidgetNs returns number of widgets per row and offset for index label
 func (tv *TableView) RowWidgetNs() (nWidgPerRow, idxOff int) {
 	nWidgPerRow = 1 + tv.NCols
-	if !tv.IsInactive() {
-		if !tv.NoAdd {
-			nWidgPerRow++
+	if !tv.IsReadOnly() {
+		if !tv.Is(giv.SliceViewNoAdd) {
+			nWidgPerRow += 1
 		}
-		if !tv.NoDelete {
-			nWidgPerRow++
+		if !tv.Is(giv.SliceViewNoDelete) {
+			nWidgPerRow += 1
 		}
 	}
 	idxOff = 1
-	if !tv.ShowIndex {
+	if !tv.Is(giv.SliceViewShowIndex) {
 		nWidgPerRow -= 1
 		idxOff = 0
 	}
 	return
 }
 
-// ConfigSliceGrid configures the SliceGrid for the current slice
-// this is only called by global Config and updates are guarded by that
-func (tv *TableView) ConfigSliceGrid() {
-	sg := tv.SliceFrame()
-	updt := sg.UpdateStart()
-	defer sg.UpdateEnd(updt)
-
-	sgf := tv.This().(giv.SliceViewer).SliceGrid()
-	if sgf != nil {
-		sgf.DeleteChildren(ki.DestroyKids)
-	}
-
-	if tv.Table.Table == nil {
+// ConfigRows configures VisRows worth of widgets
+// to display slice data.  It should only be called
+// when NeedsConfigRows is true: when VisRows changes.
+func (tv *TableView) ConfigRows() {
+	sg := tv.This().(giv.SliceViewer).SliceGrid()
+	if sg == nil {
 		return
 	}
+	tv.SetFlag(true, giv.SliceViewConfiged)
+	sg.SetFlag(true, gi.LayoutNoKeys)
 
-	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
-	if tv.NCols == 0 {
+	tv.ViewMuLock()
+	defer tv.ViewMuUnlock()
+
+	sg.DeleteChildren(ki.DestroyKids)
+	tv.Values = nil
+
+	if tv.IsNil() {
 		return
-	}
-	if sz == 0 {
-		tv.Table.Table.SetNumRows(1) // temp
 	}
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
+	nWidg := nWidgPerRow * tv.VisRows
+	sg.Styles.Columns = nWidgPerRow
 
-	sg.Lay = gi.LayoutVert
-	sg.SetMinPrefWidth(units.NewCh(20))
-	// sg.SetProp("overflow", styles.OverflowScroll) // this still gives it true size during PrefSize
-	// sg.SetStretchMax()                          // for this to work, ALL layers above need it too
-	// sg.SetProp("border-width", 0)
-	// sg.SetProp("margin", 0)
-	// sg.SetProp("padding", 0)
+	tv.Values = make([]giv.Value, tv.NCols*tv.VisRows)
+	sg.Kids = make(ki.Slice, nWidg)
 
-	sgcfg := ki.Config{}
-	sgcfg.Add(gi.KiT_ToolBar, "header")
-	sgcfg.Add(gi.KiT_Layout, "grid-lay")
-	sg.ConfigChildren(sgcfg)
+	for i := 0; i < tv.VisRows; i++ {
+		i := i
+		si := i
+		ridx := i * nWidgPerRow
 
-	sgh := tv.SliceHeader()
-	sgh.Lay = gi.LayoutHoriz
-	sgh.SetProp("overflow", styles.OverflowHidden) // no scrollbars!
-	sgh.SetProp("spacing", 0)
-	// sgh.SetStretchMaxWidth()
-
-	gl := tv.GridLayout()
-	gl.Lay = gi.LayoutHoriz
-	gl.SetStretchMax() // for this to work, ALL layers above need it too
-	gconfig := ki.Config{}
-	gconfig.Add(gi.KiT_Frame, "grid")
-	gconfig.Add(gi.KiT_ScrollBar, "scrollbar")
-	gl.ConfigChildren(gconfig) // covered by above
-
-	sgf = tv.This().(giv.SliceViewer).SliceGrid()
-	sgf.Lay = gi.LayoutGrid
-	sgf.Stripes = gi.RowStripes
-	sgf.SetMinPrefHeight(units.NewEm(10))
-	sgf.SetStretchMax() // for this to work, ALL layers above need it too
-	sgf.SetProp("columns", nWidgPerRow)
-	sgf.SetProp("overflow", styles.OverflowScroll) // this still gives it true size during PrefSize
-	// this causes sizing / layout to fail, esp on window resize etc:
-	// sgf.SetProp("spacing", gi.StdDialogVSpaceUnits)
-
-	// Configure Header
-	hcfg := ki.Config{}
-	if tv.ShowIndex {
-		hcfg.Add(gi.KiT_Action, "head-idx")
-	}
-	for fli := 0; fli < tv.NCols; fli++ {
-		labnm := fmt.Sprintf("head-%v", tv.Table.Table.ColNames[fli])
-		hcfg.Add(gi.KiT_Action, labnm)
-	}
-	if !tv.IsInactive() {
-		hcfg.Add(gi.KiT_Label, "head-add")
-		hcfg.Add(gi.KiT_Label, "head-del")
-	}
-	sgh.ConfigChildren(hcfg)
-
-	// at this point, we make one dummy row to get size of widgets
-	sgf.Kids = make(ki.Slice, nWidgPerRow)
-
-	itxt := fmt.Sprintf("%05d", 0)
-	labnm := fmt.Sprintf("index-%v", itxt)
-
-	if tv.ShowIndex {
-		hdr := sgh.Child(0).(*gi.Action)
-		hdr.SetText("Index")
-		hdr.Tooltip = "Click to sort by original native table order"
-		hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-			tvv := recv.Embed(KiT_TableView).(*TableView)
-			tvv.SortSliceAction(-1)
-		})
 		idxlab := &gi.Label{}
-		sgf.SetChild(idxlab, 0, labnm)
-		idxlab.Text = itxt
-	}
-
-	for fli := 0; fli < tv.NCols; fli++ {
-		col := tv.Table.Table.Cols[fli]
-		colnm := tv.Table.Table.ColNames[fli]
-		hdr := sgh.Child(idxOff + fli).(*gi.Action)
-		hdr.SetText(colnm)
-		if fli == tv.SortIdx {
-			if tv.SortDesc {
-				hdr.SetIcon("wedge-down")
-			} else {
-				hdr.SetIcon("wedge-up")
-			}
-		}
-		hdr.Data = fli
-		hdr.Tooltip = colnm + " (click to sort by) Type: " + col.DataType().String()
-		if dsc, has := tv.Table.Table.MetaData[colnm+":desc"]; has {
-			hdr.Tooltip += ": " + dsc
-		}
-		var vv giv.ValueView
-		if stsr, isstr := col.(*etensor.String); isstr {
-			vv = giv.ToValueView(&stsr.Values[0], "")
-			vv.SetSliceValue(reflect.ValueOf(&stsr.Values[0]), stsr.Values, 0, tv.TmpSave, tv.ViewPath)
-			hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				act := send.(*gi.Action)
-				fldIdx := act.Data.(int)
-				tvv.SortSliceAction(fldIdx)
+		itxt := strconv.Itoa(i)
+		sitxt := strconv.Itoa(si)
+		labnm := "index-" + itxt
+		if tv.Is(giv.SliceViewShowIndex) {
+			idxlab = &gi.Label{}
+			sg.SetChild(idxlab, ridx, labnm)
+			idxlab.OnSelect(func(e events.Event) {
+				e.SetHandled()
+				tv.UpdateSelectRow(i)
 			})
-		} else {
-			if col.NumDims() == 1 {
-				fval := 1.0
-				vv = giv.ToValueView(&fval, "")
-				vv.SetSoloValue(reflect.ValueOf(&fval))
-				hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					tvv := recv.Embed(KiT_TableView).(*TableView)
-					act := send.(*gi.Action)
-					fldIdx := act.Data.(int)
-					tvv.SortSliceAction(fldIdx)
-				})
-			} else {
-				cell := tv.Table.Table.CellTensorIdx(fli, 0)
-				tvv := &TensorGridValueView{}
-				ki.InitNode(tvv)
-				vv = tvv
-				vv.SetSoloValue(reflect.ValueOf(cell))
-				hdr.Tooltip = "(click to edit display parameters for this column)"
-				hdr.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					tvv := recv.Embed(KiT_TableView).(*TableView)
-					act := send.(*gi.Action)
-					fldIdx := act.Data.(int)
-					tvv.TensorDispAction(fldIdx)
-				})
-			}
-		}
-		if wd, has := tv.Table.Table.MetaData[colnm+":width"]; has {
-			vv.SetTag("width", wd)
-		}
-		vtyp := vv.WidgetType()
-		valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
-		cidx := idxOff + fli
-		widg := ki.NewOfType(vtyp).(gi.Node2D)
-		sgf.SetChild(widg, cidx, valnm)
-		vv.ConfigWidget(widg)
-	}
-
-	if !tv.IsInactive() {
-		cidx := tv.NCols + idxOff
-		if !tv.NoAdd {
-			lbl := sgh.Child(cidx).(*gi.Label)
-			lbl.Text = "+"
-			lbl.Tooltip = "insert row"
-			addnm := fmt.Sprintf("add-%v", itxt)
-			addact := gi.Action{}
-			sgf.SetChild(&addact, cidx, addnm)
-			addact.SetIcon("plus")
-			cidx++
-		}
-		if !tv.NoDelete {
-			lbl := sgh.Child(cidx).(*gi.Label)
-			lbl.Text = "-"
-			lbl.Tooltip = "delete row"
-			delnm := fmt.Sprintf("del-%v", itxt)
-			delact := gi.Action{}
-			sgf.SetChild(&delact, cidx, delnm)
-			delact.SetIcon("minus")
-			cidx++
-		}
-	}
-
-	if sz == 0 {
-		tv.Table.Table.SetNumRows(0) // revert
-	}
-
-	tv.ConfigScroll()
-}
-
-// LayoutSliceGrid does the proper layout of slice grid depending on allocated size
-// returns true if UpdateSliceGrid should be called after this
-func (tv *TableView) LayoutSliceGrid() bool {
-	sg := tv.This().(giv.SliceViewer).SliceGrid()
-	if sg == nil {
-		return false
-	}
-
-	updt := sg.UpdateStart()
-	defer sg.UpdateEnd(updt)
-
-	if tv.Table.Table == nil {
-		sg.DeleteChildren(ki.DestroyKids)
-		return false
-	}
-
-	tv.ViewMuLock()
-	defer tv.ViewMuUnlock()
-
-	tv.This().(giv.SliceViewer).UpdtSliceSize()
-	if tv.NCols == 0 {
-		sg.DeleteChildren(ki.DestroyKids)
-		return false
-	}
-
-	nWidgPerRow, _ := tv.RowWidgetNs()
-	if len(sg.GridData) > 0 && len(sg.GridData[gi.Row]) > 0 {
-		tv.RowHeight = sg.GridData[gi.Row][0].AllocSize + sg.Spacing.Dots
-	}
-	if tv.Sty.Font.Face == nil {
-		paint.OpenFont(&tv.Sty.Font, &tv.Sty.UnContext)
-	}
-	tv.RowHeight = mat32.Max(tv.RowHeight, tv.Sty.Font.Face.Metrics.Height)
-
-	mvp := tv.ViewportSafe()
-	if mvp != nil && mvp.HasFlag(int(gi.VpFlagPrefSizing)) {
-		tv.VisRows = min(gi.LayoutPrefMaxRows, tv.SliceSize)
-		tv.LayoutHeight = float32(tv.VisRows) * tv.RowHeight
-	} else {
-		sgHt := tv.AvailHeight()
-		tv.LayoutHeight = sgHt
-		if sgHt == 0 {
-			return false
-		}
-		tv.VisRows = int(mat32.Floor(sgHt / tv.RowHeight))
-	}
-	tv.DispRows = min(tv.SliceSize, tv.VisRows)
-
-	nWidg := nWidgPerRow * tv.DispRows
-
-	if tv.Values == nil || sg.NumChildren() != nWidg {
-		sg.DeleteChildren(ki.DestroyKids)
-
-		tv.Values = make([]giv.ValueView, tv.NCols*tv.DispRows)
-		sg.Kids = make(ki.Slice, nWidg)
-	}
-	tv.ConfigScroll()
-	tv.LayoutHeader()
-	return true
-}
-
-// LayoutHeader updates the header layout based on field widths
-func (tv *TableView) LayoutHeader() {
-	nWidgPerRow, idxOff := tv.RowWidgetNs()
-	nfld := tv.NCols + idxOff
-	sgh := tv.SliceHeader()
-	sgf := tv.SliceGrid()
-	spc := sgh.Spacing.Dots
-	gd := sgf.GridData[gi.Col]
-	if gd == nil {
-		return
-	}
-	sumwd := float32(0)
-	for fli := 0; fli < nfld; fli++ {
-		lbl := sgh.Child(fli).(gi.Node2D).AsWidget()
-		wd := gd[fli].AllocSize - spc
-		if fli == 0 {
-			wd += spc
-		}
-		lbl.SetMinPrefWidth(units.NewValue(wd, units.Dot))
-		lbl.SetProp("max-width", units.NewValue(wd, units.Dot))
-		sumwd += wd
-	}
-	if !tv.IsInactive() {
-		for fli := nfld; fli < nWidgPerRow; fli++ {
-			lbl := sgh.Child(fli).(gi.Node2D).AsWidget()
-			wd := gd[fli].AllocSize - spc
-			lbl.SetMinPrefWidth(units.NewValue(wd, units.Dot))
-			lbl.SetProp("max-width", units.NewValue(wd, units.Dot))
-			sumwd += wd
-		}
-	}
-	sgh.SetMinPrefWidth(units.NewValue(sumwd+spc, units.Dot))
-}
-
-// UpdateSliceGrid updates grid display -- robust to any time calling
-func (tv *TableView) UpdateSliceGrid() {
-	sg := tv.This().(giv.SliceViewer).SliceGrid()
-	if sg == nil {
-		return
-	}
-
-	wupdt := tv.TopUpdateStart()
-	defer tv.TopUpdateEnd(wupdt)
-
-	updt := sg.UpdateStart()
-	defer sg.UpdateEnd(updt)
-
-	if tv.Table.Table == nil {
-		sg.DeleteChildren(ki.DestroyKids)
-		return
-	}
-
-	tv.ViewMuLock()
-	defer tv.ViewMuUnlock()
-
-	sz := tv.This().(giv.SliceViewer).UpdtSliceSize()
-	if sz == 0 {
-		sg.DeleteChildren(ki.DestroyKids)
-		return
-	}
-
-	tv.DispRows = min(tv.SliceSize, tv.VisRows)
-
-	tv.TsrDispToDots()
-
-	nWidgPerRow, idxOff := tv.RowWidgetNs()
-	nWidg := nWidgPerRow * tv.DispRows
-
-	if tv.Values == nil || sg.NumChildren() != nWidg { // shouldn't happen..
-		tv.ViewMuUnlock()
-		tv.LayoutSliceGrid()
-		tv.ViewMuLock()
-		nWidg = nWidgPerRow * tv.DispRows
-	}
-
-	tv.UpdateStartIdx()
-
-	for ri := 0; ri < tv.DispRows; ri++ {
-		ridx := ri * nWidgPerRow
-		si := tv.StartIdx + ri // slice idx
-		ixi := tv.Table.Idxs[si]
-		issel := tv.IdxIsSelected(si)
-
-		itxt := fmt.Sprintf("%05d", ri)
-		sitxt := fmt.Sprintf("%05d", si)
-		labnm := fmt.Sprintf("index-%v", itxt)
-		if tv.ShowIndex {
-			var idxlab *gi.Label
-			if sg.Kids[ridx] != nil {
-				idxlab = sg.Kids[ridx].(*gi.Label)
-			} else {
-				idxlab = &gi.Label{}
-				sg.SetChild(idxlab, ridx, labnm)
-				idxlab.SetProp("tv-row", ri)
-				idxlab.Selectable = true
-				idxlab.Redrawable = true
-				idxlab.Sty.Template = "View.IndexLabel"
-				idxlab.WidgetSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-					if sig == int64(gi.WidgetSelected) {
-						wbb := send.(gi.Node2D).AsWidget()
-						row := wbb.Prop("tv-row").(int)
-						tvv := recv.Embed(KiT_TableView).(*TableView)
-						tvv.UpdateSelectRow(row, wbb.IsSelected())
-					}
-				})
-			}
-			idxlab.CurBgColor = gi.Prefs.Colors.Background
 			idxlab.SetText(sitxt)
-			idxlab.SetSelectedState(issel)
 		}
 
+		vpath := tv.ViewPath + "[" + sitxt + "]"
+		if lblr, ok := tv.Slice.(gi.SliceLabeler); ok {
+			slbl := lblr.ElemLabel(si)
+			if slbl != "" {
+				vpath = tv.ViewPath + "[" + slbl + "]"
+			}
+		}
 		for fli := 0; fli < tv.NCols; fli++ {
+			fli := fli
 			col := tv.Table.Table.Cols[fli]
-			colnm := tv.Table.Table.ColNames[fli]
-			tdsp := tv.ColTensorDisp(fli)
-
-			vvi := ri*tv.NCols + fli
-			var vv giv.ValueView
-			if tv.Values[vvi] == nil {
-				if stsr, isstr := col.(*etensor.String); isstr {
-					sval := stsr.Values[si]
-					vv = giv.ToValueView(&sval, "")
-					vv.SetProp("tv-row", ri)
-					vv.SetProp("tv-col", fli)
-					vv.SetSoloValue(reflect.ValueOf(&sval))
-					vv.AsValueViewBase().ViewSig.ConnectOnly(tv.This(),
-						func(recv, send ki.Ki, sig int64, data interface{}) {
-							tvv, _ := recv.Embed(KiT_TableView).(*TableView)
-							tvv.SetChanged()
-							vvv := send.(giv.ValueView).AsValueViewBase()
-							row := vvv.Prop("tv-row").(int)
-							col := vvv.Prop("tv-col").(int)
-							npv := laser.NonPtrValue(vvv.Value)
-							sv := laser.ToString(npv.Interface())
-							tvv.Table.Table.SetCellStringIdx(col, tvv.Table.Idxs[tvv.StartIdx+row], sv)
-							tvv.ViewSig.Emit(tvv.This(), 0, nil)
-						})
-				} else {
-					if col.NumDims() == 1 {
-						fval := col.FloatVal1D(ixi)
-						vv = giv.ToValueView(&fval, "")
-						vv.SetProp("tv-row", ri)
-						vv.SetProp("tv-col", fli)
-						vv.SetSoloValue(reflect.ValueOf(&fval))
-						vv.AsValueViewBase().ViewSig.ConnectOnly(tv.This(),
-							func(recv, send ki.Ki, sig int64, data interface{}) {
-								tvv, _ := recv.Embed(KiT_TableView).(*TableView)
-								tvv.SetChanged()
-								vvv := send.(giv.ValueView).AsValueViewBase()
-								row := vvv.Prop("tv-row").(int)
-								col := vvv.Prop("tv-col").(int)
-								npv := laser.NonPtrValue(vvv.Value)
-								fv, ok := laser.ToFloat(npv.Interface())
-								if ok {
-									tvv.Table.Table.SetCellFloatIdx(col, tvv.Table.Idxs[tvv.StartIdx+row], fv)
-									tvv.ViewSig.Emit(tvv.This(), 0, nil)
-								}
-							})
-					} else {
-						cell := tv.Table.Table.CellTensorIdx(fli, si)
-						tvv := &TensorGridValueView{}
-						ki.InitNode(tvv)
-						vv = tvv
-						vv.SetSoloValue(reflect.ValueOf(cell))
+			vvi := i*tv.NCols + fli
+			tags := ""
+			var vv giv.Value
+			if _, isstr := col.(*etensor.String); isstr {
+				vv = giv.ToValue(&tv.BlankString, tags)
+				vv.SetSoloValue(reflect.ValueOf(&tv.BlankString))
+				vvb := vv.AsValueBase()
+				vvb.OnChange(func(e events.Event) {
+					tv.SetChanged()
+					npv := laser.NonPtrValue(vvb.Value)
+					sv := laser.ToString(npv.Interface())
+					si := tv.StartIdx + i
+					if si < len(tv.Table.Idxs) {
+						tv.Table.Table.SetCellStringIdx(fli, tv.Table.Idxs[si], sv)
 					}
-				}
-				tv.Values[vvi] = vv
+				})
 			} else {
-				vv = tv.Values[vvi]
-				if stsr, isstr := col.(*etensor.String); isstr {
-					vv.SetSoloValue(reflect.ValueOf(&stsr.Values[ixi]))
+				if col.NumDims() == 1 {
+					vv = giv.ToValue(&tv.BlankFloat, "")
+					vv.SetSoloValue(reflect.ValueOf(&tv.BlankFloat))
+					vvb := vv.AsValueBase()
+					vvb.OnChange(func(e events.Event) {
+						tv.SetChanged()
+						npv := laser.NonPtrValue(vvb.Value)
+						fv := grr.Log1(laser.ToFloat(npv.Interface()))
+						si := tv.StartIdx + i
+						if si < len(tv.Table.Idxs) {
+							tv.Table.Table.SetCellFloatIdx(fli, tv.Table.Idxs[si], fv)
+						}
+					})
 				} else {
-					if col.NumDims() == 1 {
-						fval := col.FloatVal1D(ixi)
-						vv.SetSoloValue(reflect.ValueOf(&fval))
-					} else {
-						cell := tv.Table.Table.CellTensorIdx(fli, ixi)
-						vv.SetSoloValue(reflect.ValueOf(cell))
-					}
+					// tdsp := tv.ColTensorDisp(fli)
+					cell := tv.ColTensorBlank(fli, col)
+					tvv := &TensorGridValue{}
+					vv = tvv
+					tvv.ViewPath = vpath
+					vv.SetSoloValue(reflect.ValueOf(cell))
 				}
 			}
-
-			if wd, has := tv.Table.Table.MetaData[colnm+":width"]; has {
-				vv.SetTag("width", wd)
-			}
+			tv.Values[vvi] = vv
+			vv.SetReadOnly(tv.IsReadOnly())
 			vtyp := vv.WidgetType()
 			valnm := fmt.Sprintf("value-%v.%v", fli, itxt)
 			cidx := ridx + idxOff + fli
-			var widg gi.Node2D
-			if sg.Kids[cidx] != nil {
-				widg = sg.Kids[cidx].(gi.Node2D)
-				wn := widg.AsNode2D()
-				if tv.IsInactive() {
-					wn.SetInactive()
-				}
-				if col.IsNull1D(ri) { // todo: not working:
-					wn.SetProp("background-color", gi.Prefs.Colors.Highlight)
-				} else {
-					wn.DeleteProp("background-color")
-				}
-				widg.AsNode2D().SetSelectedState(issel)
-				vv.UpdateWidget()
-			} else {
-				widg = ki.NewOfType(vtyp).(gi.Node2D)
-				sg.SetChild(widg, cidx, valnm)
-				vv.ConfigWidget(widg)
-				wb := widg.AsWidget()
-				if wb != nil {
-					wb.SetProp("tv-row", ri)
-					wb.SetProp("vertical-align", styles.AlignTop)
-					wb.ClearSelected()
-					wb.WidgetSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-						if sig == int64(gi.WidgetSelected) {
-							wbb := send.(gi.Node2D).AsWidget()
-							row := wbb.Prop("tv-row").(int)
-							tvv := recv.Embed(KiT_TableView).(*TableView)
-							tvv.UpdateSelectRow(row, wbb.IsSelected())
-						}
-					})
-					if tv.IsInactive() {
-						wb.SetInactive()
-					}
-					if col.IsNull1D(ri) {
-						wb.SetProp("background-color", gi.Prefs.Colors.Highlight)
-					} else {
-						wb.DeleteProp("background-color")
-					}
-				}
+			w := ki.NewOfType(vtyp).(gi.Widget)
+			sg.SetChild(w, cidx, valnm)
+			vv.ConfigWidget(w)
+			if tv.IsReadOnly() {
+				w.AsWidget().SetReadOnly(true)
 			}
-			if tgw, istg := widg.(*TensorGrid); istg { // always update disp params
-				tgw.Disp = *tdsp
-			}
+			wb := w.AsWidget()
+			wb.OnSelect(func(e events.Event) {
+				e.SetHandled()
+				tv.UpdateSelectRow(i)
+			})
 		}
 
-		if !tv.IsInactive() {
+		if !tv.IsReadOnly() {
 			cidx := ridx + tv.NCols + idxOff
-			if !tv.NoAdd {
-				if sg.Kids[cidx] == nil {
-					addnm := fmt.Sprintf("add-%v", itxt)
-					addact := gi.Action{}
-					sg.SetChild(&addact, cidx, addnm)
-					addact.SetIcon("plus")
-					addact.Tooltip = "insert a new element at this index"
-					addact.Data = ri
-					addact.Sty.Template = "etview.TableView.AddAction"
-					addact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-						act := send.(*gi.Action)
-						tvv := recv.Embed(KiT_TableView).(*TableView)
-						tvv.SliceNewAtRow(act.Data.(int) + 1)
-					})
-				}
+			if !tv.Is(giv.SliceViewNoAdd) {
+				addnm := fmt.Sprintf("add-%v", itxt)
+				addact := gi.Button{}
+				sg.SetChild(&addact, cidx, addnm)
+				addact.SetType(gi.ButtonAction).SetIcon(icons.Add).
+					SetTooltip("insert a new element at this index").OnClick(func(e events.Event) {
+					tv.SliceNewAtRow(i + 1)
+				})
 				cidx++
 			}
-			if !tv.NoDelete {
-				if sg.Kids[cidx] == nil {
-					delnm := fmt.Sprintf("del-%v", itxt)
-					delact := gi.Action{}
-					sg.SetChild(&delact, cidx, delnm)
-					delact.SetIcon("minus")
-					delact.Tooltip = "delete this element"
-					delact.Data = ri
-					delact.Sty.Template = "etview.TableView.DelAction"
-					delact.ActionSig.ConnectOnly(tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-						act := send.(*gi.Action)
-						tvv := recv.Embed(KiT_TableView).(*TableView)
-						tvv.SliceDeleteAtRow(act.Data.(int), true)
-					})
+			if !tv.Is(giv.SliceViewNoDelete) {
+				delnm := fmt.Sprintf("del-%v", itxt)
+				delact := gi.Button{}
+				sg.SetChild(&delact, cidx, delnm)
+				delact.SetType(gi.ButtonAction).SetIcon(icons.Delete).
+					SetTooltip("delete this element").OnClick(func(e events.Event) {
+					tv.SliceDeleteAtRow(i)
+				})
+				cidx++
+			}
+		}
+	}
+	tv.ConfigTree()
+	tv.ApplyStyleTree()
+}
+
+// UpdateWidgets updates the row widget display to
+// represent the current state of the slice data,
+// including which range of data is being displayed.
+// This is called for scrolling, navigation etc.
+func (tv *TableView) UpdateWidgets() {
+	sg := tv.This().(giv.SliceViewer).SliceGrid()
+	if sg == nil || tv.VisRows == 0 || sg.VisRows == 0 || !sg.HasChildren() {
+		return
+	}
+	// sc := tv.Sc
+
+	updt := sg.UpdateStart()
+	defer sg.UpdateEndRender(updt)
+
+	tv.ViewMuLock()
+	defer tv.ViewMuUnlock()
+
+	nWidgPerRow, idxOff := tv.RowWidgetNs()
+
+	tv.UpdateStartIdx()
+	for i := 0; i < tv.VisRows; i++ {
+		i := i
+		ridx := i * nWidgPerRow
+		si := tv.StartIdx + i // slice idx
+		ixi := -1
+		if si < len(tv.Table.Idxs) {
+			ixi = tv.Table.Idxs[si]
+		}
+		invis := tv.ConfigIter > 2 && si >= tv.SliceSize
+
+		var idxlab *gi.Label
+		if tv.Is(giv.SliceViewShowIndex) {
+			idxlab = sg.Kids[ridx].(*gi.Label)
+			idxlab.SetTextUpdate(strconv.Itoa(si))
+			idxlab.SetState(invis, states.Invisible)
+		}
+
+		sitxt := strconv.Itoa(si)
+		vpath := tv.ViewPath + "[" + sitxt + "]"
+		if lblr, ok := tv.Slice.(gi.SliceLabeler); ok {
+			slbl := lblr.ElemLabel(si)
+			if slbl != "" {
+				vpath = tv.ViewPath + "[" + slbl + "]"
+			}
+		}
+		for fli := 0; fli < tv.NCols; fli++ {
+			fli := fli
+			col := tv.Table.Table.Cols[fli]
+			cidx := ridx + idxOff + fli
+			w := sg.Kids[cidx].(gi.Widget)
+			wb := w.AsWidget()
+			vvi := i*tv.NCols + fli
+			vv := tv.Values[vvi]
+			vvb := vv.AsValueBase()
+			vvb.ViewPath = vpath
+
+			if stsr, isstr := col.(*etensor.String); isstr {
+				sval := &tv.BlankString
+				if ixi >= 0 {
+					sval = &stsr.Values[ixi]
 				}
+				vv.SetSoloValue(reflect.ValueOf(sval))
+			} else {
+				if col.NumDims() == 1 {
+					fval := 0.0
+					if ixi >= 0 {
+						fval = col.FloatVal1D(ixi)
+					}
+					vv.SetSoloValue(reflect.ValueOf(&fval))
+				} else {
+					tdsp := tv.ColTensorDisp(fli)
+					var cell etensor.Tensor
+					cell = tv.ColTensorBlank(fli, col)
+					if ixi >= 0 {
+						cell = tv.Table.Table.CellTensorIdx(fli, ixi)
+					}
+					vv.SetSoloValue(reflect.ValueOf(cell))
+					tgw := w.This().(*TensorGrid)
+					tgw.Disp = *tdsp
+				}
+			}
+			vv.SetReadOnly(tv.IsReadOnly())
+			vv.UpdateWidget()
+
+			w.SetState(invis, states.Invisible)
+			if !invis {
+				issel := tv.IdxIsSelected(si)
+				if tv.IsReadOnly() {
+					wb.SetReadOnly(true)
+				}
+				wb.SetSelected(issel)
+			} else {
+				wb.SetSelected(false)
+				if tv.Is(giv.SliceViewShowIndex) {
+					idxlab.SetSelected(false)
+				}
+			}
+		}
+		if !tv.IsReadOnly() {
+			cidx := ridx + tv.NCols + idxOff
+			if !tv.Is(giv.SliceViewNoAdd) {
+				addact := sg.Kids[cidx].(*gi.Button)
+				addact.SetState(invis, states.Invisible)
+				cidx++
+			}
+			if !tv.Is(giv.SliceViewNoDelete) {
+				delact := sg.Kids[cidx].(*gi.Button)
+				delact.SetState(invis, states.Invisible)
 				cidx++
 			}
 		}
 	}
 
-	if tv.IsInactive() && tv.SelectedIdx >= 0 {
-		tv.SelectIdx(tv.SelectedIdx)
+	if tv.InitSelIdx >= 0 {
+		tv.SelIdx = tv.InitSelIdx
+		tv.InitSelIdx = -1
+		tv.ScrollToIdx(tv.SelIdx)
+		// tv.SetFocusEvent()
+	}
+
+	if tv.IsReadOnly() && tv.SelIdx >= 0 {
+		tv.SelectIdx(tv.SelIdx)
 	}
 	tv.UpdateScroll()
+}
+
+// ColTensorBlank returns tensor blanks for given tensor col
+func (tv *TableView) ColTensorBlank(cidx int, col etensor.Tensor) *etensor.Float64 {
+	if ctb, has := tv.ColTsrBlank[cidx]; has {
+		return ctb
+	}
+	ctb := etensor.NewFloat64Shape(col.ShapeObj(), nil)
+	tv.ColTsrBlank[cidx] = ctb
+	return ctb
 }
 
 // ColTensorDisp returns tensor display parameters for this column
@@ -792,17 +663,12 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 	return ctd
 }
 
-func (tv *TableView) StyleRow(svnp reflect.Value, widg gi.Node2D, idx, fidx int, vv giv.ValueView) {
-}
-
 // SliceNewAt inserts a new blank element at given index in the slice -- -1
 // means the end
 func (tv *TableView) SliceNewAt(idx int) {
-	wupdt := tv.TopUpdateStart()
-	defer tv.TopUpdateEnd(wupdt)
-
+	tv.ViewMuLock()
 	updt := tv.UpdateStart()
-	defer tv.UpdateEnd(updt)
+	defer tv.UpdateEndRender(updt)
 
 	tv.SliceNewAtSel(idx)
 
@@ -811,25 +677,20 @@ func (tv *TableView) SliceNewAt(idx int) {
 	if tv.TmpSave != nil {
 		tv.TmpSave.SaveTmp()
 	}
+	tv.ViewMuUnlock()
 	tv.SetChanged()
-	tv.SetFullReRender()
-	tv.This().(giv.SliceViewer).LayoutSliceGrid()
-	tv.This().(giv.SliceViewer).UpdateSliceGrid()
-	tv.ViewSig.Emit(tv.This(), 0, nil)
-	tv.SliceViewSig.Emit(tv.This(), int64(giv.SliceViewInserted), idx)
+	tv.This().(giv.SliceViewer).UpdateWidgets()
 }
 
 // SliceDeleteAt deletes element at given index from slice -- doUpdt means
 // call UpdateSliceGrid to update display
-func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
-	if idx < 0 {
+func (tv *TableView) SliceDeleteAt(idx int) {
+	if idx < 0 || idx >= tv.SliceSize {
 		return
 	}
-	wupdt := tv.TopUpdateStart()
-	defer tv.TopUpdateEnd(wupdt)
-
+	tv.ViewMuLock()
 	updt := tv.UpdateStart()
-	defer tv.UpdateEnd(updt)
+	defer tv.UpdateEndLayout(updt)
 
 	tv.SliceDeleteAtSel(idx)
 
@@ -838,34 +699,25 @@ func (tv *TableView) SliceDeleteAt(idx int, doUpdt bool) {
 	if tv.TmpSave != nil {
 		tv.TmpSave.SaveTmp()
 	}
+	tv.ViewMuUnlock()
 	tv.SetChanged()
-	if doUpdt {
-		tv.SetFullReRender()
-		tv.This().(giv.SliceViewer).LayoutSliceGrid()
-		tv.This().(giv.SliceViewer).UpdateSliceGrid()
-	}
-	tv.ViewSig.Emit(tv.This(), 0, nil)
-	tv.SliceViewSig.Emit(tv.This(), int64(giv.SliceViewDeleted), idx)
+	tv.This().(giv.SliceViewer).UpdateWidgets()
 }
 
 // SortSliceAction sorts the slice for given field index -- toggles ascending
 // vs. descending if already sorting on this dimension
 func (tv *TableView) SortSliceAction(fldIdx int) {
-	goosi.TheApp.Cursor(tv.ParentWindow().OSWin).Push(cursor.Wait)
-	defer goosi.TheApp.Cursor(tv.ParentWindow().OSWin).Pop()
-
-	wupdt := tv.TopUpdateStart()
-	defer tv.TopUpdateEnd(wupdt)
-
 	updt := tv.UpdateStart()
+	defer tv.UpdateEndLayout(updt)
+
 	sgh := tv.SliceHeader()
-	sgh.SetFullReRender()
 	_, idxOff := tv.RowWidgetNs()
 
 	ascending := true
 
 	for fli := 0; fli < tv.NCols; fli++ {
-		hdr := sgh.Child(idxOff + fli).(*gi.Action)
+		hdr := sgh.Child(idxOff + fli).(*gi.Button)
+		hdr.SetType(gi.ButtonAction)
 		if fli == fldIdx {
 			if tv.SortIdx == fli {
 				tv.SortDesc = !tv.SortDesc
@@ -874,9 +726,9 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 				tv.SortDesc = false
 			}
 			if ascending {
-				hdr.SetIcon("wedge-up")
+				hdr.SetIcon(icons.KeyboardArrowUp)
 			} else {
-				hdr.SetIcon("wedge-down")
+				hdr.SetIcon(icons.KeyboardArrowDown)
 			}
 		} else {
 			hdr.SetIcon("none")
@@ -889,65 +741,38 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 	} else {
 		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
 	}
-	tv.UpdateSliceGrid()
-	tv.UpdateEnd(updt)
+	tv.Update() // requires full update due to sort button icon
 }
 
 // TensorDispAction allows user to select tensor display options for column
 // pass -1 for global params for the entire table
 func (tv *TableView) TensorDispAction(fldIdx int) {
-	wupdt := tv.TopUpdateStart()
-	defer tv.TopUpdateEnd(wupdt)
-
 	updt := tv.UpdateStart()
+	defer tv.UpdateEndRender(updt)
+
 	ctd := &tv.TsrDisp
 	if fldIdx >= 0 {
 		ctd = tv.SetColTensorDisp(fldIdx)
 	}
-	giv.StructViewDialog(tv.ViewportSafe(), ctd, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true},
-		tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-			tvv := recv.Embed(KiT_TableView).(*TableView)
-			tvv.UpdateSliceGrid()
-		})
-
-	tv.UpdateSliceGrid()
-	tv.UpdateEnd(updt)
+	d := gi.NewBody().AddTitle("Tensor Grid Display Options")
+	giv.NewStructView(d).SetStruct(ctd)
+	d.NewFullDialog(tv).Run()
+	// tv.UpdateSliceGrid()
 }
 
-// ConfigToolbar configures the toolbar actions
-func (tv *TableView) ConfigToolbar() {
-	if tv.Table == nil {
-		return
+func (tv *TableView) TsrDispToDots() {
+	tv.TsrDisp.ToDots(&tv.Styles.UnContext)
+	for _, ctd := range tv.ColTsrDisp {
+		ctd.ToDots(&tv.Styles.UnContext)
 	}
-	if tv.ToolbarSlice == tv.Table {
-		return
-	}
-	tb := tv.ToolBar()
-	if len(*tb.Children()) == 0 {
-		tb.SetStretchMaxWidth()
-		tb.AddAction(gi.ActOpts{Label: "UpdtView", Icon: "update", Tooltip: "update the view to reflect current state of table: this will reset any existing filtering or sorting of the table view"},
-			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				tvv.UpdateTable()
-			})
-		tb.AddAction(gi.ActOpts{Label: "Config", Icon: "gear", Tooltip: "configure the view -- particularly the tensor display options"},
-			tv.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-				tvv := recv.Embed(KiT_TableView).(*TableView)
-				tvv.TensorDispAction(-1)
-			})
-	}
-	ndef := 2
-	sz := len(*tb.Children())
-	if sz > ndef {
-		for i := sz - 1; i >= ndef; i-- {
-			tb.DeleteChildAtIndex(i, true)
-		}
-	}
-	mvp := tv.ViewportSafe()
-	if giv.HasToolBarView(tv.Table) && mvp != nil {
-		giv.ToolBarView(tv.Table, mvp, tb)
-	}
-	tv.ToolbarSlice = tv.Table
+}
+
+func (tv *TableView) ApplyStyleWidget() {
+	tv.SliceViewBase.ApplyStyleWidget()
+	tv.TsrDispToDots()
+}
+
+func (tv *TableView) StyleRow(w gi.Widget, idx, fidx int) {
 }
 
 // SortFieldName returns the name of the field being sorted, along with :up or
@@ -972,9 +797,12 @@ func (tv *TableView) SetSortFieldName(nm string) {
 		return
 	}
 	spnm := strings.Split(nm, ":")
+	got := false
 	for fli := 0; fli < tv.NCols; fli++ {
-		colnm := tv.Table.Table.ColNames[fli]
-		if colnm == spnm[0] {
+		fld := tv.Table.Table.ColNames[fli]
+		if fld == spnm[0] {
+			got = true
+			// fmt.Println("sorting on:", fld.Name, fli, "from:", nm)
 			tv.SortIdx = fli
 		}
 	}
@@ -985,31 +813,10 @@ func (tv *TableView) SetSortFieldName(nm string) {
 			tv.SortDesc = false
 		}
 	}
-}
-
-func (tv *TableView) TsrDispToDots() {
-	tv.TsrDisp.ToDots(&tv.Sty.UnContext)
-	for _, ctd := range tv.ColTsrDisp {
-		ctd.ToDots(&tv.Sty.UnContext)
-	}
-}
-
-func (tv *TableView) Style2D() {
-	tv.SliceViewBase.Style2D()
-	tv.TsrDispToDots()
-}
-
-func (tv *TableView) NeedsDoubleReRender() bool {
-	return true
-}
-
-func (tv *TableView) Layout2D(parBBox image.Rectangle, iter int) bool {
-	redo := tv.Frame.Layout2D(parBBox, iter)
-	if !tv.IsConfiged() {
-		return redo
-	}
-	tv.LayoutHeader()
-	return redo
+	_ = got
+	// if got {
+	// 	tv.SortSlice()
+	// }
 }
 
 // RowFirstVisWidget returns the first visible widget for given row (could be
@@ -1020,15 +827,15 @@ func (tv *TableView) RowFirstVisWidget(row int) (*gi.WidgetBase, bool) {
 	}
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	sg := tv.SliceGrid()
-	widg := sg.Kids[row*nWidgPerRow].(gi.Node2D).AsWidget()
-	if widg.VpBBox != image.ZR {
-		return widg, true
+	w := sg.Kids[row*nWidgPerRow].(gi.Widget).AsWidget()
+	if w.Geom.TotalBBox != (image.Rectangle{}) {
+		return w, true
 	}
 	ridx := nWidgPerRow * row
 	for fli := 0; fli < tv.NCols; fli++ {
-		widg := sg.Child(ridx + idxOff + fli).(gi.Node2D).AsWidget()
-		if widg.VpBBox != image.ZR {
-			return widg, true
+		w := sg.Child(ridx + idxOff + fli).(gi.Widget).AsWidget()
+		if w.Geom.TotalBBox != (image.Rectangle{}) {
+			return w, true
 		}
 	}
 	return nil, false
@@ -1038,7 +845,7 @@ func (tv *TableView) RowFirstVisWidget(row int) (*gi.WidgetBase, bool) {
 // returns that element or nil if not successful -- note: grid must have
 // already rendered for focus to be grabbed!
 func (tv *TableView) RowGrabFocus(row int) *gi.WidgetBase {
-	if !tv.IsRowInBounds(row) || tv.InFocusGrab { // range check
+	if !tv.IsRowInBounds(row) || tv.Is(giv.SliceViewInFocusGrab) { // range check
 		return nil
 	}
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
@@ -1046,18 +853,18 @@ func (tv *TableView) RowGrabFocus(row int) *gi.WidgetBase {
 	sg := tv.SliceGrid()
 	// first check if we already have focus
 	for fli := 0; fli < tv.NCols; fli++ {
-		widg := sg.Child(ridx + idxOff + fli).(gi.Node2D).AsWidget()
-		if widg.HasFocus() || widg.ContainsFocus() {
-			return widg
+		w := sg.Child(ridx + idxOff + fli).(gi.Widget).AsWidget()
+		if w.StateIs(states.Focused) || w.ContainsFocus() {
+			return w
 		}
 	}
-	tv.InFocusGrab = true
-	defer func() { tv.InFocusGrab = false }()
+	tv.SetFlag(true, giv.SliceViewInFocusGrab)
+	defer func() { tv.SetFlag(false, giv.SliceViewInFocusGrab) }()
 	for fli := 0; fli < tv.NCols; fli++ {
-		widg := sg.Child(ridx + idxOff + fli).(gi.Node2D).AsWidget()
-		if widg.CanFocus() {
-			widg.GrabFocus()
-			return widg
+		w := sg.Child(ridx + idxOff + fli).(gi.Widget).AsWidget()
+		if w.CanFocus() {
+			w.SetFocusEvent()
+			return w
 		}
 	}
 	return nil
@@ -1068,8 +875,8 @@ func (tv *TableView) SelectRowWidgets(row int, sel bool) {
 	if row < 0 {
 		return
 	}
-	wupdt := tv.TopUpdateStart()
-	defer tv.TopUpdateEnd(wupdt)
+	updt := tv.UpdateStart()
+	defer tv.UpdateEndRender(updt)
 
 	sg := tv.SliceGrid()
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
@@ -1077,23 +884,76 @@ func (tv *TableView) SelectRowWidgets(row int, sel bool) {
 	for fli := 0; fli < tv.NCols; fli++ {
 		seldx := ridx + idxOff + fli
 		if sg.Kids.IsValidIndex(seldx) == nil {
-			widg := sg.Child(seldx).(gi.Node2D).AsNode2D()
-			widg.SetSelectedState(sel)
-			widg.UpdateSig()
+			w := sg.Child(seldx).(gi.Widget).AsWidget()
+			w.SetSelected(sel)
 		}
 	}
-	if tv.ShowIndex {
+	if tv.Is(giv.SliceViewShowIndex) {
 		if sg.Kids.IsValidIndex(ridx) == nil {
-			widg := sg.Child(ridx).(gi.Node2D).AsNode2D()
-			widg.SetSelectedState(sel)
-			widg.UpdateSig()
+			w := sg.Child(ridx).(gi.Widget).AsWidget()
+			w.SetSelected(sel)
 		}
 	}
+}
+
+func (tv *TableView) EditIdx(idx int) {
+	val := laser.OnePtrUnderlyingValue(tv.SliceNPVal.Index(idx))
+	stru := val.Interface()
+	tynm := laser.NonPtrType(val.Type()).Name()
+	lbl := gi.ToLabel(stru)
+	if lbl != "" {
+		tynm += ": " + lbl
+	}
+	d := gi.NewBody().AddTitle(tynm)
+	giv.NewStructView(d).SetStruct(stru)
+	// d.AddBottomBar(func(pw gi.Widget) {
+	// 	d.AddCancel(pw)
+	// 	d.AddOk(pw)
+	// })
+	d.NewFullDialog(tv).Run()
+}
+
+func (tv *TableView) StdCtxtMenu(m *gi.Scene, idx int) {
+	if tv.Is(giv.SliceViewIsArray) {
+		return
+	}
+	tv.SliceViewBase.StdCtxtMenu(m, idx)
+	gi.NewSeparator(m, "sep-edit")
+	gi.NewButton(m, "edit").SetText("Edit").SetData(idx).
+		OnClick(func(e events.Event) {
+			tv.EditIdx(idx)
+		})
+}
+
+//////////////////////////////////////////////////////
+// 	Header layout
+
+func (tv *TableView) SizeFinal() {
+	tv.SliceViewBase.SizeFinal()
+	sg := tv.This().(giv.SliceViewer).SliceGrid()
+	sh := tv.SliceHeader()
+	sh.WidgetKidsIter(func(i int, kwi gi.Widget, kwb *gi.WidgetBase) bool {
+		_, sgb := gi.AsWidget(sg.Child(i))
+		gsz := &sgb.Geom.Size
+		ksz := &kwb.Geom.Size
+		ksz.Actual.Total.X = gsz.Actual.Total.X
+		ksz.Actual.Content.X = gsz.Actual.Content.X
+		ksz.Alloc.Total.X = gsz.Alloc.Total.X
+		ksz.Alloc.Content.X = gsz.Alloc.Content.X
+		return ki.Continue
+	})
+	gsz := &sg.Geom.Size
+	ksz := &sh.Geom.Size
+	ksz.Actual.Total.X = gsz.Actual.Total.X
+	ksz.Actual.Content.X = gsz.Actual.Content.X
+	ksz.Alloc.Total.X = gsz.Alloc.Total.X
+	ksz.Alloc.Content.X = gsz.Alloc.Content.X
 }
 
 //////////////////////////////////////////////////////////////////////////////
 //    Copy / Cut / Paste
 
+/*
 func (tv *TableView) MimeDataType() string {
 	return fi.DataCsv
 }
@@ -1188,3 +1048,4 @@ func (tv *TableView) ItemCtxtMenu(idx int) {
 		gi.PopupMenu(men, pos.X, pos.Y, tv.ViewportSafe(), tv.Nm+"-menu")
 	}
 }
+*/

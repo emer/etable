@@ -14,7 +14,7 @@ import (
 
 	"goki.dev/etable/v2/agg"
 	"goki.dev/etable/v2/etable"
-	"goki.dev/goki/gi/v2/gi"
+	"goki.dev/gi/v2/gi"
 )
 
 var (

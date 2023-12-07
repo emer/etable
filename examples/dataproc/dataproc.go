@@ -12,16 +12,12 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etview"
 	"goki.dev/etable/v2/split"
-	"goki.dev/goki/gi/v2/gi"
-	"goki.dev/goki/gi/v2/gimain"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/gimain"
 )
 
 // this is the stub main for gogi that calls our actual mainrun function, at end of file
-func main() {
-	gimain.Main(func() {
-		mainrun()
-	})
-}
+func main() { gimain.Run(app) }
 
 // Planets is raw data
 var Planets *etable.Table
@@ -103,38 +99,32 @@ func AnalyzePlanets() {
 	// and another that has the data to put in the cells.
 }
 
-func OpenGUI() {
-	width := 1280
-	height := 768
+func app() {
+	AnalyzePlanets()
 
 	gi.SetAppName("dataproc")
 	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`)
 
-	win := gi.NewMainWindow("dataproc", "eTable Data Processing Demo", width, height)
+	b := gi.NewBody()
 
-	vp := win.WinViewport2D()
-	updt := vp.UpdateStart()
+	tv := gi.NewTabs(b)
 
-	mfr := win.SetMainFrame()
-
-	tv := gi.AddNewTabView(mfr, "tv")
-	tv.Viewport = vp
-
-	tv.AddNewTab(etview.KiT_TableView, "Planets Data").(*etview.TableView).SetTable(Planets, nil)
-	tv.AddNewTab(etview.KiT_TableView, "Non-Null Rows Desc").(*etview.TableView).SetTable(PlanetsNNDesc, nil)
-	tv.AddNewTab(etview.KiT_TableView, "All Desc").(*etview.TableView).SetTable(PlanetsDesc, nil)
-	tv.AddNewTab(etview.KiT_TableView, "By Method Orbit").(*etview.TableView).SetTable(GpMethodOrbit, nil)
-	tv.AddNewTab(etview.KiT_TableView, "By Method Year").(*etview.TableView).SetTable(GpMethodYear, nil)
-	tv.AddNewTab(etview.KiT_TableView, "By Method Decade").(*etview.TableView).SetTable(GpMethodDecade, nil)
-	tv.AddNewTab(etview.KiT_TableView, "By Decade").(*etview.TableView).SetTable(GpDecade, nil)
+	nt := tv.NewTab("Planets Data")
+	etview.NewTableView(nt).SetTable(Planets)
+	nt = tv.NewTab("Non-Null Rows Desc")
+	etview.NewTableView(nt).SetTable(PlanetsNNDesc)
+	nt = tv.NewTab("All Desc")
+	etview.NewTableView(nt).SetTable(PlanetsDesc)
+	nt = tv.NewTab("By Method Orbit")
+	etview.NewTableView(nt).SetTable(GpMethodOrbit)
+	nt = tv.NewTab("By Method Year")
+	etview.NewTableView(nt).SetTable(GpMethodYear)
+	nt = tv.NewTab("By Method Decade")
+	etview.NewTableView(nt).SetTable(GpMethodDecade)
+	nt = tv.NewTab("By Decade")
+	etview.NewTableView(nt).SetTable(GpDecade)
 
 	tv.SelectTabIndex(0)
 
-	vp.UpdateEndNoSig(updt)
-	win.StartEventLoop()
-}
-
-func mainrun() {
-	AnalyzePlanets()
-	OpenGUI()
+	b.NewWindow().Run().Wait()
 }

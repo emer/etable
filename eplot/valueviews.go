@@ -8,10 +8,10 @@ import (
 	"reflect"
 
 	"github.com/goki/ki/kit"
-	"goki.dev/goki/gi/v2/gi"
-	"goki.dev/goki/gi/v2/giv"
-	"goki.dev/goki/gi/v2/units"
-	"goki.dev/goki/ki/v2"
+	"goki.dev/gi/v2/gi"
+	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/units"
+	"goki.dev/ki/v2"
 )
 
 func init() {

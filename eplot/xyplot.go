@@ -12,7 +12,7 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/split"
-	"goki.dev/goki/gi/v2/gi"
+	"goki.dev/gi/v2/gi"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"

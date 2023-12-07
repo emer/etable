@@ -7,11 +7,8 @@ package etview
 import (
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/simat"
-	"goki.dev/gi/v2/gi"
 	"goki.dev/girl/paint"
 	"goki.dev/girl/styles"
-	"goki.dev/girl/units"
-	"goki.dev/ki/v2"
 	"goki.dev/mat32/v2"
 )
 
@@ -23,7 +20,8 @@ type SimMatGrid struct { //gti:add
 	TensorGrid
 
 	// the similarity / distance matrix
-	SimMat      *simat.SimMat
+	SimMat *simat.SimMat `set:"-"`
+
 	rowMaxSz    mat32.Vec2 // maximum label size
 	rowMinBlank int        // minimum number of blank rows
 	rowNGps     int        // number of groups in row (non-blank after blank)
@@ -32,65 +30,26 @@ type SimMatGrid struct { //gti:add
 	colNGps     int        // number of groups in col (non-blank after blank)
 }
 
-// AddNewSimMatGrid adds a new tensor grid to given parent node, with given name.
-func AddNewSimMatGrid(parent ki.Ki, name string, smat *simat.SimMat) *SimMatGrid {
-	tg := parent.AddNewChild(KiT_SimMatGrid, name).(*SimMatGrid)
-	tg.SimMat = smat
-	tg.Tensor = smat.Mat
-	return tg
-}
-
 // Defaults sets defaults for values that are at nonsensical initial values
-func (tg *SimMatGrid) Defaults() {
+func (tg *SimMatGrid) OnInit() {
+	tg.TensorGrid.OnInit()
 	tg.Disp.GridView = &tg.TensorGrid
 	tg.Disp.Defaults()
 	tg.Disp.TopZero = true
-}
 
-// func (tg *SimMatGrid) Disconnect() {
-// 	tg.WidgetBase.Disconnect()
-// 	tg.ColorMapSig.DisconnectAll()
-// }
+}
 
 // SetSimMat sets the similarity matrix and triggers a display update
 func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) {
 	tg.SimMat = smat
 	tg.Tensor = smat.Mat
-	tg.Defaults()
 	if tg.Tensor != nil {
 		tg.Disp.FmMeta(tg.Tensor)
 	}
-	tg.UpdateSig()
+	tg.Update()
 }
 
-// MouseEvent handles button MouseEvent
-func (tg *SimMatGrid) MouseEvent() {
-	// tg.ConnectEvent(event.Mouse, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
-	// 	me := d.(*mouse.Event)
-	// 	tgv := retg.(*SimMatGrid)
-	// 	switch {
-	// 	case me.Button == mouse.Right && me.Action == mouse.Press:
-	// 		giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "SimMatGrid Display Options", Ok: true, Cancel: true}, nil, nil)
-	// 	case me.Button == mouse.Left && me.Action == mouse.Press:
-	// 		me.SetProcessed()
-	// 		tgv.OpenTensorView()
-	// 	}
-	// })
-}
-
-func (tg *SimMatGrid) ConnectEvents2D() {
-	tg.MouseEvent()
-	tg.HoverTooltipEvent()
-}
-
-func (tg *SimMatGrid) Style2D() {
-	tg.SetProp("font-size", units.NewPt(tg.Disp.FontSize))
-	tg.WidgetBase.Style2D()
-	tg.Disp.Defaults()
-	tg.Disp.ToDots(&tg.Sty.UnContext)
-}
-
-func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, sz mat32.Vec2) {
+func (tg *SimMatGrid) SizeLabel(lbs []string, col bool) (minBlank, ngps int, sz mat32.Vec2) {
 	mx := 0
 	mxi := 0
 	minBlank = len(lbs)
@@ -119,64 +78,60 @@ func (tg *SimMatGrid) Size2DLabel(lbs []string, col bool) (minBlank, ngps int, s
 	}
 	minBlank = min(minBlank, curblk)
 	tr := paint.Text{}
+	fr := tg.Styles.FontRender()
 	if col {
-		tr.SetStringRot90(lbs[mxi], &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
+		tr.SetStringRot90(lbs[mxi], fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0)
 	} else {
-		tr.SetString(lbs[mxi], &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0, 0)
+		tr.SetString(lbs[mxi], fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0, 0)
 	}
-	tsz := tg.LayState.SizePrefOrMax()
+	tsz := tg.Geom.Size.Actual.Content
 	if !col {
-		tr.LayoutStdLR(&tg.Sty.Text, &tg.Sty.Font, &tg.Sty.UnContext, tsz)
+		tr.LayoutStdLR(&tg.Styles.Text, fr, &tg.Styles.UnContext, tsz)
 	}
 	return minBlank, ngps, tr.Size
 }
 
-func (tg *SimMatGrid) Size2D(iter int) {
-	if iter > 0 {
-		return // already updated in previous iter, don't redo!
-	} else {
-		tg.rowMinBlank, tg.rowNGps, tg.rowMaxSz = tg.Size2DLabel(tg.SimMat.Rows, false)
-		tg.colMinBlank, tg.colNGps, tg.colMaxSz = tg.Size2DLabel(tg.SimMat.Cols, true)
+func (tg *SimMatGrid) MinSize() mat32.Vec2 {
+	tg.rowMinBlank, tg.rowNGps, tg.rowMaxSz = tg.SizeLabel(tg.SimMat.Rows, false)
+	tg.colMinBlank, tg.colNGps, tg.colMaxSz = tg.SizeLabel(tg.SimMat.Cols, true)
 
-		tg.colMaxSz.Y += tg.rowMaxSz.Y // needs one more for some reason
+	tg.colMaxSz.Y += tg.rowMaxSz.Y // needs one more for some reason
 
-		rtxtsz := tg.rowMaxSz.Y / float32(tg.rowMinBlank+1)
-		ctxtsz := tg.colMaxSz.X / float32(tg.colMinBlank+1)
-		txtsz := mat32.Max(rtxtsz, ctxtsz)
+	rtxtsz := tg.rowMaxSz.Y / float32(tg.rowMinBlank+1)
+	ctxtsz := tg.colMaxSz.X / float32(tg.colMinBlank+1)
+	txtsz := mat32.Max(rtxtsz, ctxtsz)
 
-		tg.InitLayout2D()
-		rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
-		rowEx = tg.rowNGps
-		colEx = tg.colNGps
-		frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
-		fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-		tg.Disp.ToDots(&tg.Sty.UnContext)
-		max := float32(mat32.Max(frw, fcl))
-		gsz := tg.Disp.TotPrefSize.Dots / max
-		gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
-		gsz = mat32.Max(gsz, txtsz)
-		gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
-		tg.Size2DFromWH(tg.rowMaxSz.X+LabelSpace+gsz*float32(cols), tg.colMaxSz.Y+LabelSpace+gsz*float32(rows))
-	}
+	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
+	rowEx = tg.rowNGps
+	colEx = tg.colNGps
+	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
+	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
+	tg.Disp.ToDots(&tg.Styles.UnContext)
+	max := float32(mat32.Max(frw, fcl))
+	gsz := tg.Disp.TotPrefSize.Dots / max
+	gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
+	gsz = mat32.Max(gsz, txtsz)
+	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
+	return mat32.Vec2{tg.rowMaxSz.X + LabelSpace + gsz*float32(cols), tg.colMaxSz.Y + LabelSpace + gsz*float32(rows)}
 }
 
 func (tg *SimMatGrid) RenderSimMat() {
 	if tg.SimMat == nil || tg.SimMat.Mat.Len() == 0 {
 		return
 	}
-	tg.Defaults()
 	tg.EnsureColorMap()
 	tg.UpdateRange()
 	rs, pc, _ := tg.RenderLock()
 	defer tg.RenderUnlock(rs)
 
-	pos := tg.LayState.Alloc.Pos
-	sz := tg.LayState.Alloc.Size
+	pos := tg.Geom.Pos.Content
+	sz := tg.Geom.Size.Actual.Content
+
 	effsz := sz
 	effsz.X -= tg.rowMaxSz.X + LabelSpace
 	effsz.Y -= tg.colMaxSz.Y + LabelSpace
 
-	pc.FillBoxColor(rs, pos, sz, tg.Disp.Background)
+	pc.FillBoxColor(rs, pos, sz, tg.Styles.BackgroundColor.Solid)
 
 	tsr := tg.SimMat.Mat
 
@@ -194,10 +149,11 @@ func (tg *SimMatGrid) RenderSimMat() {
 	nr := len(tg.SimMat.Rows)
 	mx := min(nr, rows)
 	tr := paint.Text{}
-	txsty := tg.Sty.Text
+	txsty := tg.Styles.Text
 	txsty.AlignV = styles.Start
 	ygp := 0
 	prvyblk := false
+	fr := tg.Styles.FontRender()
 	for y := 0; y < mx; y++ {
 		lb := tg.SimMat.Rows[y]
 		if len(lb) == 0 {
@@ -209,8 +165,8 @@ func (tg *SimMatGrid) RenderSimMat() {
 			prvyblk = false
 		}
 		yex := float32(ygp) * tg.Disp.DimExtra
-		tr.SetString(lb, &tg.Sty.Font, &tg.Sty.UnContext, &txsty, true, 0, 0)
-		tr.LayoutStdLR(&txsty, &tg.Sty.Font, &tg.Sty.UnContext, tg.rowMaxSz)
+		tr.SetString(lb, fr, &tg.Styles.UnContext, &txsty, true, 0, 0)
+		tr.LayoutStdLR(&txsty, fr, &tg.Styles.UnContext, tg.rowMaxSz)
 		cr := mat32.Vec2{0, float32(y) + yex}
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(rs, pr)
@@ -234,7 +190,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			prvxblk = false
 		}
 		xex := float32(xgp) * tg.Disp.DimExtra
-		tr.SetStringRot90(lb, &tg.Sty.Font, &tg.Sty.UnContext, &tg.Sty.Text, true, 0)
+		tr.SetStringRot90(lb, fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0)
 		cr := mat32.Vec2{float32(x) + xex, 0}
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(rs, pr)
@@ -280,16 +236,10 @@ func (tg *SimMatGrid) RenderSimMat() {
 	}
 }
 
-func (tg *SimMatGrid) Render2D() {
-	if tg.FullReRenderIfNeeded() {
-		return
-	}
+func (tg *SimMatGrid) Render() {
 	if tg.PushBounds() {
-		tg.This().(gi.Node2D).ConnectEvents2D()
 		tg.RenderSimMat()
-		tg.Render2DChildren()
+		tg.RenderChildren()
 		tg.PopBounds()
-	} else {
-		tg.DisconnectAllEvents(gi.RegPri)
 	}
 }

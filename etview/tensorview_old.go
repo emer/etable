@@ -1,29 +1,21 @@
-// Copyright (c) 2019, The eTable Authors. All rights reserved.
+// Copyright (c) 2023, The eTable Authors. All rights reserved.
 // Use of this source code is governed by a BSD-style
 // license that can be found in the LICENSE file.
 
 package etview
 
 import (
-	"fmt"
-	"image"
-	"reflect"
-
-	"goki.dev/etable/v2/etensor"
 	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/giv"
-	"goki.dev/girl/paint"
-	"goki.dev/girl/styles"
-	"goki.dev/girl/units"
-	"goki.dev/goosi/mimedata"
-	"goki.dev/ki/v2"
-	"goki.dev/laser"
-	"goki.dev/mat32/v2"
 )
 
 // etview.TensorView provides a GUI interface for etable.Tensor's
-// using a tabular rows-and-columns interface
-type TensorView struct { //gti:add
+// using a tabular rows-and-columns interface using textfields for editing.
+// This provides an editable complement to the TensorGrid graphical display.
+type TensorView struct {
+	gi.WidgetBase
+}
+
+/*
 	giv.SliceViewBase
 
 	// the tensor that we're a view of
@@ -750,3 +742,5 @@ func (tv *TensorView) ItemCtxtMenu(idx int) {
 // 	}
 // 	return false
 // }
+
+*/

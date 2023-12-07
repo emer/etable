@@ -12,7 +12,7 @@ import (
 	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
-	"goki.dev/goki/gi/v2/gi"
+	"goki.dev/gi/v2/gi"
 )
 
 // PlotParams are parameters for overall plot

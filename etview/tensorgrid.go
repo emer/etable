@@ -9,15 +9,15 @@ import (
 	"log"
 	"strconv"
 
+	"goki.dev/colors"
 	"goki.dev/colors/colormap"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/minmax"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/giv"
+	"goki.dev/girl/styles"
 	"goki.dev/girl/units"
-	"goki.dev/goosi"
 	"goki.dev/goosi/events"
-	"goki.dev/ki/v2"
 	"goki.dev/mat32/v2"
 )
 
@@ -46,9 +46,6 @@ type TensorDisp struct { //gti:add
 
 	// the name of the color map to use in translating values to colors
 	ColorMap giv.ColorMapName
-
-	// background color
-	Background color.Color
 
 	// what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc
 	GridFill float32 `min:"0.1" max:"1" step:"0.1" def:"0.9,1"`
@@ -79,20 +76,19 @@ type TensorDisp struct { //gti:add
 func (td *TensorDisp) Defaults() {
 	if td.ColorMap == "" {
 		td.ColorMap = "ColdHot"
-		td.Background.SetName("white")
 	}
 	if td.Range.Max == 0 && td.Range.Min == 0 {
 		td.Range.SetMin(-1)
 		td.Range.SetMax(1)
 	}
 	if td.GridMinSize.Val == 0 {
-		td.GridMinSize.Set(4, units.Px)
+		td.GridMinSize.Px(4)
 	}
 	if td.GridMaxSize.Val == 0 {
-		td.GridMaxSize.Set(2, units.Em)
+		td.GridMaxSize.Em(2)
 	}
 	if td.TotPrefSize.Val == 0 {
-		td.TotPrefSize.Set(20, units.Em)
+		td.TotPrefSize.Em(20)
 	}
 	if td.GridFill == 0 {
 		td.GridFill = 0.9
@@ -100,13 +96,6 @@ func (td *TensorDisp) Defaults() {
 	}
 	if td.FontSize == 0 {
 		td.FontSize = 24
-	}
-}
-
-// Update satisfies the gi.Updater interface and will trigger display update on edits
-func (td *TensorDisp) Update() {
-	if td.GridView != nil {
-		td.GridView.UpdateSig()
 	}
 }
 
@@ -156,9 +145,6 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 			td.Range.FixMax = false
 		}
 	}
-	if op, has := tsr.MetaData("background"); has {
-		td.Background.SetString(op, nil)
-	}
 	if op, has := tsr.MetaData("colormap"); has {
 		td.ColorMap = giv.ColorMapName(op)
 	}
@@ -185,11 +171,11 @@ func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
 }
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
-type TensorGrid struct { //gti:add
+type TensorGrid struct {
 	gi.WidgetBase
 
 	// the tensor that we view
-	Tensor etensor.Tensor
+	Tensor etensor.Tensor `set:"-"`
 
 	// display options
 	Disp TensorDisp
@@ -198,23 +184,16 @@ type TensorGrid struct { //gti:add
 	ColorMap *colormap.Map
 }
 
-// AddNewTensorGrid adds a new tensor grid to given parent node, with given name.
-func AddNewTensorGrid(parent ki.Ki, name string, tsr etensor.Tensor) *TensorGrid {
-	tg := parent.AddNewChild(KiT_TensorGrid, name).(*TensorGrid)
-	tg.Tensor = tsr
-	return tg
-}
-
-// Defaults sets defaults for values that are at nonsensical initial values
-func (tg *TensorGrid) Defaults() {
+func (tg *TensorGrid) OnInit() {
 	tg.Disp.GridView = tg
 	tg.Disp.Defaults()
+	tg.HandleTensorGridEvents()
+	tg.Style(func(s *styles.Style) {
+		ms := tg.MinSize()
+		s.Min.X.Dot(ms.X)
+		s.Min.Y.Dot(ms.Y)
+	})
 }
-
-// func (tg *TensorGrid) Disconnect() {
-// 	tg.WidgetBase.Disconnect()
-// 	tg.ColorMapSig.DisconnectAll()
-// }
 
 // SetTensor sets the tensor and triggers a display update
 func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
@@ -223,76 +202,63 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
 		return
 	}
 	tg.Tensor = tsr
-	tg.Defaults()
 	if tg.Tensor != nil {
 		tg.Disp.FmMeta(tg.Tensor)
 	}
-	tg.UpdateSig()
+	tg.Update()
 }
 
 // OpenTensorView pulls up a TensorView of our tensor
 func (tg *TensorGrid) OpenTensorView() {
-	dlg := TensorViewDialog(tg.ViewportSafe(), tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
-	tvk := dlg.Frame().ChildByType(KiT_TensorView, true, 2)
-	if tvk != nil {
-		tv := tvk.(*TensorView)
-		tv.TsrLay = tg.Disp.TensorLayout
-		tv.SetInactiveState(tg.IsInactive())
-		tv.ViewSig.Connect(tg.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
-			tgg, _ := recv.Embed(KiT_TensorGrid).(*TensorGrid)
-			tgg.UpdateSig()
-		})
-	}
+	/*
+		dlg := TensorViewDialog(tg.ViewportSafe(), tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
+		tvk := dlg.Frame().ChildByType(KiT_TensorView, true, 2)
+		if tvk != nil {
+			tv := tvk.(*TensorView)
+			tv.TsrLay = tg.Disp.TensorLayout
+			tv.SetInactiveState(tg.IsInactive())
+			tv.ViewSig.Connect(tg.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+				tgg, _ := recv.Embed(KiT_TensorGrid).(*TensorGrid)
+				tgg.UpdateSig()
+			})
+		}
+	*/
 }
 
-// MouseEvent handles button MouseEvent
-func (tg *TensorGrid) MouseEvent() {
-	tg.ConnectEvent(goosi.MouseEvent, gi.RegPri, func(retg, send ki.Ki, sig int64, d interface{}) {
-		me := d.(*events.Mouse)
-		tgv := retg.(*TensorGrid)
-		switch {
-		case me.Button == events.Right && me.Action == events.Press:
-			giv.StructViewDialog(tgv.ViewportSafe(), &tgv.Disp, giv.DlgOpts{Title: "TensorGrid Display Options", Ok: true, Cancel: true}, nil, nil)
-		case me.Button == events.Left && me.Action == events.DoubleClick:
-			me.SetProcessed()
-			tgv.OpenTensorView()
-		}
+func (tg *TensorGrid) HandleTensorGridEvents() {
+	tg.OnDoubleClick(func(e events.Event) {
+		tg.OpenTensorView()
+	})
+	tg.On(events.ContextMenu, func(e events.Event) {
+		d := gi.NewBody().AddTitle("Tensor Grid Display Options")
+		giv.NewStructView(d).SetStruct(&tg.Disp)
+		d.NewFullDialog(tg).Run()
+		// todo: update view
 	})
 }
 
-func (tg *TensorGrid) ConnectEvents2D() {
-	tg.MouseEvent()
-	tg.HoverTooltipEvent()
+func (tg *TensorGrid) ApplyStyle() {
+	tg.WidgetBase.ApplyStyle()
+	tg.Disp.ToDots(&tg.Styles.UnContext)
 }
 
-func (tg *TensorGrid) Style2D() {
-	tg.WidgetBase.Style2D()
-	tg.Disp.Defaults()
-	tg.Disp.ToDots(&tg.Sty.UnContext)
-}
-
-func (tg *TensorGrid) Size2D(iter int) {
+// MinSize returns minimum size based on tensor and display settings
+func (tg *TensorGrid) MinSize() mat32.Vec2 {
 	if tg.Tensor == nil || tg.Tensor.Len() == 0 {
-		return
+		return mat32.Vec2{}
 	}
-	if iter > 0 {
-		return // already updated in previous iter, don't redo!
-	} else {
-		if tg.Disp.Image {
-			tg.Size2DFromWH(float32(tg.Tensor.Dim(1)), float32(tg.Tensor.Dim(0)))
-		} else {
-			tg.InitLayout2D()
-			rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
-			frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
-			fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-			tg.Disp.ToDots(&tg.Sty.UnContext)
-			max := float32(mat32.Max(frw, fcl))
-			gsz := tg.Disp.TotPrefSize.Dots / max
-			gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
-			gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
-			tg.Size2DFromWH(gsz*float32(cols)+tg.Disp.BotRtSpace.Dots, gsz*float32(rows)+tg.Disp.BotRtSpace.Dots)
-		}
+	if tg.Disp.Image {
+		return mat32.Vec2{float32(tg.Tensor.Dim(1)), float32(tg.Tensor.Dim(0))}
 	}
+	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
+	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
+	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
+	tg.Disp.ToDots(&tg.Styles.UnContext)
+	max := float32(mat32.Max(frw, fcl))
+	gsz := tg.Disp.TotPrefSize.Dots / max
+	gsz = mat32.Max(gsz, tg.Disp.GridMinSize.Dots)
+	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize.Dots)
+	return mat32.Vec2{gsz*float32(cols) + tg.Disp.BotRtSpace.Dots, gsz*float32(rows) + tg.Disp.BotRtSpace.Dots}
 }
 
 // EnsureColorMap makes sure there is a valid color map that matches specified name
@@ -339,18 +305,17 @@ func (tg *TensorGrid) RenderTensor() {
 	if tg.Tensor == nil || tg.Tensor.Len() == 0 {
 		return
 	}
-	tg.Defaults()
 	tg.EnsureColorMap()
 	tg.UpdateRange()
 
 	rs, pc, _ := tg.RenderLock()
 	defer tg.RenderUnlock(rs)
 
-	pos := tg.LayState.Alloc.Pos
-	sz := tg.LayState.Alloc.Size
+	pos := tg.Geom.Pos.Content
+	sz := tg.Geom.Size.Actual.Content
 	sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
 
-	pc.FillBoxColor(rs, pos, sz, tg.Disp.Background)
+	pc.FillBoxColor(rs, pos, sz, tg.Styles.BackgroundColor.Solid)
 
 	tsr := tg.Tensor
 
@@ -389,8 +354,8 @@ func (tg *TensorGrid) RenderTensor() {
 					}
 					cr := mat32.Vec2{float32(x), float32(ey)}
 					pr := pos.Add(cr.Mul(gsz))
-					pc.StrokeStyle.Color.Color.SetFloat64(r, g, b, a)
-					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Color)
+					pc.StrokeStyle.Color.Solid = colors.FromFloat64(r, g, b, a)
+					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Solid)
 				case nclr > 1:
 					var r, g, b, a float64
 					a = 1
@@ -402,14 +367,14 @@ func (tg *TensorGrid) RenderTensor() {
 					}
 					cr := mat32.Vec2{float32(x), float32(ey)}
 					pr := pos.Add(cr.Mul(gsz))
-					pc.StrokeStyle.Color.Color.SetFloat64(r, g, b, a)
-					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Color)
+					pc.StrokeStyle.Color.Solid = colors.FromFloat64(r, g, b, a)
+					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Solid)
 				default:
 					val := tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x}))
 					cr := mat32.Vec2{float32(x), float32(ey)}
 					pr := pos.Add(cr.Mul(gsz))
-					pc.StrokeStyle.Color.Color.SetFloat64(val, val, val, 1)
-					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Color)
+					pc.StrokeStyle.Color.Solid = colors.FromFloat64(val, val, val, 1)
+					pc.FillBoxColor(rs, pr, gsz, pc.StrokeStyle.Color.Solid)
 				}
 			}
 		}
@@ -447,25 +412,10 @@ func (tg *TensorGrid) RenderTensor() {
 	}
 }
 
-func (tg *TensorGrid) Render2D() {
-	if tg.FullReRenderIfNeeded() {
-		return
-	}
+func (tg *TensorGrid) Render() {
 	if tg.PushBounds() {
-		tg.This().(gi.Node2D).ConnectEvents2D()
 		tg.RenderTensor()
-		tg.Render2DChildren()
+		tg.RenderChildren()
 		tg.PopBounds()
-	} else {
-		tg.DisconnectAllEvents(gi.RegPri)
 	}
-}
-
-var TensorDispProps = ki.Props{
-	"ToolBar": ki.PropSlice{
-		{"Update", ki.Props{
-			"label": "Update Grid",
-			"icon":  "update",
-		}},
-	},
 }

@@ -4,15 +4,7 @@
 
 package etview
 
-import (
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/etable/v2/simat"
-	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/giv"
-	"goki.dev/ki/v2"
-)
-
+/*
 // TensorViewDialog is for editing an etensor.Tensor using a TensorView --
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
@@ -138,3 +130,4 @@ func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, 
 	})
 	return dlg
 }
+*/
