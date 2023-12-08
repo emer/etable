@@ -81,7 +81,7 @@ func (pl *Plot2D) OnInit() {
 				s.Direction = styles.Column
 				s.Grow.Set(0, 1)
 				s.Overflow.Y = styles.OverflowAuto
-				s.BackgroundColor.SetSolid(colors.Scheme.SurfaceContainer)
+				s.BackgroundColor.SetSolid(colors.Scheme.SurfaceContainerLow)
 			})
 		case "plot":
 			w.Style(func(s *styles.Style) {
@@ -175,7 +175,9 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
 
 // SavePNG saves the current plot to a png, capturing current render
 func (pl *Plot2D) SavePNG(fname gi.FileName) { //gti:add
-	// sv := pl.SVGPlot()
+	// TODO: implement SavePNG
+	sv := pl.SVGPlot()
+	_ = sv
 	// sv.SavePNG(string(fname))
 }
 
@@ -582,14 +584,14 @@ func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
 			pl.ConfigPlot()
 			pl.Update()
 		})
-	gi.NewButton(tb).SetText("Config...").SetIcon(icons.Settings).
+	gi.NewButton(tb).SetText("Config").SetIcon(icons.Settings).
 		SetTooltip("set parameters that control display (font size etc)").
 		OnClick(func(e events.Event) {
 			d := gi.NewBody().AddTitle(pl.Nm + " Params")
 			giv.NewStructView(d).SetStruct(&pl.Params)
 			d.NewFullDialog(pl).Run()
 		})
-	gi.NewButton(tb).SetText("Table...").SetIcon(icons.Edit).
+	gi.NewButton(tb).SetText("Table").SetIcon(icons.Edit).
 		SetTooltip("open a TableView window of the data").
 		OnClick(func(e events.Event) {
 			d := gi.NewBody().AddTitle(pl.Nm + " Data")
@@ -598,7 +600,7 @@ func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
 		})
 	gi.NewSeparator(tb)
 
-	gi.NewButton(tb).SetText("Save...").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
+	gi.NewButton(tb).SetText("Save").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
 		giv.NewFuncButton(m, pl.SaveSVG).SetIcon(icons.Save)
 		giv.NewFuncButton(m, pl.SavePNG).SetIcon(icons.Save)
 		giv.NewFuncButton(m, pl.SaveCSV).SetIcon(icons.Save)
@@ -607,8 +609,8 @@ func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
 	})
 	giv.NewFuncButton(tb, pl.OpenCSV).SetIcon(icons.Open)
 	gi.NewSeparator(tb)
-	giv.NewFuncButton(tb, pl.Table.FilterColName).SetIcon(icons.Search)
-	giv.NewFuncButton(tb, pl.Table.Sequential).SetIcon(icons.Search)
+	giv.NewFuncButton(tb, pl.Table.FilterColName).SetText("Filter").SetIcon(icons.FilterAlt)
+	giv.NewFuncButton(tb, pl.Table.Sequential).SetText("Unfilter").SetIcon(icons.FilterAltOff)
 }
 
 // these are the plot color names to use in order for successive lines -- feel free to choose your own!
