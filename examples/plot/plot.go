@@ -14,10 +14,8 @@ import (
 func main() { gimain.Run(app) }
 
 func app() {
-	gi.SetAppName("plot")
-	gi.SetAppAbout(`This demonstrates data plotting using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`)
-
-	b := gi.NewBody()
+	b := gi.NewAppBody("plot")
+	b.App().About = `This demonstrates data plotting using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
 
 	epc := etable.NewTable("epc")
 	epc.OpenCSV("ra25epoch.tsv", etable.Tab)
@@ -29,10 +27,7 @@ func app() {
 	pl.ColsUpdate()
 	pl.Update()
 
-	b.AddTopBar(func(pw gi.Widget) {
-		tb := b.DefaultTopAppBar(pw)
-		pl.PlotTopAppBar(tb)
-	})
+	b.AddAppBar(pl.ConfigToolbar)
 
 	b.NewWindow().Run().Wait()
 }

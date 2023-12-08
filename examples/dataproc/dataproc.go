@@ -101,12 +101,8 @@ func AnalyzePlanets() {
 func app() {
 	AnalyzePlanets()
 
-	gi.SetAppName("dataproc")
-	gi.SetAppAbout(`This demonstrates data processing using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`)
-
-	b := gi.NewBody()
-
-	b.AddDefaultTopAppBar()
+	b := gi.NewAppBody("dataproc")
+	b.App().About = `This demonstrates data processing using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
 
 	tv := gi.NewTabs(b)
 

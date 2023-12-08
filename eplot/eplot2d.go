@@ -564,7 +564,7 @@ func (pl *Plot2D) PlotConfig() {
 	// sv.SetProp("background-color", &gi.Prefs.Colors.Background)
 }
 
-func (pl *Plot2D) PlotTopAppBar(tb *gi.TopAppBar) {
+func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
