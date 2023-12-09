@@ -371,6 +371,8 @@ func (tv *TableView) ConfigRows() {
 		return
 	}
 
+	tv.This().(giv.SliceViewer).UpdtSliceSize()
+
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nWidg := nWidgPerRow * tv.VisRows
 	sg.Styles.Columns = nWidgPerRow
@@ -508,6 +510,8 @@ func (tv *TableView) UpdateWidgets() {
 
 	tv.ViewMuLock()
 	defer tv.ViewMuUnlock()
+
+	tv.This().(giv.SliceViewer).UpdtSliceSize()
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 
