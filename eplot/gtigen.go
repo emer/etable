@@ -131,3 +131,57 @@ func (t *Plot2D) SetStackTop(v int) *Plot2D {
 	t.StackTop = v
 	return t
 }
+
+var _ = gti.AddType(&gti.Type{
+	Name:      "goki.dev/etable/v2/eplot.PlotParams",
+	ShortName: "eplot.PlotParams",
+	IDName:    "plot-params",
+	Doc:       "PlotParams are parameters for overall plot",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"Title", &gti.Field{Name: "Title", Type: "string", LocalType: "string", Doc: "optional title at top of plot", Directives: gti.Directives{}, Tag: ""}},
+		{"Type", &gti.Field{Name: "Type", Type: "goki.dev/etable/v2/eplot.PlotTypes", LocalType: "PlotTypes", Doc: "type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional", Directives: gti.Directives{}, Tag: ""}},
+		{"Lines", &gti.Field{Name: "Lines", Type: "bool", LocalType: "bool", Doc: "plot lines", Directives: gti.Directives{}, Tag: ""}},
+		{"Points", &gti.Field{Name: "Points", Type: "bool", LocalType: "bool", Doc: "plot points with symbols", Directives: gti.Directives{}, Tag: ""}},
+		{"LineWidth", &gti.Field{Name: "LineWidth", Type: "float64", LocalType: "float64", Doc: "width of lines", Directives: gti.Directives{}, Tag: ""}},
+		{"PointSize", &gti.Field{Name: "PointSize", Type: "float64", LocalType: "float64", Doc: "size of points", Directives: gti.Directives{}, Tag: ""}},
+		{"BarWidth", &gti.Field{Name: "BarWidth", Type: "float64", LocalType: "float64", Doc: "width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default", Directives: gti.Directives{}, Tag: "min:\"0.01\" max:\"1\""}},
+		{"NegXDraw", &gti.Field{Name: "NegXDraw", Type: "bool", LocalType: "bool", Doc: "draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn", Directives: gti.Directives{}, Tag: ""}},
+		{"Scale", &gti.Field{Name: "Scale", Type: "float64", LocalType: "float64", Doc: "overall scaling factor -- the larger the number, the larger the fonts are relative to the graph", Directives: gti.Directives{}, Tag: "def:\"2\""}},
+		{"XAxisCol", &gti.Field{Name: "XAxisCol", Type: "string", LocalType: "string", Doc: "what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values.", Directives: gti.Directives{}, Tag: ""}},
+		{"LegendCol", &gti.Field{Name: "LegendCol", Type: "string", LocalType: "string", Doc: "optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables", Directives: gti.Directives{}, Tag: ""}},
+		{"XAxisRot", &gti.Field{Name: "XAxisRot", Type: "float64", LocalType: "float64", Doc: "rotation of the X Axis labels, in degrees", Directives: gti.Directives{}, Tag: ""}},
+		{"XAxisLabel", &gti.Field{Name: "XAxisLabel", Type: "string", LocalType: "string", Doc: "optional label to use for XAxis instead of column name", Directives: gti.Directives{}, Tag: ""}},
+		{"YAxisLabel", &gti.Field{Name: "YAxisLabel", Type: "string", LocalType: "string", Doc: "optional label to use for YAxis -- if empty, first column name is used", Directives: gti.Directives{}, Tag: ""}},
+		{"Plot", &gti.Field{Name: "Plot", Type: "*goki.dev/etable/v2/eplot.Plot2D", LocalType: "*Plot2D", Doc: "our plot, for update method", Directives: gti.Directives{}, Tag: "copy:\"-\" json:\"-\" xml:\"-\" view:\"-\""}},
+	}),
+	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
+	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
+})
+
+var _ = gti.AddType(&gti.Type{
+	Name:      "goki.dev/etable/v2/eplot.ColParams",
+	ShortName: "eplot.ColParams",
+	IDName:    "col-params",
+	Doc:       "ColParams are parameters for plotting one column of data",
+	Directives: gti.Directives{
+		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+	},
+	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+		{"On", &gti.Field{Name: "On", Type: "bool", LocalType: "bool", Doc: "whether to plot this column", Directives: gti.Directives{}, Tag: ""}},
+		{"Col", &gti.Field{Name: "Col", Type: "string", LocalType: "string", Doc: "name of column we're plotting", Directives: gti.Directives{}, Tag: "label:\"Column\""}},
+		{"Range", &gti.Field{Name: "Range", Type: "goki.dev/etable/v2/minmax.Range64", LocalType: "minmax.Range64", Doc: "effective range of data to plot -- either end can be fixed", Directives: gti.Directives{}, Tag: ""}},
+		{"FullRange", &gti.Field{Name: "FullRange", Type: "goki.dev/etable/v2/minmax.F64", LocalType: "minmax.F64", Doc: "full actual range of data -- only valid if specifically computed", Directives: gti.Directives{}, Tag: ""}},
+		{"Color", &gti.Field{Name: "Color", Type: "image/color.Color", LocalType: "color.Color", Doc: "color to use when plotting the line / column", Directives: gti.Directives{}, Tag: ""}},
+		{"NTicks", &gti.Field{Name: "NTicks", Type: "int", LocalType: "int", Doc: "desired number of ticks", Directives: gti.Directives{}, Tag: ""}},
+		{"Lbl", &gti.Field{Name: "Lbl", Type: "string", LocalType: "string", Doc: "if non-empty, this is an alternative label to use in plotting", Directives: gti.Directives{}, Tag: "label:\"Label\""}},
+		{"TensorIdx", &gti.Field{Name: "TensorIdx", Type: "int", LocalType: "int", Doc: "if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines", Directives: gti.Directives{}, Tag: ""}},
+		{"ErrCol", &gti.Field{Name: "ErrCol", Type: "string", LocalType: "string", Doc: "specifies a column containing error bars for this column", Directives: gti.Directives{}, Tag: ""}},
+		{"IsString", &gti.Field{Name: "IsString", Type: "bool", LocalType: "bool", Doc: "if true this is a string column -- plots as labels", Directives: gti.Directives{}, Tag: "inactive:\"+\""}},
+		{"Plot", &gti.Field{Name: "Plot", Type: "*goki.dev/etable/v2/eplot.Plot2D", LocalType: "*Plot2D", Doc: "our plot, for update method", Directives: gti.Directives{}, Tag: "copy:\"-\" json:\"-\" xml:\"-\" view:\"-\""}},
+	}),
+	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
+	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
+})

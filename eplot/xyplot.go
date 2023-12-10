@@ -66,7 +66,6 @@ func (pl *Plot2D) GenPlotXY() {
 	var strCols []*ColParams
 	nys := 0
 	for _, cp := range pl.Cols {
-		cp.UpdateVals()
 		if !cp.On {
 			continue
 		}

@@ -9,6 +9,7 @@ package eplot
 import (
 	"fmt"
 	"log"
+	"log/slog"
 	"math"
 	"path/filepath"
 	"strings"
@@ -269,7 +270,7 @@ func (pl *Plot2D) GenPlot() {
 		return
 	}
 	if pl.InPlot {
-		fmt.Printf("error: in plot already\n")
+		slog.Error("in plot already")
 		return
 	}
 	pl.InPlot = true
@@ -611,6 +612,3 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 	giv.NewFuncButton(tb, pl.Table.FilterColName).SetText("Filter").SetIcon(icons.FilterAlt)
 	giv.NewFuncButton(tb, pl.Table.Sequential).SetText("Unfilter").SetIcon(icons.FilterAltOff)
 }
-
-// these are the plot color names to use in order for successive lines -- feel free to choose your own!
-var PlotColorNames = []string{"black", "red", "blue", "ForestGreen", "purple", "orange", "brown", "chartreuse", "navy", "cyan", "magenta", "tan", "salmon", "goldenrod", "SkyBlue", "pink"}

@@ -9,14 +9,12 @@ import (
 	"strings"
 
 	"github.com/goki/ki/kit"
-	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
-	"goki.dev/gi/v2/gi"
 )
 
 // PlotParams are parameters for overall plot
-type PlotParams struct {
+type PlotParams struct { //gti:add
 
 	// optional title at top of plot
 	Title string
@@ -166,13 +164,13 @@ func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 }
 
 // ColParams are parameters for plotting one column of data
-type ColParams struct {
+type ColParams struct { //gti:add
 
-	// plot this column
+	// whether to plot this column
 	On bool
 
 	// name of column we're plotting
-	Col string
+	Col string `label:"Column"`
 
 	// effective range of data to plot -- either end can be fixed
 	Range minmax.Range64
@@ -180,17 +178,14 @@ type ColParams struct {
 	// full actual range of data -- only valid if specifically computed
 	FullRange minmax.F64
 
-	// if non-empty, color is set by this name
-	ColorName gi.ColorName
-
-	// color to use in plotting the line
+	// color to use when plotting the line / column
 	Color color.Color
 
 	// desired number of ticks
 	NTicks int
 
 	// if non-empty, this is an alternative label to use in plotting
-	Lbl string
+	Lbl string `label:"Label"`
 
 	// if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines
 	TensorIdx int
@@ -214,7 +209,6 @@ func (cp *ColParams) Defaults() {
 
 // Update satisfies the gi.Updater interface and will trigger display update on edits
 func (cp *ColParams) Update() {
-	cp.UpdateVals()
 	if cp.Plot != nil {
 		cp.Plot.Update()
 	}
@@ -225,16 +219,6 @@ func (cp *ColParams) CopyFrom(fr *ColParams) {
 	pl := cp.Plot
 	*cp = *fr
 	cp.Plot = pl
-}
-
-// UpdateVals update derived values e.g., color from color name
-func (cp *ColParams) UpdateVals() {
-	if cp.ColorName != "" {
-		clr, err := colors.FromString(string(cp.ColorName), nil)
-		if err == nil {
-			cp.Color = clr
-		}
-	}
 }
 
 func (cp *ColParams) Label() string {
@@ -293,9 +277,6 @@ func (cp *ColParams) FmMetaMap(meta map[string]string) {
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":Min"); has {
 		cp.Range.Min, _ = kit.ToFloat(vl)
-	}
-	if lb, has := MetaMapLower(meta, cp.Col+":Color"); has {
-		cp.ColorName = gi.ColorName(lb)
 	}
 	if lb, has := MetaMapLower(meta, cp.Col+":Label"); has {
 		cp.Lbl = lb
