@@ -6,13 +6,14 @@ package eplot
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 
 	"goki.dev/colors"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/split"
+	"goki.dev/grr"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -26,7 +27,9 @@ func (pl *Plot2D) GenPlotXY() {
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
 
-	clr := colors.Scheme.Primary.Base
+	plt.BackgroundColor = colors.Scheme.Surface
+
+	clr := colors.Scheme.OnSurface
 
 	plt.Title.TextStyle.Color = clr
 	plt.Legend.TextStyle.Color = clr
@@ -38,8 +41,6 @@ func (pl *Plot2D) GenPlotXY() {
 	plt.Y.Tick.Color = clr
 	plt.X.Tick.Label.Color = clr
 	plt.Y.Tick.Label.Color = clr
-
-	plt.BackgroundColor = nil
 
 	// process xaxis first
 	xi, xview, xbreaks, err := pl.PlotXAxis(plt, pl.Table)
@@ -53,12 +54,9 @@ func (pl *Plot2D) GenPlotXY() {
 	if pl.Params.LegendCol != "" {
 		_, err = pl.Table.Table.ColIdxTry(pl.Params.LegendCol)
 		if err != nil {
-			log.Println("eplot.LegendCol: " + err.Error())
+			slog.Error("eplot.LegendCol", "err", err.Error())
 		} else {
-			err = xview.SortStableColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending)
-			if err != nil {
-				log.Println(err)
-			}
+			grr.Log(xview.SortStableColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending))
 			lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
 			nleg = max(lsplit.Len(), 1)
 		}
