@@ -13,7 +13,6 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/split"
-	"goki.dev/grr"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"
@@ -143,10 +142,10 @@ func (pl *Plot2D) GenPlotXY() {
 					}
 					if nleg > 1 {
 						cidx := yidx*nleg + li
-						clr = grr.Log1(colors.FromString(PlotColorNames[cidx%len(PlotColorNames)], nil))
+						clr = colors.AccentVariantList(nys)[cidx]
 					}
 					if nidx > 1 {
-						clr = grr.Log1(colors.FromString(PlotColorNames[idx%len(PlotColorNames)], nil))
+						clr = colors.AccentVariantList(nys)[idx]
 						lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 					}
 					if pl.Params.Lines && pl.Params.Points {

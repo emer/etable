@@ -403,7 +403,6 @@ func (pl *Plot2D) ColsListUpdate() {
 	if nc == len(pl.Cols) {
 		return
 	}
-	npc := len(PlotColorNames)
 	pl.Cols = make([]*ColParams, nc)
 	clri := 0
 	for ci := range dt.Cols {
@@ -412,7 +411,7 @@ func (pl *Plot2D) ColsListUpdate() {
 		if cn == pl.Params.XAxisCol { // re-use xaxis color
 			inc = 0
 		}
-		cp := &ColParams{Col: cn, ColorName: gi.ColorName(PlotColorNames[clri%npc])}
+		cp := &ColParams{Col: cn, Color: colors.AccentVariantList(nc)[clri]}
 		cp.Defaults()
 		tcol := dt.Cols[ci]
 		if tcol.DataType() == etensor.STRING {
