@@ -140,10 +140,10 @@ func (pl *Plot2D) GenPlotXY() {
 					}
 					if nleg > 1 {
 						cidx := yidx*nleg + li
-						clr = colors.AccentVariantList(nys)[cidx]
+						clr = colors.BinarySpacedAccentVariant(cidx)
 					}
 					if nidx > 1 {
-						clr = colors.AccentVariantList(nys)[idx]
+						clr = colors.BinarySpacedAccentVariant(idx)
 						lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 					}
 					if pl.Params.Lines && pl.Params.Points {

@@ -27,7 +27,8 @@ func (pl *Plot2D) GenPlotBar() {
 	plt.Title.Text = pl.Params.Title
 	plt.X.Label.Text = pl.XLabel()
 	plt.Y.Label.Text = pl.YLabel()
-	plt.BackgroundColor = nil
+	// TODO(kai): better bar plot styling
+	plt.BackgroundColor = colors.Scheme.Surface
 
 	if pl.Params.BarWidth > 1 {
 		pl.Params.BarWidth = .8
@@ -132,10 +133,10 @@ func (pl *Plot2D) GenPlotBar() {
 				}
 				if nleg > 1 {
 					cidx := yidx*nleg + li
-					clr, _ = colors.FromString(PlotColorNames[cidx%len(PlotColorNames)], nil)
+					clr = colors.BinarySpacedAccentVariant(cidx)
 				}
 				if nidx > 1 {
-					clr, _ = colors.FromString(PlotColorNames[idx%len(PlotColorNames)], nil)
+					clr = colors.BinarySpacedAccentVariant(idx)
 					lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 				}
 				ec := -1
