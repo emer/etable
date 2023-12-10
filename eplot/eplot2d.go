@@ -411,7 +411,7 @@ func (pl *Plot2D) ColsListUpdate() {
 		if cn == pl.Params.XAxisCol { // re-use xaxis color
 			inc = 0
 		}
-		cp := &ColParams{Col: cn, Color: colors.AccentVariantList(nc)[clri]}
+		cp := &ColParams{Col: cn, Color: colors.BinarySpacedColor(clri, 48, 60)}
 		cp.Defaults()
 		tcol := dt.Cols[ci]
 		if tcol.DataType() == etensor.STRING {
