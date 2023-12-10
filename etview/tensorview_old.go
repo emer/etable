@@ -25,7 +25,7 @@ type TensorView struct {
 	TsrLay TensorLayout
 
 	// number of columns in table (as of last update)
-	NCols int `inactive:"+"`
+	NCols int `edit:"-"`
 }
 
 // check for interface impl

@@ -194,7 +194,7 @@ type ColParams struct { //gti:add
 	ErrCol string
 
 	// if true this is a string column -- plots as labels
-	IsString bool `inactive:"+"`
+	IsString bool `edit:"-"`
 
 	// our plot, for update method
 	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-"`

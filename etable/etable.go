@@ -26,7 +26,7 @@ type Table struct { //gti:add
 	ColNames []string
 
 	// number of rows, which is enforced to be the size of the outer-most dimension of the column tensors
-	Rows int `inactive:"+"`
+	Rows int `edit:"-"`
 
 	// the map of column names to column numbers
 	ColNameMap map[string]int `view:"-"`

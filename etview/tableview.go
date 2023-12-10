@@ -45,7 +45,7 @@ type TableView struct {
 	ColTsrBlank map[int]*etensor.Float64
 
 	// number of columns in table (as of last update)
-	NCols int `inactive:"+"`
+	NCols int `edit:"-"`
 
 	// current sort index
 	SortIdx int
