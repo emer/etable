@@ -109,14 +109,14 @@ func (pl *Plot2D) OnInit() {
 func (pl *Plot2D) SetTable(tab *etable.Table) {
 	pl.Table = etable.NewIdxView(tab)
 	pl.Cols = nil
-	pl.ConfigPlot()
+	pl.Update()
 }
 
 // SetTableView sets the idxview of table to view and updates view
 func (pl *Plot2D) SetTableView(tab *etable.IdxView) {
 	pl.Table = tab
 	pl.Cols = nil
-	pl.ConfigPlot()
+	pl.Update()
 }
 
 // ColParamsTry returns the current column parameters by name (to access by index, just use Cols directly)
@@ -202,7 +202,6 @@ func (pl *Plot2D) SaveAll(fname gi.FileName) { //gti:add
 func (pl *Plot2D) OpenCSV(fname gi.FileName, delim etable.Delims) { //gti:add
 	pl.Table.Table.OpenCSV(fname, delim)
 	pl.DataFile = fname
-	pl.Config()
 	pl.Update()
 }
 
@@ -234,22 +233,28 @@ func (pl *Plot2D) XLabel() string {
 	return "X"
 }
 
-// Update updates the display based on current state of table.
-// Calls Sequential method on etable.IdxView to view entire current table.
-func (pl *Plot2D) Update() {
+// GoUpdatePlot updates the display based on current IdxView into table.
+// this version can be called from go routines.
+func (pl *Plot2D) GoUpdatePlot() {
 	if pl == nil || pl.This() == nil {
 		return
 	}
-	if pl.Table == nil || pl.Table.Table == nil {
+	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
+		return
+	}
+	updt := pl.Sc.UpdateStartAsync()
+	if !updt {
+		pl.Sc.UpdateEndAsyncRender(updt)
 		return
 	}
 	pl.Table.Sequential()
-	pl.UpdatePlot()
+	pl.GenPlot()
+	pl.Sc.UpdateEndAsyncRender(updt)
 }
 
 // UpdatePlot updates the display based on current IdxView into table.
 // This version can only be called within main goroutine for
-// window eventloop -- use GoUpdate for other-goroutine updates.
+// window eventloop -- use GoUpdateUplot for other-goroutine updates.
 func (pl *Plot2D) UpdatePlot() {
 	if pl == nil || pl.This() == nil {
 		return
@@ -258,8 +263,10 @@ func (pl *Plot2D) UpdatePlot() {
 		return
 	}
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
-		pl.Config()
+		fmt.Println("did update")
+		pl.Update()
 	}
+	pl.Table.Sequential()
 	pl.GenPlot()
 }
 
@@ -270,7 +277,7 @@ func (pl *Plot2D) GenPlot() {
 		return
 	}
 	if pl.InPlot {
-		slog.Error("in plot already")
+		slog.Error("eplot: in plot already")
 		return
 	}
 	pl.InPlot = true
@@ -293,6 +300,9 @@ func (pl *Plot2D) GenPlot() {
 	}
 	if pl.GPlot != nil {
 		PlotViewSVG(pl.GPlot, sv, pl.Params.Scale)
+	} else {
+		sv.SVG.DeleteAll()
+		// slog.Error("eplot: no plot generated from gonum plot")
 	}
 	pl.InPlot = false
 }
@@ -368,11 +378,16 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 	return
 }
 
+func (pl *Plot2D) ConfigWidget() {
+	if pl.Table != nil {
+		pl.ConfigPlot()
+	}
+}
+
 // ConfigPlot configures the overall view widget
 func (pl *Plot2D) ConfigPlot() {
 	pl.Params.FmMeta(pl.Table.Table)
 	if !pl.HasChildren() {
-		// pl.AddDefaultTopAppBar()
 		gi.NewFrame(pl, "cols")
 		gi.NewSVG(pl, "plot")
 	}
@@ -504,6 +519,7 @@ func (pl *Plot2D) ColsConfig() {
 	vl := pl.ColsLay()
 	pl.ColsListUpdate()
 	if len(vl.Kids) == len(pl.Cols)+PlotColsHeaderN {
+		pl.ColsUpdate()
 		return
 	}
 	vl.DeleteChildren(true)
@@ -515,6 +531,7 @@ func (pl *Plot2D) ColsConfig() {
 	sw.OnChange(func(e events.Event) {
 		sw.SetChecked(false)
 		pl.SetAllCols(false)
+		pl.ColsUpdate()
 	})
 	gi.NewButton(sc, "col").SetText("Select Cols").SetType(gi.ButtonAction).
 		SetTooltip("click to select columns based on column name").
@@ -531,26 +548,28 @@ func (pl *Plot2D) ColsConfig() {
 			s.Direction = styles.Row
 			s.Grow.Set(0, 0)
 		})
-		sw := gi.NewSwitch(cl, "on").SetTooltip("toggle plot on")
+		sw := gi.NewSwitch(cl, "on").SetType(gi.SwitchCheckbox).SetTooltip("toggle plot on")
 		sw.OnChange(func(e events.Event) {
 			cp.On = sw.StateIs(states.Checked)
 			pl.Update()
+			pl.UpdatePlot()
 		})
 		sw.SetState(cp.On, states.Checked)
 		bt := gi.NewButton(cl, "col").SetText(cp.Col).SetType(gi.ButtonAction)
 		bt.SetMenu(func(m *gi.Scene) {
 			gi.NewButton(m, "set-x").SetText("Set X Axis").OnClick(func(e events.Event) {
 				pl.Params.XAxisCol = cp.Col
-				pl.Update()
+				pl.UpdatePlot()
 			})
 			gi.NewButton(m, "set-legend").SetText("Set Legend").OnClick(func(e events.Event) {
 				pl.Params.LegendCol = cp.Col
-				pl.Update()
+				pl.UpdatePlot()
 			})
 			gi.NewButton(m, "edit").SetText("Edit").OnClick(func(e events.Event) {
 				d := gi.NewBody().AddTitle("Col Params")
 				giv.NewStructView(d).SetStruct(cp)
 				d.NewFullDialog(pl).Run()
+				// todo: add update on ok
 			})
 		})
 	}
@@ -570,12 +589,12 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 	}
 	gi.NewButton(tb).SetIcon(icons.PanTool).
 		SetTooltip("return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)").OnClick(func(e events.Event) {
-		fmt.Printf("this will select pan mode\n")
+		fmt.Println("this will select pan mode")
 	})
 	gi.NewButton(tb).SetIcon(icons.ArrowForward).
 		SetTooltip("turn on select mode for selecting units and layers with mouse clicks").
 		OnClick(func(e events.Event) {
-			fmt.Printf("this will select select mode\n")
+			fmt.Println("this will select select mode")
 		})
 	gi.NewSeparator(tb)
 	gi.NewButton(tb).SetText("Update").SetIcon(icons.Update).

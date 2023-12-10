@@ -9,6 +9,7 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/gimain"
+	"goki.dev/goosi/events"
 )
 
 func main() { gimain.Run(app) }
@@ -22,10 +23,12 @@ func app() {
 
 	pl := eplot.NewPlot2D(b)
 	pl.SetTable(epc)
+	pl.Params.Title = "RA25 Epoch Train"
 	pl.Params.XAxisCol = "Epoch"
 	pl.ColParams("UnitErr").On = true
-	pl.ColsUpdate()
-	pl.Update()
+	pl.OnShow(func(e events.Event) {
+		pl.UpdatePlot()
+	})
 
 	b.AddAppBar(pl.ConfigToolbar)
 

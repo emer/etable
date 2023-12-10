@@ -7,6 +7,7 @@ package eplot
 import (
 	"bytes"
 	"log"
+	"log/slog"
 	"os"
 
 	"goki.dev/gi/v2/gi"
@@ -40,17 +41,18 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 
 	var buf bytes.Buffer
 	if _, err := c.WriteTo(&buf); err != nil {
-		log.Println(err)
+		slog.Error(err.Error())
 	} else {
-		svge.SVG.ReadXML(&buf)
-
+		err := svge.SVG.ReadXML(&buf)
+		if err != nil {
+			slog.Error("eplot: svg render errors", "err", err)
+		}
 		svge.SVG.Norm = true
 		svge.SVG.Fill = true
 		svge.SVG.SetNormTransform()
 		// svge.Scale = float32(scale)
 		// svge.SVG.SetTransform()
-
-		svge.Update()
+		svge.SetNeedsRender(true)
 	}
 }
 

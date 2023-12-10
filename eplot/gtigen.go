@@ -179,7 +179,7 @@ var _ = gti.AddType(&gti.Type{
 		{"Lbl", &gti.Field{Name: "Lbl", Type: "string", LocalType: "string", Doc: "if non-empty, this is an alternative label to use in plotting", Directives: gti.Directives{}, Tag: "label:\"Label\""}},
 		{"TensorIdx", &gti.Field{Name: "TensorIdx", Type: "int", LocalType: "int", Doc: "if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines", Directives: gti.Directives{}, Tag: ""}},
 		{"ErrCol", &gti.Field{Name: "ErrCol", Type: "string", LocalType: "string", Doc: "specifies a column containing error bars for this column", Directives: gti.Directives{}, Tag: ""}},
-		{"IsString", &gti.Field{Name: "IsString", Type: "bool", LocalType: "bool", Doc: "if true this is a string column -- plots as labels", Directives: gti.Directives{}, Tag: "inactive:\"+\""}},
+		{"IsString", &gti.Field{Name: "IsString", Type: "bool", LocalType: "bool", Doc: "if true this is a string column -- plots as labels", Directives: gti.Directives{}, Tag: "edit:\"-\""}},
 		{"Plot", &gti.Field{Name: "Plot", Type: "*goki.dev/etable/v2/eplot.Plot2D", LocalType: "*Plot2D", Doc: "our plot, for update method", Directives: gti.Directives{}, Tag: "copy:\"-\" json:\"-\" xml:\"-\" view:\"-\""}},
 	}),
 	Embeds:  ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
