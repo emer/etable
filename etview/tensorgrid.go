@@ -271,7 +271,7 @@ func (tg *TensorGrid) Color(val float64) (norm float64, clr color.Color) {
 		clr = tg.ColorMap.MapIndex(int(val))
 	} else {
 		norm = tg.Disp.Range.ClipNormVal(val)
-		clr = tg.ColorMap.Map(norm)
+		clr = tg.ColorMap.Map(float32(norm))
 	}
 	return
 }
