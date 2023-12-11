@@ -452,7 +452,7 @@ func (pl *Plot2D) ColsUpdate() {
 // SetAllCols turns all Cols on or off (except X axis)
 func (pl *Plot2D) SetAllCols(on bool) {
 	updt := pl.UpdateStart()
-	defer pl.UpdateEnd(updt)
+	defer pl.UpdateEndRender(updt)
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i < PlotColsHeaderN {
@@ -467,14 +467,15 @@ func (pl *Plot2D) SetAllCols(on bool) {
 		cl := cli.(*gi.Layout)
 		sw := cl.Child(0).(*gi.Switch)
 		sw.SetChecked(cp.On)
+		sw.SetNeedsRender(true)
 	}
-	pl.Update()
+	pl.UpdatePlot()
 }
 
 // SetColsByName turns cols On or Off if their name contains given string
-func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
+func (pl *Plot2D) SetColsByName(nameContains string, on bool) { //gti:add
 	updt := pl.UpdateStart()
-	defer pl.UpdateEnd(updt)
+	defer pl.UpdateEndRender(updt)
 
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
@@ -493,8 +494,9 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) {
 		cl := cli.(*gi.Layout)
 		sw := cl.Child(0).(*gi.Switch)
 		sw.SetChecked(cp.On)
+		sw.SetNeedsRender(true)
 	}
-	pl.Update()
+	pl.UpdatePlot()
 }
 
 // ColsConfig configures the column gui buttons
@@ -514,7 +516,6 @@ func (pl *Plot2D) ColsConfig() {
 	sw.OnChange(func(e events.Event) {
 		sw.SetChecked(false)
 		pl.SetAllCols(false)
-		pl.ColsUpdate()
 	})
 	gi.NewButton(sc, "col").SetText("Select Cols").SetType(gi.ButtonAction).
 		SetTooltip("click to select columns based on column name").
@@ -625,6 +626,6 @@ func NewSubPlot(par gi.Widget, name ...string) *Plot2D {
 		s.Direction = styles.Column
 		s.Grow.Set(1, 1)
 	})
-	pl.ConfigToolbar(tb)
+	tb.ToolbarFuncs.Add(pl.ConfigToolbar)
 	return pl
 }

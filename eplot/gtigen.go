@@ -59,6 +59,12 @@ var Plot2DType = gti.AddType(&gti.Type{
 			{"fname", &gti.Field{Name: "fname", Type: "goki.dev/gi/v2/gi.FileName", LocalType: "gi.FileName", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 			{"delim", &gti.Field{Name: "delim", Type: "goki.dev/etable/v2/etable.Delims", LocalType: "etable.Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{})}},
+		{"SetColsByName", &gti.Method{Name: "SetColsByName", Doc: "SetColsByName turns cols On or Off if their name contains given string", Directives: gti.Directives{
+			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+			{"nameContains", &gti.Field{Name: "nameContains", Type: "string", LocalType: "string", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"on", &gti.Field{Name: "on", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{})}},
 	}),
 	Instance: &Plot2D{},
 })
