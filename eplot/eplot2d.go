@@ -75,34 +75,6 @@ func (pl *Plot2D) OnInit() {
 		s.Direction = styles.Row
 		s.Grow.Set(1, 1)
 	})
-	pl.OnWidgetAdded(func(w gi.Widget) {
-		switch w.PathFrom(pl) {
-		case "cols":
-			w.Style(func(s *styles.Style) {
-				s.Direction = styles.Column
-				s.Grow.Set(0, 1)
-				s.Overflow.Y = styles.OverflowAuto
-				s.BackgroundColor.SetSolid(colors.Scheme.SurfaceContainerLow)
-			})
-		case "plot":
-			w.Style(func(s *styles.Style) {
-				s.Min.Set(units.Em(30))
-				s.Grow.Set(1, 1)
-			})
-		}
-	})
-	// plot
-	// play.Lay = gi.LayoutHoriz
-	// play.SetProp("max-width", -1)
-	// play.SetProp("max-height", -1)
-	// play.SetProp("spacing", gi.StdDialogVSpaceUnits)
-
-	// cols
-	// vl.Lay = gi.LayoutVert
-	// vl.SetProp("spacing", 0)
-	// vl.SetProp("vertical-align", gist.AlignTop)
-	// vl.SetMinPrefHeight(units.NewEm(5)) // get separate scroll on cols
-	// vl.SetStretchMaxHeight()
 }
 
 // SetTable sets the table to view and updates view
@@ -388,8 +360,19 @@ func (pl *Plot2D) ConfigWidget() {
 func (pl *Plot2D) ConfigPlot() {
 	pl.Params.FmMeta(pl.Table.Table)
 	if !pl.HasChildren() {
-		gi.NewFrame(pl, "cols")
-		gi.NewSVG(pl, "plot")
+		fr := gi.NewFrame(pl, "cols")
+		fr.Style(func(s *styles.Style) {
+			s.Direction = styles.Column
+			s.Grow.Set(0, 1)
+			s.Overflow.Y = styles.OverflowAuto
+			s.BackgroundColor.SetSolid(colors.Scheme.SurfaceContainerLow)
+		})
+		pt := gi.NewSVG(pl, "plot")
+		pt.Style(func(s *styles.Style) {
+			s.Min.Set(units.Em(30))
+			s.Grow.Set(1, 1)
+		})
+
 	}
 	updt := pl.UpdateStart()
 	defer pl.UpdateEndLayout(updt)
@@ -538,7 +521,7 @@ func (pl *Plot2D) ColsConfig() {
 		OnClick(func(e events.Event) {
 			giv.CallFunc(pl, pl.SetColsByName)
 		})
-	gi.NewSeparator(vl, "sep").SetHoriz(true)
+	gi.NewSeparator(vl, "sep")
 
 	for _, cp := range pl.Cols {
 		cp := cp
@@ -630,4 +613,18 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 	gi.NewSeparator(tb)
 	giv.NewFuncButton(tb, pl.Table.FilterColName).SetText("Filter").SetIcon(icons.FilterAlt)
 	giv.NewFuncButton(tb, pl.Table.Sequential).SetText("Unfilter").SetIcon(icons.FilterAltOff)
+}
+
+// NewSubPlot returns a Plot2D with its own separate Toolbar,
+// suitable for a tab or other element that is not the main plot.
+func NewSubPlot(par gi.Widget, name ...string) *Plot2D {
+	fr := gi.NewFrame(par, name...)
+	tb := gi.NewToolbar(fr, "tbar")
+	pl := NewPlot2D(fr, "plot")
+	fr.Style(func(s *styles.Style) {
+		s.Direction = styles.Column
+		s.Grow.Set(1, 1)
+	})
+	pl.ConfigToolbar(tb)
+	return pl
 }
