@@ -196,13 +196,13 @@ func (dt *Table) DeleteAll() {
 }
 
 // AddRows adds n rows to each of the columns
-func (dt *Table) AddRows(n int) {
+func (dt *Table) AddRows(n int) { //gti:add
 	dt.SetNumRows(dt.Rows + n)
 }
 
 // SetNumRows sets the number of rows in the table, across all columns
 // if rows = 0 then effective number of rows in tensors is 1, as this dim cannot be 0
-func (dt *Table) SetNumRows(rows int) {
+func (dt *Table) SetNumRows(rows int) { //gti:add
 	dt.Rows = rows // can be 0
 	rows = max(1, rows)
 	for _, tsr := range dt.Cols {
@@ -818,63 +818,3 @@ func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpR
 	}
 	return nil
 }
-
-//////////////////////////////////////////////////////////////////////////////////////
-//  Table props for gui
-
-// todo:
-
-/*
-var TableProps = ki.Props{
-	"ToolBar": ki.PropSlice{
-		{"AddRows", ki.Props{
-			"icon": "plus",
-			"Args": ki.PropSlice{
-				{"N Rows", ki.Props{
-					"default": 1,
-				}},
-			},
-		}},
-		{"SetNumRows", ki.Props{
-			"label": "Set N Rows",
-			"icon":  "new",
-			"Args": ki.PropSlice{
-				{"N Rows", ki.Props{
-					"default-field": "Rows",
-				}},
-			},
-		}},
-		{"sep-file", ki.BlankProp{}},
-		{"OpenCSV", ki.Props{
-			"label": "Open CSV...",
-			"icon":  "file-open",
-			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"ext": ".tsv,.csv",
-				}},
-				{"Delimiter", ki.Props{
-					"default": Tab,
-				}},
-			},
-		}},
-		{"SaveCSV", ki.Props{
-			"label": "Save CSV...",
-			"icon":  "file-save",
-			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"ext": ".tsv,.csv",
-				}},
-				{"Delimiter", ki.Props{
-					"default": Tab,
-				}},
-				{"Headers", ki.Props{
-					"default": true,
-					"desc":    "output C++ emergent-style headers that have type and tensor geometry information",
-				}},
-			},
-		}},
-	},
-}
-*/

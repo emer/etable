@@ -18,12 +18,22 @@ var _ = gti.AddType(&gti.Type{
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 		{"Cols", &gti.Field{Name: "Cols", Type: "[]goki.dev/etable/v2/etensor.Tensor", LocalType: "[]etensor.Tensor", Doc: "columns of data, as etensor.Tensor tensors", Directives: gti.Directives{}, Tag: "view:\"no-inline\""}},
 		{"ColNames", &gti.Field{Name: "ColNames", Type: "[]string", LocalType: "[]string", Doc: "the names of the columns", Directives: gti.Directives{}, Tag: ""}},
-		{"Rows", &gti.Field{Name: "Rows", Type: "int", LocalType: "int", Doc: "number of rows, which is enforced to be the size of the outer-most dimension of the column tensors", Directives: gti.Directives{}, Tag: "inactive:\"+\""}},
+		{"Rows", &gti.Field{Name: "Rows", Type: "int", LocalType: "int", Doc: "number of rows, which is enforced to be the size of the outer-most dimension of the column tensors", Directives: gti.Directives{}, Tag: "edit:\"-\""}},
 		{"ColNameMap", &gti.Field{Name: "ColNameMap", Type: "map[string]int", LocalType: "map[string]int", Doc: "the map of column names to column numbers", Directives: gti.Directives{}, Tag: "view:\"-\""}},
 		{"MetaData", &gti.Field{Name: "MetaData", Type: "map[string]string", LocalType: "map[string]string", Doc: "misc meta data for the table.  We use lower-case key names following the struct tag convention:  name = name of table; desc = description; read-only = gui is read-only; precision = n for precision to write out floats in csv.  For Column-specific data, we look for ColName: prefix, specifically ColName:desc = description of the column contents, which is shown as tooltip in the etview.TableView, and :width for width of a column", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
 	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{
+		{"AddRows", &gti.Method{Name: "AddRows", Doc: "AddRows adds n rows to each of the columns", Directives: gti.Directives{
+			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+			{"n", &gti.Field{Name: "n", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{})}},
+		{"SetNumRows", &gti.Method{Name: "SetNumRows", Doc: "SetNumRows sets the number of rows in the table, across all columns\nif rows = 0 then effective number of rows in tensors is 1, as this dim cannot be 0", Directives: gti.Directives{
+			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+			{"rows", &gti.Field{Name: "rows", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{})}},
 		{"SaveCSV", &gti.Method{Name: "SaveCSV", Doc: "SaveCSV writes a table to a comma-separated-values (CSV) file\n(where comma = any delimiter, specified in the delim arg).\nIf headers = true then generate C++ emergent-tyle column headers.\nThese headers have full configuration information for the tensor\ncolumns.  Otherwise, only the data is written.", Directives: gti.Directives{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
@@ -62,6 +72,14 @@ var _ = gti.AddType(&gti.Type{
 		{"Sequential", &gti.Method{Name: "Sequential", Doc: "Sequential sets indexes to sequential row-wise indexes into table", Directives: gti.Directives{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{})}},
+		{"SortColName", &gti.Method{Name: "SortColName", Doc: "SortColName sorts the indexes into our Table according to values in\ngiven column name, using either ascending or descending order.\nOnly valid for 1-dimensional columns.\nReturns error if column name not found.", Directives: gti.Directives{
+			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+			{"colNm", &gti.Field{Name: "colNm", Type: "string", LocalType: "string", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"ascending", &gti.Field{Name: "ascending", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		})}},
 		{"FilterColName", &gti.Method{Name: "FilterColName", Doc: "FilterColName filters the indexes into our Table according to values in\ngiven column name, using string representation of column values.\nIncludes rows with matching values unless exclude is set.\nIf contains, only checks if row contains string; if ignoreCase, ignores case.\nUse named args for greater clarity.\nOnly valid for 1-dimensional columns.\nReturns error if column name not found.", Directives: gti.Directives{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
@@ -71,6 +89,11 @@ var _ = gti.AddType(&gti.Type{
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		})}},
+		{"AddRows", &gti.Method{Name: "AddRows", Doc: "AddRows adds n rows to end of underlying Table, and to the indexes in this view", Directives: gti.Directives{
+			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
+		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
+			{"n", &gti.Field{Name: "n", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{})}},
 		{"SaveCSV", &gti.Method{Name: "SaveCSV", Doc: "SaveCSV writes a table idx view to a comma-separated-values (CSV) file\n(where comma = any delimiter, specified in the delim arg).\nIf headers = true then generate C++ emergent-tyle column headers.\nThese headers have full configuration information for the tensor\ncolumns.  Otherwise, only the data is written.", Directives: gti.Directives{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{

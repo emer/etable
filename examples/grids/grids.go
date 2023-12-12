@@ -28,7 +28,8 @@ func app() {
 
 	// nt := tv.NewTab("First")
 	nt := tv.NewTab("Patterns")
-	etview.NewTableView(nt).SetTable(pats)
+	etv := etview.NewTableView(nt).SetTable(pats)
+	b.AddAppBar(etv.ConfigToolbar)
 
 	b.NewWindow().Run().Wait()
 }

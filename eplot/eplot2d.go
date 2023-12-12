@@ -598,7 +598,8 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 		SetTooltip("open a TableView window of the data").
 		OnClick(func(e events.Event) {
 			d := gi.NewBody().AddTitle(pl.Nm + " Data")
-			etview.NewTableView(d).SetTable(pl.Table.Table)
+			etv := etview.NewTableView(d).SetTable(pl.Table.Table)
+			d.AddAppBar(etv.ConfigToolbar)
 			d.NewFullDialog(pl).Run()
 		})
 	gi.NewSeparator(tb)

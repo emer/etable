@@ -901,18 +901,6 @@ func (tv *TableView) EditIdx(idx int) {
 	d.NewFullDialog(tv).Run()
 }
 
-func (tv *TableView) StdCtxtMenu(m *gi.Scene, idx int) {
-	if tv.Is(giv.SliceViewIsArray) {
-		return
-	}
-	tv.SliceViewBase.StdCtxtMenu(m, idx)
-	gi.NewSeparator(m, "sep-edit")
-	gi.NewButton(m, "edit").SetText("Edit").SetData(idx).
-		OnClick(func(e events.Event) {
-			tv.EditIdx(idx)
-		})
-}
-
 //////////////////////////////////////////////////////
 // 	Header layout
 
@@ -940,6 +928,18 @@ func (tv *TableView) SizeFinal() {
 
 //////////////////////////////////////////////////////////////////////////////
 //    Copy / Cut / Paste
+
+func (tv *TableView) ConfigToolbar(tb *gi.Toolbar) {
+	if tv.Table == nil || tv.Table.Table == nil {
+		return
+	}
+	giv.NewFuncButton(tb, tv.Table.AddRows).SetIcon(icons.Add)
+	giv.NewFuncButton(tb, tv.Table.SortColName).SetText("Sort").SetIcon(icons.Sort)
+	giv.NewFuncButton(tb, tv.Table.FilterColName).SetText("Filter").SetIcon(icons.FilterAlt)
+	giv.NewFuncButton(tb, tv.Table.Sequential).SetText("Unfilter").SetIcon(icons.FilterAltOff)
+	giv.NewFuncButton(tb, tv.Table.OpenCSV).SetIcon(icons.Open)
+	giv.NewFuncButton(tb, tv.Table.SaveCSV).SetIcon(icons.Save)
+}
 
 /*
 func (tv *TableView) MimeDataType() string {

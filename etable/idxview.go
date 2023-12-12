@@ -136,7 +136,7 @@ const (
 // given column name, using either ascending or descending order.
 // Only valid for 1-dimensional columns.
 // Returns error if column name not found.
-func (ix *IdxView) SortColName(colNm string, ascending bool) error {
+func (ix *IdxView) SortColName(colNm string, ascending bool) error { //gti:add
 	ci, err := ix.Table.ColIdxTry(colNm)
 	if err != nil {
 		log.Println(err)
@@ -472,7 +472,7 @@ func (ix *IdxView) CopyFrom(oix *IdxView) {
 }
 
 // AddRows adds n rows to end of underlying Table, and to the indexes in this view
-func (ix *IdxView) AddRows(n int) {
+func (ix *IdxView) AddRows(n int) { //gti:add
 	stidx := ix.Table.Rows
 	ix.Table.SetNumRows(stidx + n)
 	for i := stidx; i < stidx+n; i++ {
@@ -568,85 +568,3 @@ func (ix *IdxView) Less(i, j int) bool {
 func (ix *IdxView) Swap(i, j int) {
 	ix.Idxs[i], ix.Idxs[j] = ix.Idxs[j], ix.Idxs[i]
 }
-
-/*
-
-todo:
-
-var IdxViewProps = ki.Props{
-	"ToolBar": ki.PropSlice{
-		{"AddRows", ki.Props{
-			"icon": "plus",
-			"Args": ki.PropSlice{
-				{"N Rows", ki.Props{
-					"default": 1,
-				}},
-			},
-		}},
-		{"SortColName", ki.Props{
-			"label": "Sort...",
-			"desc":  "sort by given column name",
-			"icon":  "edit",
-			"Args": ki.PropSlice{
-				{"Column Name", ki.Props{
-					"width": 20,
-				}},
-				{"Ascending", ki.Props{}},
-			},
-		}},
-		{"FilterColName", ki.Props{
-			"label": "Filter...",
-			"desc":  "Filter rows by values in given column name, using string representation.  Includes matches unless exclude is set.  contains matches if column contains value, otherwise must be entire value.",
-			"icon":  "search",
-			"Args": ki.PropSlice{
-				{"Column Name", ki.Props{
-					"width": 20,
-				}},
-				{"Value", ki.Props{
-					"width": 50,
-				}},
-				{"Exclude", ki.Props{}},
-				{"Contains", ki.Props{}},
-				{"Ignore Case", ki.Props{}},
-			},
-		}},
-		{"Sequential", ki.Props{
-			"label": "Show All",
-			"desc":  "show all rows in the table (undo any filtering and sorting)",
-			"icon":  "update",
-		}},
-
-		{"sep-file", ki.BlankProp{}},
-		{"OpenCSV", ki.Props{
-			"label": "Open CSV...",
-			"icon":  "file-open",
-			"desc":  "Open CSV-formatted data (or any delimeter) -- also recognizes emergent-style headers",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"ext": ".tsv,.csv",
-				}},
-				{"Delimiter", ki.Props{
-					"default": Tab,
-				}},
-			},
-		}},
-		{"SaveCSV", ki.Props{
-			"label": "Save CSV...",
-			"icon":  "file-save",
-			"desc":  "Save CSV-formatted data (or any delimiter) -- header outputs emergent-style header data (recommended)",
-			"Args": ki.PropSlice{
-				{"File Name", ki.Props{
-					"ext": ".tsv,.csv",
-				}},
-				{"Delimiter", ki.Props{
-					"default": Tab,
-				}},
-				{"Headers", ki.Props{
-					"default": true,
-					"desc":    "output C++ emergent-style headers that have type and tensor geometry information",
-				}},
-			},
-		}},
-	},
-}
-*/

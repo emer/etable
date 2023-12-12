@@ -107,7 +107,9 @@ func app() {
 	tv := gi.NewTabs(b)
 
 	nt := tv.NewTab("Planets Data")
-	etview.NewTableView(nt).SetTable(Planets)
+	tv := etview.NewTableView(nt).SetTable(Planets)
+	b.AddAppBar(tv.ConfigToolbar)
+
 	nt = tv.NewTab("Non-Null Rows Desc")
 	etview.NewTableView(nt).SetTable(PlanetsNNDesc)
 	nt = tv.NewTab("All Desc")
