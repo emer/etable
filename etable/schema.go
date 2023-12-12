@@ -22,6 +22,6 @@ type Column struct {
 	DimNames []string
 }
 
-// Schema specifies all of the columns of a table, sufficient to create the table
+// Schema specifies all of the columns of a table, sufficient to create the table.
 // It is just a slice list of Columns
 type Schema []Column
