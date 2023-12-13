@@ -153,7 +153,7 @@ func (pl *Plot2D) GenPlotXY() {
 						lns, _ = plotter.NewLine(xy)
 					}
 					if lns != nil {
-						lns.LineStyle.Width = vg.Points(pl.Params.LineWidth)
+						lns.LineStyle.Width = vg.Points(cp.LineWidth.Or(pl.Params.LineWidth))
 						lns.LineStyle.Color = clr
 						plt.Add(lns)
 						if bi == 0 {
@@ -162,8 +162,8 @@ func (pl *Plot2D) GenPlotXY() {
 					}
 					if pts != nil {
 						pts.GlyphStyle.Color = clr
-						pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
-						pts.GlyphStyle.Shape = pl.Params.PointShape.Glyph()
+						pts.GlyphStyle.Radius = vg.Points(cp.PointSize.Or(pl.Params.PointSize))
+						pts.GlyphStyle.Shape = cp.PointShape.Or(pl.Params.PointShape).Glyph()
 						plt.Add(pts)
 						if lns == nil && bi == 0 {
 							plt.Legend.Add(lbl, pts)

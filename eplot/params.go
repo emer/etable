@@ -35,7 +35,7 @@ type PlotParams struct { //gti:add
 	// size of points
 	PointSize float64
 
-	// PointShape is the shape used to draw points
+	// the shape used to draw points
 	PointShape Shapes
 
 	// width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default
@@ -176,13 +176,20 @@ type ColParams struct { //gti:add
 	// name of column we're plotting
 	Col string `label:"Column"`
 
-	// Lines is whether to plot lines. If it is unset,
-	// it uses the overall plot parameter option.
+	// whether to plot lines; uses the overall plot option if unset
 	Lines option.Option[bool]
 
-	// Points is whether to plot points with symbols. If it
-	// is unset, it uses the overall plot parameter option.
+	// whether to plot points with symbols; uses the overall plot option if unset
 	Points option.Option[bool]
+
+	// the width of lines; uses the overall plot option if unset
+	LineWidth option.Option[float64]
+
+	// the size of points; uses the overall plot option if unset
+	PointSize option.Option[float64]
+
+	// the shape used to draw points; uses the overall plot option if unset
+	PointShape option.Option[Shapes]
 
 	// effective range of data to plot -- either end can be fixed
 	Range minmax.Range64
