@@ -92,6 +92,12 @@ func (tv *TableView) TableViewInit() {
 			sh.Style(func(s *styles.Style) {
 				s.Grow.Set(0, 0)
 			})
+		case "header/head-idx": // index header
+			lbl := w.(*gi.Label)
+			lbl.SetText("Index").SetType(gi.LabelBodyMedium)
+			w.Style(func(s *styles.Style) {
+				s.Align.Self = styles.Center
+			})
 		case "grid-lay": // grid layout
 			w.Style(func(s *styles.Style) {
 				s.Grow.Set(1, 1)
@@ -271,10 +277,6 @@ func (tv *TableView) ConfigHeader() {
 	sgh.ConfigChildren(hcfg) // headers SHOULD be unique, but with labels..
 	_, idxOff := tv.RowWidgetNs()
 	nfld := tv.NCols
-	if tv.Is(giv.SliceViewShowIndex) {
-		lbl := sgh.Child(0).(*gi.Label)
-		lbl.Text = "Index"
-	}
 	for fli := 0; fli < nfld; fli++ {
 		fli := fli
 		field := tv.Table.Table.ColNames[fli]
