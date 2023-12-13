@@ -46,6 +46,12 @@ type Plot2D struct { //gti:add
 	// the gonum plot that actually does the plotting -- always save the last one generated
 	Plot *plot.Plot `set:"-" edit:"-" json:"-" xml:"-"`
 
+	// ConfigPlotFunc is a function to call to configure [Plot2D.Plot], the gonum plot that
+	// actually does the plotting. It is called after [Plot] is generated, and properties
+	// of [Plot] can be modified in it. Properties of [Plot] should not be modified outside
+	// of this function, as doing so will have no effect.
+	ConfigPlotFunc func() `json:"-" xml:"-"`
+
 	// current svg file
 	SVGFile gi.FileName
 

@@ -217,4 +217,7 @@ func (pl *Plot2D) GenPlotBar() {
 		plt.X.Tick.Label.XAlign = draw.XRight
 	}
 	pl.Plot = plt
+	if pl.ConfigPlotFunc != nil {
+		pl.ConfigPlotFunc()
+	}
 }

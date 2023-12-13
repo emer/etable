@@ -23,7 +23,8 @@ var Plot2DType = gti.AddType(&gti.Type{
 		{"Table", &gti.Field{Name: "Table", Type: "*goki.dev/etable/v2/etable.IdxView", LocalType: "*etable.IdxView", Doc: "the idxview of the table that we're plotting", Directives: gti.Directives{}, Tag: "set:\"-\""}},
 		{"Params", &gti.Field{Name: "Params", Type: "goki.dev/etable/v2/eplot.PlotParams", LocalType: "PlotParams", Doc: "the overall plot parameters", Directives: gti.Directives{}, Tag: ""}},
 		{"Cols", &gti.Field{Name: "Cols", Type: "[]*goki.dev/etable/v2/eplot.ColParams", LocalType: "[]*ColParams", Doc: "the parameters for each column of the table", Directives: gti.Directives{}, Tag: "set:\"-\""}},
-		{"GPlot", &gti.Field{Name: "GPlot", Type: "*gonum.org/v1/plot.Plot", LocalType: "*plot.Plot", Doc: "the gonum plot that actually does the plotting -- always save the last one generated", Directives: gti.Directives{}, Tag: "set:\"-\" edit:\"-\" json:\"-\" xml:\"-\""}},
+		{"Plot", &gti.Field{Name: "Plot", Type: "*gonum.org/v1/plot.Plot", LocalType: "*plot.Plot", Doc: "the gonum plot that actually does the plotting -- always save the last one generated", Directives: gti.Directives{}, Tag: "set:\"-\" edit:\"-\" json:\"-\" xml:\"-\""}},
+		{"ConfigPlotFunc", &gti.Field{Name: "ConfigPlotFunc", Type: "func()", LocalType: "func()", Doc: "ConfigPlotFunc is a function to call to configure [Plot2D.Plot], the gonum plot that\nactually does the plotting. It is called after [Plot] is generated, and properties\nof [Plot] can be modified in it. Properties of [Plot] should not be modified outside\nof this function, as doing so will have no effect.", Directives: gti.Directives{}, Tag: "json:\"-\" xml:\"-\""}},
 		{"SVGFile", &gti.Field{Name: "SVGFile", Type: "goki.dev/gi/v2/gi.FileName", LocalType: "gi.FileName", Doc: "current svg file", Directives: gti.Directives{}, Tag: ""}},
 		{"DataFile", &gti.Field{Name: "DataFile", Type: "goki.dev/gi/v2/gi.FileName", LocalType: "gi.FileName", Doc: "current csv data file", Directives: gti.Directives{}, Tag: ""}},
 		{"InPlot", &gti.Field{Name: "InPlot", Type: "bool", LocalType: "bool", Doc: "currently doing a plot", Directives: gti.Directives{}, Tag: "set:\"-\" edit:\"-\" json:\"-\" xml:\"-\""}},
@@ -91,6 +92,16 @@ func (t *Plot2D) New() ki.Ki {
 // the overall plot parameters
 func (t *Plot2D) SetParams(v PlotParams) *Plot2D {
 	t.Params = v
+	return t
+}
+
+// SetConfigPlotFunc sets the [Plot2D.ConfigPlotFunc]:
+// ConfigPlotFunc is a function to call to configure [Plot2D.Plot], the gonum plot that
+// actually does the plotting. It is called after [Plot] is generated, and properties
+// of [Plot] can be modified in it. Properties of [Plot] should not be modified outside
+// of this function, as doing so will have no effect.
+func (t *Plot2D) SetConfigPlotFunc(v func()) *Plot2D {
+	t.ConfigPlotFunc = v
 	return t
 }
 
