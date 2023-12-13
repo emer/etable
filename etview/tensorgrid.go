@@ -179,13 +179,19 @@ type TensorGrid struct {
 }
 
 func (tg *TensorGrid) OnInit() {
+	tg.WidgetBase.OnInit()
 	tg.Disp.GridView = tg
 	tg.Disp.Defaults()
-	tg.HandleTensorGridEvents()
+	tg.HandleEvents()
+	tg.SetStyles()
+}
+
+func (tg *TensorGrid) SetStyles() {
 	tg.Style(func(s *styles.Style) {
 		ms := tg.MinSize()
 		s.Min.X.Dot(ms.X)
 		s.Min.Y.Dot(ms.Y)
+		s.Grow.Set(1, 1)
 	})
 }
 
@@ -219,7 +225,7 @@ func (tg *TensorGrid) OpenTensorView() {
 	*/
 }
 
-func (tg *TensorGrid) HandleTensorGridEvents() {
+func (tg *TensorGrid) HandleEvents() {
 	tg.OnDoubleClick(func(e events.Event) {
 		tg.OpenTensorView()
 	})
