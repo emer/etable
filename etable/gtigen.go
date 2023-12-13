@@ -86,6 +86,8 @@ var _ = gti.AddType(&gti.Type{
 			{"colNm", &gti.Field{Name: "colNm", Type: "string", LocalType: "string", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 			{"str", &gti.Field{Name: "str", Type: "string", LocalType: "string", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 			{"exclude", &gti.Field{Name: "exclude", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"contains", &gti.Field{Name: "contains", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"ignoreCase", &gti.Field{Name: "ignoreCase", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		})}},
