@@ -76,7 +76,7 @@ func (pl *Plot2D) CopyFieldsFrom(frm any) {
 func (pl *Plot2D) OnInit() {
 	pl.Params.Plot = pl
 	pl.Params.Defaults()
-	plot.DefaultFont = font.Font{Typeface: "Liberation", Variant: "Sans"}
+	plot.DefaultFont = font.Font{Typeface: "Roboto", Variant: "Sans"}
 	pl.Style(func(s *styles.Style) {
 		s.Direction = styles.Row
 		s.Grow.Set(1, 1)
