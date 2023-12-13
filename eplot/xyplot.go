@@ -213,5 +213,5 @@ func (pl *Plot2D) GenPlotXY() {
 		plt.X.Tick.Label.YAlign = draw.YCenter
 		plt.X.Tick.Label.XAlign = draw.XRight
 	}
-	pl.GPlot = plt
+	pl.Plot = plt
 }

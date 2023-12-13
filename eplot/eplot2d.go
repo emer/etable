@@ -44,7 +44,7 @@ type Plot2D struct { //gti:add
 	Cols []*ColParams `set:"-"`
 
 	// the gonum plot that actually does the plotting -- always save the last one generated
-	GPlot *plot.Plot `set:"-" edit:"-" json:"-" xml:"-"`
+	Plot *plot.Plot `set:"-" edit:"-" json:"-" xml:"-"`
 
 	// current svg file
 	SVGFile gi.FileName
@@ -144,7 +144,7 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
 	pl.Update()
 	sv := pl.SVGPlot()
-	SaveSVGView(string(fname), pl.GPlot, sv, 2)
+	SaveSVGView(string(fname), pl.Plot, sv, 2)
 	pl.SVGFile = fname
 }
 
@@ -265,15 +265,15 @@ func (pl *Plot2D) GenPlot() {
 	if lsti >= pl.Table.Table.Rows { // out of date
 		pl.Table.Sequential()
 	}
-	pl.GPlot = nil
+	pl.Plot = nil
 	switch pl.Params.Type {
 	case XY:
 		pl.GenPlotXY()
 	case Bar:
 		pl.GenPlotBar()
 	}
-	if pl.GPlot != nil {
-		PlotViewSVG(pl.GPlot, sv, pl.Params.Scale)
+	if pl.Plot != nil {
+		PlotViewSVG(pl.Plot, sv, pl.Params.Scale)
 	} else {
 		sv.SVG.DeleteAll()
 		// slog.Error("eplot: no plot generated from gonum plot")
