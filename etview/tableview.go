@@ -62,10 +62,12 @@ type TableView struct {
 var _ giv.SliceViewer = (*TableView)(nil)
 
 func (tv *TableView) OnInit() {
-	tv.TableViewInit()
+	tv.Frame.OnInit()
+	tv.SliceViewBase.HandleEvents()
+	tv.SetStyles()
 }
 
-func (tv *TableView) TableViewInit() {
+func (tv *TableView) SetStyles() {
 	tv.SortIdx = -1
 	tv.MinRows = 4
 	tv.TsrDisp.Defaults()
@@ -74,8 +76,6 @@ func (tv *TableView) TableViewInit() {
 	tv.SetFlag(false, giv.SliceViewSelectMode)
 	tv.SetFlag(true, giv.SliceViewShowIndex)
 	tv.SetFlag(true, giv.SliceViewReadOnlyKeyNav)
-
-	tv.HandleSliceViewEvents()
 
 	tv.Style(func(s *styles.Style) {
 		s.SetAbilities(true, abilities.FocusWithinable)
