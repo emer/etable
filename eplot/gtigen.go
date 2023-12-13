@@ -157,6 +157,7 @@ var _ = gti.AddType(&gti.Type{
 		{"Points", &gti.Field{Name: "Points", Type: "bool", LocalType: "bool", Doc: "whether to plot points with symbols", Directives: gti.Directives{}, Tag: ""}},
 		{"LineWidth", &gti.Field{Name: "LineWidth", Type: "float64", LocalType: "float64", Doc: "width of lines", Directives: gti.Directives{}, Tag: ""}},
 		{"PointSize", &gti.Field{Name: "PointSize", Type: "float64", LocalType: "float64", Doc: "size of points", Directives: gti.Directives{}, Tag: ""}},
+		{"PointShape", &gti.Field{Name: "PointShape", Type: "gonum.org/v1/plot/vg/draw.GlyphDrawer", LocalType: "draw.GlyphDrawer", Doc: "PointShape is the shape used to draw points", Directives: gti.Directives{}, Tag: ""}},
 		{"BarWidth", &gti.Field{Name: "BarWidth", Type: "float64", LocalType: "float64", Doc: "width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default", Directives: gti.Directives{}, Tag: "min:\"0.01\" max:\"1\""}},
 		{"NegXDraw", &gti.Field{Name: "NegXDraw", Type: "bool", LocalType: "bool", Doc: "draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn", Directives: gti.Directives{}, Tag: ""}},
 		{"Scale", &gti.Field{Name: "Scale", Type: "float64", LocalType: "float64", Doc: "overall scaling factor -- the larger the number, the larger the fonts are relative to the graph", Directives: gti.Directives{}, Tag: "def:\"2\""}},
