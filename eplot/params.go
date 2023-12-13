@@ -11,6 +11,7 @@ import (
 	"github.com/goki/ki/kit"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
+	"goki.dev/glop/option"
 )
 
 // PlotParams are parameters for overall plot
@@ -22,10 +23,10 @@ type PlotParams struct { //gti:add
 	// type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional
 	Type PlotTypes
 
-	// plot lines
+	// whether to plot lines
 	Lines bool
 
-	// plot points with symbols
+	// whether to plot points with symbols
 	Points bool
 
 	// width of lines
@@ -171,6 +172,14 @@ type ColParams struct { //gti:add
 
 	// name of column we're plotting
 	Col string `label:"Column"`
+
+	// Lines is whether to plot lines. If it is unset,
+	// it uses the overall plot parameter option.
+	Lines option.Option[bool]
+
+	// Points is whether to plot points with symbols. If it
+	// is unset, it uses the overall plot parameter option.
+	Points option.Option[bool]
 
 	// effective range of data to plot -- either end can be fixed
 	Range minmax.Range64

@@ -145,9 +145,9 @@ func (pl *Plot2D) GenPlotXY() {
 						clr = colors.BinarySpacedAccentVariant(idx)
 						lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 					}
-					if pl.Params.Lines && pl.Params.Points {
+					if cp.Lines.Or(pl.Params.Lines) && cp.Points.Or(pl.Params.Points) {
 						lns, pts, _ = plotter.NewLinePoints(xy)
-					} else if pl.Params.Points {
+					} else if cp.Points.Or(pl.Params.Points) {
 						pts, _ = plotter.NewScatter(xy)
 					} else {
 						lns, _ = plotter.NewLine(xy)
