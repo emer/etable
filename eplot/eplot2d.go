@@ -78,17 +78,19 @@ func (pl *Plot2D) OnInit() {
 }
 
 // SetTable sets the table to view and updates view
-func (pl *Plot2D) SetTable(tab *etable.Table) {
+func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
 	pl.Table = etable.NewIdxView(tab)
 	pl.Cols = nil
 	pl.Update()
+	return pl
 }
 
 // SetTableView sets the idxview of table to view and updates view
-func (pl *Plot2D) SetTableView(tab *etable.IdxView) {
+func (pl *Plot2D) SetTableView(tab *etable.IdxView) *Plot2D {
 	pl.Table = tab
 	pl.Cols = nil
 	pl.Update()
+	return pl
 }
 
 // ColParamsTry returns the current column parameters by name (to access by index, just use Cols directly)
