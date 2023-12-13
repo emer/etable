@@ -8,7 +8,7 @@ package etable
 
 import (
 	"fmt"
-	"log"
+	"log/slog"
 	"math"
 	"strings"
 
@@ -148,7 +148,7 @@ func (dt *Table) UpdateColNameMap() {
 	dt.ColNameMap = make(map[string]int, nc)
 	for i, nm := range dt.ColNames {
 		if _, has := dt.ColNameMap[nm]; has {
-			log.Printf("Warning: etable.Table duplicate column name: %s\n", nm)
+			slog.Warn("etable.Table duplicate column name", "name", nm)
 		} else {
 			dt.ColNameMap[nm] = i
 		}
