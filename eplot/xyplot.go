@@ -163,7 +163,7 @@ func (pl *Plot2D) GenPlotXY() {
 					if pts != nil {
 						pts.GlyphStyle.Color = clr
 						pts.GlyphStyle.Radius = vg.Points(pl.Params.PointSize)
-						pts.GlyphStyle.Shape = pl.Params.PointShape
+						pts.GlyphStyle.Shape = pl.Params.PointShape.Glyph()
 						plt.Add(pts)
 						if lns == nil && bi == 0 {
 							plt.Legend.Add(lbl, pts)

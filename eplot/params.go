@@ -12,7 +12,6 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/minmax"
 	"goki.dev/glop/option"
-	"gonum.org/v1/plot/vg/draw"
 )
 
 // PlotParams are parameters for overall plot
@@ -37,7 +36,7 @@ type PlotParams struct { //gti:add
 	PointSize float64
 
 	// PointShape is the shape used to draw points
-	PointShape draw.GlyphDrawer
+	PointShape Shapes
 
 	// width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default
 	BarWidth float64 `min:"0.01" max:"1"`
@@ -74,7 +73,6 @@ func (pp *PlotParams) Defaults() {
 		pp.Lines = true
 		pp.Points = false
 		pp.PointSize = 3
-		pp.PointShape = draw.RingGlyph{}
 		pp.BarWidth = .8
 	}
 	if pp.Scale == 0 {
