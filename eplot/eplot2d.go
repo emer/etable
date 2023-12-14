@@ -593,7 +593,7 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 		SetTooltip("update fully redraws display, reflecting any new settings etc").
 		OnClick(func(e events.Event) {
 			pl.ConfigPlot()
-			pl.Update()
+			pl.UpdatePlot()
 		})
 	gi.NewButton(tb).SetText("Config").SetIcon(icons.Settings).
 		SetTooltip("set parameters that control display (font size etc)").
