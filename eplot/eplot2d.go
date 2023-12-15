@@ -26,6 +26,7 @@ import (
 	"goki.dev/goosi/events"
 	"goki.dev/icons"
 	"goki.dev/ki/v2"
+	"goki.dev/mat32/v2"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/font"
 )
@@ -156,10 +157,8 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
 
 // SavePNG saves the current plot to a png, capturing current render
 func (pl *Plot2D) SavePNG(fname gi.FileName) { //gti:add
-	// TODO: implement SavePNG
 	sv := pl.SVGPlot()
-	_ = sv
-	// sv.SavePNG(string(fname))
+	sv.SavePNG(string(fname))
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
@@ -569,10 +568,12 @@ func (pl *Plot2D) ColsConfig() {
 
 // PlotConfig configures the PlotView
 func (pl *Plot2D) PlotConfig() {
-	// sv := pl.SVGPlot()
-	// sv.InitScale()
-	// sv.Fill = true
-	// sv.SetProp("background-color", &gi.Prefs.Colors.Background)
+	sv := pl.SVGPlot()
+	sv.SVG.Fill = true
+	sv.SVG.Norm = true
+	sv.SVG.Scale = 1
+	sv.SVG.Translate = mat32.Vec2{}
+	sv.SetReadOnly(true)
 }
 
 func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
@@ -580,11 +581,13 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 		return
 	}
 	gi.NewButton(tb).SetIcon(icons.PanTool).
-		SetTooltip("return to default pan / orbit mode where mouse drags move camera around (Shift = pan, Alt = pan target)").OnClick(func(e events.Event) {
-		fmt.Println("this will select pan mode")
+		SetTooltip("toggle the ability to zoom and pan the view").OnClick(func(e events.Event) {
+		sv := pl.SVGPlot()
+		sv.SetReadOnly(!sv.IsReadOnly())
+		sv.ApplyStyleUpdate()
 	})
 	gi.NewButton(tb).SetIcon(icons.ArrowForward).
-		SetTooltip("turn on select mode for selecting units and layers with mouse clicks").
+		SetTooltip("turn on select mode for selecting SVG elements").
 		OnClick(func(e events.Event) {
 			fmt.Println("this will select select mode")
 		})

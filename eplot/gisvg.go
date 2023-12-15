@@ -49,9 +49,6 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 		}
 		svge.SVG.Norm = true
 		svge.SVG.Fill = true
-		svge.SVG.SetNormTransform()
-		// svge.Scale = float32(scale)
-		// svge.SVG.SetTransform()
 		svge.SetNeedsRender(true)
 	}
 }
@@ -99,7 +96,4 @@ func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
 
 	svge.SVG.Norm = true
 	svge.SVG.Fill = true
-	svge.SVG.SetNormTransform()
-	// svge.Scale = float32(scale) * (svge.ParentWindow().LogicalDPI() / 96.0)
-	// svge.SetTransform()
 }
