@@ -87,7 +87,7 @@ func (pl *Plot2D) OnInit() {
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
 	pl.Table = etable.NewIdxView(tab)
-	pl.Cols = nil
+	pl.DeleteCols()
 	pl.Update()
 	return pl
 }
@@ -95,7 +95,7 @@ func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
 // SetTableView sets the idxview of table to view and updates view
 func (pl *Plot2D) SetTableView(tab *etable.IdxView) *Plot2D {
 	pl.Table = tab
-	pl.Cols = nil
+	pl.DeleteCols()
 	pl.Update()
 	return pl
 }
@@ -158,7 +158,7 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
 // SavePNG saves the current plot to a png, capturing current render
 func (pl *Plot2D) SavePNG(fname gi.FileName) { //gti:add
 	sv := pl.SVGPlot()
-	sv.SavePNG(string(fname))
+	sv.SavePNG(fname)
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
@@ -242,7 +242,6 @@ func (pl *Plot2D) UpdatePlot() {
 		return
 	}
 	if len(pl.Kids) != 2 || len(pl.Cols) != pl.Table.Table.NumCols() {
-		fmt.Println("did update")
 		pl.Update()
 	}
 	pl.Table.Sequential()
@@ -386,6 +385,15 @@ func (pl *Plot2D) ConfigPlot() {
 
 	pl.ColsConfig()
 	pl.PlotConfig()
+}
+
+// DeleteCols deletes any existing cols, to ensure an update to new table
+func (pl *Plot2D) DeleteCols() {
+	pl.Cols = nil
+	if pl.HasChildren() {
+		vl := pl.ColsLay()
+		vl.DeleteChildren(ki.DestroyKids)
+	}
 }
 
 func (pl *Plot2D) ColsLay() *gi.Frame {
@@ -542,7 +550,6 @@ func (pl *Plot2D) ColsConfig() {
 		sw := gi.NewSwitch(cl, "on").SetType(gi.SwitchCheckbox).SetTooltip("toggle plot on")
 		sw.OnChange(func(e events.Event) {
 			cp.On = sw.StateIs(states.Checked)
-			pl.Update()
 			pl.UpdatePlot()
 		})
 		sw.SetState(cp.On, states.Checked)
