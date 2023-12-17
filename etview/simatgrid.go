@@ -40,13 +40,14 @@ func (tg *SimMatGrid) OnInit() {
 }
 
 // SetSimMat sets the similarity matrix and triggers a display update
-func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) {
+func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) *SimMatGrid {
 	tg.SimMat = smat
 	tg.Tensor = smat.Mat
 	if tg.Tensor != nil {
 		tg.Disp.FmMeta(tg.Tensor)
 	}
 	tg.Update()
+	return tg
 }
 
 func (tg *SimMatGrid) SizeLabel(lbs []string, col bool) (minBlank, ngps int, sz mat32.Vec2) {

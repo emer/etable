@@ -196,16 +196,17 @@ func (tg *TensorGrid) SetStyles() {
 }
 
 // SetTensor sets the tensor and triggers a display update
-func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) {
+func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) *TensorGrid {
 	if _, ok := tsr.(*etensor.String); ok {
 		log.Printf("TensorGrid: String tensors cannot be displayed using TensorGrid\n")
-		return
+		return tg
 	}
 	tg.Tensor = tsr
 	if tg.Tensor != nil {
 		tg.Disp.FmMeta(tg.Tensor)
 	}
 	tg.Update()
+	return tg
 }
 
 // OpenTensorView pulls up a TensorView of our tensor

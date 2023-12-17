@@ -22,7 +22,6 @@ import (
 	"goki.dev/gi/v2/giv"
 	"goki.dev/girl/states"
 	"goki.dev/girl/styles"
-	"goki.dev/girl/units"
 	"goki.dev/goosi/events"
 	"goki.dev/icons"
 	"goki.dev/ki/v2"
@@ -375,7 +374,6 @@ func (pl *Plot2D) ConfigPlot() {
 		})
 		pt := gi.NewSVG(pl, "plot")
 		pt.Style(func(s *styles.Style) {
-			s.Min.Set(units.Em(30))
 			s.Grow.Set(1, 1)
 		})
 
