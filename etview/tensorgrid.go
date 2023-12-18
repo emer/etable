@@ -311,7 +311,7 @@ func (tg *TensorGrid) RenderTensor() {
 	sz := tg.Geom.Size.Actual.Content
 	// sz.SetSubScalar(tg.Disp.BotRtSpace.Dots)
 
-	pc.FillBoxColor(pos, sz, tg.Styles.BackgroundColor.Solid)
+	pc.FillBoxColor(pos, sz, tg.Styles.Background.Solid)
 
 	tsr := tg.Tensor
 
