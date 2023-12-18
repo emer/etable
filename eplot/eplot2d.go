@@ -377,7 +377,7 @@ func (pl *Plot2D) ConfigPlot() {
 			s.Direction = styles.Column
 			s.Grow.Set(0, 1)
 			s.Overflow.Y = styles.OverflowAuto
-			s.BackgroundColor.SetSolid(colors.Scheme.SurfaceContainerLow)
+			s.Background = colors.C(colors.Scheme.SurfaceContainerLow)
 		})
 		pt := gi.NewSVG(pl, "plot")
 		pt.Style(func(s *styles.Style) {

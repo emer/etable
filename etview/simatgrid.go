@@ -131,7 +131,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 	effsz.X -= tg.rowMaxSz.X + LabelSpace
 	effsz.Y -= tg.colMaxSz.Y + LabelSpace
 
-	pc.FillBoxColor(pos, sz, tg.Styles.BackgroundColor.Solid)
+	pc.FillBox(pos, sz, tg.Styles.Background)
 
 	tsr := tg.SimMat.Mat
 
