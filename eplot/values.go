@@ -69,6 +69,7 @@ func (vv *Plot2DValue) ConfigWidget(w gi.Widget) {
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
 	bt.OnClick(func(e events.Event) {
+		vv.SetDialogType(e)
 		vv.OpenDialog(bt, nil)
 	})
 	vv.UpdateWidget()

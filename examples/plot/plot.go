@@ -9,7 +9,6 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/gimain"
-	"goki.dev/goosi/events"
 )
 
 func main() { gimain.Run(app) }
@@ -26,9 +25,6 @@ func app() {
 	pl.Params.Title = "RA25 Epoch Train"
 	pl.Params.XAxisCol = "Epoch"
 	pl.ColParams("UnitErr").On = true
-	pl.OnShow(func(e events.Event) {
-		pl.UpdatePlot()
-	})
 
 	b.AddAppBar(pl.ConfigToolbar)
 

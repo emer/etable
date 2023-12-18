@@ -116,6 +116,7 @@ func (vv *TensorValue) ConfigWidget(w gi.Widget) {
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
 	bt.OnClick(func(e events.Event) {
+		vv.SetDialogType(e)
 		vv.OpenDialog(bt, nil)
 	})
 	vv.UpdateWidget()
@@ -179,6 +180,7 @@ func (vv *TableValue) ConfigWidget(w gi.Widget) {
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
 	bt.OnClick(func(e events.Event) {
+		vv.SetDialogType(e)
 		vv.OpenDialog(bt, nil)
 	})
 	vv.UpdateWidget()
@@ -245,6 +247,7 @@ func (vv *SimMatValue) ConfigWidget(w gi.Widget) {
 	bt.Config()
 	bt.OnClick(func(e events.Event) {
 		if !vv.IsReadOnly() {
+			vv.SetDialogType(e)
 			vv.OpenDialog(bt, nil)
 		}
 	})

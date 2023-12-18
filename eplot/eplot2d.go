@@ -83,6 +83,13 @@ func (pl *Plot2D) OnInit() {
 	})
 }
 
+func (pl *Plot2D) OnAdd() {
+	pl.Layout.OnAdd()
+	pl.OnShow(func(e events.Event) {
+		pl.UpdatePlot()
+	})
+}
+
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
 	pl.Table = etable.NewIdxView(tab)
