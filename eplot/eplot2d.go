@@ -426,19 +426,20 @@ func (pl *Plot2D) ColsListUpdate() {
 	clri := 0
 	for ci := range dt.Cols {
 		cn := dt.ColNames[ci]
-		inc := 1
-		if cn == pl.Params.XAxisCol { // re-use xaxis color
-			inc = 0
-		}
-		cp := &ColParams{Col: cn, Color: colors.BinarySpacedAccentVariant(clri)}
-		cp.Defaults()
 		tcol := dt.Cols[ci]
+		cp := &ColParams{Col: cn}
+		cp.Defaults()
 		if tcol.DataType() == etensor.STRING {
 			cp.IsString = true
 		} else {
 			cp.IsString = false
 		}
 		cp.FmMetaMap(pl.Table.Table.MetaData)
+		inc := 1
+		if cn == pl.Params.XAxisCol || tcol.DataType() == etensor.INT || tcol.DataType() == etensor.INT64 || tcol.DataType() == etensor.STRING {
+			inc = 0
+		}
+		cp.Color = colors.Spaced(clri)
 		pl.Cols[ci] = cp
 		clri += inc
 	}

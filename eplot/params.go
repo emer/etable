@@ -69,7 +69,7 @@ type PlotParams struct { //gti:add
 // Defaults sets defaults if nil vals present
 func (pp *PlotParams) Defaults() {
 	if pp.LineWidth == 0 {
-		pp.LineWidth = 1
+		pp.LineWidth = 2
 		pp.Lines = true
 		pp.Points = false
 		pp.PointSize = 3
