@@ -132,10 +132,10 @@ func (pl *Plot2D) GenPlotBar() {
 				}
 				if nleg > 1 {
 					cidx := yidx*nleg + li
-					clr = colors.BinarySpacedAccentVariant(cidx)
+					clr = colors.Spaced(cidx)
 				}
 				if nidx > 1 {
-					clr = colors.BinarySpacedAccentVariant(idx)
+					clr = colors.Spaced(idx)
 					lbl = fmt.Sprintf("%s_%02d", lbl, idx)
 				}
 				ec := -1
