@@ -13,7 +13,7 @@ See [examples/dataproc](examples/dataproc) for a full demo of how to use this sy
 
 See [Wiki](https://goki.dev/etable/v2/wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
 
-As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [GoKi Naming Convention](https://github.com/goki/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
+As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [Goki Naming Convention](https://github.com/goki/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
 
 The following packages are included:
 
