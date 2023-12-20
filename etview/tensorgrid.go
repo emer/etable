@@ -244,7 +244,7 @@ func (tg *TensorGrid) MinSize() mat32.Vec2 {
 		return mat32.Vec2{}
 	}
 	if tg.Disp.Image {
-		return mat32.Vec2{float32(tg.Tensor.Dim(1)), float32(tg.Tensor.Dim(0))}
+		return mat32.V2(float32(tg.Tensor.Dim(1)), float32(tg.Tensor.Dim(0)))
 	}
 	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
@@ -254,7 +254,7 @@ func (tg *TensorGrid) MinSize() mat32.Vec2 {
 	gsz = max(gsz, tg.Disp.GridMinSize)
 	gsz = min(gsz, tg.Disp.GridMaxSize)
 	gsz = max(gsz, 2)
-	return mat32.Vec2{gsz * float32(fcl), gsz * float32(frw)}
+	return mat32.V2(gsz*float32(fcl), gsz*float32(frw))
 }
 
 // EnsureColorMap makes sure there is a valid color map that matches specified name
@@ -330,7 +330,7 @@ func (tg *TensorGrid) RenderTensor() {
 				nclr = tsr.Dim(2)
 			}
 		}
-		tsz := mat32.Vec2{float32(xsz), float32(ysz)}
+		tsz := mat32.V2(float32(xsz), float32(ysz))
 		gsz := sz.Div(tsz)
 		for y := 0; y < ysz; y++ {
 			for x := 0; x < xsz; x++ {
@@ -348,7 +348,7 @@ func (tg *TensorGrid) RenderTensor() {
 					if nclr > 3 {
 						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{3, y, x}))
 					}
-					cr := mat32.Vec2{float32(x), float32(ey)}
+					cr := mat32.V2(float32(x), float32(ey))
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color = colors.C(colors.FromFloat64(r, g, b, a))
 					pc.FillBox(pr, gsz, pc.StrokeStyle.Color)
@@ -361,13 +361,13 @@ func (tg *TensorGrid) RenderTensor() {
 					if nclr > 3 {
 						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 3}))
 					}
-					cr := mat32.Vec2{float32(x), float32(ey)}
+					cr := mat32.V2(float32(x), float32(ey))
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color = colors.C(colors.FromFloat64(r, g, b, a))
 					pc.FillBox(pr, gsz, pc.StrokeStyle.Color)
 				default:
 					val := tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x}))
-					cr := mat32.Vec2{float32(x), float32(ey)}
+					cr := mat32.V2(float32(x), float32(ey))
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color = colors.C(colors.FromFloat64(val, val, val, 1))
 					pc.FillBox(pr, gsz, pc.StrokeStyle.Color)
@@ -387,7 +387,7 @@ func (tg *TensorGrid) RenderTensor() {
 	if colEx > 0 {
 		colsInner = cols / colEx
 	}
-	tsz := mat32.Vec2{fcl, frw}
+	tsz := mat32.V2(fcl, frw)
 	gsz := sz.Div(tsz)
 
 	ssz := gsz.MulScalar(tg.Disp.GridFill) // smaller size with margin
@@ -400,7 +400,7 @@ func (tg *TensorGrid) RenderTensor() {
 				ey = (rows - 1) - y
 			}
 			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
-			cr := mat32.Vec2{float32(x) + xex, float32(y) + yex}
+			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
 			pc.FillBoxColor(pr, ssz, clr)

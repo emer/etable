@@ -112,7 +112,7 @@ func (tg *SimMatGrid) MinSize() mat32.Vec2 {
 	gsz = mat32.Max(gsz, tg.Disp.GridMinSize)
 	gsz = mat32.Max(gsz, txtsz)
 	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize)
-	return mat32.Vec2{tg.rowMaxSz.X + LabelSpace + gsz*float32(cols), tg.colMaxSz.Y + LabelSpace + gsz*float32(rows)}
+	return mat32.V2(tg.rowMaxSz.X+LabelSpace+gsz*float32(cols), tg.colMaxSz.Y+LabelSpace+gsz*float32(rows))
 }
 
 func (tg *SimMatGrid) RenderSimMat() {
@@ -140,7 +140,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 	colEx = tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-	tsz := mat32.Vec2{fcl, frw}
+	tsz := mat32.V2(fcl, frw)
 	gsz := effsz.Div(tsz)
 
 	// Render Rows
@@ -167,7 +167,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 		yex := float32(ygp) * tg.Disp.DimExtra
 		tr.SetString(lb, fr, &tg.Styles.UnContext, &txsty, true, 0, 0)
 		tr.LayoutStdLR(&txsty, fr, &tg.Styles.UnContext, tg.rowMaxSz)
-		cr := mat32.Vec2{0, float32(y) + yex}
+		cr := mat32.V2(0, float32(y)+yex)
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(pc, pr)
 	}
@@ -191,7 +191,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 		}
 		xex := float32(xgp) * tg.Disp.DimExtra
 		tr.SetStringRot90(lb, fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0)
-		cr := mat32.Vec2{float32(x) + xex, 0}
+		cr := mat32.V2(float32(x)+xex, 0)
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(pc, pr)
 	}
@@ -222,7 +222,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 				ey = (rows - 1) - y
 			}
 			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
-			cr := mat32.Vec2{float32(x) + xex, float32(y) + yex}
+			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
 			pc.FillBoxColor(pr, ssz, clr)
