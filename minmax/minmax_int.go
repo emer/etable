@@ -14,8 +14,8 @@ type Int struct {
 }
 
 // Set sets the min and max values
-func (mr *Int) Set(min, max int) {
-	mr.Min, mr.Max = min, max
+func (mr *Int) Set(mn, mx int) {
+	mr.Min, mr.Max = mn, mx
 }
 
 // SetInfinity sets the Min to +MaxFloat, Max to -MaxFloat -- suitable for

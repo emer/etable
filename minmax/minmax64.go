@@ -20,9 +20,9 @@ type F64 struct {
 }
 
 // Set sets the min and max values
-func (mr *F64) Set(min, max float64) {
-	mr.Min = min
-	mr.Max = max
+func (mr *F64) Set(mn, mx float64) {
+	mr.Min = mn
+	mr.Max = mx
 }
 
 // SetInfinity sets the Min to +MaxFloat, Max to -MaxFloat -- suitable for
