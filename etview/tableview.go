@@ -198,6 +198,15 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	return tv
 }
 
+// GoUpdateView updates the display for asynchronous updating from
+// other goroutines.  Also updates indexview (calling Sequential).
+func (tv *TableView) GoUpdateView() {
+	updt := tv.UpdateStartAsync()
+	tv.Table.Sequential()
+	tv.UpdateWidgets()
+	tv.UpdateEndAsyncRender(updt)
+}
+
 // SetTableView sets the source IdxView of a table (using a copy so original is not modified)
 // and then configures the display
 func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
