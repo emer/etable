@@ -54,6 +54,9 @@ type TableView struct {
 	// whether current sort order is descending
 	SortDesc bool
 
+	// HeaderWidths has number of characters in each header, per visfields
+	HeaderWidths []int `copy:"-" view:"-" json:"-" xml:"-"`
+
 	//	blank values for out-of-range rows
 	BlankString string
 	BlankFloat  float64
@@ -154,6 +157,19 @@ func (tv *TableView) SetStyles() {
 					s.Color = colors.Scheme.Error.Base
 				})
 			case strings.HasPrefix(w.Name(), "value-"):
+				w.Style(func(s *styles.Style) {
+					fstr := strings.TrimPrefix(w.Name(), "value-")
+					dp := strings.Index(fstr, ".")
+					fstr = fstr[:dp] // field idx is -X.
+					fli := grr.Log1(strconv.Atoi(fstr))
+					hw := float32(tv.HeaderWidths[fli])
+					if fli == tv.SortIdx {
+						hw += 6
+					}
+					hv := units.Ch(hw)
+					s.Min.X.Val = max(s.Min.X.Val, hv.Convert(s.Min.X.Un, &s.UnContext).Val)
+					s.Max.X.Val = max(s.Max.X.Val, hv.Convert(s.Max.X.Un, &s.UnContext).Val)
+				})
 			}
 		}
 		if w.Parent().PathFrom(tv) == "header" {
@@ -277,6 +293,7 @@ func (tv *TableView) ConfigHeader() {
 	if tv.Is(giv.SliceViewShowIndex) {
 		hcfg.Add(gi.LabelType, "head-idx")
 	}
+	tv.HeaderWidths = make([]int, tv.NCols)
 	for fli := 0; fli < tv.NCols; fli++ {
 		fld := tv.Table.Table.ColNames[fli]
 		labnm := "head-" + fld
@@ -296,6 +313,7 @@ func (tv *TableView) ConfigHeader() {
 		hdr.SetType(gi.ButtonMenu)
 		hdr.SetText(field)
 		hdr.Data = fli
+		tv.HeaderWidths[fli] = len(field)
 		if fli == tv.SortIdx {
 			if tv.SortDesc {
 				hdr.SetIcon(icons.KeyboardArrowDown)
