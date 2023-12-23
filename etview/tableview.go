@@ -219,8 +219,9 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 func (tv *TableView) GoUpdateView() {
 	updt := tv.UpdateStartAsync()
 	tv.Table.Sequential()
+	tv.ScrollToIdxNoUpdt(tv.SliceSize - 1)
 	tv.UpdateWidgets()
-	tv.UpdateEndAsyncRender(updt)
+	tv.UpdateEndAsyncLayout(updt)
 }
 
 // SetTableView sets the source IdxView of a table (using a copy so original is not modified)
