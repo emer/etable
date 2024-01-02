@@ -5,8 +5,6 @@
 package eplot
 
 import (
-	"reflect"
-
 	"github.com/goki/ki/kit"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/giv"
@@ -17,7 +15,7 @@ import (
 )
 
 func init() {
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(Plot2D{})), func() giv.Value {
+	giv.ValueMapAdd(Plot2D{}, func() giv.Value {
 		return &Plot2DValue{}
 	})
 }

@@ -5,8 +5,6 @@
 package etview
 
 import (
-	"reflect"
-
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/etable/v2/simat"
@@ -18,25 +16,25 @@ import (
 )
 
 func init() {
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Float32{})), func() giv.Value {
+	giv.ValueMapAdd(etensor.Float32{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Float64{})), func() giv.Value {
+	giv.ValueMapAdd(etensor.Float64{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Int64{})), func() giv.Value {
+	giv.ValueMapAdd(etensor.Int64{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.Int32{})), func() giv.Value {
+	giv.ValueMapAdd(etensor.Int32{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etensor.String{})), func() giv.Value {
+	giv.ValueMapAdd(etensor.String{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(etable.Table{})), func() giv.Value {
+	giv.ValueMapAdd(etable.Table{}, func() giv.Value {
 		return &TableValue{}
 	})
-	giv.ValueMapAdd(laser.LongTypeName(reflect.TypeOf(simat.SimMat{})), func() giv.Value {
+	giv.ValueMapAdd(simat.SimMat{}, func() giv.Value {
 		return &SimMatValue{}
 	})
 }
