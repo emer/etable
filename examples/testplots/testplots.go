@@ -10,12 +10,9 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/gimain"
 )
 
-func main() { gimain.Run(app) }
-
-func app() {
+func main() {
 	b := gi.NewAppBody("testplots")
 	b.App().About = `This runs various testing data plots using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
 

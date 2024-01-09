@@ -13,10 +13,7 @@ import (
 	"goki.dev/etable/v2/etview"
 	"goki.dev/etable/v2/split"
 	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/gimain"
 )
-
-func main() { gimain.Run(app) }
 
 // Planets is raw data
 var Planets *etable.Table
@@ -98,7 +95,7 @@ func AnalyzePlanets() {
 	// and another that has the data to put in the cells.
 }
 
-func app() {
+func main() {
 	AnalyzePlanets()
 
 	b := gi.NewAppBody("dataproc")

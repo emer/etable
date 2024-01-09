@@ -8,12 +8,9 @@ import (
 	"goki.dev/etable/v2/eplot"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/gimain"
 )
 
-func main() { gimain.Run(app) }
-
-func app() {
+func main() {
 	b := gi.NewAppBody("plot")
 	b.App().About = `This demonstrates data plotting using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
 

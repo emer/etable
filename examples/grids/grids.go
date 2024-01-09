@@ -8,13 +8,10 @@ import (
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etview"
 	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/gimain"
 	"goki.dev/grr"
 )
 
-func main() { gimain.Run(app) }
-
-func app() {
+func main() {
 	pats := etable.NewTable("pats")
 	pats.SetMetaData("name", "TrainPats")
 	pats.SetMetaData("desc", "Training patterns")
