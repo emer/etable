@@ -124,18 +124,6 @@ func (t *Plot2D) SetTooltip(v string) *Plot2D {
 	return t
 }
 
-// SetClass sets the [Plot2D.Class]
-func (t *Plot2D) SetClass(v string) *Plot2D {
-	t.Class = v
-	return t
-}
-
-// SetCustomContextMenu sets the [Plot2D.CustomContextMenu]
-func (t *Plot2D) SetCustomContextMenu(v func(m *gi.Scene)) *Plot2D {
-	t.CustomContextMenu = v
-	return t
-}
-
 // SetStackTop sets the [Plot2D.StackTop]
 func (t *Plot2D) SetStackTop(v int) *Plot2D {
 	t.StackTop = v
@@ -157,7 +145,7 @@ var _ = gti.AddType(&gti.Type{
 		{"Points", &gti.Field{Name: "Points", Type: "bool", LocalType: "bool", Doc: "whether to plot points with symbols", Directives: gti.Directives{}, Tag: ""}},
 		{"LineWidth", &gti.Field{Name: "LineWidth", Type: "float64", LocalType: "float64", Doc: "width of lines", Directives: gti.Directives{}, Tag: ""}},
 		{"PointSize", &gti.Field{Name: "PointSize", Type: "float64", LocalType: "float64", Doc: "size of points", Directives: gti.Directives{}, Tag: ""}},
-		{"PointShape", &gti.Field{Name: "PointShape", Type: "gonum.org/v1/plot/vg/draw.GlyphDrawer", LocalType: "draw.GlyphDrawer", Doc: "PointShape is the shape used to draw points", Directives: gti.Directives{}, Tag: ""}},
+		{"PointShape", &gti.Field{Name: "PointShape", Type: "goki.dev/etable/v2/eplot.Shapes", LocalType: "Shapes", Doc: "the shape used to draw points", Directives: gti.Directives{}, Tag: ""}},
 		{"BarWidth", &gti.Field{Name: "BarWidth", Type: "float64", LocalType: "float64", Doc: "width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default", Directives: gti.Directives{}, Tag: "min:\"0.01\" max:\"1\""}},
 		{"NegXDraw", &gti.Field{Name: "NegXDraw", Type: "bool", LocalType: "bool", Doc: "draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn", Directives: gti.Directives{}, Tag: ""}},
 		{"Scale", &gti.Field{Name: "Scale", Type: "float64", LocalType: "float64", Doc: "overall scaling factor -- the larger the number, the larger the fonts are relative to the graph", Directives: gti.Directives{}, Tag: "def:\"2\""}},
@@ -183,8 +171,11 @@ var _ = gti.AddType(&gti.Type{
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 		{"On", &gti.Field{Name: "On", Type: "bool", LocalType: "bool", Doc: "whether to plot this column", Directives: gti.Directives{}, Tag: ""}},
 		{"Col", &gti.Field{Name: "Col", Type: "string", LocalType: "string", Doc: "name of column we're plotting", Directives: gti.Directives{}, Tag: "label:\"Column\""}},
-		{"Lines", &gti.Field{Name: "Lines", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[bool]", Doc: "Lines is whether to plot lines. If it is unset,\nit uses the overall plot parameter option.", Directives: gti.Directives{}, Tag: ""}},
-		{"Points", &gti.Field{Name: "Points", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[bool]", Doc: "Points is whether to plot points with symbols. If it\nis unset, it uses the overall plot parameter option.", Directives: gti.Directives{}, Tag: ""}},
+		{"Lines", &gti.Field{Name: "Lines", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[bool]", Doc: "whether to plot lines; uses the overall plot option if unset", Directives: gti.Directives{}, Tag: ""}},
+		{"Points", &gti.Field{Name: "Points", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[bool]", Doc: "whether to plot points with symbols; uses the overall plot option if unset", Directives: gti.Directives{}, Tag: ""}},
+		{"LineWidth", &gti.Field{Name: "LineWidth", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[float64]", Doc: "the width of lines; uses the overall plot option if unset", Directives: gti.Directives{}, Tag: ""}},
+		{"PointSize", &gti.Field{Name: "PointSize", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[float64]", Doc: "the size of points; uses the overall plot option if unset", Directives: gti.Directives{}, Tag: ""}},
+		{"PointShape", &gti.Field{Name: "PointShape", Type: "goki.dev/glop/option.Option", LocalType: "option.Option[Shapes]", Doc: "the shape used to draw points; uses the overall plot option if unset", Directives: gti.Directives{}, Tag: ""}},
 		{"Range", &gti.Field{Name: "Range", Type: "goki.dev/etable/v2/minmax.Range64", LocalType: "minmax.Range64", Doc: "effective range of data to plot -- either end can be fixed", Directives: gti.Directives{}, Tag: ""}},
 		{"FullRange", &gti.Field{Name: "FullRange", Type: "goki.dev/etable/v2/minmax.F64", LocalType: "minmax.F64", Doc: "full actual range of data -- only valid if specifically computed", Directives: gti.Directives{}, Tag: ""}},
 		{"Color", &gti.Field{Name: "Color", Type: "image/color.Color", LocalType: "color.Color", Doc: "color to use when plotting the line / column", Directives: gti.Directives{}, Tag: ""}},

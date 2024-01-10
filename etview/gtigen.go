@@ -10,7 +10,6 @@ import (
 	"goki.dev/etable/v2/etensor"
 	"goki.dev/gi/v2/gi"
 	"goki.dev/gi/v2/giv"
-	"goki.dev/goosi/events"
 	"goki.dev/gti"
 	"goki.dev/ki/v2"
 	"goki.dev/mat32/v2"
@@ -102,24 +101,6 @@ func (t *SimMatGrid) SetTooltip(v string) *SimMatGrid {
 	return t
 }
 
-// SetClass sets the [SimMatGrid.Class]
-func (t *SimMatGrid) SetClass(v string) *SimMatGrid {
-	t.Class = v
-	return t
-}
-
-// SetPriorityEvents sets the [SimMatGrid.PriorityEvents]
-func (t *SimMatGrid) SetPriorityEvents(v []events.Types) *SimMatGrid {
-	t.PriorityEvents = v
-	return t
-}
-
-// SetCustomContextMenu sets the [SimMatGrid.CustomContextMenu]
-func (t *SimMatGrid) SetCustomContextMenu(v func(m *gi.Scene)) *SimMatGrid {
-	t.CustomContextMenu = v
-	return t
-}
-
 // SetDisp sets the [SimMatGrid.Disp]
 func (t *SimMatGrid) SetDisp(v TensorDisp) *SimMatGrid {
 	t.Disp = v
@@ -144,9 +125,10 @@ var TableViewType = gti.AddType(&gti.Type{
 		{"TsrDisp", &gti.Field{Name: "TsrDisp", Type: "goki.dev/etable/v2/etview.TensorDisp", LocalType: "TensorDisp", Doc: "overall display options for tensor display", Directives: gti.Directives{}, Tag: ""}},
 		{"ColTsrDisp", &gti.Field{Name: "ColTsrDisp", Type: "map[int]*goki.dev/etable/v2/etview.TensorDisp", LocalType: "map[int]*TensorDisp", Doc: "per column tensor display params", Directives: gti.Directives{}, Tag: ""}},
 		{"ColTsrBlank", &gti.Field{Name: "ColTsrBlank", Type: "map[int]*goki.dev/etable/v2/etensor.Float64", LocalType: "map[int]*etensor.Float64", Doc: "per column blank tensor values", Directives: gti.Directives{}, Tag: ""}},
-		{"NCols", &gti.Field{Name: "NCols", Type: "int", LocalType: "int", Doc: "number of columns in table (as of last update)", Directives: gti.Directives{}, Tag: "inactive:\"+\""}},
+		{"NCols", &gti.Field{Name: "NCols", Type: "int", LocalType: "int", Doc: "number of columns in table (as of last update)", Directives: gti.Directives{}, Tag: "edit:\"-\""}},
 		{"SortIdx", &gti.Field{Name: "SortIdx", Type: "int", LocalType: "int", Doc: "current sort index", Directives: gti.Directives{}, Tag: ""}},
 		{"SortDesc", &gti.Field{Name: "SortDesc", Type: "bool", LocalType: "bool", Doc: "whether current sort order is descending", Directives: gti.Directives{}, Tag: ""}},
+		{"HeaderWidths", &gti.Field{Name: "HeaderWidths", Type: "[]int", LocalType: "[]int", Doc: "HeaderWidths has number of characters in each header, per visfields", Directives: gti.Directives{}, Tag: "copy:\"-\" view:\"-\" json:\"-\" xml:\"-\""}},
 		{"BlankString", &gti.Field{Name: "BlankString", Type: "string", LocalType: "string", Doc: "\tblank values for out-of-range rows", Directives: gti.Directives{}, Tag: ""}},
 		{"BlankFloat", &gti.Field{Name: "BlankFloat", Type: "float64", LocalType: "float64", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
@@ -217,6 +199,13 @@ func (t *TableView) SetSortDesc(v bool) *TableView {
 	return t
 }
 
+// SetHeaderWidths sets the [TableView.HeaderWidths]:
+// HeaderWidths has number of characters in each header, per visfields
+func (t *TableView) SetHeaderWidths(v []int) *TableView {
+	t.HeaderWidths = v
+	return t
+}
+
 // SetBlankString sets the [TableView.BlankString]:
 //
 //	blank values for out-of-range rows
@@ -234,24 +223,6 @@ func (t *TableView) SetBlankFloat(v float64) *TableView {
 // SetTooltip sets the [TableView.Tooltip]
 func (t *TableView) SetTooltip(v string) *TableView {
 	t.Tooltip = v
-	return t
-}
-
-// SetClass sets the [TableView.Class]
-func (t *TableView) SetClass(v string) *TableView {
-	t.Class = v
-	return t
-}
-
-// SetPriorityEvents sets the [TableView.PriorityEvents]
-func (t *TableView) SetPriorityEvents(v []events.Types) *TableView {
-	t.PriorityEvents = v
-	return t
-}
-
-// SetCustomContextMenu sets the [TableView.CustomContextMenu]
-func (t *TableView) SetCustomContextMenu(v func(m *gi.Scene)) *TableView {
-	t.CustomContextMenu = v
 	return t
 }
 
@@ -404,13 +375,11 @@ var _ = gti.AddType(&gti.Type{
 		{"Range", &gti.Field{Name: "Range", Type: "goki.dev/etable/v2/minmax.Range64", LocalType: "minmax.Range64", Doc: "range to plot", Directives: gti.Directives{}, Tag: "view:\"inline\""}},
 		{"MinMax", &gti.Field{Name: "MinMax", Type: "goki.dev/etable/v2/minmax.F64", LocalType: "minmax.F64", Doc: "if not using fixed range, this is the actual range of data", Directives: gti.Directives{}, Tag: "view:\"inline\""}},
 		{"ColorMap", &gti.Field{Name: "ColorMap", Type: "goki.dev/gi/v2/giv.ColorMapName", LocalType: "giv.ColorMapName", Doc: "the name of the color map to use in translating values to colors", Directives: gti.Directives{}, Tag: ""}},
-		{"Background", &gti.Field{Name: "Background", Type: "image/color.Color", LocalType: "color.Color", Doc: "background color", Directives: gti.Directives{}, Tag: ""}},
 		{"GridFill", &gti.Field{Name: "GridFill", Type: "float32", LocalType: "float32", Doc: "what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc", Directives: gti.Directives{}, Tag: "min:\"0.1\" max:\"1\" step:\"0.1\" def:\"0.9,1\""}},
 		{"DimExtra", &gti.Field{Name: "DimExtra", Type: "float32", LocalType: "float32", Doc: "amount of extra space to add at dimension boundaries, as a proportion of total grid size", Directives: gti.Directives{}, Tag: "min:\"0\" max:\"1\" step:\"0.02\" def:\"0.1,0.3\""}},
-		{"BotRtSpace", &gti.Field{Name: "BotRtSpace", Type: "goki.dev/girl/units.Value", LocalType: "units.Value", Doc: "extra space to add at bottom of grid -- needed when included in TableView for example", Directives: gti.Directives{}, Tag: ""}},
-		{"GridMinSize", &gti.Field{Name: "GridMinSize", Type: "goki.dev/girl/units.Value", LocalType: "units.Value", Doc: "minimum size for grid squares -- they will never be smaller than this", Directives: gti.Directives{}, Tag: ""}},
-		{"GridMaxSize", &gti.Field{Name: "GridMaxSize", Type: "goki.dev/girl/units.Value", LocalType: "units.Value", Doc: "maximum size for grid squares -- they will never be larger than this", Directives: gti.Directives{}, Tag: ""}},
-		{"TotPrefSize", &gti.Field{Name: "TotPrefSize", Type: "goki.dev/girl/units.Value", LocalType: "units.Value", Doc: "total preferred display size along largest dimension -- grid squares will be sized to fit within this size, subject to harder GridMin / Max size constraints", Directives: gti.Directives{}, Tag: ""}},
+		{"GridMinSize", &gti.Field{Name: "GridMinSize", Type: "float32", LocalType: "float32", Doc: "minimum size for grid squares -- they will never be smaller than this", Directives: gti.Directives{}, Tag: ""}},
+		{"GridMaxSize", &gti.Field{Name: "GridMaxSize", Type: "float32", LocalType: "float32", Doc: "maximum size for grid squares -- they will never be larger than this", Directives: gti.Directives{}, Tag: ""}},
+		{"TotPrefSize", &gti.Field{Name: "TotPrefSize", Type: "float32", LocalType: "float32", Doc: "total preferred display size along largest dimension.\ngrid squares will be sized to fit within this size,\nsubject to harder GridMin / Max size constraints", Directives: gti.Directives{}, Tag: ""}},
 		{"FontSize", &gti.Field{Name: "FontSize", Type: "float32", LocalType: "float32", Doc: "font size in standard point units for labels (e.g., SimMat)", Directives: gti.Directives{}, Tag: ""}},
 		{"GridView", &gti.Field{Name: "GridView", Type: "*goki.dev/etable/v2/etview.TensorGrid", LocalType: "*TensorGrid", Doc: "our gridview, for update method", Directives: gti.Directives{}, Tag: "copy:\"-\" json:\"-\" xml:\"-\" view:\"-\""}},
 	}),
@@ -477,24 +446,6 @@ func (t *TensorGrid) SetTooltip(v string) *TensorGrid {
 	return t
 }
 
-// SetClass sets the [TensorGrid.Class]
-func (t *TensorGrid) SetClass(v string) *TensorGrid {
-	t.Class = v
-	return t
-}
-
-// SetPriorityEvents sets the [TensorGrid.PriorityEvents]
-func (t *TensorGrid) SetPriorityEvents(v []events.Types) *TensorGrid {
-	t.PriorityEvents = v
-	return t
-}
-
-// SetCustomContextMenu sets the [TensorGrid.CustomContextMenu]
-func (t *TensorGrid) SetCustomContextMenu(v func(m *gi.Scene)) *TensorGrid {
-	t.CustomContextMenu = v
-	return t
-}
-
 // TensorViewType is the [gti.Type] for [TensorView]
 var TensorViewType = gti.AddType(&gti.Type{
 	Name:       "goki.dev/etable/v2/etview.TensorView",
@@ -531,23 +482,5 @@ func (t *TensorView) New() ki.Ki {
 // SetTooltip sets the [TensorView.Tooltip]
 func (t *TensorView) SetTooltip(v string) *TensorView {
 	t.Tooltip = v
-	return t
-}
-
-// SetClass sets the [TensorView.Class]
-func (t *TensorView) SetClass(v string) *TensorView {
-	t.Class = v
-	return t
-}
-
-// SetPriorityEvents sets the [TensorView.PriorityEvents]
-func (t *TensorView) SetPriorityEvents(v []events.Types) *TensorView {
-	t.PriorityEvents = v
-	return t
-}
-
-// SetCustomContextMenu sets the [TensorView.CustomContextMenu]
-func (t *TensorView) SetCustomContextMenu(v func(m *gi.Scene)) *TensorView {
-	t.CustomContextMenu = v
 	return t
 }

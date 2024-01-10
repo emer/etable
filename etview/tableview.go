@@ -103,11 +103,7 @@ func (tv *TableView) SetStyles() {
 			w.Style(func(s *styles.Style) {
 				s.Align.Self = styles.Center
 			})
-		case "grid-lay": // grid layout
-			w.Style(func(s *styles.Style) {
-				s.Grow.Set(1, 1)
-			})
-		case "grid-lay/grid": // slice grid
+		case "grid": // slice grid
 			sg := w.(*giv.SliceViewGrid)
 			sg.Stripes = gi.RowStripes
 			sg.Style(func(s *styles.Style) {
@@ -116,27 +112,14 @@ func (tv *TableView) SetStyles() {
 				nWidgPerRow, _ := tv.RowWidgetNs()
 				s.Columns = nWidgPerRow
 				s.Grow.Set(1, 1)
+				s.Overflow.Y = styles.OverflowAuto
 				s.Gap.Set(units.Em(0.5)) // note: match header
 				// baseline mins:
 				s.Min.X.Ch(20)
 				s.Min.Y.Em(6)
 			})
-		case "grid-lay/scrollbar":
-			sb := w.(*gi.Slider)
-			sb.Style(func(s *styles.Style) {
-				sb.Type = gi.SliderScrollbar
-				s.Min.X = tv.Styles.ScrollBarWidth
-				s.Grow.Set(0, 1)
-			})
-			sb.OnInput(func(e events.Event) {
-				updt := tv.UpdateStart()
-				tv.StartIdx = int(sb.Value)
-				tv.This().(giv.SliceViewer).UpdateWidgets()
-				tv.UpdateEndRender(updt)
-			})
-
 		}
-		if w.Parent().PathFrom(tv) == "grid-lay/grid" {
+		if w.Parent().PathFrom(tv) == "grid" {
 			switch {
 			case strings.HasPrefix(w.Name(), "index-"):
 				w.Style(func(s *styles.Style) {
@@ -270,7 +253,6 @@ func (tv *TableView) ConfigTableView() {
 	tv.ConfigFrame()
 	tv.This().(giv.SliceViewer).ConfigRows()
 	tv.This().(giv.SliceViewer).UpdateWidgets()
-	tv.ConfigScroll()
 	tv.ApplyStyleTree()
 	tv.UpdateEndLayout(updt)
 }
@@ -281,10 +263,7 @@ func (tv *TableView) ConfigFrame() {
 	}
 	tv.SetFlag(true, giv.SliceViewConfiged)
 	gi.NewFrame(tv, "header")
-	gl := gi.NewLayout(tv, "grid-lay")
-	gl.SetFlag(true, gi.LayoutNoKeys)
-	giv.NewSliceViewGrid(gl, "grid")
-	gi.NewSlider(gl, "scrollbar")
+	giv.NewSliceViewGrid(tv, "grid")
 	tv.ConfigHeader()
 }
 
@@ -343,20 +322,10 @@ func (tv *TableView) ConfigHeader() {
 	}
 }
 
-// GridLayout returns the SliceGrid grid-layout widget, with grid and scrollbar
-func (tv *TableView) GridLayout() *gi.Layout {
-	return tv.ChildByName("grid-lay", 0).(*gi.Layout)
-}
-
 // SliceGrid returns the SliceGrid grid frame widget, which contains all the
 // fields and values, within SliceFrame
 func (tv *TableView) SliceGrid() *giv.SliceViewGrid {
-	return tv.GridLayout().ChildByName("grid", 0).(*giv.SliceViewGrid)
-}
-
-// ScrollBar returns the SliceGrid scrollbar
-func (tv *TableView) ScrollBar() *gi.Slider {
-	return tv.GridLayout().ChildByName("scrollbar", 1).(*gi.Slider)
+	return tv.Child(1).(*giv.SliceViewGrid)
 }
 
 // SliceHeader returns the Frame header for slice grid

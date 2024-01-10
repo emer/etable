@@ -5,7 +5,6 @@
 package main
 
 import (
-	"goki.dev/colors"
 	"goki.dev/etable/v2/eplot"
 	"goki.dev/etable/v2/etable"
 	"goki.dev/etable/v2/etensor"
@@ -40,7 +39,7 @@ func PlotColorSpread(tv *gi.Tabs) {
 	dt.SetNumRows(mx)
 
 	for i := 0; i < mx; i++ {
-		val := colors.BinarySpacedNumber(i)
+		val := i                                   // colors.BinarySpacedNumber(i)
 		dt.SetCellFloat("Idx", i, float64(i))      // select this to see the timecourse
 		dt.SetCellFloat("Collapse", i, float64(0)) // select this to collapse all points on top
 		dt.SetCellFloat("Val", i, float64(val))
