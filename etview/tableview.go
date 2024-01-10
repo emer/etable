@@ -466,6 +466,12 @@ func (tv *TableView) ConfigRows() {
 				e.SetHandled()
 				tv.UpdateSelectRow(i)
 			})
+			if col.NumDims() > 1 {
+				tgw := w.This().(*TensorGrid)
+				tgw.Style(func(s *styles.Style) {
+					s.Grow.Set(0, 0)
+				})
+			}
 		}
 
 		if !tv.IsReadOnly() {

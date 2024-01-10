@@ -191,7 +191,7 @@ func (tg *TensorGrid) SetStyles() {
 		ms := tg.MinSize()
 		s.Min.X.Dot(ms.X)
 		s.Min.Y.Dot(ms.Y)
-		// s.Grow.Set(1, 1)
+		s.Grow.Set(1, 1)
 	})
 }
 
