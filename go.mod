@@ -4,7 +4,7 @@ go 1.21
 
 require (
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40
-	goki.dev v0.0.0
+	goki.dev v0.0.1
 	gonum.org/v1/gonum v0.14.0
 	gonum.org/v1/plot v0.14.0
 )
