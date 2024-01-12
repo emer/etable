@@ -5,7 +5,6 @@
 package eplot
 
 import (
-	"github.com/goki/ki/kit"
 	"goki.dev/events"
 	"goki.dev/gi"
 	"goki.dev/giv"
@@ -38,11 +37,11 @@ func (vv *Plot2DValue) UpdateWidget() {
 		return
 	}
 	ac := vv.Widget.(*gi.Button)
-	npv := kit.NonPtrValue(vv.Value)
-	if kit.ValueIsZero(vv.Value) || kit.ValueIsZero(npv) {
+	npv := laser.NonPtrValue(vv.Value)
+	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
 		ac.SetText("nil")
 	} else {
-		opv := kit.OnePtrUnderlyingValue(vv.Value)
+		opv := laser.OnePtrUnderlyingValue(vv.Value)
 		plot := opv.Interface().(*Plot2D)
 		if plot != nil && plot.Table != nil && plot.Table.Table != nil {
 			if nm, has := plot.Table.Table.MetaData["name"]; has {

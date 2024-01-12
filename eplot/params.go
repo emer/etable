@@ -10,8 +10,8 @@ import (
 
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/minmax"
-	"github.com/goki/ki/kit"
 	"goki.dev/glop/option"
+	"goki.dev/laser"
 )
 
 // PlotParams are parameters for overall plot
@@ -132,13 +132,13 @@ func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 		}
 	}
 	if lw, has := MetaMapLower(meta, "LineWidth"); has {
-		pp.LineWidth, _ = kit.ToFloat(lw)
+		pp.LineWidth, _ = laser.ToFloat(lw)
 	}
 	if ps, has := MetaMapLower(meta, "PointSize"); has {
-		pp.PointSize, _ = kit.ToFloat(ps)
+		pp.PointSize, _ = laser.ToFloat(ps)
 	}
 	if bw, has := MetaMapLower(meta, "BarWidth"); has {
-		pp.BarWidth, _ = kit.ToFloat(bw)
+		pp.BarWidth, _ = laser.ToFloat(bw)
 	}
 	if op, has := MetaMapLower(meta, "NegXDraw"); has {
 		if op == "+" || op == "true" {
@@ -148,7 +148,7 @@ func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 		}
 	}
 	if scl, has := MetaMapLower(meta, "Scale"); has {
-		pp.Scale, _ = kit.ToFloat(scl)
+		pp.Scale, _ = laser.ToFloat(scl)
 	}
 	if xc, has := MetaMapLower(meta, "XAxisCol"); has {
 		pp.XAxisCol = xc
@@ -157,7 +157,7 @@ func (pp *PlotParams) FmMetaMap(meta map[string]string) {
 		pp.LegendCol = lc
 	}
 	if xrot, has := MetaMapLower(meta, "XAxisRot"); has {
-		pp.XAxisRot, _ = kit.ToFloat(xrot)
+		pp.XAxisRot, _ = laser.ToFloat(xrot)
 	}
 	if lb, has := MetaMapLower(meta, "XAxisLabel"); has {
 		pp.XAxisLabel = lb
@@ -292,10 +292,10 @@ func (cp *ColParams) FmMetaMap(meta map[string]string) {
 		}
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":Max"); has {
-		cp.Range.Max, _ = kit.ToFloat(vl)
+		cp.Range.Max, _ = laser.ToFloat(vl)
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":Min"); has {
-		cp.Range.Min, _ = kit.ToFloat(vl)
+		cp.Range.Min, _ = laser.ToFloat(vl)
 	}
 	if lb, has := MetaMapLower(meta, cp.Col+":Label"); has {
 		cp.Lbl = lb
@@ -304,7 +304,7 @@ func (cp *ColParams) FmMetaMap(meta map[string]string) {
 		cp.ErrCol = lb
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":TensorIdx"); has {
-		iv, _ := kit.ToInt(vl)
+		iv, _ := laser.ToInt(vl)
 		cp.TensorIdx = int(iv)
 	}
 }
