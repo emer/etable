@@ -12,7 +12,7 @@ import (
 
 func main() {
 	b := gi.NewAppBody("plot")
-	b.App().About = `This demonstrates data plotting using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
+	b.App().About = `This demonstrates data plotting using etable.Table. See <a href="https://github.com/emer/etable/v2">etable on GitHub</a>.</p>`
 
 	epc := etable.NewTable("epc")
 	epc.OpenCSV("ra25epoch.tsv", etable.Tab)
