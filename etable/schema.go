@@ -4,7 +4,7 @@
 
 package etable
 
-import "github.com/goki/etable/v2/etensor"
+import "github.com/emer/etable/v2/etensor"
 
 // Column specifies everything about a column -- can be used for constructing tables
 type Column struct {

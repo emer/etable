@@ -9,9 +9,9 @@ import (
 	"math"
 	"math/rand"
 
-	"github.com/goki/etable/v2/etensor"
-	"github.com/goki/etable/v2/norm"
-	"github.com/goki/etable/v2/simat"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/norm"
+	"github.com/emer/etable/v2/simat"
 	"goki.dev/glop/indent"
 )
 

@@ -9,8 +9,8 @@ import (
 	"log"
 	"strconv"
 
-	"github.com/goki/etable/v2/etensor"
-	"github.com/goki/etable/v2/minmax"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/minmax"
 	"goki.dev/colors"
 	"goki.dev/colors/colormap"
 	"goki.dev/events"

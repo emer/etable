@@ -1,4 +1,4 @@
-module github.com/goki/etable/v2
+module github.com/emer/etable/v2
 
 go 1.21
 

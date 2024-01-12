@@ -5,8 +5,8 @@
 package agg
 
 import (
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/etensor"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etensor"
 )
 
 // DescAggs are all the standard aggregates

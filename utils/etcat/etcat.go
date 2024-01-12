@@ -12,8 +12,8 @@ import (
 	"sort"
 	"strconv"
 
-	"github.com/goki/etable/v2/agg"
-	"github.com/goki/etable/v2/etable"
+	"github.com/emer/etable/v2/agg"
+	"github.com/emer/etable/v2/etable"
 	"goki.dev/gi"
 )
 

@@ -7,8 +7,8 @@ package split
 import (
 	"fmt"
 
-	"github.com/goki/etable/v2/agg"
-	"github.com/goki/etable/v2/etable"
+	"github.com/emer/etable/v2/agg"
+	"github.com/emer/etable/v2/etable"
 )
 
 // AggIdx performs aggregation using given standard aggregation function across

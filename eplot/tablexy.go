@@ -9,9 +9,9 @@ import (
 	"log"
 	"math"
 
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/etensor"
-	"github.com/goki/etable/v2/minmax"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/minmax"
 )
 
 // TableXY selects two columns from a etable.Table data table to plot in a gonum plot,

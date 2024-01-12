@@ -5,8 +5,8 @@
 package etview
 
 import (
-	"github.com/goki/etable/v2/etensor"
-	"github.com/goki/etable/v2/simat"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/simat"
 	"goki.dev/mat32"
 	"goki.dev/paint"
 	"goki.dev/styles"

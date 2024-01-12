@@ -8,8 +8,8 @@ import (
 	"image/color"
 	"strings"
 
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/minmax"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/minmax"
 	"github.com/goki/ki/kit"
 	"goki.dev/glop/option"
 )

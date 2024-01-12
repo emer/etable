@@ -11,7 +11,7 @@ import (
 	"strings"
 
 	"github.com/apache/arrow/go/arrow"
-	"github.com/goki/etable/v2/bitslice"
+	"github.com/emer/etable/v2/bitslice"
 	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )

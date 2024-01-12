@@ -8,7 +8,7 @@ import (
 )
 
 var _ = gti.AddType(&gti.Type{
-	Name:      "github.com/goki/etable/v2/etable.Table",
+	Name:      "github.com/emer/etable/v2/etable.Table",
 	ShortName: "etable.Table",
 	IDName:    "table",
 	Doc:       "etable.Table is the emer DataTable structure, containing columns of etensor tensors.\nAll tensors MUST have RowMajor stride layout!",
@@ -16,7 +16,7 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Cols", &gti.Field{Name: "Cols", Type: "[]github.com/goki/etable/v2/etensor.Tensor", LocalType: "[]etensor.Tensor", Doc: "columns of data, as etensor.Tensor tensors", Directives: gti.Directives{}, Tag: "view:\"no-inline\""}},
+		{"Cols", &gti.Field{Name: "Cols", Type: "[]github.com/emer/etable/v2/etensor.Tensor", LocalType: "[]etensor.Tensor", Doc: "columns of data, as etensor.Tensor tensors", Directives: gti.Directives{}, Tag: "view:\"no-inline\""}},
 		{"ColNames", &gti.Field{Name: "ColNames", Type: "[]string", LocalType: "[]string", Doc: "the names of the columns", Directives: gti.Directives{}, Tag: ""}},
 		{"Rows", &gti.Field{Name: "Rows", Type: "int", LocalType: "int", Doc: "number of rows, which is enforced to be the size of the outer-most dimension of the column tensors", Directives: gti.Directives{}, Tag: "edit:\"-\""}},
 		{"ColNameMap", &gti.Field{Name: "ColNameMap", Type: "map[string]int", LocalType: "map[string]int", Doc: "the map of column names to column numbers", Directives: gti.Directives{}, Tag: "view:\"-\""}},
@@ -38,7 +38,7 @@ var _ = gti.AddType(&gti.Type{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"filename", &gti.Field{Name: "filename", Type: "goki.dev/gi.FileName", LocalType: "gi.FileName", Doc: "", Directives: gti.Directives{}, Tag: ""}},
-			{"delim", &gti.Field{Name: "delim", Type: "github.com/goki/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"delim", &gti.Field{Name: "delim", Type: "github.com/emer/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 			{"headers", &gti.Field{Name: "headers", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
@@ -47,7 +47,7 @@ var _ = gti.AddType(&gti.Type{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"filename", &gti.Field{Name: "filename", Type: "goki.dev/gi.FileName", LocalType: "gi.FileName", Doc: "", Directives: gti.Directives{}, Tag: ""}},
-			{"delim", &gti.Field{Name: "delim", Type: "github.com/goki/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"delim", &gti.Field{Name: "delim", Type: "github.com/emer/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		})}},
@@ -55,7 +55,7 @@ var _ = gti.AddType(&gti.Type{
 })
 
 var _ = gti.AddType(&gti.Type{
-	Name:      "github.com/goki/etable/v2/etable.IdxView",
+	Name:      "github.com/emer/etable/v2/etable.IdxView",
 	ShortName: "etable.IdxView",
 	IDName:    "idx-view",
 	Doc:       "IdxView is an indexed wrapper around an etable.Table that provides a\nspecific view onto the Table defined by the set of indexes.\nThis provides an efficient way of sorting and filtering a table by only\nupdating the indexes while doing nothing to the Table itself.\nTo produce a table that has data actually organized according to the\nindexed order, call the NewTable method.\nIdxView views on a table can also be organized together as Splits\nof the table rows, e.g., by grouping values along a given column.",
@@ -63,9 +63,9 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Table", &gti.Field{Name: "Table", Type: "*github.com/goki/etable/v2/etable.Table", LocalType: "*Table", Doc: "Table that we are an indexed view onto", Directives: gti.Directives{}, Tag: ""}},
+		{"Table", &gti.Field{Name: "Table", Type: "*github.com/emer/etable/v2/etable.Table", LocalType: "*Table", Doc: "Table that we are an indexed view onto", Directives: gti.Directives{}, Tag: ""}},
 		{"Idxs", &gti.Field{Name: "Idxs", Type: "[]int", LocalType: "[]int", Doc: "current indexes into Table", Directives: gti.Directives{}, Tag: ""}},
-		{"lessFunc", &gti.Field{Name: "lessFunc", Type: "github.com/goki/etable/v2/etable.LessFunc", LocalType: "LessFunc", Doc: "current Less function used in sorting", Directives: gti.Directives{}, Tag: "copy:\"-\" view:\"-\" xml:\"-\" json:\"-\""}},
+		{"lessFunc", &gti.Field{Name: "lessFunc", Type: "github.com/emer/etable/v2/etable.LessFunc", LocalType: "LessFunc", Doc: "current Less function used in sorting", Directives: gti.Directives{}, Tag: "copy:\"-\" view:\"-\" xml:\"-\" json:\"-\""}},
 	}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
 	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{
@@ -100,7 +100,7 @@ var _ = gti.AddType(&gti.Type{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"filename", &gti.Field{Name: "filename", Type: "goki.dev/gi.FileName", LocalType: "gi.FileName", Doc: "", Directives: gti.Directives{}, Tag: ""}},
-			{"delim", &gti.Field{Name: "delim", Type: "github.com/goki/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"delim", &gti.Field{Name: "delim", Type: "github.com/emer/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 			{"headers", &gti.Field{Name: "headers", Type: "bool", LocalType: "bool", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
@@ -109,7 +109,7 @@ var _ = gti.AddType(&gti.Type{
 			&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 		}, Args: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"filename", &gti.Field{Name: "filename", Type: "goki.dev/gi.FileName", LocalType: "gi.FileName", Doc: "", Directives: gti.Directives{}, Tag: ""}},
-			{"delim", &gti.Field{Name: "delim", Type: "github.com/goki/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+			{"delim", &gti.Field{Name: "delim", Type: "github.com/emer/etable/v2/etable.Delims", LocalType: "Delims", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		}), Returns: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
 			{"error", &gti.Field{Name: "error", Type: "error", LocalType: "error", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		})}},

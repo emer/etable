@@ -9,9 +9,9 @@ import (
 	"log"
 	"math"
 
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/minmax"
-	"github.com/goki/etable/v2/split"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/minmax"
+	"github.com/emer/etable/v2/split"
 	"goki.dev/colors"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"

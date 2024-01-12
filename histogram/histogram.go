@@ -5,8 +5,8 @@
 package histogram
 
 import (
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/etensor"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etensor"
 	"goki.dev/mat32"
 )
 

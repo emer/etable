@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"github.com/goki/etable/v2/etensor"
+	"github.com/emer/etable/v2/etensor"
 )
 
 // ClosestRow32 returns the closest fit between probe pattern and patterns in

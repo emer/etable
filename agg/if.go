@@ -4,7 +4,7 @@
 
 package agg
 
-import "github.com/goki/etable/v2/etable"
+import "github.com/emer/etable/v2/etable"
 
 // IfFunc is used for the *If aggregators -- counted if it returns true
 type IfFunc func(idx int, val float64) bool

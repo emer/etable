@@ -10,7 +10,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/goki/etable/v2/etensor"
+	"github.com/emer/etable/v2/etensor"
 )
 
 // SplitAgg contains aggregation results for splits

@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/goki/etable/v2/bitslice"
+	"github.com/emer/etable/v2/bitslice"
 	"gonum.org/v1/gonum/mat"
 )
 

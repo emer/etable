@@ -5,9 +5,9 @@
 package clust
 
 import (
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/etensor"
-	"github.com/goki/etable/v2/simat"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/simat"
 )
 
 // Plot sets the rows of given data table to trace out lines with labels that

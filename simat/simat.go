@@ -7,9 +7,9 @@ package simat
 import (
 	"fmt"
 
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/etensor"
-	"github.com/goki/etable/v2/metric"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/metric"
 )
 
 // SimMat is a similarity / distance matrix with additional row and column

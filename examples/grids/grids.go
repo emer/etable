@@ -5,8 +5,8 @@
 package main
 
 import (
-	"github.com/goki/etable/v2/etable"
-	"github.com/goki/etable/v2/etview"
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etview"
 	"goki.dev/gi"
 	"goki.dev/grr"
 )
