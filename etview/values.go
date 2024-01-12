@@ -8,9 +8,9 @@ import (
 	"github.com/goki/etable/v2/etable"
 	"github.com/goki/etable/v2/etensor"
 	"github.com/goki/etable/v2/simat"
+	"goki.dev/events"
 	"goki.dev/gi"
 	"goki.dev/giv"
-	"goki.dev/goosi/events"
 	"goki.dev/gti"
 	"goki.dev/laser"
 )

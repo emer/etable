@@ -7,7 +7,7 @@ package main
 import (
 	"github.com/goki/etable/v2/eplot"
 	"github.com/goki/etable/v2/etable"
-	"goki.dev/gi/v2/gi"
+	"goki.dev/gi"
 )
 
 func main() {

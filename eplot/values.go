@@ -6,12 +6,12 @@ package eplot
 
 import (
 	"github.com/goki/ki/kit"
+	"goki.dev/events"
 	"goki.dev/gi"
-	"goki.dev/girl/styles"
 	"goki.dev/giv"
-	"goki.dev/goosi/events"
 	"goki.dev/gti"
 	"goki.dev/laser"
+	"goki.dev/styles"
 )
 
 func init() {

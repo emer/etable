@@ -11,7 +11,7 @@ import (
 	"goki.dev/gi"
 	"goki.dev/giv"
 	"goki.dev/gti"
-	"goki.dev/ki/v2"
+	"goki.dev/ki"
 	"goki.dev/mat32"
 	"goki.dev/ordmap"
 )

@@ -13,11 +13,11 @@ import (
 	"github.com/goki/etable/v2/minmax"
 	"goki.dev/colors"
 	"goki.dev/colors/colormap"
+	"goki.dev/events"
 	"goki.dev/gi"
-	"goki.dev/girl/styles"
 	"goki.dev/giv"
-	"goki.dev/goosi/events"
 	"goki.dev/mat32"
+	"goki.dev/styles"
 )
 
 // TensorLayout are layout options for displaying tensors

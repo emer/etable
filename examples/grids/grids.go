@@ -7,7 +7,7 @@ package main
 import (
 	"github.com/goki/etable/v2/etable"
 	"github.com/goki/etable/v2/etview"
-	"goki.dev/gi/v2/gi"
+	"goki.dev/gi"
 	"goki.dev/grr"
 )
 

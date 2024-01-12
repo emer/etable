@@ -7,9 +7,9 @@ package etview
 import (
 	"github.com/goki/etable/v2/etensor"
 	"github.com/goki/etable/v2/simat"
-	"goki.dev/girl/paint"
-	"goki.dev/girl/styles"
 	"goki.dev/mat32"
+	"goki.dev/paint"
+	"goki.dev/styles"
 )
 
 const LabelSpace = float32(8)

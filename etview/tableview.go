@@ -15,18 +15,18 @@ import (
 
 	"github.com/goki/etable/v2/etable"
 	"github.com/goki/etable/v2/etensor"
+	"goki.dev/abilities"
 	"goki.dev/colors"
+	"goki.dev/events"
 	"goki.dev/gi"
-	"goki.dev/girl/abilities"
-	"goki.dev/girl/states"
-	"goki.dev/girl/styles"
-	"goki.dev/girl/units"
 	"goki.dev/giv"
-	"goki.dev/goosi/events"
 	"goki.dev/grr"
 	"goki.dev/icons"
-	"goki.dev/ki/v2"
+	"goki.dev/ki"
 	"goki.dev/laser"
+	"goki.dev/states"
+	"goki.dev/styles"
+	"goki.dev/units"
 )
 
 // etview.TableView provides a GUI interface for etable.Table's

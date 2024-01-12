@@ -5,7 +5,7 @@ package eplot
 import (
 	"goki.dev/gi"
 	"goki.dev/gti"
-	"goki.dev/ki/v2"
+	"goki.dev/ki"
 	"goki.dev/ordmap"
 )
 

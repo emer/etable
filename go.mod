@@ -14,7 +14,7 @@ require (
 	goki.dev/grr v0.0.12
 	goki.dev/gti v0.1.32
 	goki.dev/icons v0.0.17
-	goki.dev/ki/v2 v2.0.0-dev0.0.33
+	goki.dev/ki v2.0.0-dev0.0.33
 	goki.dev/laser v0.1.34
 	goki.dev/mat32 v2.0.0-dev0.0.28
 	goki.dev/ordmap v0.5.10

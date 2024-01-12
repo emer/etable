@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"math"
 
-	"github.com/goki/etable/v2agg"
-	"github.com/goki/etable/v2etable"
-	"github.com/goki/etable/v2etview"
-	"github.com/goki/etable/v2split"
-	"goki.dev/gi/v2/gi"
+	"github.com/goki/etable/v2/agg"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etview"
+	"github.com/goki/etable/v2/split"
+	"goki.dev/gi"
 )
 
 // Planets is raw data
