@@ -5,9 +5,9 @@
 package histogram
 
 import (
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/mat32/v2"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etensor"
+	"goki.dev/mat32"
 )
 
 // F64 generates a histogram of counts of values within given

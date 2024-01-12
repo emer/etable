@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"os"
 
-	"goki.dev/gi/v2/gi"
+	"goki.dev/gi"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"

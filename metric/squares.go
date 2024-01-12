@@ -7,8 +7,8 @@ package metric
 import (
 	"math"
 
-	"goki.dev/etable/v2/norm"
-	"goki.dev/mat32/v2"
+	"github.com/goki/etable/v2/norm"
+	"goki.dev/mat32"
 )
 
 ///////////////////////////////////////////

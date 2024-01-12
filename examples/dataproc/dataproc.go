@@ -8,10 +8,10 @@ import (
 	"fmt"
 	"math"
 
-	"goki.dev/etable/v2/agg"
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etview"
-	"goki.dev/etable/v2/split"
+	"github.com/goki/etable/v2agg"
+	"github.com/goki/etable/v2etable"
+	"github.com/goki/etable/v2etview"
+	"github.com/goki/etable/v2split"
 	"goki.dev/gi/v2/gi"
 )
 

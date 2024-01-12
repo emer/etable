@@ -5,11 +5,11 @@
 package etview
 
 import (
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/etable/v2/simat"
-	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/giv"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etensor"
+	"github.com/goki/etable/v2/simat"
+	"goki.dev/gi"
+	"goki.dev/giv"
 	"goki.dev/goosi/events"
 	"goki.dev/gti"
 	"goki.dev/laser"

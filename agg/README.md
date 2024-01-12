@@ -1,6 +1,6 @@
 # agg
 
-Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/agg)
+Docs: [GoDoc](https://pkg.go.dev/github.com/goki/etable/v2/agg)
 
 This package provides aggregation functions operating on `IdxView` indexed views of `etable.Table` data, along with standard AggFunc functions that can be used at any level of aggregation from etensor on up.
 

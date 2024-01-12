@@ -5,8 +5,8 @@
 package convolve
 
 import (
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etensor"
 )
 
 // SmoothTable returns a cloned table with each of the floating-point

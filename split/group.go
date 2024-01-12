@@ -8,7 +8,7 @@ import (
 	"log"
 	"slices"
 
-	"goki.dev/etable/v2/etable"
+	"github.com/goki/etable/v2/etable"
 )
 
 // All returns a single "split" with all of the rows in given view

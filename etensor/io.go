@@ -11,7 +11,7 @@ import (
 	"os"
 	"strconv"
 
-	"goki.dev/gi/v2/gi"
+	"goki.dev/gi"
 )
 
 // SaveCSV writes a tensor to a comma-separated-values (CSV) file

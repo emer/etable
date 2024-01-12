@@ -7,7 +7,7 @@ package convolve
 import (
 	"testing"
 
-	"goki.dev/mat32/v2"
+	"goki.dev/mat32"
 )
 
 func TestConv32(t *testing.T) {

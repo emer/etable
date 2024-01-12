@@ -7,8 +7,8 @@ package norm
 import (
 	"math"
 
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/mat32/v2"
+	"github.com/goki/etable/v2/etensor"
+	"goki.dev/mat32"
 )
 
 // Abs32 applies the Abs function to each element in given slice

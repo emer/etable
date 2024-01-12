@@ -8,8 +8,8 @@ import (
 	"fmt"
 	"testing"
 
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etensor"
 )
 
 func TestPermuted(t *testing.T) {

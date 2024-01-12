@@ -7,9 +7,9 @@ package pca
 import (
 	"fmt"
 
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/etable/v2/metric"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etensor"
+	"github.com/goki/etable/v2/metric"
 )
 
 // CovarTableCol generates a covariance matrix from given column name

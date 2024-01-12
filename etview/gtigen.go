@@ -6,19 +6,19 @@ import (
 	"reflect"
 	"sync"
 
+	"github.com/goki/etable/v2/etensor"
 	"goki.dev/colors/colormap"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/giv"
+	"goki.dev/gi"
+	"goki.dev/giv"
 	"goki.dev/gti"
 	"goki.dev/ki/v2"
-	"goki.dev/mat32/v2"
+	"goki.dev/mat32"
 	"goki.dev/ordmap"
 )
 
 // SimMatGridType is the [gti.Type] for [SimMatGrid]
 var SimMatGridType = gti.AddType(&gti.Type{
-	Name:      "goki.dev/etable/v2/etview.SimMatGrid",
+	Name:      "github.com/goki/etable/v2/etview.SimMatGrid",
 	ShortName: "etview.SimMatGrid",
 	IDName:    "sim-mat-grid",
 	Doc:       "SimMatGrid is a widget that displays a similarity / distance matrix\nwith tensor values as a grid of colored squares, and labels for rows, cols",
@@ -26,16 +26,16 @@ var SimMatGridType = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"SimMat", &gti.Field{Name: "SimMat", Type: "*goki.dev/etable/v2/simat.SimMat", LocalType: "*simat.SimMat", Doc: "the similarity / distance matrix", Directives: gti.Directives{}, Tag: "set:\"-\""}},
-		{"rowMaxSz", &gti.Field{Name: "rowMaxSz", Type: "goki.dev/mat32/v2.Vec2", LocalType: "mat32.Vec2", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"SimMat", &gti.Field{Name: "SimMat", Type: "*github.com/goki/etable/v2/simat.SimMat", LocalType: "*simat.SimMat", Doc: "the similarity / distance matrix", Directives: gti.Directives{}, Tag: "set:\"-\""}},
+		{"rowMaxSz", &gti.Field{Name: "rowMaxSz", Type: "goki.dev/mat32.Vec2", LocalType: "mat32.Vec2", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		{"rowMinBlank", &gti.Field{Name: "rowMinBlank", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		{"rowNGps", &gti.Field{Name: "rowNGps", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
-		{"colMaxSz", &gti.Field{Name: "colMaxSz", Type: "goki.dev/mat32/v2.Vec2", LocalType: "mat32.Vec2", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"colMaxSz", &gti.Field{Name: "colMaxSz", Type: "goki.dev/mat32.Vec2", LocalType: "mat32.Vec2", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		{"colMinBlank", &gti.Field{Name: "colMinBlank", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 		{"colNGps", &gti.Field{Name: "colNGps", Type: "int", LocalType: "int", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"TensorGrid", &gti.Field{Name: "TensorGrid", Type: "goki.dev/etable/v2/etview.TensorGrid", LocalType: "TensorGrid", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"TensorGrid", &gti.Field{Name: "TensorGrid", Type: "github.com/goki/etable/v2/etview.TensorGrid", LocalType: "TensorGrid", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Methods:  ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
 	Instance: &SimMatGrid{},
@@ -115,16 +115,16 @@ func (t *SimMatGrid) SetColorMap(v *colormap.Map) *SimMatGrid {
 
 // TableViewType is the [gti.Type] for [TableView]
 var TableViewType = gti.AddType(&gti.Type{
-	Name:       "goki.dev/etable/v2/etview.TableView",
+	Name:       "github.com/goki/etable/v2/etview.TableView",
 	ShortName:  "etview.TableView",
 	IDName:     "table-view",
 	Doc:        "etview.TableView provides a GUI interface for etable.Table's",
 	Directives: gti.Directives{},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Table", &gti.Field{Name: "Table", Type: "*goki.dev/etable/v2/etable.IdxView", LocalType: "*etable.IdxView", Doc: "the idx view of the table that we're a view of", Directives: gti.Directives{}, Tag: "set:\"-\""}},
-		{"TsrDisp", &gti.Field{Name: "TsrDisp", Type: "goki.dev/etable/v2/etview.TensorDisp", LocalType: "TensorDisp", Doc: "overall display options for tensor display", Directives: gti.Directives{}, Tag: ""}},
-		{"ColTsrDisp", &gti.Field{Name: "ColTsrDisp", Type: "map[int]*goki.dev/etable/v2/etview.TensorDisp", LocalType: "map[int]*TensorDisp", Doc: "per column tensor display params", Directives: gti.Directives{}, Tag: ""}},
-		{"ColTsrBlank", &gti.Field{Name: "ColTsrBlank", Type: "map[int]*goki.dev/etable/v2/etensor.Float64", LocalType: "map[int]*etensor.Float64", Doc: "per column blank tensor values", Directives: gti.Directives{}, Tag: ""}},
+		{"Table", &gti.Field{Name: "Table", Type: "*github.com/goki/etable/v2/etable.IdxView", LocalType: "*etable.IdxView", Doc: "the idx view of the table that we're a view of", Directives: gti.Directives{}, Tag: "set:\"-\""}},
+		{"TsrDisp", &gti.Field{Name: "TsrDisp", Type: "github.com/goki/etable/v2/etview.TensorDisp", LocalType: "TensorDisp", Doc: "overall display options for tensor display", Directives: gti.Directives{}, Tag: ""}},
+		{"ColTsrDisp", &gti.Field{Name: "ColTsrDisp", Type: "map[int]*github.com/goki/etable/v2/etview.TensorDisp", LocalType: "map[int]*TensorDisp", Doc: "per column tensor display params", Directives: gti.Directives{}, Tag: ""}},
+		{"ColTsrBlank", &gti.Field{Name: "ColTsrBlank", Type: "map[int]*github.com/goki/etable/v2/etensor.Float64", LocalType: "map[int]*etensor.Float64", Doc: "per column blank tensor values", Directives: gti.Directives{}, Tag: ""}},
 		{"NCols", &gti.Field{Name: "NCols", Type: "int", LocalType: "int", Doc: "number of columns in table (as of last update)", Directives: gti.Directives{}, Tag: "edit:\"-\""}},
 		{"SortIdx", &gti.Field{Name: "SortIdx", Type: "int", LocalType: "int", Doc: "current sort index", Directives: gti.Directives{}, Tag: ""}},
 		{"SortDesc", &gti.Field{Name: "SortDesc", Type: "bool", LocalType: "bool", Doc: "whether current sort order is descending", Directives: gti.Directives{}, Tag: ""}},
@@ -133,7 +133,7 @@ var TableViewType = gti.AddType(&gti.Type{
 		{"BlankFloat", &gti.Field{Name: "BlankFloat", Type: "float64", LocalType: "float64", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"SliceViewBase", &gti.Field{Name: "SliceViewBase", Type: "goki.dev/gi/v2/giv.SliceViewBase", LocalType: "giv.SliceViewBase", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"SliceViewBase", &gti.Field{Name: "SliceViewBase", Type: "goki.dev/giv.SliceViewBase", LocalType: "giv.SliceViewBase", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Methods:  ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
 	Instance: &TableView{},
@@ -347,7 +347,7 @@ func (t *TableView) SetElVal(v reflect.Value) *TableView {
 }
 
 var _ = gti.AddType(&gti.Type{
-	Name:      "goki.dev/etable/v2/etview.TensorLayout",
+	Name:      "github.com/goki/etable/v2/etview.TensorLayout",
 	ShortName: "etview.TensorLayout",
 	IDName:    "tensor-layout",
 	Doc:       "TensorLayout are layout options for displaying tensors",
@@ -364,7 +364,7 @@ var _ = gti.AddType(&gti.Type{
 })
 
 var _ = gti.AddType(&gti.Type{
-	Name:      "goki.dev/etable/v2/etview.TensorDisp",
+	Name:      "github.com/goki/etable/v2/etview.TensorDisp",
 	ShortName: "etview.TensorDisp",
 	IDName:    "tensor-disp",
 	Doc:       "TensorDisp are options for displaying tensors",
@@ -372,37 +372,37 @@ var _ = gti.AddType(&gti.Type{
 		&gti.Directive{Tool: "gti", Directive: "add", Args: []string{}},
 	},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Range", &gti.Field{Name: "Range", Type: "goki.dev/etable/v2/minmax.Range64", LocalType: "minmax.Range64", Doc: "range to plot", Directives: gti.Directives{}, Tag: "view:\"inline\""}},
-		{"MinMax", &gti.Field{Name: "MinMax", Type: "goki.dev/etable/v2/minmax.F64", LocalType: "minmax.F64", Doc: "if not using fixed range, this is the actual range of data", Directives: gti.Directives{}, Tag: "view:\"inline\""}},
-		{"ColorMap", &gti.Field{Name: "ColorMap", Type: "goki.dev/gi/v2/giv.ColorMapName", LocalType: "giv.ColorMapName", Doc: "the name of the color map to use in translating values to colors", Directives: gti.Directives{}, Tag: ""}},
+		{"Range", &gti.Field{Name: "Range", Type: "github.com/goki/etable/v2/minmax.Range64", LocalType: "minmax.Range64", Doc: "range to plot", Directives: gti.Directives{}, Tag: "view:\"inline\""}},
+		{"MinMax", &gti.Field{Name: "MinMax", Type: "github.com/goki/etable/v2/minmax.F64", LocalType: "minmax.F64", Doc: "if not using fixed range, this is the actual range of data", Directives: gti.Directives{}, Tag: "view:\"inline\""}},
+		{"ColorMap", &gti.Field{Name: "ColorMap", Type: "goki.dev/giv.ColorMapName", LocalType: "giv.ColorMapName", Doc: "the name of the color map to use in translating values to colors", Directives: gti.Directives{}, Tag: ""}},
 		{"GridFill", &gti.Field{Name: "GridFill", Type: "float32", LocalType: "float32", Doc: "what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc", Directives: gti.Directives{}, Tag: "min:\"0.1\" max:\"1\" step:\"0.1\" def:\"0.9,1\""}},
 		{"DimExtra", &gti.Field{Name: "DimExtra", Type: "float32", LocalType: "float32", Doc: "amount of extra space to add at dimension boundaries, as a proportion of total grid size", Directives: gti.Directives{}, Tag: "min:\"0\" max:\"1\" step:\"0.02\" def:\"0.1,0.3\""}},
 		{"GridMinSize", &gti.Field{Name: "GridMinSize", Type: "float32", LocalType: "float32", Doc: "minimum size for grid squares -- they will never be smaller than this", Directives: gti.Directives{}, Tag: ""}},
 		{"GridMaxSize", &gti.Field{Name: "GridMaxSize", Type: "float32", LocalType: "float32", Doc: "maximum size for grid squares -- they will never be larger than this", Directives: gti.Directives{}, Tag: ""}},
 		{"TotPrefSize", &gti.Field{Name: "TotPrefSize", Type: "float32", LocalType: "float32", Doc: "total preferred display size along largest dimension.\ngrid squares will be sized to fit within this size,\nsubject to harder GridMin / Max size constraints", Directives: gti.Directives{}, Tag: ""}},
 		{"FontSize", &gti.Field{Name: "FontSize", Type: "float32", LocalType: "float32", Doc: "font size in standard point units for labels (e.g., SimMat)", Directives: gti.Directives{}, Tag: ""}},
-		{"GridView", &gti.Field{Name: "GridView", Type: "*goki.dev/etable/v2/etview.TensorGrid", LocalType: "*TensorGrid", Doc: "our gridview, for update method", Directives: gti.Directives{}, Tag: "copy:\"-\" json:\"-\" xml:\"-\" view:\"-\""}},
+		{"GridView", &gti.Field{Name: "GridView", Type: "*github.com/goki/etable/v2/etview.TensorGrid", LocalType: "*TensorGrid", Doc: "our gridview, for update method", Directives: gti.Directives{}, Tag: "copy:\"-\" json:\"-\" xml:\"-\" view:\"-\""}},
 	}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"TensorLayout", &gti.Field{Name: "TensorLayout", Type: "goki.dev/etable/v2/etview.TensorLayout", LocalType: "TensorLayout", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"TensorLayout", &gti.Field{Name: "TensorLayout", Type: "github.com/goki/etable/v2/etview.TensorLayout", LocalType: "TensorLayout", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Methods: ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
 })
 
 // TensorGridType is the [gti.Type] for [TensorGrid]
 var TensorGridType = gti.AddType(&gti.Type{
-	Name:       "goki.dev/etable/v2/etview.TensorGrid",
+	Name:       "github.com/goki/etable/v2/etview.TensorGrid",
 	ShortName:  "etview.TensorGrid",
 	IDName:     "tensor-grid",
 	Doc:        "TensorGrid is a widget that displays tensor values as a grid of colored squares.",
 	Directives: gti.Directives{},
 	Fields: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"Tensor", &gti.Field{Name: "Tensor", Type: "goki.dev/etable/v2/etensor.Tensor", LocalType: "etensor.Tensor", Doc: "the tensor that we view", Directives: gti.Directives{}, Tag: "set:\"-\""}},
-		{"Disp", &gti.Field{Name: "Disp", Type: "goki.dev/etable/v2/etview.TensorDisp", LocalType: "TensorDisp", Doc: "display options", Directives: gti.Directives{}, Tag: ""}},
+		{"Tensor", &gti.Field{Name: "Tensor", Type: "github.com/goki/etable/v2/etensor.Tensor", LocalType: "etensor.Tensor", Doc: "the tensor that we view", Directives: gti.Directives{}, Tag: "set:\"-\""}},
+		{"Disp", &gti.Field{Name: "Disp", Type: "github.com/goki/etable/v2/etview.TensorDisp", LocalType: "TensorDisp", Doc: "display options", Directives: gti.Directives{}, Tag: ""}},
 		{"ColorMap", &gti.Field{Name: "ColorMap", Type: "*goki.dev/colors/colormap.Map", LocalType: "*colormap.Map", Doc: "the actual colormap", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"WidgetBase", &gti.Field{Name: "WidgetBase", Type: "goki.dev/gi/v2/gi.WidgetBase", LocalType: "gi.WidgetBase", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"WidgetBase", &gti.Field{Name: "WidgetBase", Type: "goki.dev/gi.WidgetBase", LocalType: "gi.WidgetBase", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Methods:  ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
 	Instance: &TensorGrid{},
@@ -448,14 +448,14 @@ func (t *TensorGrid) SetTooltip(v string) *TensorGrid {
 
 // TensorViewType is the [gti.Type] for [TensorView]
 var TensorViewType = gti.AddType(&gti.Type{
-	Name:       "goki.dev/etable/v2/etview.TensorView",
+	Name:       "github.com/goki/etable/v2/etview.TensorView",
 	ShortName:  "etview.TensorView",
 	IDName:     "tensor-view",
 	Doc:        "etview.TensorView provides a GUI interface for etable.Tensor's\nusing a tabular rows-and-columns interface using textfields for editing.\nThis provides an editable complement to the TensorGrid graphical display.",
 	Directives: gti.Directives{},
 	Fields:     ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{}),
 	Embeds: ordmap.Make([]ordmap.KeyVal[string, *gti.Field]{
-		{"WidgetBase", &gti.Field{Name: "WidgetBase", Type: "goki.dev/gi/v2/gi.WidgetBase", LocalType: "gi.WidgetBase", Doc: "", Directives: gti.Directives{}, Tag: ""}},
+		{"WidgetBase", &gti.Field{Name: "WidgetBase", Type: "goki.dev/gi.WidgetBase", LocalType: "gi.WidgetBase", Doc: "", Directives: gti.Directives{}, Tag: ""}},
 	}),
 	Methods:  ordmap.Make([]ordmap.KeyVal[string, *gti.Method]{}),
 	Instance: &TensorView{},

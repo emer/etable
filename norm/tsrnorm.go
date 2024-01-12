@@ -4,9 +4,7 @@
 
 package norm
 
-import (
-	"goki.dev/etable/v2/etensor"
-)
+import "github.com/goki/etable/v2/etensor"
 
 ///////////////////////////////////////////
 //  DivNorm

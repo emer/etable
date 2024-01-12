@@ -9,10 +9,10 @@ import (
 	"log"
 	"math"
 
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/minmax"
+	"github.com/goki/etable/v2/split"
 	"goki.dev/colors"
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/minmax"
-	"goki.dev/etable/v2/split"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg/draw"

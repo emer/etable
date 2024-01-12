@@ -5,15 +5,15 @@
 package main
 
 import (
-	"goki.dev/etable/v2/eplot"
-	"goki.dev/etable/v2/etable"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/gi/v2/gi"
+	"github.com/goki/etable/v2/eplot"
+	"github.com/goki/etable/v2/etable"
+	"github.com/goki/etable/v2/etensor"
+	"goki.dev/gi"
 )
 
 func main() {
 	b := gi.NewAppBody("testplots")
-	b.App().About = `This runs various testing data plots using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
+	b.App().About = `This runs various testing data plots using etable.Table. See <a href="https://github.com/goki/etable/v2">etable on GitHub</a>.</p>`
 
 	tv := gi.NewTabs(b)
 

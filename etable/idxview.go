@@ -13,7 +13,7 @@ import (
 	"sort"
 	"strings"
 
-	"goki.dev/etable/v2/etensor"
+	"github.com/goki/etable/v2/etensor"
 )
 
 // LessFunc is a function used for sort comparisons that returns

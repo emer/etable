@@ -9,15 +9,15 @@ import (
 	"log"
 	"strconv"
 
+	"github.com/goki/etable/v2/etensor"
+	"github.com/goki/etable/v2/minmax"
 	"goki.dev/colors"
 	"goki.dev/colors/colormap"
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/etable/v2/minmax"
-	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/giv"
+	"goki.dev/gi"
 	"goki.dev/girl/styles"
+	"goki.dev/giv"
 	"goki.dev/goosi/events"
-	"goki.dev/mat32/v2"
+	"goki.dev/mat32"
 )
 
 // TensorLayout are layout options for displaying tensors

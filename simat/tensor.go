@@ -7,8 +7,8 @@ package simat
 import (
 	"fmt"
 
-	"goki.dev/etable/v2/etensor"
-	"goki.dev/etable/v2/metric"
+	"github.com/goki/etable/v2/etensor"
+	"github.com/goki/etable/v2/metric"
 )
 
 // Tensor computes a similarity / distance matrix on tensor

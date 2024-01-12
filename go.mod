@@ -1,4 +1,4 @@
-module goki.dev/etable/v2
+module github.com/goki/etable/v2
 
 go 1.21
 
@@ -7,7 +7,7 @@ require (
 	github.com/goki/ki v1.1.17
 	goki.dev/colors v0.8.44
 	goki.dev/enums v0.9.56
-	goki.dev/gi/v2 v2.0.0-dev0.0.28
+	goki.dev/gi v2.0.0-dev0.0.28
 	goki.dev/girl v0.0.36
 	goki.dev/glop v0.1.10
 	goki.dev/goosi v0.0.25
@@ -16,7 +16,7 @@ require (
 	goki.dev/icons v0.0.17
 	goki.dev/ki/v2 v2.0.0-dev0.0.33
 	goki.dev/laser v0.1.34
-	goki.dev/mat32/v2 v2.0.0-dev0.0.28
+	goki.dev/mat32 v2.0.0-dev0.0.28
 	goki.dev/ordmap v0.5.10
 	gonum.org/v1/gonum v0.14.0
 	gonum.org/v1/plot v0.14.0

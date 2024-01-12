@@ -7,7 +7,7 @@ package etable
 import (
 	"testing"
 
-	"goki.dev/etable/v2/etensor"
+	"github.com/goki/etable/v2/etensor"
 )
 
 func TestAdd4DCol(t *testing.T) {

@@ -6,9 +6,9 @@ package eplot
 
 import (
 	"github.com/goki/ki/kit"
-	"goki.dev/gi/v2/gi"
-	"goki.dev/gi/v2/giv"
+	"goki.dev/gi"
 	"goki.dev/girl/styles"
+	"goki.dev/giv"
 	"goki.dev/goosi/events"
 	"goki.dev/gti"
 	"goki.dev/laser"

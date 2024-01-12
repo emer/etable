@@ -1,6 +1,6 @@
 # etensor
 
-Docs: [GoDoc](https://pkg.go.dev/goki.dev/etable/v2/etensor)
+Docs: [GoDoc](https://pkg.go.dev/github.com/goki/etable/v2/etensor)
 
 `etensor` provides a basic set of tensor data structures (n-dimensional arrays of data), based on [apache arrow tensor](https://github.com/apache/arrow/tree/master/go/arrow/tensor) and intercompatible with those structures, and also with a [gonum](https://github.com/gonum/gonum) matrix interface.
 

@@ -12,7 +12,7 @@ import (
 	"math"
 	"strings"
 
-	"goki.dev/etable/v2/etensor"
+	"github.com/goki/etable/v2/etensor"
 )
 
 // etable.Table is the emer DataTable structure, containing columns of etensor tensors.
