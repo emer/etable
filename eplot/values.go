@@ -5,7 +5,6 @@
 package eplot
 
 import (
-	"goki.dev/events"
 	"goki.dev/gi"
 	"goki.dev/giv"
 	"goki.dev/gti"
@@ -65,10 +64,7 @@ func (vv *Plot2DValue) ConfigWidget(w gi.Widget) {
 	bt := vv.Widget.(*gi.Button)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
-	bt.OnClick(func(e events.Event) {
-		vv.SetDialogType(e)
-		vv.OpenDialog(bt, nil)
-	})
+	giv.ConfigDialogWidget(vv, bt, true)
 	vv.UpdateWidget()
 }
 

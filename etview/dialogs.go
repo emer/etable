@@ -4,6 +4,13 @@
 
 package etview
 
+import (
+	"github.com/emer/etable/v2/etable"
+	"github.com/emer/etable/v2/etensor"
+	"github.com/emer/etable/v2/simat"
+	"goki.dev/gi"
+)
+
 /*
 // TensorViewDialog is for editing an etensor.Tensor using a TensorView --
 // optionally connects to given signal receiving object and function for
@@ -37,97 +44,38 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	})
 	return dlg
 }
-
-// TensorGridDialog is for viewing a etensor.Tensor using a TensorGrid --
-// optionally connects to given signal receiving object and function for
-// dialog signals (nil to ignore)
-// gopy:interface=handle
-func TensorGridDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Body {
-	dlg := gi.NewStdDialog(opts.ToGiOpts(), opts.Ok, opts.Cancel) // note: cannot use Recycle here b/c of Table view..
-
-	frame := dlg.Frame()
-	_, prIdx := dlg.PromptWidget(frame)
-
-	sv := frame.InsertNewChild(KiT_TensorGrid, prIdx+1, "tensor-grid").(*TensorGrid)
-	sv.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
-	if opts.Inactive {
-		sv.SetInactive()
-	}
-	sv.SetStretchMax()
-	sv.SetTensor(tsr)
-
-	if recv != nil && dlgFunc != nil {
-		dlg.DialogSig.Connect(recv, dlgFunc)
-	}
-	dlg.UpdateEndNoSig(true)
-	dlg.Open(0, 0, avp, func() {
-		giv.MainMenuView(tsr, dlg.Win, dlg.Win.MainMenu)
-	})
-	return dlg
-}
-
-// TableViewDialog is for editing an etable.Table using a TableView --
-// optionally connects to given signal receiving object and function for
-// dialog signals (nil to ignore)
-// gopy:interface=handle
-func TableViewDialog(avp *gi.Viewport2D, et *etable.Table, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Body {
-	dlg, recyc := gi.RecycleStdDialog(et, opts.ToGiOpts(), opts.Ok, opts.Cancel)
-	if recyc {
-		return dlg
-	}
-	dlg.Data = et
-
-	frame := dlg.Frame()
-	_, prIdx := dlg.PromptWidget(frame)
-
-	sv := frame.InsertNewChild(KiT_TableView, prIdx+1, "table-view").(*TableView)
-	sv.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
-	if opts.Inactive {
-		sv.SetInactive()
-	}
-	sv.NoAdd = opts.NoAdd
-	sv.NoDelete = opts.NoDelete
-	sv.SetTable(et, opts.TmpSave)
-
-	if recv != nil && dlgFunc != nil {
-		dlg.DialogSig.Connect(recv, dlgFunc)
-	}
-	dlg.UpdateEndNoSig(true)
-	dlg.Open(0, 0, avp, func() {
-		giv.MainMenuView(et, dlg.Win, dlg.Win.MainMenu)
-	})
-	return dlg
-}
-
-// SimMatGridDialog is for viewing a etensor.Tensor using a SimMatGrid --
-// optionally connects to given signal receiving object and function for
-// dialog signals (nil to ignore)
-// gopy:interface=handle
-func SimMatGridDialog(avp *gi.Viewport2D, smat *simat.SimMat, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Body {
-	dlg, recyc := gi.RecycleStdDialog(smat, opts.ToGiOpts(), opts.Ok, opts.Cancel)
-	if recyc {
-		return dlg
-	}
-	dlg.Data = smat
-
-	frame := dlg.Frame()
-	_, prIdx := dlg.PromptWidget(frame)
-
-	sv := frame.InsertNewChild(KiT_SimMatGrid, prIdx+1, "simat-grid").(*SimMatGrid)
-	sv.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
-	if opts.Inactive {
-		sv.SetInactive()
-	}
-	sv.SetStretchMax()
-	sv.SetSimMat(smat)
-
-	if recv != nil && dlgFunc != nil {
-		dlg.DialogSig.Connect(recv, dlgFunc)
-	}
-	dlg.UpdateEndNoSig(true)
-	dlg.Open(0, 0, avp, func() {
-		giv.MainMenuView(smat, dlg.Win, dlg.Win.MainMenu)
-	})
-	return dlg
-}
 */
+
+// TensorGridDialog is for viewing a etensor.Tensor using a TensorGrid.
+// gopy:interface=handle
+func TensorGridDialog(ctx gi.Widget, tsr etensor.Tensor, title string) {
+	d := gi.NewBody()
+	if title != "" {
+		d.SetTitle(title)
+	}
+	NewTensorGrid(d).SetTensor(tsr)
+	d.NewDialog(ctx).SetNewWindow(true).Run()
+}
+
+// TableViewDialog is for editing an etable.Table using a TableView.
+// gopy:interface=handle
+func TableViewDialog(ctx gi.Widget, ix *etable.IdxView, title string) {
+	d := gi.NewBody()
+	if title != "" {
+		d.SetTitle(title)
+	}
+	NewTableView(d).SetTableView(ix)
+	d.NewDialog(ctx).SetNewWindow(true).Run()
+}
+
+// SimMatGridDialog is for viewing a etensor.Tensor using a SimMatGrid.
+// dialog signals (nil to ignore)
+// gopy:interface=handle
+func SimMatGridDialog(ctx gi.Widget, smat *simat.SimMat, title string) {
+	d := gi.NewBody()
+	if title != "" {
+		d.SetTitle(title)
+	}
+	NewSimMatGrid(d).SetSimMat(smat)
+	d.NewDialog(ctx).SetNewWindow(true).Run()
+}

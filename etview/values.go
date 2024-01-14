@@ -8,7 +8,6 @@ import (
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/simat"
-	"goki.dev/events"
 	"goki.dev/gi"
 	"goki.dev/giv"
 	"goki.dev/gti"
@@ -113,10 +112,7 @@ func (vv *TensorValue) ConfigWidget(w gi.Widget) {
 	bt := vv.Widget.(*gi.Button)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
-	bt.OnClick(func(e events.Event) {
-		vv.SetDialogType(e)
-		vv.OpenDialog(bt, nil)
-	})
+	giv.ConfigDialogWidget(vv, bt, true)
 	vv.UpdateWidget()
 }
 
@@ -177,10 +173,7 @@ func (vv *TableValue) ConfigWidget(w gi.Widget) {
 	bt := vv.Widget.(*gi.Button)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
-	bt.OnClick(func(e events.Event) {
-		vv.SetDialogType(e)
-		vv.OpenDialog(bt, nil)
-	})
+	giv.ConfigDialogWidget(vv, bt, true)
 	vv.UpdateWidget()
 }
 
@@ -243,12 +236,7 @@ func (vv *SimMatValue) ConfigWidget(w gi.Widget) {
 	vv.StdConfigWidget(w)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
-	bt.OnClick(func(e events.Event) {
-		if !vv.IsReadOnly() {
-			vv.SetDialogType(e)
-			vv.OpenDialog(bt, nil)
-		}
-	})
+	giv.ConfigDialogWidget(vv, bt, false)
 	vv.UpdateWidget()
 }
 
