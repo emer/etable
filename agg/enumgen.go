@@ -185,7 +185,7 @@ func (i Aggs) MarshalText() ([]byte, error) {
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Aggs) UnmarshalText(text []byte) error {
 	if err := i.SetString(string(text)); err != nil {
-		log.Println(err)
+		log.Println("Aggs.UnmarshalText:", err)
 	}
 	return nil
 }

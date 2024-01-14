@@ -125,7 +125,7 @@ func (i StdDists) MarshalText() ([]byte, error) {
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *StdDists) UnmarshalText(text []byte) error {
 	if err := i.SetString(string(text)); err != nil {
-		log.Println(err)
+		log.Println("StdDists.UnmarshalText:", err)
 	}
 	return nil
 }

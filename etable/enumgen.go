@@ -125,7 +125,7 @@ func (i Delims) MarshalText() ([]byte, error) {
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Delims) UnmarshalText(text []byte) error {
 	if err := i.SetString(string(text)); err != nil {
-		log.Println(err)
+		log.Println("Delims.UnmarshalText:", err)
 	}
 	return nil
 }

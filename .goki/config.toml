@@ -35,7 +35,6 @@ Type = "Library"
   Lang = "en"
   Author = ""
   Image = ""
-  AutoUpdateInterval = "10s"
   WasmContentLengthHeader = ""
 
 [Setup]

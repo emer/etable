@@ -115,7 +115,7 @@ func (i PlotTypes) MarshalText() ([]byte, error) {
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *PlotTypes) UnmarshalText(text []byte) error {
 	if err := i.SetString(string(text)); err != nil {
-		log.Println(err)
+		log.Println("PlotTypes.UnmarshalText:", err)
 	}
 	return nil
 }
@@ -254,7 +254,7 @@ func (i Shapes) MarshalText() ([]byte, error) {
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
 func (i *Shapes) UnmarshalText(text []byte) error {
 	if err := i.SetString(string(text)); err != nil {
-		log.Println(err)
+		log.Println("Shapes.UnmarshalText:", err)
 	}
 	return nil
 }
