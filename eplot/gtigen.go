@@ -40,11 +40,11 @@ func (t *Plot2D) SetConfigPlotFunc(v func()) *Plot2D { t.ConfigPlotFunc = v; ret
 
 // SetSvgfile sets the [Plot2D.SVGFile]:
 // current svg file
-func (t *Plot2D) SetSvgfile(v gi.FileName) *Plot2D { t.SVGFile = v; return t }
+func (t *Plot2D) SetSvgfile(v gi.Filename) *Plot2D { t.SVGFile = v; return t }
 
 // SetDataFile sets the [Plot2D.DataFile]:
 // current csv data file
-func (t *Plot2D) SetDataFile(v gi.FileName) *Plot2D { t.DataFile = v; return t }
+func (t *Plot2D) SetDataFile(v gi.Filename) *Plot2D { t.DataFile = v; return t }
 
 // SetTooltip sets the [Plot2D.Tooltip]
 func (t *Plot2D) SetTooltip(v string) *Plot2D { t.Tooltip = v; return t }

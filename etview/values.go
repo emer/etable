@@ -94,7 +94,7 @@ func (vv *TensorValue) UpdateWidget() {
 	}
 	bt := vv.Widget.(*gi.Button)
 	npv := laser.NonPtrValue(vv.Value)
-	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
+	if vv.Value.IsZero() || npv.IsZero() {
 		bt.SetText("nil")
 	} else {
 		// opv := laser.OnePtrUnderlyingValue(vv.Value)
@@ -148,7 +148,7 @@ func (vv *TableValue) UpdateWidget() {
 	}
 	bt := vv.Widget.(*gi.Button)
 	npv := laser.NonPtrValue(vv.Value)
-	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
+	if vv.Value.IsZero() || npv.IsZero() {
 		bt.SetText("nil")
 	} else {
 		opv := laser.OnePtrUnderlyingValue(vv.Value)
@@ -209,7 +209,7 @@ func (vv *SimMatValue) UpdateWidget() {
 	}
 	bt := vv.Widget.(*gi.Button)
 	npv := laser.NonPtrValue(vv.Value)
-	if laser.ValueIsZero(vv.Value) || laser.ValueIsZero(npv) {
+	if vv.Value.IsZero() || npv.IsZero() {
 		bt.SetText("nil")
 	} else {
 		opv := laser.OnePtrUnderlyingValue(vv.Value)

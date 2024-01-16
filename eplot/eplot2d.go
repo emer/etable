@@ -53,10 +53,10 @@ type Plot2D struct { //gti:add
 	ConfigPlotFunc func() `json:"-" xml:"-"`
 
 	// current svg file
-	SVGFile gi.FileName
+	SVGFile gi.Filename
 
 	// current csv data file
-	DataFile gi.FileName
+	DataFile gi.Filename
 
 	// currently doing a plot
 	InPlot bool `set:"-" edit:"-" json:"-" xml:"-"`
@@ -154,7 +154,7 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 }
 
 // SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
-func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
+func (pl *Plot2D) SaveSVG(fname gi.Filename) { //gti:add
 	pl.Update()
 	sv := pl.SVGPlot()
 	SaveSVGView(string(fname), pl.Plot, sv, 2)
@@ -162,29 +162,29 @@ func (pl *Plot2D) SaveSVG(fname gi.FileName) { //gti:add
 }
 
 // SavePNG saves the current plot to a png, capturing current render
-func (pl *Plot2D) SavePNG(fname gi.FileName) { //gti:add
+func (pl *Plot2D) SavePNG(fname gi.Filename) { //gti:add
 	sv := pl.SVGPlot()
 	sv.SavePNG(fname)
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
-func (pl *Plot2D) SaveCSV(fname gi.FileName, delim etable.Delims) { //gti:add
+func (pl *Plot2D) SaveCSV(fname gi.Filename, delim etable.Delims) { //gti:add
 	pl.Table.SaveCSV(fname, delim, etable.Headers)
 	pl.DataFile = fname
 }
 
 // SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save
 // Any extension is removed and appropriate extensions are added
-func (pl *Plot2D) SaveAll(fname gi.FileName) { //gti:add
+func (pl *Plot2D) SaveAll(fname gi.Filename) { //gti:add
 	fn := string(fname)
 	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
-	pl.SaveCSV(gi.FileName(fn+".tsv"), etable.Tab)
-	pl.SavePNG(gi.FileName(fn + ".png"))
-	pl.SaveSVG(gi.FileName(fn + ".svg"))
+	pl.SaveCSV(gi.Filename(fn+".tsv"), etable.Tab)
+	pl.SavePNG(gi.Filename(fn + ".png"))
+	pl.SaveSVG(gi.Filename(fn + ".svg"))
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
-func (pl *Plot2D) OpenCSV(fname gi.FileName, delim etable.Delims) { //gti:add
+func (pl *Plot2D) OpenCSV(fname gi.Filename, delim etable.Delims) { //gti:add
 	pl.Table.Table.OpenCSV(fname, delim)
 	pl.DataFile = fname
 	pl.Update()
