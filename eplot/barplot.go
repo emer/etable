@@ -9,10 +9,10 @@ import (
 	"log"
 	"math"
 
+	"cogentcore.org/core/colors"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/minmax"
 	"github.com/emer/etable/v2/split"
-	"goki.dev/colors"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg/draw"

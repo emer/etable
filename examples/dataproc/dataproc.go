@@ -8,11 +8,11 @@ import (
 	"fmt"
 	"math"
 
+	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/agg"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etview"
 	"github.com/emer/etable/v2/split"
-	"goki.dev/gi"
 )
 
 // Planets is raw data
@@ -99,7 +99,7 @@ func main() {
 	AnalyzePlanets()
 
 	b := gi.NewAppBody("dataproc")
-	b.App().About = `This demonstrates data processing using etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
+	b.App().About = `This demonstrates data processing using etable.Table. See <a href="https://cogentcore.org/core/etable/v2">etable on GitHub</a>.</p>`
 
 	tv := gi.NewTabs(b)
 

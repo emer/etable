@@ -10,9 +10,9 @@ import (
 	"log"
 	"strings"
 
+	"cogentcore.org/core/laser"
 	"github.com/apache/arrow/go/arrow"
 	"github.com/emer/etable/v2/bitslice"
-	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )
 

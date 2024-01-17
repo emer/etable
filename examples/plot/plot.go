@@ -5,9 +5,9 @@
 package main
 
 import (
+	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/eplot"
 	"github.com/emer/etable/v2/etable"
-	"goki.dev/gi"
 )
 
 func main() {

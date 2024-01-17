@@ -5,13 +5,13 @@
 package etview
 
 import (
+	"cogentcore.org/core/gi"
+	"cogentcore.org/core/giv"
+	"cogentcore.org/core/gti"
+	"cogentcore.org/core/laser"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/simat"
-	"goki.dev/gi"
-	"goki.dev/giv"
-	"goki.dev/gti"
-	"goki.dev/laser"
 )
 
 func init() {

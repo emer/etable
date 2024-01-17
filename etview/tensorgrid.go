@@ -9,15 +9,15 @@ import (
 	"log"
 	"strconv"
 
+	"cogentcore.org/core/colors"
+	"cogentcore.org/core/colors/colormap"
+	"cogentcore.org/core/events"
+	"cogentcore.org/core/gi"
+	"cogentcore.org/core/giv"
+	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/styles"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/minmax"
-	"goki.dev/colors"
-	"goki.dev/colors/colormap"
-	"goki.dev/events"
-	"goki.dev/gi"
-	"goki.dev/giv"
-	"goki.dev/mat32"
-	"goki.dev/styles"
 )
 
 // TensorLayout are layout options for displaying tensors

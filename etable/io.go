@@ -15,8 +15,8 @@ import (
 	"strconv"
 	"strings"
 
+	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/etensor"
-	"goki.dev/gi"
 )
 
 // Delim are standard CSV delimiter options (Tab, Comma, Space)

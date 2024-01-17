@@ -5,7 +5,7 @@
 package etview
 
 import (
-	"goki.dev/gi"
+	"cogentcore.org/core/gi"
 )
 
 // etview.TensorView provides a GUI interface for etable.Tensor's

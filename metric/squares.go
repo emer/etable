@@ -7,8 +7,8 @@ package metric
 import (
 	"math"
 
+	"cogentcore.org/core/mat32"
 	"github.com/emer/etable/v2/norm"
-	"goki.dev/mat32"
 )
 
 ///////////////////////////////////////////

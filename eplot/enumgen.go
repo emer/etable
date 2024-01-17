@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"goki.dev/enums"
+	"cogentcore.org/core/enums"
 )
 
 var _PlotTypesValues = []PlotTypes{0, 1}

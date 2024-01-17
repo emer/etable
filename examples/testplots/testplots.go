@@ -5,10 +5,10 @@
 package main
 
 import (
+	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/eplot"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
-	"goki.dev/gi"
 )
 
 func main() {

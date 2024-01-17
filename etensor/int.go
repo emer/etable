@@ -12,11 +12,11 @@ import (
 	"strconv"
 	"unsafe"
 
+	"cogentcore.org/core/laser"
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
 	"github.com/emer/etable/v2/bitslice"
-	"goki.dev/laser"
 	"gonum.org/v1/gonum/mat"
 )
 

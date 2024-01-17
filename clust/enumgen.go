@@ -8,7 +8,7 @@ import (
 	"strconv"
 	"strings"
 
-	"goki.dev/enums"
+	"cogentcore.org/core/enums"
 )
 
 var _StdDistsValues = []StdDists{0, 1, 2, 3}

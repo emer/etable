@@ -12,9 +12,9 @@ import (
 	"sort"
 	"strconv"
 
+	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/agg"
 	"github.com/emer/etable/v2/etable"
-	"goki.dev/gi"
 )
 
 var (

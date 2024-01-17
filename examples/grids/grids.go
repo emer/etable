@@ -5,10 +5,10 @@
 package main
 
 import (
+	"cogentcore.org/core/gi"
+	"cogentcore.org/core/grr"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etview"
-	"goki.dev/gi"
-	"goki.dev/grr"
 )
 
 func main() {
@@ -19,7 +19,7 @@ func main() {
 	grr.Log(pats.OpenCSV("random_5x5_25.tsv", etable.Tab))
 
 	b := gi.NewAppBody("grids")
-	b.App().About = `This demonstrates tensor grid and related functionality in etable.Table. See <a href="https://goki.dev/etable/v2">etable on GitHub</a>.</p>`
+	b.App().About = `This demonstrates tensor grid and related functionality in etable.Table. See <a href="https://cogentcore.org/core/etable/v2">etable on GitHub</a>.</p>`
 
 	tv := gi.NewTabs(b)
 

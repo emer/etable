@@ -5,11 +5,11 @@
 package etview
 
 import (
+	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/paint"
+	"cogentcore.org/core/styles"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/simat"
-	"goki.dev/mat32"
-	"goki.dev/paint"
-	"goki.dev/styles"
 )
 
 const LabelSpace = float32(8)

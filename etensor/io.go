@@ -11,7 +11,7 @@ import (
 	"os"
 	"strconv"
 
-	"goki.dev/gi"
+	"cogentcore.org/core/gi"
 )
 
 // SaveCSV writes a tensor to a comma-separated-values (CSV) file

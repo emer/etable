@@ -3,9 +3,9 @@
 package eplot
 
 import (
-	"goki.dev/gi"
-	"goki.dev/gti"
-	"goki.dev/ki"
+	"cogentcore.org/core/gi"
+	"cogentcore.org/core/gti"
+	"cogentcore.org/core/ki"
 )
 
 // Plot2DType is the [gti.Type] for [Plot2D]

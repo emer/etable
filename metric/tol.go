@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"goki.dev/mat32"
+	"cogentcore.org/core/mat32"
 )
 
 ///////////////////////////////////////////

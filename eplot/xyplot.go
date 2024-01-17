@@ -9,11 +9,11 @@ import (
 	"log/slog"
 	"math"
 
+	"cogentcore.org/core/colors"
+	"cogentcore.org/core/grr"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/split"
-	"goki.dev/colors"
-	"goki.dev/grr"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/plotter"
 	"gonum.org/v1/plot/vg"

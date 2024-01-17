@@ -5,10 +5,10 @@
 package etview
 
 import (
+	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/simat"
-	"goki.dev/gi"
 )
 
 /*

@@ -6,13 +6,13 @@ import (
 	"reflect"
 	"sync"
 
+	"cogentcore.org/core/colors/colormap"
+	"cogentcore.org/core/gi"
+	"cogentcore.org/core/giv"
+	"cogentcore.org/core/gti"
+	"cogentcore.org/core/ki"
+	"cogentcore.org/core/mat32"
 	"github.com/emer/etable/v2/etensor"
-	"goki.dev/colors/colormap"
-	"goki.dev/gi"
-	"goki.dev/giv"
-	"goki.dev/gti"
-	"goki.dev/ki"
-	"goki.dev/mat32"
 )
 
 // SimMatGridType is the [gti.Type] for [SimMatGrid]
