@@ -37,7 +37,7 @@ func (vv *Plot2DValue) UpdateWidget() {
 	}
 	ac := vv.Widget.(*gi.Button)
 	npv := laser.NonPtrValue(vv.Value)
-	if vv.Value.IsZero() || npv.IsZero() {
+	if !vv.Value.IsValid() || vv.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
 		ac.SetText("nil")
 	} else {
 		opv := laser.OnePtrUnderlyingValue(vv.Value)
