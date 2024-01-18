@@ -4,7 +4,7 @@
 
 package etensor
 
-//go:generate goki generate
+//go:generate core generate
 
 import (
 	"github.com/apache/arrow/go/arrow"

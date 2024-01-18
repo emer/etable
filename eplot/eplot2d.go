@@ -4,7 +4,7 @@
 
 package eplot
 
-//go:generate goki generate
+//go:generate core generate
 
 import (
 	"fmt"
