@@ -47,10 +47,10 @@ type TensorDisp struct { //gti:add
 	ColorMap giv.ColorMapName
 
 	// what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc
-	GridFill float32 `min:"0.1" max:"1" step:"0.1" def:"0.9,1"`
+	GridFill float32 `min:"0.1" max:"1" step:"0.1" default:"0.9,1"`
 
 	// amount of extra space to add at dimension boundaries, as a proportion of total grid size
-	DimExtra float32 `min:"0" max:"1" step:"0.02" def:"0.1,0.3"`
+	DimExtra float32 `min:"0" max:"1" step:"0.02" default:"0.1,0.3"`
 
 	// minimum size for grid squares -- they will never be smaller than this
 	GridMinSize float32

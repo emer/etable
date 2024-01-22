@@ -30,7 +30,7 @@ import (
 	"gonum.org/v1/plot/font"
 )
 
-// Plot2D is a GoGi Widget that provides a 2D plot of selected columns of etable data
+// Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data
 type Plot2D struct { //gti:add
 	gi.Layout
 
@@ -62,7 +62,7 @@ type Plot2D struct { //gti:add
 	InPlot bool `set:"-" edit:"-" json:"-" xml:"-"`
 }
 
-func (pl *Plot2D) CopyFieldsFrom(frm any) {
+func (pl *Plot2D) CopyFieldsFrom(frm ki.Ki) {
 	fr := frm.(*Plot2D)
 	pl.Layout.CopyFieldsFrom(&fr.Layout)
 	pl.Params.CopyFrom(&fr.Params)
@@ -227,14 +227,14 @@ func (pl *Plot2D) GoUpdatePlot() {
 	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
 		return
 	}
-	updt := pl.Sc.UpdateStartAsync()
+	updt := pl.Scene.UpdateStartAsync()
 	if !updt {
-		pl.Sc.UpdateEndAsyncRender(updt)
+		pl.Scene.UpdateEndAsyncRender(updt)
 		return
 	}
 	pl.Table.Sequential()
 	pl.GenPlot()
-	pl.Sc.UpdateEndAsyncRender(updt)
+	pl.Scene.UpdateEndAsyncRender(updt)
 }
 
 // UpdatePlot updates the display based on current IdxView into table.
@@ -583,7 +583,6 @@ func (pl *Plot2D) ColsConfig() {
 func (pl *Plot2D) PlotConfig() {
 	sv := pl.SVGPlot()
 	sv.SVG.Fill = true
-	sv.SVG.Norm = true
 	sv.SVG.Scale = 1
 	sv.SVG.Translate = mat32.Vec2{}
 	sv.SetReadOnly(true)

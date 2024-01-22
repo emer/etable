@@ -21,7 +21,7 @@ type SVD struct {
 	Kind mat.SVDKind
 
 	// condition value -- minimum normalized eigenvalue to return in values
-	Cond float64 `def:"0.01"`
+	Cond float64 `default:"0.01"`
 
 	// the rank (count) of singular values greater than Cond
 	Rank int

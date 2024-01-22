@@ -17,7 +17,7 @@ import (
 	"gonum.org/v1/plot/vg/vgsvg"
 )
 
-// PlotViewSVG shows the given gonum Plot in given GoGi svg editor widget.
+// PlotViewSVG shows the given gonum Plot in given Cogent Core svg editor widget.
 // The scale rescales the default font sizes -- 2-4 recommended.
 // This call must generally be enclosed within an UpdateStart / End
 // as part of the overall update routine using it.
@@ -47,13 +47,12 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 		if err != nil {
 			slog.Error("eplot: svg render errors", "err", err)
 		}
-		svge.SVG.Norm = true
 		svge.SVG.Fill = true
 		svge.SetNeedsRender(true)
 	}
 }
 
-// SaveSVGView saves the given gonum Plot exactly as it is rendered given GoGi svg editor widget.
+// SaveSVGView saves the given gonum Plot exactly as it is rendered given Cogent Core svg editor widget.
 // The scale rescales the default font sizes -- 2-4 recommended.
 func SaveSVGView(fname string, plt *plot.Plot, svge *gi.SVG, scale float64) error {
 	sz := svge.Geom.ContentBBox.Size()
@@ -84,7 +83,7 @@ func SaveSVGView(fname string, plt *plot.Plot, svge *gi.SVG, scale float64) erro
 	return err
 }
 
-// StringViewSVG shows the given svg string in given GoGi svg editor widget
+// StringViewSVG shows the given svg string in given Cogent Core svg editor widget
 // Scale to fit your window -- e.g., 2-3 depending on sizes
 func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
 	updt := svge.UpdateStart()
@@ -94,6 +93,5 @@ func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
 	buf.Write([]byte(svgstr))
 	svge.SVG.ReadXML(&buf)
 
-	svge.SVG.Norm = true
 	svge.SVG.Fill = true
 }

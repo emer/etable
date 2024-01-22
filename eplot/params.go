@@ -45,7 +45,7 @@ type PlotParams struct { //gti:add
 	NegXDraw bool
 
 	// overall scaling factor -- the larger the number, the larger the fonts are relative to the graph
-	Scale float64 `def:"2"`
+	Scale float64 `default:"2"`
 
 	// what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values.
 	XAxisCol string

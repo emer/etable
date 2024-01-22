@@ -13,7 +13,6 @@ import (
 	"strconv"
 	"strings"
 
-	"cogentcore.org/core/abilities"
 	"cogentcore.org/core/colors"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/gi"
@@ -82,7 +81,6 @@ func (tv *TableView) SetStyles() {
 	tv.SetFlag(true, giv.SliceViewReadOnlyKeyNav)
 
 	tv.Style(func(s *styles.Style) {
-		s.SetAbilities(true, abilities.FocusWithinable)
 		s.Direction = styles.Column
 		// absorb horizontal here, vertical in view
 		s.Overflow.X = styles.OverflowAuto
@@ -158,7 +156,7 @@ func (tv *TableView) SetStyles() {
 		if w.Parent().PathFrom(tv) == "header" {
 			w.Style(func(s *styles.Style) {
 				if hdr, ok := w.(*gi.Button); ok {
-					fli := hdr.Data.(int)
+					fli := hdr.Prop("field-index").(int)
 					if fli == tv.SortIdx {
 						if tv.SortDesc {
 							hdr.SetIcon(icons.KeyboardArrowDown)
@@ -184,7 +182,7 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	tv.Table = etable.NewIdxView(et)
 
 	tv.This().(giv.SliceViewer).UpdtSliceSize()
-	tv.SetFlag(false, giv.SliceViewConfiged)
+	tv.SetFlag(false, giv.SliceViewConfigured)
 	tv.StartIdx = 0
 	tv.VisRows = tv.MinRows
 	if !tv.IsReadOnly() {
@@ -219,7 +217,7 @@ func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 	tv.Table = ix.Clone() // always copy
 
 	tv.This().(giv.SliceViewer).UpdtSliceSize()
-	tv.SetFlag(false, giv.SliceViewConfiged)
+	tv.SetFlag(false, giv.SliceViewConfigured)
 	tv.StartIdx = 0
 	tv.VisRows = tv.MinRows
 	if !tv.IsReadOnly() {
@@ -245,7 +243,7 @@ func (tv *TableView) ConfigWidget() {
 }
 
 func (tv *TableView) ConfigTableView() {
-	if tv.Is(giv.SliceViewConfiged) {
+	if tv.Is(giv.SliceViewConfigured) {
 		tv.This().(giv.SliceViewer).UpdateWidgets()
 		return
 	}
@@ -261,7 +259,7 @@ func (tv *TableView) ConfigFrame() {
 	if tv.HasChildren() {
 		return
 	}
-	tv.SetFlag(true, giv.SliceViewConfiged)
+	tv.SetFlag(true, giv.SliceViewConfigured)
 	gi.NewFrame(tv, "header")
 	giv.NewSliceViewGrid(tv, "grid")
 	tv.ConfigHeader()
@@ -292,7 +290,7 @@ func (tv *TableView) ConfigHeader() {
 		hdr := sgh.Child(idxOff + fli).(*gi.Button)
 		hdr.SetType(gi.ButtonMenu)
 		hdr.SetText(field)
-		hdr.Data = fli
+		hdr.SetProp("field-index", fli)
 		tv.HeaderWidths[fli] = len(field)
 		if fli == tv.SortIdx {
 			if tv.SortDesc {
@@ -360,7 +358,7 @@ func (tv *TableView) ConfigRows() {
 	if sg == nil {
 		return
 	}
-	tv.SetFlag(true, giv.SliceViewConfiged)
+	tv.SetFlag(true, giv.SliceViewConfigured)
 	sg.SetFlag(true, gi.LayoutNoKeys)
 
 	tv.ViewMuLock()
