@@ -2,7 +2,7 @@
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/goki/etable/v2)](https://goreportcard.com/report/github.com/goki/etable/v2)
 [![Go Reference](https://pkg.go.dev/badge/github.com/goki/etable/v2.svg)](https://pkg.go.dev/github.com/goki/etable/v2)
-[![CI](https://github.com/emer/etable/v2/actions/workflows/ci.yml/badge.svg)](https://github.com/emer/etable/v2/actions/workflows/ci.yml)
+[![CI](https://github.com/emer/etable/actions/workflows/ci.yml/badge.svg)](https://github.com/emer/etable/actions/workflows/ci.yml)
 [![Codecov](https://codecov.io/gh/emer/etable/branch/master/graph/badge.svg?token=Hw5cInAxY3)](https://codecov.io/gh/emer/etable)
 
  **etable** (or eTable) provides a DataTable / DataFrame structure in Go (golang), similar to [pandas](https://pandas.pydata.org/) and [xarray](http://xarray.pydata.org/en/stable/) in Python, and [Apache Arrow Table](https://github.com/apache/arrow/tree/master/go/arrow/array/table.go), using `etensor` n-dimensional columns aligned by common outermost row dimension.
