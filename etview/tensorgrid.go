@@ -14,6 +14,7 @@ import (
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/gi"
 	"cogentcore.org/core/giv"
+	"cogentcore.org/core/icons"
 	"cogentcore.org/core/mat32"
 	"cogentcore.org/core/styles"
 	"github.com/emer/etable/v2/etensor"
@@ -230,12 +231,18 @@ func (tg *TensorGrid) HandleEvents() {
 	tg.OnDoubleClick(func(e events.Event) {
 		tg.OpenTensorView()
 	})
-	tg.On(events.ContextMenu, func(e events.Event) {
-		d := gi.NewBody().AddTitle("Tensor Grid Display Options")
-		giv.NewStructView(d).SetStruct(&tg.Disp)
-		d.NewFullDialog(tg).Run()
-		// todo: update view
+	tg.AddContextMenu(func(m *gi.Scene) { // todo: still not getting the context menu event at all
+		giv.NewFuncButton(m, tg.EditSettings).SetIcon(icons.Edit)
 	})
+}
+
+func (tg *TensorGrid) EditSettings() { //gti:add
+	d := gi.NewBody().AddTitle("Tensor Grid Display Options")
+	giv.NewStructView(d).SetStruct(&tg.Disp).
+		OnChange(func(e events.Event) {
+			tg.SetNeedsRender(true)
+		})
+	d.NewFullDialog(tg).Run()
 }
 
 // MinSize returns minimum size based on tensor and display settings
