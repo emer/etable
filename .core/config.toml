@@ -1,7 +1,7 @@
 ID = 'com.etable.v2'
 Name = 'etable'
 Type = 'Library'
-Version = 'v2.0.0-dev0.0.14'
+Version = 'v2.0.0-dev0.0.15'
 
 [Generate]
   [Generate.Enumgen]
