@@ -10,6 +10,7 @@ import (
 
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/gi"
+	"cogentcore.org/core/icons"
 	"github.com/emer/etable/v2/agg"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etview"
@@ -106,7 +107,7 @@ func main() {
 	tbv := etview.NewTableView(nt).SetTable(Planets)
 	b.AddAppBar(tbv.ConfigToolbar)
 	b.AddAppBar(func(tb *gi.Toolbar) {
-		gi.NewButton(tb).SetText("README").
+		gi.NewButton(tb).SetText("README").SetIcon(icons.FileMarkdown).
 			SetTooltip("open README help file").OnClick(func(e events.Event) {
 			gi.TheApp.OpenURL("https://github.com/emer/etable/blob/master/examples/dataproc/README.md")
 		})
