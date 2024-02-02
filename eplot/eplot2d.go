@@ -571,9 +571,11 @@ func (pl *Plot2D) ColsConfig() {
 			})
 			gi.NewButton(m, "edit").SetText("Edit").OnClick(func(e events.Event) {
 				d := gi.NewBody().AddTitle("Col Params")
-				giv.NewStructView(d).SetStruct(cp)
-				d.NewFullDialog(pl).Run()
-				// todo: add update on ok
+				giv.NewStructView(d).SetStruct(cp).
+					OnChange(func(e events.Event) {
+						pl.UpdatePlot()
+					})
+				d.NewFullDialog(pl).SetNewWindow(true).Run()
 			})
 		})
 	}
@@ -614,8 +616,11 @@ func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
 		SetTooltip("set parameters that control display (font size etc)").
 		OnClick(func(e events.Event) {
 			d := gi.NewBody().AddTitle(pl.Nm + " Params")
-			giv.NewStructView(d).SetStruct(&pl.Params)
-			d.NewFullDialog(pl).Run()
+			giv.NewStructView(d).SetStruct(&pl.Params).
+				OnChange(func(e events.Event) {
+					pl.UpdatePlot()
+				})
+			d.NewFullDialog(pl).SetNewWindow(true).Run()
 		})
 	gi.NewButton(tb).SetText("Table").SetIcon(icons.Edit).
 		SetTooltip("open a TableView window of the data").
