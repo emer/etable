@@ -18,14 +18,10 @@ func NewPlot2D(par ki.Ki, name ...string) *Plot2D {
 }
 
 // KiType returns the [*gti.Type] of [Plot2D]
-func (t *Plot2D) KiType() *gti.Type {
-	return Plot2DType
-}
+func (t *Plot2D) KiType() *gti.Type { return Plot2DType }
 
 // New returns a new [*Plot2D] value
-func (t *Plot2D) New() ki.Ki {
-	return &Plot2D{}
-}
+func (t *Plot2D) New() ki.Ki { return &Plot2D{} }
 
 // SetParams sets the [Plot2D.Params]:
 // the overall plot parameters

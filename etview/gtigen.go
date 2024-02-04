@@ -7,12 +7,11 @@ import (
 	"sync"
 
 	"cogentcore.org/core/colors/colormap"
-	"cogentcore.org/core/gi"
 	"cogentcore.org/core/giv"
 	"cogentcore.org/core/gti"
-	"cogentcore.org/core/ki"
 	"cogentcore.org/core/mat32"
 	"github.com/emer/etable/v2/etensor"
+	"cogentcore.org/core/ki"
 )
 
 // SimMatGridType is the [gti.Type] for [SimMatGrid]
@@ -26,14 +25,10 @@ func NewSimMatGrid(par ki.Ki, name ...string) *SimMatGrid {
 }
 
 // KiType returns the [*gti.Type] of [SimMatGrid]
-func (t *SimMatGrid) KiType() *gti.Type {
-	return SimMatGridType
-}
+func (t *SimMatGrid) KiType() *gti.Type { return SimMatGridType }
 
 // New returns a new [*SimMatGrid] value
-func (t *SimMatGrid) New() ki.Ki {
-	return &SimMatGrid{}
-}
+func (t *SimMatGrid) New() ki.Ki { return &SimMatGrid{} }
 
 // SetRowMaxSz sets the [SimMatGrid.rowMaxSz]
 func (t *SimMatGrid) SetRowMaxSz(v mat32.Vec2) *SimMatGrid { t.rowMaxSz = v; return t }
@@ -72,14 +67,10 @@ func NewTableView(par ki.Ki, name ...string) *TableView {
 }
 
 // KiType returns the [*gti.Type] of [TableView]
-func (t *TableView) KiType() *gti.Type {
-	return TableViewType
-}
+func (t *TableView) KiType() *gti.Type { return TableViewType }
 
 // New returns a new [*TableView] value
-func (t *TableView) New() ki.Ki {
-	return &TableView{}
-}
+func (t *TableView) New() ki.Ki { return &TableView{} }
 
 // SetTsrDisp sets the [TableView.TsrDisp]:
 // overall display options for tensor display
@@ -125,9 +116,6 @@ func (t *TableView) SetTooltip(v string) *TableView { t.Tooltip = v; return t }
 
 // SetStackTop sets the [TableView.StackTop]
 func (t *TableView) SetStackTop(v int) *TableView { t.StackTop = v; return t }
-
-// SetStripes sets the [TableView.Stripes]
-func (t *TableView) SetStripes(v gi.Stripes) *TableView { t.Stripes = v; return t }
 
 // SetMinRows sets the [TableView.MinRows]
 func (t *TableView) SetMinRows(v int) *TableView { t.MinRows = v; return t }
@@ -188,7 +176,7 @@ var _ = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorLayo
 var _ = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorDisp", IDName: "tensor-disp", Doc: "TensorDisp are options for displaying tensors", Directives: []gti.Directive{{Tool: "gti", Directive: "add"}}, Embeds: []gti.Field{{Name: "TensorLayout"}}, Fields: []gti.Field{{Name: "Range", Doc: "range to plot"}, {Name: "MinMax", Doc: "if not using fixed range, this is the actual range of data"}, {Name: "ColorMap", Doc: "the name of the color map to use in translating values to colors"}, {Name: "GridFill", Doc: "what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc"}, {Name: "DimExtra", Doc: "amount of extra space to add at dimension boundaries, as a proportion of total grid size"}, {Name: "GridMinSize", Doc: "minimum size for grid squares -- they will never be smaller than this"}, {Name: "GridMaxSize", Doc: "maximum size for grid squares -- they will never be larger than this"}, {Name: "TotPrefSize", Doc: "total preferred display size along largest dimension.\ngrid squares will be sized to fit within this size,\nsubject to harder GridMin / Max size constraints"}, {Name: "FontSize", Doc: "font size in standard point units for labels (e.g., SimMat)"}, {Name: "GridView", Doc: "our gridview, for update method"}}})
 
 // TensorGridType is the [gti.Type] for [TensorGrid]
-var TensorGridType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorGrid", IDName: "tensor-grid", Doc: "TensorGrid is a widget that displays tensor values as a grid of colored squares.", Embeds: []gti.Field{{Name: "WidgetBase"}}, Fields: []gti.Field{{Name: "Tensor", Doc: "the tensor that we view"}, {Name: "Disp", Doc: "display options"}, {Name: "ColorMap", Doc: "the actual colormap"}}, Instance: &TensorGrid{}})
+var TensorGridType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorGrid", IDName: "tensor-grid", Doc: "TensorGrid is a widget that displays tensor values as a grid of colored squares.", Methods: []gti.Method{{Name: "EditSettings", Directives: []gti.Directive{{Tool: "gti", Directive: "add"}}}}, Embeds: []gti.Field{{Name: "WidgetBase"}}, Fields: []gti.Field{{Name: "Tensor", Doc: "the tensor that we view"}, {Name: "Disp", Doc: "display options"}, {Name: "ColorMap", Doc: "the actual colormap"}}, Instance: &TensorGrid{}})
 
 // NewTensorGrid adds a new [TensorGrid] with the given name to the given parent:
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
@@ -197,14 +185,10 @@ func NewTensorGrid(par ki.Ki, name ...string) *TensorGrid {
 }
 
 // KiType returns the [*gti.Type] of [TensorGrid]
-func (t *TensorGrid) KiType() *gti.Type {
-	return TensorGridType
-}
+func (t *TensorGrid) KiType() *gti.Type { return TensorGridType }
 
 // New returns a new [*TensorGrid] value
-func (t *TensorGrid) New() ki.Ki {
-	return &TensorGrid{}
-}
+func (t *TensorGrid) New() ki.Ki { return &TensorGrid{} }
 
 // SetDisp sets the [TensorGrid.Disp]:
 // display options
@@ -229,14 +213,10 @@ func NewTensorView(par ki.Ki, name ...string) *TensorView {
 }
 
 // KiType returns the [*gti.Type] of [TensorView]
-func (t *TensorView) KiType() *gti.Type {
-	return TensorViewType
-}
+func (t *TensorView) KiType() *gti.Type { return TensorViewType }
 
 // New returns a new [*TensorView] value
-func (t *TensorView) New() ki.Ki {
-	return &TensorView{}
-}
+func (t *TensorView) New() ki.Ki { return &TensorView{} }
 
 // SetTooltip sets the [TensorView.Tooltip]
 func (t *TensorView) SetTooltip(v string) *TensorView { t.Tooltip = v; return t }
