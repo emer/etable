@@ -3,7 +3,7 @@ module github.com/emer/etable/v2
 go 1.21
 
 require (
-	cogentcore.org/core v0.0.4-0.20240204205229-7337320fcaf1
+	cogentcore.org/core v0.0.4
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40
 	gonum.org/v1/gonum v0.14.0
 	gonum.org/v1/plot v0.14.0

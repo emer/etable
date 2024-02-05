@@ -1,7 +1,7 @@
 cloud.google.com/go v0.26.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
 cloud.google.com/go v0.34.0/go.mod h1:aQUYkXzVsufM+DwF1aE+0xfcU+56JwCaLick0ClmMTw=
-cogentcore.org/core v0.0.4-0.20240204205229-7337320fcaf1 h1:UrLUD+h9jwbiSuzBhuCWJWMfSPOrnIkszNE2G0lNiOc=
-cogentcore.org/core v0.0.4-0.20240204205229-7337320fcaf1/go.mod h1:2FRMZndYhlkaWDnaJqaQzFBjV7R46cuHpMUV5ONSSl8=
+cogentcore.org/core v0.0.4 h1:ej1byMwNTKHUevUGW7HbZaAF6VkS0wbdyM8aUKIdx5Y=
+cogentcore.org/core v0.0.4/go.mod h1:2FRMZndYhlkaWDnaJqaQzFBjV7R46cuHpMUV5ONSSl8=
 dmitri.shuralyov.com/gpu/mtl v0.0.0-20190408044501-666a987793e9/go.mod h1:H6x//7gZCb22OMCxBHrMx7a5I7Hp++hsVxbQ4BYO7hU=
 gioui.org v0.0.0-20210308172011-57750fc8a0a6/go.mod h1:RSH6KIUZ0p2xy5zHDxgAM4zumjgTw83q2ge/PI+yyw8=
 git.sr.ht/~sbinet/cmpimg v0.1.0 h1:E0zPRk2muWuCqSKSVZIWsgtU9pjsw3eKHi8VmQeScxo=
