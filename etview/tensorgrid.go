@@ -68,7 +68,7 @@ type TensorDisp struct { //gti:add
 	FontSize float32
 
 	// our gridview, for update method
-	GridView *TensorGrid `copy:"-" json:"-" xml:"-" view:"-"`
+	GridView *TensorGrid `copier:"-" json:"-" xml:"-" view:"-"`
 }
 
 // Defaults sets defaults for values that are at nonsensical initial values

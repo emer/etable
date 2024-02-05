@@ -3,7 +3,6 @@
 package etview
 
 import (
-	"reflect"
 	"sync"
 
 	"cogentcore.org/core/colors/colormap"
@@ -120,17 +119,11 @@ func (t *TableView) SetStackTop(v int) *TableView { t.StackTop = v; return t }
 // SetMinRows sets the [TableView.MinRows]
 func (t *TableView) SetMinRows(v int) *TableView { t.MinRows = v; return t }
 
+// SetViewPath sets the [TableView.ViewPath]
+func (t *TableView) SetViewPath(v string) *TableView { t.ViewPath = v; return t }
+
 // SetViewMu sets the [TableView.ViewMu]
 func (t *TableView) SetViewMu(v *sync.Mutex) *TableView { t.ViewMu = v; return t }
-
-// SetSliceNpval sets the [TableView.SliceNPVal]
-func (t *TableView) SetSliceNpval(v reflect.Value) *TableView { t.SliceNPVal = v; return t }
-
-// SetSliceValView sets the [TableView.SliceValView]
-func (t *TableView) SetSliceValView(v giv.Value) *TableView { t.SliceValView = v; return t }
-
-// SetValues sets the [TableView.Values]
-func (t *TableView) SetValues(v ...giv.Value) *TableView { t.Values = v; return t }
 
 // SetSelVal sets the [TableView.SelVal]
 func (t *TableView) SetSelVal(v any) *TableView { t.SelVal = v; return t }
@@ -138,38 +131,11 @@ func (t *TableView) SetSelVal(v any) *TableView { t.SelVal = v; return t }
 // SetSelIdx sets the [TableView.SelIdx]
 func (t *TableView) SetSelIdx(v int) *TableView { t.SelIdx = v; return t }
 
-// SetSelIdxs sets the [TableView.SelIdxs]
-func (t *TableView) SetSelIdxs(v map[int]struct{}) *TableView { t.SelIdxs = v; return t }
-
 // SetInitSelIdx sets the [TableView.InitSelIdx]
 func (t *TableView) SetInitSelIdx(v int) *TableView { t.InitSelIdx = v; return t }
 
-// SetDraggedIdxs sets the [TableView.DraggedIdxs]
-func (t *TableView) SetDraggedIdxs(v ...int) *TableView { t.DraggedIdxs = v; return t }
-
-// SetViewPath sets the [TableView.ViewPath]
-func (t *TableView) SetViewPath(v string) *TableView { t.ViewPath = v; return t }
-
 // SetTmpSave sets the [TableView.TmpSave]
 func (t *TableView) SetTmpSave(v giv.Value) *TableView { t.TmpSave = v; return t }
-
-// SetVisRows sets the [TableView.VisRows]
-func (t *TableView) SetVisRows(v int) *TableView { t.VisRows = v; return t }
-
-// SetStartIdx sets the [TableView.StartIdx]
-func (t *TableView) SetStartIdx(v int) *TableView { t.StartIdx = v; return t }
-
-// SetSliceSize sets the [TableView.SliceSize]
-func (t *TableView) SetSliceSize(v int) *TableView { t.SliceSize = v; return t }
-
-// SetConfigIter sets the [TableView.ConfigIter]
-func (t *TableView) SetConfigIter(v int) *TableView { t.ConfigIter = v; return t }
-
-// SetTmpIdx sets the [TableView.TmpIdx]
-func (t *TableView) SetTmpIdx(v int) *TableView { t.TmpIdx = v; return t }
-
-// SetElVal sets the [TableView.ElVal]
-func (t *TableView) SetElVal(v reflect.Value) *TableView { t.ElVal = v; return t }
 
 var _ = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorLayout", IDName: "tensor-layout", Doc: "TensorLayout are layout options for displaying tensors", Directives: []gti.Directive{{Tool: "gti", Directive: "add"}}, Fields: []gti.Field{{Name: "OddRow", Doc: "even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension"}, {Name: "TopZero", Doc: "if true, then the Y=0 coordinate is displayed from the top-down; otherwise the Y=0 coordinate is displayed from the bottom up, which is typical for emergent network patterns."}, {Name: "Image", Doc: "display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image"}}})
 

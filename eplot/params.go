@@ -63,7 +63,7 @@ type PlotParams struct { //gti:add
 	YAxisLabel string
 
 	// our plot, for update method
-	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-"`
+	Plot *Plot2D `copier:"-" json:"-" xml:"-" view:"-"`
 }
 
 // Defaults sets defaults if nil vals present
@@ -216,7 +216,7 @@ type ColParams struct { //gti:add
 	IsString bool `edit:"-"`
 
 	// our plot, for update method
-	Plot *Plot2D `copy:"-" json:"-" xml:"-" view:"-"`
+	Plot *Plot2D `copier:"-" json:"-" xml:"-" view:"-"`
 }
 
 // Defaults sets defaults if nil vals present

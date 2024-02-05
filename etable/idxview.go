@@ -44,7 +44,7 @@ type IdxView struct { //gti:add
 	Idxs []int
 
 	// current Less function used in sorting
-	lessFunc LessFunc `copy:"-" view:"-" xml:"-" json:"-"`
+	lessFunc LessFunc `copier:"-" view:"-" xml:"-" json:"-"`
 }
 
 // NewIdxView returns a new IdxView based on given table, initialized with sequential idxes
