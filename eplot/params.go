@@ -24,22 +24,22 @@ type PlotParams struct { //gti:add
 	Type PlotTypes
 
 	// whether to plot lines
-	Lines bool
+	Lines bool `default:"true"`
 
 	// whether to plot points with symbols
 	Points bool
 
 	// width of lines
-	LineWidth float64
+	LineWidth float64 `default:"2"`
 
-	// size of points (default is 3)
-	PointSize float64
+	// size of points
+	PointSize float64 `default:"3"`
 
 	// the shape used to draw points
 	PointShape Shapes
 
-	// width of bars for bar plot, as fraction of available space -- 1 = no gaps, .8 default
-	BarWidth float64 `min:"0.01" max:"1"`
+	// width of bars for bar plot, as fraction of available space (1 = no gaps)
+	BarWidth float64 `min:"0.01" max:"1" default:"0.8"`
 
 	// draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn
 	NegXDraw bool
