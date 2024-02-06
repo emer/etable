@@ -32,7 +32,7 @@ type PlotParams struct { //gti:add
 	// width of lines
 	LineWidth float64
 
-	// size of points
+	// size of points (default is 3)
 	PointSize float64
 
 	// the shape used to draw points
