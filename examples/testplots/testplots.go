@@ -12,8 +12,7 @@ import (
 )
 
 func main() {
-	b := gi.NewAppBody("testplots")
-	b.App().About = `This runs various testing data plots using etable.Table. See <a href="https://github.com/emer/etable/v2">etable on GitHub</a>.</p>`
+	b := gi.NewBody("Test Plots")
 
 	tv := gi.NewTabs(b)
 
