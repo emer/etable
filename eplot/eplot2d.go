@@ -8,6 +8,7 @@ package eplot
 
 import (
 	"fmt"
+	"io/fs"
 	"log"
 	"log/slog"
 	"math"
@@ -184,9 +185,17 @@ func (pl *Plot2D) SaveAll(fname gi.Filename) { //gti:add
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
-func (pl *Plot2D) OpenCSV(fname gi.Filename, delim etable.Delims) { //gti:add
-	pl.Table.Table.OpenCSV(fname, delim)
-	pl.DataFile = fname
+func (pl *Plot2D) OpenCSV(filename gi.Filename, delim etable.Delims) { //gti:add
+	pl.Table.Table.OpenCSV(filename, delim)
+	pl.DataFile = filename
+	pl.Update()
+}
+
+// OpenFS opens the Table data from a csv (comma-separated values) file (or any delim)
+// from the given filesystem.
+func (pl *Plot2D) OpenFS(fsys fs.FS, filename gi.Filename, delim etable.Delims) {
+	pl.Table.Table.OpenFS(fsys, string(filename), delim)
+	pl.DataFile = filename
 	pl.Update()
 }
 

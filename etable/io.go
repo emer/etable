@@ -9,6 +9,7 @@ import (
 	"encoding/csv"
 	"fmt"
 	"io"
+	"io/fs"
 	"log"
 	"math"
 	"os"
@@ -16,6 +17,7 @@ import (
 	"strings"
 
 	"cogentcore.org/core/gi"
+	"cogentcore.org/core/grr"
 	"github.com/emer/etable/v2/etensor"
 )
 
@@ -103,11 +105,20 @@ func (ix *IdxView) SaveCSV(filename gi.Filename, delim Delims, headers bool) err
 // for whatever information fits from each row of the file.
 func (dt *Table) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
 	fp, err := os.Open(string(filename))
-	defer fp.Close()
 	if err != nil {
-		log.Println(err)
-		return err
+		return grr.Log(err)
 	}
+	defer fp.Close()
+	return dt.ReadCSV(bufio.NewReader(fp), delim)
+}
+
+// OpenFS is the version of [Table.OpenCSV] that uses an [fs.FS] filesystem.
+func (dt *Table) OpenFS(fsys fs.FS, filename string, delim Delims) error {
+	fp, err := fsys.Open(filename)
+	if err != nil {
+		return grr.Log(err)
+	}
+	defer fp.Close()
 	return dt.ReadCSV(bufio.NewReader(fp), delim)
 }
 
@@ -121,13 +132,14 @@ func (dt *Table) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
 // If the table DOES have existing columns, then those are used robustly
 // for whatever information fits from each row of the file.
 func (ix *IdxView) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
-	fp, err := os.Open(string(filename))
-	defer fp.Close()
-	if err != nil {
-		log.Println(err)
-		return err
-	}
-	err = ix.Table.ReadCSV(bufio.NewReader(fp), delim)
+	err := ix.Table.OpenCSV(filename, delim)
+	ix.Sequential()
+	return err
+}
+
+// OpenFS is the version of [IdxView.OpenCSV] that uses an [fs.FS] filesystem.
+func (ix *IdxView) OpenFS(fsys fs.FS, filename string, delim Delims) error {
+	err := ix.Table.OpenFS(fsys, filename, delim)
 	ix.Sequential()
 	return err
 }

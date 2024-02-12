@@ -5,16 +5,21 @@
 package main
 
 import (
+	"embed"
+
 	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/eplot"
 	"github.com/emer/etable/v2/etable"
 )
 
+//go:embed *.tsv
+var tsv embed.FS
+
 func main() {
 	b := gi.NewBody("plot")
 
 	epc := etable.NewTable("epc")
-	epc.OpenCSV("ra25epoch.tsv", etable.Tab)
+	epc.OpenFS(tsv, "ra25epoch.tsv", etable.Tab)
 
 	pl := eplot.NewPlot2D(b)
 	pl.SetTable(epc)
