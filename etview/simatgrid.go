@@ -81,13 +81,13 @@ func (tg *SimMatGrid) SizeLabel(lbs []string, col bool) (minBlank, ngps int, sz 
 	tr := paint.Text{}
 	fr := tg.Styles.FontRender()
 	if col {
-		tr.SetStringRot90(lbs[mxi], fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0)
+		tr.SetStringRot90(lbs[mxi], fr, &tg.Styles.UnitContext, &tg.Styles.Text, true, 0)
 	} else {
-		tr.SetString(lbs[mxi], fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0, 0)
+		tr.SetString(lbs[mxi], fr, &tg.Styles.UnitContext, &tg.Styles.Text, true, 0, 0)
 	}
 	tsz := tg.Geom.Size.Actual.Content
 	if !col {
-		tr.LayoutStdLR(&tg.Styles.Text, fr, &tg.Styles.UnContext, tsz)
+		tr.LayoutStdLR(&tg.Styles.Text, fr, &tg.Styles.UnitContext, tsz)
 	}
 	return minBlank, ngps, tr.Size
 }
@@ -165,8 +165,8 @@ func (tg *SimMatGrid) RenderSimMat() {
 			prvyblk = false
 		}
 		yex := float32(ygp) * tg.Disp.DimExtra
-		tr.SetString(lb, fr, &tg.Styles.UnContext, &txsty, true, 0, 0)
-		tr.LayoutStdLR(&txsty, fr, &tg.Styles.UnContext, tg.rowMaxSz)
+		tr.SetString(lb, fr, &tg.Styles.UnitContext, &txsty, true, 0, 0)
+		tr.LayoutStdLR(&txsty, fr, &tg.Styles.UnitContext, tg.rowMaxSz)
 		cr := mat32.V2(0, float32(y)+yex)
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(pc, pr)
@@ -190,7 +190,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			prvxblk = false
 		}
 		xex := float32(xgp) * tg.Disp.DimExtra
-		tr.SetStringRot90(lb, fr, &tg.Styles.UnContext, &tg.Styles.Text, true, 0)
+		tr.SetStringRot90(lb, fr, &tg.Styles.UnitContext, &tg.Styles.Text, true, 0)
 		cr := mat32.V2(float32(x)+xex, 0)
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(pc, pr)

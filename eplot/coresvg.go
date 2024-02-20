@@ -47,7 +47,6 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 		if err != nil {
 			slog.Error("eplot: svg render errors", "err", err)
 		}
-		svge.SVG.Fill = true
 		svge.SetNeedsRender(true)
 	}
 }
@@ -92,6 +91,4 @@ func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
 	var buf bytes.Buffer
 	buf.Write([]byte(svgstr))
 	svge.SVG.ReadXML(&buf)
-
-	svge.SVG.Fill = true
 }

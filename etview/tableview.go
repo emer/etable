@@ -124,9 +124,7 @@ func (tv *TableView) StyleValueWidget(w gi.Widget, s *styles.Style, row, col int
 		hw = max(float32(tv.ColMaxWidths[col]), hw)
 	}
 	hv := units.Ch(hw)
-	s.Min.X.Val = max(s.Min.X.Val, hv.Convert(s.Min.X.Un, &s.UnContext).Val)
-	// s.Max.X.Val = max(s.Max.X.Val, hv.Convert(s.Max.X.Un, &s.UnContext).Val)
-	s.Grow.Set(0, 0)
+	s.Min.X.Val = max(s.Min.X.Val, hv.Convert(s.Min.X.Un, &s.UnitContext).Val)
 	s.SetTextWrap(false)
 }
 
@@ -186,26 +184,6 @@ func (tv *TableView) UpdtSliceSize() int {
 	tv.SliceSize = tv.Table.Len()
 	tv.NCols = tv.Table.Table.NumCols()
 	return tv.SliceSize
-}
-
-// WidgetIndex returns the row and column indexes for given widget.
-// Typically this is decoded from the name of the widget.
-func (tv *TableView) WidgetIndex(w gi.Widget) (row, col int) {
-	nm := w.Name()
-	if strings.Contains(nm, "value-") {
-		fstr := strings.TrimPrefix(nm, "value-")
-		dp := strings.Index(fstr, ".")
-		istr := fstr[dp+1:] // index is after .
-		fstr = fstr[:dp]    // field idx is -X.
-		idx := grr.Log1(strconv.Atoi(istr))
-		fli := grr.Log1(strconv.Atoi(fstr))
-		row = tv.StartIdx + idx
-		col = fli
-	} else if strings.Contains(nm, "index-") {
-		idx := grr.Log1(strconv.Atoi(strings.TrimPrefix(nm, "index-")))
-		row = tv.StartIdx + idx
-	}
-	return
 }
 
 // Config configures the view
@@ -332,11 +310,12 @@ func (tv *TableView) ConfigRows() {
 		if tv.Is(giv.SliceViewShowIndex) {
 			idxlab = &gi.Label{}
 			sg.SetChild(idxlab, ridx, labnm)
+			idxlab.SetText(sitxt)
 			idxlab.OnSelect(func(e events.Event) {
 				e.SetHandled()
 				tv.UpdateSelectRow(i, e.SelectMode())
 			})
-			idxlab.SetText(sitxt)
+			idxlab.SetProp(giv.SliceViewRowProp, i)
 		}
 
 		vpath := tv.ViewPath + "[" + sitxt + "]"
@@ -401,6 +380,8 @@ func (tv *TableView) ConfigRows() {
 			w := ki.NewOfType(vtyp).(gi.Widget)
 			sg.SetChild(w, cidx, valnm)
 			vv.ConfigWidget(w)
+			w.SetProp(giv.SliceViewRowProp, i)
+			w.SetProp(giv.SliceViewColProp, fli)
 			if col.NumDims() > 1 {
 				tgw := w.This().(*TensorGrid)
 				tgw.Style(func(s *styles.Style) {
@@ -450,6 +431,9 @@ func (tv *TableView) UpdateWidgets() {
 		tv.SelIdx = tv.InitSelIdx
 		tv.InitSelIdx = -1
 		scrollTo = tv.SelIdx
+	}
+	if scrollTo >= 0 {
+		tv.ScrollToIdx(scrollTo)
 	}
 
 	tv.UpdateStartIdx()
@@ -529,10 +513,6 @@ func (tv *TableView) UpdateWidgets() {
 				}
 			}
 		}
-	}
-
-	if scrollTo >= 0 {
-		tv.ScrollToIdx(scrollTo)
 	}
 }
 
@@ -674,6 +654,10 @@ func (tv *TableView) TensorDispAction(fldIdx int) {
 	// tv.UpdateSliceGrid()
 }
 
+func (tv *TableView) HasStyleFunc() bool {
+	return false
+}
+
 func (tv *TableView) StyleRow(w gi.Widget, idx, fidx int) {
 }
 
@@ -770,23 +754,6 @@ func (tv *TableView) RowGrabFocus(row int) *gi.WidgetBase {
 		}
 	}
 	return nil
-}
-
-func (tv *TableView) EditIdx(idx int) {
-	val := laser.OnePtrUnderlyingValue(tv.SliceNPVal.Index(idx))
-	stru := val.Interface()
-	tynm := laser.NonPtrType(val.Type()).Name()
-	lbl := gi.ToLabel(stru)
-	if lbl != "" {
-		tynm += ": " + lbl
-	}
-	d := gi.NewBody().AddTitle(tynm)
-	giv.NewStructView(d).SetStruct(stru)
-	// d.AddBottomBar(func(pw gi.Widget) {
-	// 	d.AddCancel(pw)
-	// 	d.AddOk(pw)
-	// })
-	d.NewFullDialog(tv).Run()
 }
 
 //////////////////////////////////////////////////////

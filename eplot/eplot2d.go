@@ -593,7 +593,6 @@ func (pl *Plot2D) ColsConfig() {
 // PlotConfig configures the PlotView
 func (pl *Plot2D) PlotConfig() {
 	sv := pl.SVGPlot()
-	sv.SVG.Fill = true
 	sv.SVG.Scale = 1
 	sv.SVG.Translate = mat32.Vec2{}
 	sv.SetReadOnly(true)
