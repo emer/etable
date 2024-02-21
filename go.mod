@@ -3,7 +3,7 @@ module github.com/emer/etable/v2
 go 1.21
 
 require (
-	cogentcore.org/core v0.0.4
+	cogentcore.org/core v0.0.6-0.20240221052542-5455cf7f8fd4
 	github.com/apache/arrow/go/arrow v0.0.0-20211112161151-bc219186db40
 	gonum.org/v1/gonum v0.14.0
 	gonum.org/v1/plot v0.14.0
@@ -11,13 +11,13 @@ require (
 
 require (
 	git.sr.ht/~sbinet/gg v0.5.0 // indirect
+	github.com/Bios-Marcel/wastebasket v0.0.4-0.20240213135800-f26f1ae0a7c4 // indirect
 	github.com/Masterminds/vcs v1.13.3 // indirect
 	github.com/ajstarks/svgo v0.0.0-20211024235047-1546f124cd8b // indirect
 	github.com/anthonynsimon/bild v0.13.0 // indirect
 	github.com/aymerick/douceur v0.2.0 // indirect
 	github.com/campoy/embedmd v1.0.0 // indirect
 	github.com/chewxy/math32 v1.10.1 // indirect
-	github.com/fatih/camelcase v1.0.0 // indirect
 	github.com/fsnotify/fsnotify v1.7.0 // indirect
 	github.com/go-fonts/liberation v0.3.2 // indirect
 	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20240118000515-a250818d05e3 // indirect
@@ -31,7 +31,6 @@ require (
 	github.com/hack-pad/go-indexeddb v0.3.2 // indirect
 	github.com/hack-pad/hackpadfs v0.2.1 // indirect
 	github.com/hack-pad/safejs v0.1.1 // indirect
-	github.com/iancoleman/strcase v0.3.0 // indirect
 	github.com/jinzhu/copier v0.4.0 // indirect
 	github.com/mitchellh/go-homedir v1.1.0 // indirect
 	github.com/pelletier/go-toml/v2 v2.1.1 // indirect
