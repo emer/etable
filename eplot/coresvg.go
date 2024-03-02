@@ -30,8 +30,8 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 		return
 	}
 
-	w := float64(sz.X-4) / scale
-	h := float64(sz.Y-4) / scale
+	w := float64(sz.X) / scale
+	h := float64(sz.Y) / scale
 
 	// Create a Canvas for writing SVG images.
 	c := vgsvg.New(vg.Length(w), vg.Length(h))
@@ -47,6 +47,8 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 		if err != nil {
 			slog.Error("eplot: svg render errors", "err", err)
 		}
+		svge.SVG.Translate.Set(5, 5)
+		svge.SVG.Scale = float32(sz.X-30) / float32(sz.X)
 		svge.SetNeedsRender(true)
 	}
 }
