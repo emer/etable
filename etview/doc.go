@@ -4,7 +4,7 @@
 
 /*
 Package etview provides GUI Views of etable Table and Tensor structures
-using the Cogent Core View framework: https://github.com/goki/gi
+using the Cogent Core View framework: https://cogentcore.org/core
 
 * TableView provides a row-and-column tabular GUI interface, similar to
 a spreadsheet, for viewing and editing Table data.  Any higher-dimensional

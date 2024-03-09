@@ -7,7 +7,21 @@
 # this tests transferring data between python and etable data.
 # we're using the pyleabra gopy executable, built in emer/leabra/python
 
-from leabra import go, etable, efile, split, etensor, etview, rand, erand, patgen, gi, giv, pygiv, mat32
+from leabra import (
+    go,
+    etable,
+    efile,
+    split,
+    etensor,
+    etview,
+    rand,
+    erand,
+    patgen,
+    gi,
+    giv,
+    pygiv,
+    mat32,
+)
 
 import pyet
 
@@ -17,13 +31,15 @@ import pandas as pd
 import torch
 import torch.utils.data as data_utils
 
-# this will become Sim later.. 
+# this will become Sim later..
 TheSim = 1
+
 
 def TestCB(recv, send, sig, data):
     TheSim.Test()
     TheSim.UpdateClassView()
     TheSim.vp.SetNeedsFullRender()
+
 
 class Sim(pygiv.ClassViewObj):
     """
@@ -47,18 +63,30 @@ class Sim(pygiv.ClassViewObj):
         self.SetTags("Win", 'view:"-" desc:"main GUI window"')
         self.ToolBar = 0
         self.SetTags("ToolBar", 'view:"-" desc:"the master toolbar"')
-        self.vp  = 0
+        self.vp = 0
         self.SetTags("vp", 'view:"-" desc:"viewport"')
-        
+
     def Config(ss):
         ss.ConfigPats()
-        
+
     def ConfigPats(ss):
         dt = ss.Pats
         sch = etable.Schema(
-            [etable.Column("Name", etensor.STRING, go.nil, go.nil),
-            etable.Column("Input", etensor.FLOAT32, go.Slice_int([4, 5]), go.Slice_string(["Y", "X"])),
-            etable.Column("Output", etensor.FLOAT32, go.Slice_int([4, 5]), go.Slice_string(["Y", "X"]))]
+            [
+                etable.Column("Name", etensor.STRING, go.nil, go.nil),
+                etable.Column(
+                    "Input",
+                    etensor.FLOAT32,
+                    go.Slice_int([4, 5]),
+                    go.Slice_string(["Y", "X"]),
+                ),
+                etable.Column(
+                    "Output",
+                    etensor.FLOAT32,
+                    go.Slice_int([4, 5]),
+                    go.Slice_string(["Y", "X"]),
+                ),
+            ]
         )
         dt.SetFromSchema(sch, 3)
         ss.Pats.SetMetaData("name", "Pats")
@@ -81,8 +109,8 @@ class Sim(pygiv.ClassViewObj):
         print(npf)
         ctf = pyet.numpy_to_etensor(npf)
         print(ctf)
-        
-        etu32 = etensor.NewUint32(go.Slice_int([3,4,5]), go.nil, go.nil)
+
+        etu32 = etensor.NewUint32(go.Slice_int([3, 4, 5]), go.nil, go.nil)
         sz = etf.Len()
         for i in range(sz):
             etu32.Values[i] = int(etf.Values[i])
@@ -93,7 +121,7 @@ class Sim(pygiv.ClassViewObj):
         print(ctu32)
         pyet.copy_etensor_to_numpy(npu32, etu32)
         pyet.copy_numpy_to_etensor(etu32, npu32)
-        
+
         ets = etensor.String(dt.Cols[0])
         nps = pyet.etensor_to_numpy(ets)
         print(nps)
@@ -101,11 +129,11 @@ class Sim(pygiv.ClassViewObj):
         print(cts)
         pyet.copy_etensor_to_numpy(nps, ets)
         pyet.copy_numpy_to_etensor(ets, nps)
-        
-        etb = etensor.NewBits(go.Slice_int([3,4,5]), go.nil, go.nil)
+
+        etb = etensor.NewBits(go.Slice_int([3, 4, 5]), go.nil, go.nil)
         sz = etb.Len()
         for i in range(sz):
-            etb.Set1D(i, erand.BoolProb(.2, -1))
+            etb.Set1D(i, erand.BoolProb(0.2, -1))
         print(etb)
         npb = pyet.etensor_to_numpy(etb)
         print(npb)
@@ -113,7 +141,7 @@ class Sim(pygiv.ClassViewObj):
         print(ctb)
         pyet.copy_etensor_to_numpy(npb, etb)
         pyet.copy_numpy_to_etensor(etb, npb)
-        
+
     def PeTable(ss):
         """
         test conversions to eTable
@@ -152,27 +180,29 @@ class Sim(pygiv.ClassViewObj):
         df.to_csv("pandas.csv")
         pcd = pyet.pandas_to_etable(df)
         print(pcd)
-        pcd.MergeCols('Input_0', 20) # merge back into tensor
-        pcd.MergeCols('Output_0', 20) # merge back into tensor
-        pcd.ReshapeCol('Input_0', (pcd.Rows, 4, 5))
-        pcd.ReshapeCol('Output_0', (pcd.Rows, 4, 5))
+        pcd.MergeCols("Input_0", 20)  # merge back into tensor
+        pcd.MergeCols("Output_0", 20)  # merge back into tensor
+        pcd.ReshapeCol("Input_0", (pcd.Rows, 4, 5))
+        pcd.ReshapeCol("Output_0", (pcd.Rows, 4, 5))
         print(pcd)
-        
+
     def Test(ss):
         ss.Numpy()
         ss.PeTable()
         ss.Torch()
         ss.Pandas()
-        
-    def ConfigGui(ss):
+
+    def ConfigGUI(ss):
         """
-        ConfigGui configures the GoGi gui interface for this simulation,
+        ConfigGUI configures the GoGi gui interface for this simulation,
         """
         width = 1600
         height = 1200
 
         gi.SetAppName("pyet")
-        gi.SetAppAbout('testing of converting etable data between Go and Python. See <a href="https://goki.dev/etable/v2/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>')
+        gi.SetAppAbout(
+            'testing of converting etable data between Go and Python. See <a href="https://goki.dev/etable/v2/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>'
+        )
 
         win = gi.NewMainWindow("pyet", "PyEt Testing", width, height)
         ss.Win = win
@@ -202,10 +232,14 @@ class Sim(pygiv.ClassViewObj):
         tabv.SetTable(ss.Pats, go.nil)
         ss.PatsTable = tabv
 
-        split.SetSplitsList(go.Slice_float32([.2, .8]))
+        split.SetSplitsList(go.Slice_float32([0.2, 0.8]))
         recv = win.This()
 
-        tbar.AddAction(gi.ActOpts(Label="Test", Icon="update", Tooltip="run the test."), recv, TestCB)
+        tbar.AddAction(
+            gi.ActOpts(Label="Test", Icon="update", Tooltip="run the test."),
+            recv,
+            TestCB,
+        )
 
         # main menu
         appnm = gi.AppName()
@@ -222,14 +256,15 @@ class Sim(pygiv.ClassViewObj):
         vp.UpdateEndNoSig(updt)
         win.GoStartEventLoop()
 
+
 # TheSim is the overall state for this simulation
 TheSim = Sim()
- 
+
+
 def main(argv):
     TheSim.Config()
     TheSim.Test()
-    TheSim.ConfigGui()
-    
-main(sys.argv[1:])
+    TheSim.ConfigGUI()
 
-        
+
+main(sys.argv[1:])

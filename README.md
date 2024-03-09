@@ -13,7 +13,7 @@ See [examples/dataproc](examples/dataproc) for a full demo of how to use this sy
 
 See [Wiki](https://github.com/goki/etable/v2wiki) for how-to documentation, etc. and [Cheat Sheet](#cheat_sheet) below for quick reference.
 
-As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [Goki Naming Convention](https://github.com/goki/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
+As a general convention, it is safest, clearest, and quite fast to access columns by name instead of index (there is a map that caches the column indexes), so the base access method names generally take a column name argument, and those that take a column index have an `Idx` suffix.  In addition, we adopt the [Goki Naming Convention](https://cogentcore.org/core/ki/wiki/Naming) of using the `Try` suffix for versions that return an error message.  It is a bit painful for the writer of these methods but very convenient for the users..
 
 The following packages are included:
 
@@ -23,9 +23,9 @@ The following packages are included:
 
 * [etable](etable) has the `etable.Table` DataTable / DataFrame object, which is useful for many different data analysis and database functions, and also for holding patterns to present to a neural network, and logs of output from the models, etc.  A `etable.Table` is just a slice of `etensor.Tensor` columns, that are all aligned along the outer-most *row* dimension.  Index-based indirection, which is essential for efficient Sort, Filter etc, is provided by the `etable.IdxView` type, which is an indexed view into a Table.  All data processing operations are defined on the IdxView.
 
-* [eplot](eplot) provides an interactive 2D plotting GUI in [GoGi](https://github.com/goki/gi) for Table data, using the [gonum plot](https://github.com/gonum/plot) plotting package.  You can select which columns to plot and specify various basic plot parameters.
+* [eplot](eplot) provides an interactive 2D plotting GUI in [GoGi](https://cogentcore.org/core/gi) for Table data, using the [gonum plot](https://github.com/gonum/plot) plotting package.  You can select which columns to plot and specify various basic plot parameters.
 
-* [etview](etview) provides an interactive tabular, spreadsheet-style GUI using [GoGi](https://github.com/goki/gi) for viewing and editing `etable.Table` and `etable.Tensor` objects.  The `etview.TensorGrid` also provides a colored grid display higher-dimensional tensor data.
+* [etview](etview) provides an interactive tabular, spreadsheet-style GUI using [GoGi](https://cogentcore.org/core/gi) for viewing and editing `etable.Table` and `etable.Tensor` objects.  The `etview.TensorGrid` also provides a colored grid display higher-dimensional tensor data.
 
 * [agg](agg) provides standard aggregation functions (`Sum`, `Mean`, `Var`, `Std` etc) operating over `etable.IdxView` views of Table data.  It also defines standard `AggFunc` functions such as `SumFunc` which can be used for `Agg` functions on either a Tensor or IdxView.
 
@@ -157,5 +157,5 @@ mean := desc.CellFloat("ColNm", desc.RowsByString("Agg", "Mean", etable.Equals, 
 
 # Developer info
 
-The visualization tools use the [GoGi](https://github.com/goki/gi) GUI and the struct fields use the `desc` tag for documentation.  Use the modified `goimports` tool to auto-update standard comments based on these tags: https://cogentcore.org/core/docs/general/structfieldcomments/
+The visualization tools use the [GoGi](https://cogentcore.org/core/gi) GUI and the struct fields use the `desc` tag for documentation.  Use the modified `goimports` tool to auto-update standard comments based on these tags: https://cogentcore.org/core/docs/general/structfieldcomments/
 
