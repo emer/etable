@@ -132,5 +132,5 @@ func main() {
 
 	tv.SelectTabIndex(0)
 
-	b.NewWindow().Run().Wait()
+	b.RunMainWindow()
 }

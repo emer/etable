@@ -18,7 +18,7 @@ func main() {
 
 	PlotColorSpread(tv)
 
-	b.NewWindow().Run().Wait()
+	b.RunMainWindow()
 }
 
 func PlotColorSpread(tv *gi.Tabs) {

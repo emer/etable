@@ -29,5 +29,5 @@ func main() {
 
 	b.AddAppBar(pl.ConfigToolbar)
 
-	b.NewWindow().Run().Wait()
+	b.RunMainWindow()
 }

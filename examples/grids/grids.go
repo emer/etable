@@ -32,5 +32,5 @@ func main() {
 	etv := etview.NewTableView(nt).SetTable(pats)
 	b.AddAppBar(etv.ConfigToolbar)
 
-	b.NewWindow().Run().Wait()
+	b.RunMainWindow()
 }
