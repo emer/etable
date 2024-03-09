@@ -35,8 +35,8 @@ func (t *SimMatGrid) SetRowMaxSz(v mat32.Vec2) *SimMatGrid { t.rowMaxSz = v; ret
 // SetRowMinBlank sets the [SimMatGrid.rowMinBlank]
 func (t *SimMatGrid) SetRowMinBlank(v int) *SimMatGrid { t.rowMinBlank = v; return t }
 
-// SetRowNgps sets the [SimMatGrid.rowNGps]
-func (t *SimMatGrid) SetRowNgps(v int) *SimMatGrid { t.rowNGps = v; return t }
+// SetRowNGps sets the [SimMatGrid.rowNGps]
+func (t *SimMatGrid) SetRowNGps(v int) *SimMatGrid { t.rowNGps = v; return t }
 
 // SetColMaxSz sets the [SimMatGrid.colMaxSz]
 func (t *SimMatGrid) SetColMaxSz(v mat32.Vec2) *SimMatGrid { t.colMaxSz = v; return t }
@@ -44,8 +44,8 @@ func (t *SimMatGrid) SetColMaxSz(v mat32.Vec2) *SimMatGrid { t.colMaxSz = v; ret
 // SetColMinBlank sets the [SimMatGrid.colMinBlank]
 func (t *SimMatGrid) SetColMinBlank(v int) *SimMatGrid { t.colMinBlank = v; return t }
 
-// SetColNgps sets the [SimMatGrid.colNGps]
-func (t *SimMatGrid) SetColNgps(v int) *SimMatGrid { t.colNGps = v; return t }
+// SetColNGps sets the [SimMatGrid.colNGps]
+func (t *SimMatGrid) SetColNGps(v int) *SimMatGrid { t.colNGps = v; return t }
 
 // SetTooltip sets the [SimMatGrid.Tooltip]
 func (t *SimMatGrid) SetTooltip(v string) *SimMatGrid { t.Tooltip = v; return t }
@@ -86,9 +86,9 @@ func (t *TableView) SetColTsrBlank(v map[int]*etensor.Float64) *TableView {
 	return t
 }
 
-// SetNcols sets the [TableView.NCols]:
+// SetNCols sets the [TableView.NCols]:
 // number of columns in table (as of last update)
-func (t *TableView) SetNcols(v int) *TableView { t.NCols = v; return t }
+func (t *TableView) SetNCols(v int) *TableView { t.NCols = v; return t }
 
 // SetSortIdx sets the [TableView.SortIdx]:
 // current sort index
@@ -166,26 +166,6 @@ func (t *TensorGrid) SetColorMap(v *colormap.Map) *TensorGrid { t.ColorMap = v; 
 
 // SetTooltip sets the [TensorGrid.Tooltip]
 func (t *TensorGrid) SetTooltip(v string) *TensorGrid { t.Tooltip = v; return t }
-
-// TensorViewType is the [gti.Type] for [TensorView]
-var TensorViewType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorView", IDName: "tensor-view", Doc: "etview.TensorView provides a GUI interface for etable.Tensor's\nusing a tabular rows-and-columns interface using textfields for editing.\nThis provides an editable complement to the TensorGrid graphical display.", Embeds: []gti.Field{{Name: "WidgetBase"}}, Instance: &TensorView{}})
-
-// NewTensorView adds a new [TensorView] with the given name to the given parent:
-// etview.TensorView provides a GUI interface for etable.Tensor's
-// using a tabular rows-and-columns interface using textfields for editing.
-// This provides an editable complement to the TensorGrid graphical display.
-func NewTensorView(par ki.Ki, name ...string) *TensorView {
-	return par.NewChild(TensorViewType, name...).(*TensorView)
-}
-
-// KiType returns the [*gti.Type] of [TensorView]
-func (t *TensorView) KiType() *gti.Type { return TensorViewType }
-
-// New returns a new [*TensorView] value
-func (t *TensorView) New() ki.Ki { return &TensorView{} }
-
-// SetTooltip sets the [TensorView.Tooltip]
-func (t *TensorView) SetTooltip(v string) *TensorView { t.Tooltip = v; return t }
 
 var _ = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorGridValue", IDName: "tensor-grid-value", Doc: "TensorGridValue manages a TensorGrid view of an etensor.Tensor", Embeds: []gti.Field{{Name: "ValueBase"}}})
 

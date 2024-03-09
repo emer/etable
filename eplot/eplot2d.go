@@ -236,14 +236,11 @@ func (pl *Plot2D) GoUpdatePlot() {
 	if !pl.IsVisible() || pl.Table == nil || pl.Table.Table == nil || pl.InPlot {
 		return
 	}
-	updt := pl.Scene.UpdateStartAsync()
-	if !updt {
-		pl.Scene.UpdateEndAsyncRender(updt)
-		return
-	}
+	pl.Scene.AsyncLock()
 	pl.Table.Sequential()
 	pl.GenPlot()
-	pl.Scene.UpdateEndAsyncRender(updt)
+	pl.Scene.AsyncUnlock()
+	pl.Scene.NeedsRender()
 }
 
 // UpdatePlot updates the display based on current IdxView into table.
@@ -276,7 +273,7 @@ func (pl *Plot2D) GenPlot() {
 	pl.InPlot = true
 	sv := pl.SVGPlot()
 	if pl.Table == nil || pl.Table.Table == nil || pl.Table.Table.Rows == 0 || pl.Table.Len() == 0 {
-		sv.DeleteChildren(ki.DestroyKids)
+		sv.DeleteChildren()
 		pl.InPlot = false
 		return
 	}
@@ -371,7 +368,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 	return
 }
 
-func (pl *Plot2D) ConfigWidget() {
+func (pl *Plot2D) Config() {
 	if pl.Table != nil {
 		pl.ConfigPlot()
 	}
@@ -394,11 +391,10 @@ func (pl *Plot2D) ConfigPlot() {
 		})
 
 	}
-	updt := pl.UpdateStart()
-	defer pl.UpdateEndLayout(updt)
 
 	pl.ColsConfig()
 	pl.PlotConfig()
+	pl.NeedsLayout()
 }
 
 // DeleteCols deletes any existing cols, to ensure an update to new table
@@ -406,7 +402,7 @@ func (pl *Plot2D) DeleteCols() {
 	pl.Cols = nil
 	if pl.HasChildren() {
 		vl := pl.ColsLay()
-		vl.DeleteChildren(ki.DestroyKids)
+		vl.DeleteChildren()
 	}
 }
 
@@ -474,15 +470,13 @@ func (pl *Plot2D) ColsUpdate() {
 		sw := cl.Child(0).(*gi.Switch)
 		if sw.StateIs(states.Checked) != cp.On {
 			sw.SetChecked(cp.On)
-			sw.SetNeedsRender(true)
+			sw.NeedsRender()
 		}
 	}
 }
 
 // SetAllCols turns all Cols on or off (except X axis)
 func (pl *Plot2D) SetAllCols(on bool) {
-	updt := pl.UpdateStart()
-	defer pl.UpdateEndRender(updt)
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i < PlotColsHeaderN {
@@ -497,16 +491,13 @@ func (pl *Plot2D) SetAllCols(on bool) {
 		cl := cli.(*gi.Layout)
 		sw := cl.Child(0).(*gi.Switch)
 		sw.SetChecked(cp.On)
-		sw.SetNeedsRender(true)
 	}
 	pl.UpdatePlot()
+	pl.NeedsRender()
 }
 
 // SetColsByName turns cols On or Off if their name contains given string
 func (pl *Plot2D) SetColsByName(nameContains string, on bool) { //gti:add
-	updt := pl.UpdateStart()
-	defer pl.UpdateEndRender(updt)
-
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i < PlotColsHeaderN {
@@ -524,9 +515,9 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) { //gti:add
 		cl := cli.(*gi.Layout)
 		sw := cl.Child(0).(*gi.Switch)
 		sw.SetChecked(cp.On)
-		sw.SetNeedsRender(true)
 	}
 	pl.UpdatePlot()
+	pl.NeedsRender()
 }
 
 // ColsConfig configures the column gui buttons
@@ -537,7 +528,7 @@ func (pl *Plot2D) ColsConfig() {
 		pl.ColsUpdate()
 		return
 	}
-	vl.DeleteChildren(true)
+	vl.DeleteChildren()
 	if len(pl.Cols) == 0 {
 		return
 	}

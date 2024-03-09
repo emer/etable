@@ -240,7 +240,7 @@ func (tg *TensorGrid) EditSettings() { //gti:add
 	d := gi.NewBody().AddTitle("Tensor Grid Display Options")
 	giv.NewStructView(d).SetStruct(&tg.Disp).
 		OnChange(func(e events.Event) {
-			tg.SetNeedsRender(true)
+			tg.NeedsRender()
 		})
 	d.NewFullDialog(tg).Run()
 }

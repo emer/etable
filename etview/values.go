@@ -60,13 +60,13 @@ func (vv *TensorGridValue) UpdateWidget() {
 	tg.SetTensor(tsr)
 }
 
-func (vv *TensorGridValue) ConfigWidget(w gi.Widget) {
+func (vv *TensorGridValue) Config(w gi.Widget) {
 	if vv.Widget == w {
 		vv.UpdateWidget()
 		return
 	}
 	vv.Widget = w
-	// vv.StdConfigWidget(w)
+	// vv.StdConfig(w)
 	tg := vv.Widget.(*TensorGrid)
 	tsr := vv.Value.Interface().(etensor.Tensor)
 	tg.SetTensor(tsr)
@@ -102,13 +102,13 @@ func (vv *TensorValue) UpdateWidget() {
 	}
 }
 
-func (vv *TensorValue) ConfigWidget(w gi.Widget) {
+func (vv *TensorValue) Config(w gi.Widget) {
 	if vv.Widget == w {
 		vv.UpdateWidget()
 		return
 	}
 	vv.Widget = w
-	vv.StdConfigWidget(w)
+	vv.StdConfig(w)
 	bt := vv.Widget.(*gi.Button)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
@@ -163,13 +163,13 @@ func (vv *TableValue) UpdateWidget() {
 	}
 }
 
-func (vv *TableValue) ConfigWidget(w gi.Widget) {
+func (vv *TableValue) Config(w gi.Widget) {
 	if vv.Widget == w {
 		vv.UpdateWidget()
 		return
 	}
 	vv.Widget = w
-	vv.StdConfigWidget(w)
+	vv.StdConfig(w)
 	bt := vv.Widget.(*gi.Button)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
@@ -226,14 +226,14 @@ func (vv *SimMatValue) UpdateWidget() {
 	}
 }
 
-func (vv *SimMatValue) ConfigWidget(w gi.Widget) {
+func (vv *SimMatValue) Config(w gi.Widget) {
 	if vv.Widget == w {
 		vv.UpdateWidget()
 		return
 	}
 	vv.Widget = w
 	bt := vv.Widget.(*gi.Button)
-	vv.StdConfigWidget(w)
+	vv.StdConfig(w)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()
 	giv.ConfigDialogWidget(vv, bt, false)

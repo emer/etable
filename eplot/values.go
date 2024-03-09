@@ -54,13 +54,13 @@ func (vv *Plot2DValue) UpdateWidget() {
 	}
 }
 
-func (vv *Plot2DValue) ConfigWidget(w gi.Widget) {
+func (vv *Plot2DValue) Config(w gi.Widget) {
 	if vv.Widget == w {
 		vv.UpdateWidget()
 		return
 	}
 	vv.Widget = w
-	vv.StdConfigWidget(w)
+	vv.StdConfig(w)
 	bt := vv.Widget.(*gi.Button)
 	bt.SetType(gi.ButtonTonal)
 	bt.Config()

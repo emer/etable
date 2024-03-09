@@ -134,8 +134,6 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	if et == nil {
 		return nil
 	}
-	updt := tv.UpdateStart()
-	defer tv.UpdateEndLayout(updt)
 
 	tv.SetSliceBase()
 	tv.Table = etable.NewIdxView(et)
@@ -147,11 +145,12 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 // GoUpdateView updates the display for asynchronous updating from
 // other goroutines.  Also updates indexview (calling Sequential).
 func (tv *TableView) GoUpdateView() {
-	updt := tv.UpdateStartAsync()
+	tv.AsyncLock()
 	tv.Table.Sequential()
 	tv.ScrollToIdxNoUpdt(tv.SliceSize - 1)
 	tv.UpdateWidgets()
-	tv.UpdateEndAsyncLayout(updt)
+	tv.NeedsLayout()
+	tv.AsyncUnlock()
 }
 
 // SetTableView sets the source IdxView of a table (using a copy so original is not modified)
@@ -160,8 +159,6 @@ func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 	if ix == nil {
 		return tv
 	}
-	updt := tv.UpdateStart()
-	defer tv.UpdateEndLayout(updt)
 
 	tv.Table = ix.Clone() // always copy
 
@@ -187,7 +184,7 @@ func (tv *TableView) UpdtSliceSize() int {
 }
 
 // Config configures the view
-func (tv *TableView) ConfigWidget() {
+func (tv *TableView) Config() {
 	tv.ConfigTableView()
 }
 
@@ -196,12 +193,11 @@ func (tv *TableView) ConfigTableView() {
 		tv.This().(giv.SliceViewer).UpdateWidgets()
 		return
 	}
-	updt := tv.UpdateStart()
 	tv.ConfigFrame()
 	tv.This().(giv.SliceViewer).ConfigRows()
 	tv.This().(giv.SliceViewer).UpdateWidgets()
 	tv.ApplyStyleTree()
-	tv.UpdateEndLayout(updt)
+	tv.NeedsLayout()
 }
 
 func (tv *TableView) ConfigFrame() {
@@ -282,7 +278,7 @@ func (tv *TableView) ConfigRows() {
 	tv.ViewMuLock()
 	defer tv.ViewMuUnlock()
 
-	sg.DeleteChildren(ki.DestroyKids)
+	sg.DeleteChildren()
 	tv.Values = nil
 
 	if tv.Table == nil {
@@ -379,7 +375,7 @@ func (tv *TableView) ConfigRows() {
 			cidx := ridx + idxOff + fli
 			w := ki.NewOfType(vtyp).(gi.Widget)
 			sg.SetChild(w, cidx, valnm)
-			vv.ConfigWidget(w)
+			vv.Config(w)
 			w.SetProp(giv.SliceViewRowProp, i)
 			w.SetProp(giv.SliceViewColProp, fli)
 			if col.NumDims() > 1 {
@@ -414,10 +410,6 @@ func (tv *TableView) UpdateWidgets() {
 	if sg == nil || tv.VisRows == 0 || sg.VisRows == 0 || !sg.HasChildren() {
 		return
 	}
-	// sc := tv.Sc
-
-	updt := sg.UpdateStart()
-	defer sg.UpdateEndRender(updt)
 
 	tv.ViewMuLock()
 	defer tv.ViewMuUnlock()
@@ -450,7 +442,7 @@ func (tv *TableView) UpdateWidgets() {
 		var idxlab *gi.Label
 		if tv.Is(giv.SliceViewShowIndex) {
 			idxlab = sg.Kids[ridx].(*gi.Label)
-			idxlab.SetTextUpdate(strconv.Itoa(si))
+			idxlab.SetText(strconv.Itoa(si)).Config()
 			idxlab.SetState(invis, states.Invisible)
 		}
 
@@ -514,6 +506,7 @@ func (tv *TableView) UpdateWidgets() {
 			}
 		}
 	}
+	sg.NeedsRender()
 }
 
 // ColTensorBlank returns tensor blanks for given tensor col
@@ -561,8 +554,6 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 // means the end
 func (tv *TableView) SliceNewAt(idx int) {
 	tv.ViewMuLock()
-	updt := tv.UpdateStart()
-	defer tv.UpdateEndLayout(updt)
 
 	tv.SliceNewAtSel(idx)
 
@@ -576,6 +567,7 @@ func (tv *TableView) SliceNewAt(idx int) {
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateWidgets()
 	tv.IdxGrabFocus(idx)
+	tv.NeedsLayout()
 }
 
 // SliceDeleteAt deletes element at given index from slice -- doUpdt means
@@ -585,8 +577,6 @@ func (tv *TableView) SliceDeleteAt(idx int) {
 		return
 	}
 	tv.ViewMuLock()
-	updt := tv.UpdateStart()
-	defer tv.UpdateEndLayout(updt)
 
 	tv.SliceDeleteAtSel(idx)
 
@@ -598,14 +588,12 @@ func (tv *TableView) SliceDeleteAt(idx int) {
 	tv.ViewMuUnlock()
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateWidgets()
+	tv.NeedsLayout()
 }
 
 // SortSliceAction sorts the slice for given field index -- toggles ascending
 // vs. descending if already sorting on this dimension
 func (tv *TableView) SortSliceAction(fldIdx int) {
-	updt := tv.UpdateStart()
-	defer tv.UpdateEndLayout(updt)
-
 	sgh := tv.SliceHeader()
 	_, idxOff := tv.RowWidgetNs()
 
@@ -643,9 +631,6 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 // TensorDispAction allows user to select tensor display options for column
 // pass -1 for global params for the entire table
 func (tv *TableView) TensorDispAction(fldIdx int) {
-	updt := tv.UpdateStart()
-	defer tv.UpdateEndRender(updt)
-
 	ctd := &tv.TsrDisp
 	if fldIdx >= 0 {
 		ctd = tv.SetColTensorDisp(fldIdx)
@@ -654,6 +639,7 @@ func (tv *TableView) TensorDispAction(fldIdx int) {
 	giv.NewStructView(d).SetStruct(ctd)
 	d.NewFullDialog(tv).Run()
 	// tv.UpdateSliceGrid()
+	tv.NeedsRender()
 }
 
 func (tv *TableView) HasStyleFunc() bool {

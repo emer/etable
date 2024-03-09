@@ -49,7 +49,7 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 		}
 		svge.SVG.Translate.Set(5, 5)
 		svge.SVG.Scale = float32(sz.X-30) / float32(sz.X)
-		svge.SetNeedsRender(true)
+		svge.NeedsRender()
 	}
 }
 
@@ -87,10 +87,8 @@ func SaveSVGView(fname string, plt *plot.Plot, svge *gi.SVG, scale float64) erro
 // StringViewSVG shows the given svg string in given Cogent Core svg editor widget
 // Scale to fit your window -- e.g., 2-3 depending on sizes
 func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
-	updt := svge.UpdateStart()
-	defer svge.UpdateEndRender(updt)
-
 	var buf bytes.Buffer
 	buf.Write([]byte(svgstr))
 	svge.SVG.ReadXML(&buf)
+	svge.NeedsRender()
 }
