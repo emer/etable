@@ -3,129 +3,46 @@
 package clust
 
 import (
-	"errors"
-	"log"
-	"strconv"
-	"strings"
-
 	"cogentcore.org/core/enums"
 )
 
 var _StdDistsValues = []StdDists{0, 1, 2, 3}
 
-// StdDistsN is the highest valid value
-// for type StdDists, plus one.
+// StdDistsN is the highest valid value for type StdDists, plus one.
 const StdDistsN StdDists = 4
 
-// An "invalid array index" compiler error signifies that the constant values have changed.
-// Re-run the enumgen command to generate them again.
-func _StdDistsNoOp() {
-	var x [1]struct{}
-	_ = x[Min-(0)]
-	_ = x[Max-(1)]
-	_ = x[Avg-(2)]
-	_ = x[Contrast-(3)]
-}
+var _StdDistsValueMap = map[string]StdDists{`Min`: 0, `Max`: 1, `Avg`: 2, `Contrast`: 3}
 
-var _StdDistsNameToValueMap = map[string]StdDists{
-	`Min`:      0,
-	`min`:      0,
-	`Max`:      1,
-	`max`:      1,
-	`Avg`:      2,
-	`avg`:      2,
-	`Contrast`: 3,
-	`contrast`: 3,
-}
+var _StdDistsDescMap = map[StdDists]string{0: `Min is the minimum-distance or single-linkage weighting function`, 1: `Max is the maximum-distance or complete-linkage weighting function`, 2: `Avg is the average-distance or average-linkage weighting function`, 3: `Contrast computes maxd + (average within distance - average between distance)`}
 
-var _StdDistsDescMap = map[StdDists]string{
-	0: `Min is the minimum-distance or single-linkage weighting function`,
-	1: `Max is the maximum-distance or complete-linkage weighting function`,
-	2: `Avg is the average-distance or average-linkage weighting function`,
-	3: `Contrast computes maxd + (average within distance - average between distance)`,
-}
+var _StdDistsMap = map[StdDists]string{0: `Min`, 1: `Max`, 2: `Avg`, 3: `Contrast`}
 
-var _StdDistsMap = map[StdDists]string{
-	0: `Min`,
-	1: `Max`,
-	2: `Avg`,
-	3: `Contrast`,
-}
+// String returns the string representation of this StdDists value.
+func (i StdDists) String() string { return enums.String(i, _StdDistsMap) }
 
-// String returns the string representation
-// of this StdDists value.
-func (i StdDists) String() string {
-	if str, ok := _StdDistsMap[i]; ok {
-		return str
-	}
-	return strconv.FormatInt(int64(i), 10)
-}
-
-// SetString sets the StdDists value from its
-// string representation, and returns an
-// error if the string is invalid.
+// SetString sets the StdDists value from its string representation,
+// and returns an error if the string is invalid.
 func (i *StdDists) SetString(s string) error {
-	if val, ok := _StdDistsNameToValueMap[s]; ok {
-		*i = val
-		return nil
-	}
-	if val, ok := _StdDistsNameToValueMap[strings.ToLower(s)]; ok {
-		*i = val
-		return nil
-	}
-	return errors.New(s + " is not a valid value for type StdDists")
+	return enums.SetString(i, s, _StdDistsValueMap, "StdDists")
 }
 
 // Int64 returns the StdDists value as an int64.
-func (i StdDists) Int64() int64 {
-	return int64(i)
-}
+func (i StdDists) Int64() int64 { return int64(i) }
 
 // SetInt64 sets the StdDists value from an int64.
-func (i *StdDists) SetInt64(in int64) {
-	*i = StdDists(in)
-}
+func (i *StdDists) SetInt64(in int64) { *i = StdDists(in) }
 
 // Desc returns the description of the StdDists value.
-func (i StdDists) Desc() string {
-	if str, ok := _StdDistsDescMap[i]; ok {
-		return str
-	}
-	return i.String()
-}
+func (i StdDists) Desc() string { return enums.Desc(i, _StdDistsDescMap) }
 
-// StdDistsValues returns all possible values
-// for the type StdDists.
-func StdDistsValues() []StdDists {
-	return _StdDistsValues
-}
+// StdDistsValues returns all possible values for the type StdDists.
+func StdDistsValues() []StdDists { return _StdDistsValues }
 
-// Values returns all possible values
-// for the type StdDists.
-func (i StdDists) Values() []enums.Enum {
-	res := make([]enums.Enum, len(_StdDistsValues))
-	for i, d := range _StdDistsValues {
-		res[i] = d
-	}
-	return res
-}
-
-// IsValid returns whether the value is a
-// valid option for type StdDists.
-func (i StdDists) IsValid() bool {
-	_, ok := _StdDistsMap[i]
-	return ok
-}
+// Values returns all possible values for the type StdDists.
+func (i StdDists) Values() []enums.Enum { return enums.Values(_StdDistsValues) }
 
 // MarshalText implements the [encoding.TextMarshaler] interface.
-func (i StdDists) MarshalText() ([]byte, error) {
-	return []byte(i.String()), nil
-}
+func (i StdDists) MarshalText() ([]byte, error) { return []byte(i.String()), nil }
 
 // UnmarshalText implements the [encoding.TextUnmarshaler] interface.
-func (i *StdDists) UnmarshalText(text []byte) error {
-	if err := i.SetString(string(text)); err != nil {
-		log.Println("StdDists.UnmarshalText:", err)
-	}
-	return nil
-}
+func (i *StdDists) UnmarshalText(text []byte) error { return enums.UnmarshalText(i, text, "StdDists") }

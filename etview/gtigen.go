@@ -6,7 +6,6 @@ import (
 	"sync"
 
 	"cogentcore.org/core/colors/colormap"
-	"cogentcore.org/core/giv"
 	"cogentcore.org/core/gti"
 	"cogentcore.org/core/ki"
 	"cogentcore.org/core/mat32"
@@ -128,14 +127,11 @@ func (t *TableView) SetViewMu(v *sync.Mutex) *TableView { t.ViewMu = v; return t
 // SetSelVal sets the [TableView.SelVal]
 func (t *TableView) SetSelVal(v any) *TableView { t.SelVal = v; return t }
 
-// SetSelIdx sets the [TableView.SelIdx]
-func (t *TableView) SetSelIdx(v int) *TableView { t.SelIdx = v; return t }
+// SetSelectedIndex sets the [TableView.SelectedIndex]
+func (t *TableView) SetSelectedIndex(v int) *TableView { t.SelectedIndex = v; return t }
 
-// SetInitSelIdx sets the [TableView.InitSelIdx]
-func (t *TableView) SetInitSelIdx(v int) *TableView { t.InitSelIdx = v; return t }
-
-// SetTmpSave sets the [TableView.TmpSave]
-func (t *TableView) SetTmpSave(v giv.Value) *TableView { t.TmpSave = v; return t }
+// SetInitSelectedIndex sets the [TableView.InitSelectedIndex]
+func (t *TableView) SetInitSelectedIndex(v int) *TableView { t.InitSelectedIndex = v; return t }
 
 var _ = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TensorLayout", IDName: "tensor-layout", Doc: "TensorLayout are layout options for displaying tensors", Directives: []gti.Directive{{Tool: "gti", Directive: "add"}}, Fields: []gti.Field{{Name: "OddRow", Doc: "even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension"}, {Name: "TopZero", Doc: "if true, then the Y=0 coordinate is displayed from the top-down; otherwise the Y=0 coordinate is displayed from the bottom up, which is typical for emergent network patterns."}, {Name: "Image", Doc: "display the data as a bitmap image.  if a 2D tensor, then it will be a greyscale image.  if a 3D tensor with size of either the first or last dim = either 3 or 4, then it is a RGB(A) color image"}}})
 

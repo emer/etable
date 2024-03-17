@@ -164,10 +164,10 @@ func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 
 	tv.This().(giv.SliceViewer).UpdtSliceSize()
 	tv.SetFlag(false, giv.SliceViewConfigured)
-	tv.StartIdx = 0
+	tv.StartIndex = 0
 	tv.VisRows = tv.MinRows
 	if !tv.IsReadOnly() {
-		tv.SelIdx = -1
+		tv.SelectedIndex = -1
 	}
 	tv.ResetSelectedIdxs()
 	tv.SetFlag(false, giv.SliceViewSelectMode)
@@ -332,12 +332,11 @@ func (tv *TableView) ConfigRows() {
 				vv = giv.ToValue(&tv.BlankString, tags)
 				vv.SetSoloValue(reflect.ValueOf(&tv.BlankString))
 				if !tv.IsReadOnly() {
-					vvb := vv.AsValueBase()
-					vvb.OnChange(func(e events.Event) {
+					vv.OnChange(func(e events.Event) {
 						tv.SetChanged()
-						npv := laser.NonPtrValue(vvb.Value)
+						npv := laser.NonPtrValue(vv.Val())
 						sv := laser.ToString(npv.Interface())
-						si := tv.StartIdx + i
+						si := tv.StartIndex + i
 						if si < len(tv.Table.Idxs) {
 							tv.Table.Table.SetCellStringIdx(fli, tv.Table.Idxs[si], sv)
 						}
@@ -348,12 +347,11 @@ func (tv *TableView) ConfigRows() {
 					vv = giv.ToValue(&tv.BlankFloat, "")
 					vv.SetSoloValue(reflect.ValueOf(&tv.BlankFloat))
 					if !tv.IsReadOnly() {
-						vvb := vv.AsValueBase()
-						vvb.OnChange(func(e events.Event) {
+						vv.OnChange(func(e events.Event) {
 							tv.SetChanged()
-							npv := laser.NonPtrValue(vvb.Value)
+							npv := laser.NonPtrValue(vv.Val())
 							fv := grr.Log1(laser.ToFloat(npv.Interface()))
-							si := tv.StartIdx + i
+							si := tv.StartIndex + i
 							if si < len(tv.Table.Idxs) {
 								tv.Table.Table.SetCellFloatIdx(fli, tv.Table.Idxs[si], fv)
 							}
@@ -375,7 +373,7 @@ func (tv *TableView) ConfigRows() {
 			cidx := ridx + idxOff + fli
 			w := ki.NewOfType(vtyp).(gi.Widget)
 			sg.SetChild(w, cidx, valnm)
-			vv.Config(w)
+			giv.Config(vv, w)
 			w.SetProp(giv.SliceViewRowProp, i)
 			w.SetProp(giv.SliceViewColProp, fli)
 			if col.NumDims() > 1 {
@@ -419,10 +417,10 @@ func (tv *TableView) UpdateWidgets() {
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 
 	scrollTo := -1
-	if tv.InitSelIdx >= 0 {
-		tv.SelIdx = tv.InitSelIdx
-		tv.InitSelIdx = -1
-		scrollTo = tv.SelIdx
+	if tv.InitSelectedIndex >= 0 {
+		tv.SelectedIndex = tv.InitSelectedIndex
+		tv.InitSelectedIndex = -1
+		scrollTo = tv.SelectedIndex
 	}
 	if scrollTo >= 0 {
 		tv.ScrollToIdx(scrollTo)
@@ -432,7 +430,7 @@ func (tv *TableView) UpdateWidgets() {
 	for i := 0; i < tv.VisRows; i++ {
 		i := i
 		ridx := i * nWidgPerRow
-		si := tv.StartIdx + i // slice idx
+		si := tv.StartIndex + i // slice idx
 		ixi := -1
 		if si < len(tv.Table.Idxs) {
 			ixi = tv.Table.Idxs[si]
@@ -462,8 +460,7 @@ func (tv *TableView) UpdateWidgets() {
 			wb := w.AsWidget()
 			vvi := i*tv.NCols + fli
 			vv := tv.Values[vvi]
-			vvb := vv.AsValueBase()
-			vvb.ViewPath = vpath
+			vv.AsValueData().ViewPath = vpath
 
 			if stsr, isstr := col.(*etensor.String); isstr {
 				sval := &tv.BlankString
@@ -491,7 +488,7 @@ func (tv *TableView) UpdateWidgets() {
 				}
 			}
 			vv.SetReadOnly(tv.IsReadOnly())
-			vv.UpdateWidget()
+			vv.Update()
 
 			w.SetState(invis, states.Invisible)
 			if !invis {
@@ -559,9 +556,6 @@ func (tv *TableView) SliceNewAt(idx int) {
 
 	tv.Table.InsertRows(idx, 1)
 
-	if tv.TmpSave != nil {
-		tv.TmpSave.SaveTmp()
-	}
 	tv.SelectIdxAction(idx, events.SelectOne)
 	tv.ViewMuUnlock()
 	tv.SetChanged()
@@ -582,9 +576,6 @@ func (tv *TableView) SliceDeleteAt(idx int) {
 
 	tv.Table.DeleteRows(idx, 1)
 
-	if tv.TmpSave != nil {
-		tv.TmpSave.SaveTmp()
-	}
 	tv.ViewMuUnlock()
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateWidgets()
@@ -837,9 +828,6 @@ func (tv *TableView) PasteAssign(md mimedata.Mimes, idx int) {
 	}
 	updt := tv.UpdateStart()
 	tv.Table.Table.ReadCSVRow(recs[1], tv.Table.Idxs[idx])
-	if tv.TmpSave != nil {
-		tv.TmpSave.SaveTmp()
-	}
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	tv.UpdateEnd(updt)
@@ -861,9 +849,6 @@ func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
 		rec := recs[1+ri]
 		rw := tv.Table.Idxs[idx+ri]
 		tv.Table.Table.ReadCSVRow(rec, rw)
-	}
-	if tv.TmpSave != nil {
-		tv.TmpSave.SaveTmp()
 	}
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()

@@ -7,13 +7,13 @@ package eplot
 import (
 	"cogentcore.org/core/gi"
 	"cogentcore.org/core/giv"
-	"cogentcore.org/core/gti"
+	"cogentcore.org/core/icons"
 	"cogentcore.org/core/laser"
 	"cogentcore.org/core/styles"
 )
 
 func init() {
-	giv.ValueMapAdd(Plot2D{}, func() giv.Value {
+	giv.AddValue(Plot2D{}, func() giv.Value {
 		return &Plot2DValue{}
 	})
 }
@@ -23,56 +23,35 @@ func init() {
 
 // Plot2DValue presents a button that pulls up the Plot2D in a dialog
 type Plot2DValue struct {
-	giv.ValueBase
+	giv.ValueBase[*gi.Button]
 }
 
-func (vv *Plot2DValue) WidgetType() *gti.Type {
-	vv.WidgetTyp = gi.ButtonType
-	return vv.WidgetTyp
+func (v *Plot2DValue) Config() {
+	v.Widget.SetType(gi.ButtonTonal).SetIcon(icons.Edit)
+	giv.ConfigDialogWidget(v, true)
 }
 
-func (vv *Plot2DValue) UpdateWidget() {
-	if vv.Widget == nil {
-		return
-	}
-	ac := vv.Widget.(*gi.Button)
-	npv := laser.NonPtrValue(vv.Value)
-	if !vv.Value.IsValid() || vv.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
-		ac.SetText("nil")
+func (v *Plot2DValue) Update() {
+	npv := laser.NonPtrValue(v.Value)
+	if !v.Value.IsValid() || v.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
+		v.Widget.SetText("nil")
 	} else {
-		opv := laser.OnePtrUnderlyingValue(vv.Value)
+		opv := laser.OnePtrUnderlyingValue(v.Value)
 		plot := opv.Interface().(*Plot2D)
 		if plot != nil && plot.Table != nil && plot.Table.Table != nil {
 			if nm, has := plot.Table.Table.MetaData["name"]; has {
-				ac.SetText(nm)
+				v.Widget.SetText(nm)
 			} else {
-				ac.SetText("eplot.Plot2D")
+				v.Widget.SetText("eplot.Plot2D")
 			}
 		} else {
-			ac.SetText("eplot.Plot2D")
+			v.Widget.SetText("eplot.Plot2D")
 		}
 	}
 }
 
-func (vv *Plot2DValue) Config(w gi.Widget) {
-	if vv.Widget == w {
-		vv.UpdateWidget()
-		return
-	}
-	vv.Widget = w
-	vv.StdConfig(w)
-	bt := vv.Widget.(*gi.Button)
-	bt.SetType(gi.ButtonTonal)
-	bt.Config()
-	giv.ConfigDialogWidget(vv, bt, true)
-	vv.UpdateWidget()
-}
-
-func (vv *Plot2DValue) HasDialog() bool                      { return true }
-func (vv *Plot2DValue) OpenDialog(ctx gi.Widget, fun func()) { giv.OpenValueDialog(vv, ctx, fun) }
-
-func (vv *Plot2DValue) ConfigDialog(d *gi.Body) (bool, func()) {
-	opv := laser.OnePtrUnderlyingValue(vv.Value)
+func (v *Plot2DValue) ConfigDialog(d *gi.Body) (bool, func()) {
+	opv := laser.OnePtrUnderlyingValue(v.Value)
 	plot := opv.Interface().(*Plot2D)
 	if plot == nil || plot.Table == nil {
 		return false, nil

@@ -7,7 +7,7 @@ package etview
 import (
 	"cogentcore.org/core/gi"
 	"cogentcore.org/core/giv"
-	"cogentcore.org/core/gti"
+	"cogentcore.org/core/icons"
 	"cogentcore.org/core/laser"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
@@ -15,25 +15,25 @@ import (
 )
 
 func init() {
-	giv.ValueMapAdd(etensor.Float32{}, func() giv.Value {
+	giv.AddValue(etensor.Float32{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(etensor.Float64{}, func() giv.Value {
+	giv.AddValue(etensor.Float64{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(etensor.Int64{}, func() giv.Value {
+	giv.AddValue(etensor.Int64{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(etensor.Int32{}, func() giv.Value {
+	giv.AddValue(etensor.Int32{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(etensor.String{}, func() giv.Value {
+	giv.AddValue(etensor.String{}, func() giv.Value {
 		return &TensorValue{}
 	})
-	giv.ValueMapAdd(etable.Table{}, func() giv.Value {
+	giv.AddValue(etable.Table{}, func() giv.Value {
 		return &TableValue{}
 	})
-	giv.ValueMapAdd(simat.SimMat{}, func() giv.Value {
+	giv.AddValue(simat.SimMat{}, func() giv.Value {
 		return &SimMatValue{}
 	})
 }
@@ -43,84 +43,44 @@ func init() {
 
 // TensorGridValue manages a TensorGrid view of an etensor.Tensor
 type TensorGridValue struct {
-	giv.ValueBase
+	giv.ValueBase[*TensorGrid]
 }
 
-func (vv *TensorGridValue) WidgetType() *gti.Type {
-	vv.WidgetTyp = TensorGridType
-	return vv.WidgetTyp
+func (v *TensorGridValue) Config() {
+	tsr := v.Value.Interface().(etensor.Tensor)
+	v.Widget.SetTensor(tsr)
 }
 
-func (vv *TensorGridValue) UpdateWidget() {
-	if vv.Widget == nil {
-		return
-	}
-	tg := vv.Widget.(*TensorGrid)
-	tsr := vv.Value.Interface().(etensor.Tensor)
-	tg.SetTensor(tsr)
+func (v *TensorGridValue) Update() {
+	tsr := v.Value.Interface().(etensor.Tensor)
+	v.Widget.SetTensor(tsr)
 }
-
-func (vv *TensorGridValue) Config(w gi.Widget) {
-	if vv.Widget == w {
-		vv.UpdateWidget()
-		return
-	}
-	vv.Widget = w
-	// vv.StdConfig(w)
-	tg := vv.Widget.(*TensorGrid)
-	tsr := vv.Value.Interface().(etensor.Tensor)
-	tg.SetTensor(tsr)
-	vv.UpdateWidget()
-}
-
-func (vv *TensorGridValue) HasDialog() bool { return false }
 
 ////////////////////////////////////////////////////////////////////////////////////////
 //  TensorValue
 
 // TensorValue presents a button that pulls up the TensorView viewer for an etensor.Tensor
 type TensorValue struct {
-	giv.ValueBase
+	giv.ValueBase[*gi.Button]
 }
 
-func (vv *TensorValue) WidgetType() *gti.Type {
-	vv.WidgetTyp = gi.ButtonType
-	return vv.WidgetTyp
+func (v *TensorValue) Config() {
+	v.Widget.SetType(gi.ButtonTonal).SetIcon(icons.Edit)
+	giv.ConfigDialogWidget(v, true)
 }
 
-func (vv *TensorValue) UpdateWidget() {
-	if vv.Widget == nil {
-		return
-	}
-	bt := vv.Widget.(*gi.Button)
-	npv := laser.NonPtrValue(vv.Value)
-	if !vv.Value.IsValid() || vv.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
-		bt.SetText("nil")
+func (v *TensorValue) Update() {
+	npv := laser.NonPtrValue(v.Value)
+	if !v.Value.IsValid() || v.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
+		v.Widget.SetText("nil")
 	} else {
 		// opv := laser.OnePtrUnderlyingValue(vv.Value)
-		bt.SetText("etensor.Tensor")
+		v.Widget.SetText("etensor.Tensor")
 	}
 }
 
-func (vv *TensorValue) Config(w gi.Widget) {
-	if vv.Widget == w {
-		vv.UpdateWidget()
-		return
-	}
-	vv.Widget = w
-	vv.StdConfig(w)
-	bt := vv.Widget.(*gi.Button)
-	bt.SetType(gi.ButtonTonal)
-	bt.Config()
-	giv.ConfigDialogWidget(vv, bt, true)
-	vv.UpdateWidget()
-}
-
-func (vv *TensorValue) HasDialog() bool                      { return true }
-func (vv *TensorValue) OpenDialog(ctx gi.Widget, fun func()) { giv.OpenValueDialog(vv, ctx, fun) }
-
-func (vv *TensorValue) ConfigDialog(d *gi.Body) (bool, func()) {
-	opv := laser.OnePtrUnderlyingValue(vv.Value)
+func (v *TensorValue) ConfigDialog(d *gi.Body) (bool, func()) {
+	opv := laser.OnePtrUnderlyingValue(v.Value)
 	et := opv.Interface().(etensor.Tensor)
 	if et == nil {
 		return false, nil
@@ -134,54 +94,33 @@ func (vv *TensorValue) ConfigDialog(d *gi.Body) (bool, func()) {
 
 // TableValue presents a button that pulls up the TableView viewer for an etable.Table
 type TableValue struct {
-	giv.ValueBase
+	giv.ValueBase[*gi.Button]
 }
 
-func (vv *TableValue) WidgetType() *gti.Type {
-	vv.WidgetTyp = gi.ButtonType
-	return vv.WidgetTyp
+func (v *TableValue) Config() {
+	v.Widget.SetType(gi.ButtonTonal).SetIcon(icons.Edit)
+	giv.ConfigDialogWidget(v, true)
 }
 
-func (vv *TableValue) UpdateWidget() {
-	if vv.Widget == nil {
-		return
-	}
-	bt := vv.Widget.(*gi.Button)
-	npv := laser.NonPtrValue(vv.Value)
-	if !vv.Value.IsValid() || vv.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
-		bt.SetText("nil")
+func (v *TableValue) Update() {
+	npv := laser.NonPtrValue(v.Value)
+	if !v.Value.IsValid() || v.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
+		v.Widget.SetText("nil")
 	} else {
-		opv := laser.OnePtrUnderlyingValue(vv.Value)
+		opv := laser.OnePtrUnderlyingValue(v.Value)
 		et := opv.Interface().(*etable.Table)
 		if et != nil {
 			if nm, has := et.MetaData["name"]; has {
-				bt.SetText(nm)
+				v.Widget.SetText(nm)
 			} else {
-				bt.SetText("etable.Table")
+				v.Widget.SetText("etable.Table")
 			}
 		}
 	}
 }
 
-func (vv *TableValue) Config(w gi.Widget) {
-	if vv.Widget == w {
-		vv.UpdateWidget()
-		return
-	}
-	vv.Widget = w
-	vv.StdConfig(w)
-	bt := vv.Widget.(*gi.Button)
-	bt.SetType(gi.ButtonTonal)
-	bt.Config()
-	giv.ConfigDialogWidget(vv, bt, true)
-	vv.UpdateWidget()
-}
-
-func (vv *TableValue) HasDialog() bool                      { return true }
-func (vv *TableValue) OpenDialog(ctx gi.Widget, fun func()) { giv.OpenValueDialog(vv, ctx, fun) }
-
-func (vv *TableValue) ConfigDialog(d *gi.Body) (bool, func()) {
-	opv := laser.OnePtrUnderlyingValue(vv.Value)
+func (v *TableValue) ConfigDialog(d *gi.Body) (bool, func()) {
+	opv := laser.OnePtrUnderlyingValue(v.Value)
 	et := opv.Interface().(*etable.Table)
 	if et == nil {
 		return false, nil
@@ -195,56 +134,35 @@ func (vv *TableValue) ConfigDialog(d *gi.Body) (bool, func()) {
 
 // SimMatValue presents a button that pulls up the SimMatGridView viewer for an etable.Table
 type SimMatValue struct {
-	giv.ValueBase
+	giv.ValueBase[*gi.Button]
 }
 
-func (vv *SimMatValue) WidgetType() *gti.Type {
-	vv.WidgetTyp = gi.ButtonType
-	return vv.WidgetTyp
+func (v *SimMatValue) Config() {
+	v.Widget.SetType(gi.ButtonTonal).SetIcon(icons.Edit)
+	giv.ConfigDialogWidget(v, false)
 }
 
-func (vv *SimMatValue) UpdateWidget() {
-	if vv.Widget == nil {
-		return
-	}
-	bt := vv.Widget.(*gi.Button)
-	npv := laser.NonPtrValue(vv.Value)
-	if !vv.Value.IsValid() || vv.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
-		bt.SetText("nil")
+func (v *SimMatValue) Update() {
+	npv := laser.NonPtrValue(v.Value)
+	if !v.Value.IsValid() || v.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
+		v.Widget.SetText("nil")
 	} else {
-		opv := laser.OnePtrUnderlyingValue(vv.Value)
+		opv := laser.OnePtrUnderlyingValue(v.Value)
 		smat := opv.Interface().(*simat.SimMat)
 		if smat != nil && smat.Mat != nil {
 			if nm, has := smat.Mat.MetaData("name"); has {
-				bt.SetText(nm)
+				v.Widget.SetText(nm)
 			} else {
-				bt.SetText("simat.SimMat")
+				v.Widget.SetText("simat.SimMat")
 			}
 		} else {
-			bt.SetText("simat.SimMat")
+			v.Widget.SetText("simat.SimMat")
 		}
 	}
 }
 
-func (vv *SimMatValue) Config(w gi.Widget) {
-	if vv.Widget == w {
-		vv.UpdateWidget()
-		return
-	}
-	vv.Widget = w
-	bt := vv.Widget.(*gi.Button)
-	vv.StdConfig(w)
-	bt.SetType(gi.ButtonTonal)
-	bt.Config()
-	giv.ConfigDialogWidget(vv, bt, false)
-	vv.UpdateWidget()
-}
-
-func (vv *SimMatValue) HasDialog() bool                      { return true }
-func (vv *SimMatValue) OpenDialog(ctx gi.Widget, fun func()) { giv.OpenValueDialog(vv, ctx, fun) }
-
-func (vv *SimMatValue) ConfigDialog(d *gi.Body) (bool, func()) {
-	opv := laser.OnePtrUnderlyingValue(vv.Value)
+func (v *SimMatValue) ConfigDialog(d *gi.Body) (bool, func()) {
+	opv := laser.OnePtrUnderlyingValue(v.Value)
 	smat := opv.Interface().(*simat.SimMat)
 	if smat == nil || smat.Mat == nil {
 		return false, nil
