@@ -271,12 +271,12 @@ func (tg *TensorGrid) EnsureColorMap() {
 	}
 	if tg.ColorMap == nil {
 		ok := false
-		tg.ColorMap, ok = colormap.AvailMaps[string(tg.Disp.ColorMap)]
+		tg.ColorMap, ok = colormap.AvailableMaps[string(tg.Disp.ColorMap)]
 		if !ok {
 			tg.Disp.ColorMap = ""
 			tg.Disp.Defaults()
 		}
-		tg.ColorMap = colormap.AvailMaps[string(tg.Disp.ColorMap)]
+		tg.ColorMap = colormap.AvailableMaps[string(tg.Disp.ColorMap)]
 	}
 }
 
@@ -304,15 +304,14 @@ func (tg *TensorGrid) UpdateRange() {
 	}
 }
 
-func (tg *TensorGrid) RenderTensor() {
+func (tg *TensorGrid) Render() {
 	if tg.Tensor == nil || tg.Tensor.Len() == 0 {
 		return
 	}
 	tg.EnsureColorMap()
 	tg.UpdateRange()
 
-	pc, _ := tg.RenderLock()
-	defer tg.RenderUnlock()
+	pc := &tg.Scene.PaintContext
 
 	pos := tg.Geom.Pos.Content
 	sz := tg.Geom.Size.Actual.Content
@@ -410,15 +409,7 @@ func (tg *TensorGrid) RenderTensor() {
 			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
-			pc.FillBoxColor(pr, ssz, clr)
+			pc.FillBox(pr, ssz, colors.C(clr))
 		}
-	}
-}
-
-func (tg *TensorGrid) Render() {
-	if tg.PushBounds() {
-		tg.RenderTensor()
-		tg.RenderChildren()
-		tg.PopBounds()
 	}
 }

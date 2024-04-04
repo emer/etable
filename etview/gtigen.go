@@ -3,8 +3,6 @@
 package etview
 
 import (
-	"sync"
-
 	"cogentcore.org/core/colors/colormap"
 	"cogentcore.org/core/gti"
 	"cogentcore.org/core/ki"
@@ -18,8 +16,8 @@ var SimMatGridType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etvi
 // NewSimMatGrid adds a new [SimMatGrid] with the given name to the given parent:
 // SimMatGrid is a widget that displays a similarity / distance matrix
 // with tensor values as a grid of colored squares, and labels for rows, cols
-func NewSimMatGrid(par ki.Ki, name ...string) *SimMatGrid {
-	return par.NewChild(SimMatGridType, name...).(*SimMatGrid)
+func NewSimMatGrid(parent ki.Ki, name ...string) *SimMatGrid {
+	return parent.NewChild(SimMatGridType, name...).(*SimMatGrid)
 }
 
 // KiType returns the [*gti.Type] of [SimMatGrid]
@@ -60,8 +58,8 @@ var TableViewType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etvie
 
 // NewTableView adds a new [TableView] with the given name to the given parent:
 // etview.TableView provides a GUI interface for etable.Table's
-func NewTableView(par ki.Ki, name ...string) *TableView {
-	return par.NewChild(TableViewType, name...).(*TableView)
+func NewTableView(parent ki.Ki, name ...string) *TableView {
+	return parent.NewChild(TableViewType, name...).(*TableView)
 }
 
 // KiType returns the [*gti.Type] of [TableView]
@@ -112,20 +110,14 @@ func (t *TableView) SetBlankFloat(v float64) *TableView { t.BlankFloat = v; retu
 // SetTooltip sets the [TableView.Tooltip]
 func (t *TableView) SetTooltip(v string) *TableView { t.Tooltip = v; return t }
 
-// SetStackTop sets the [TableView.StackTop]
-func (t *TableView) SetStackTop(v int) *TableView { t.StackTop = v; return t }
-
 // SetMinRows sets the [TableView.MinRows]
 func (t *TableView) SetMinRows(v int) *TableView { t.MinRows = v; return t }
 
 // SetViewPath sets the [TableView.ViewPath]
 func (t *TableView) SetViewPath(v string) *TableView { t.ViewPath = v; return t }
 
-// SetViewMu sets the [TableView.ViewMu]
-func (t *TableView) SetViewMu(v *sync.Mutex) *TableView { t.ViewMu = v; return t }
-
-// SetSelVal sets the [TableView.SelVal]
-func (t *TableView) SetSelVal(v any) *TableView { t.SelVal = v; return t }
+// SetSelectedValue sets the [TableView.SelectedValue]
+func (t *TableView) SetSelectedValue(v any) *TableView { t.SelectedValue = v; return t }
 
 // SetSelectedIndex sets the [TableView.SelectedIndex]
 func (t *TableView) SetSelectedIndex(v int) *TableView { t.SelectedIndex = v; return t }
@@ -142,8 +134,8 @@ var TensorGridType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etvi
 
 // NewTensorGrid adds a new [TensorGrid] with the given name to the given parent:
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
-func NewTensorGrid(par ki.Ki, name ...string) *TensorGrid {
-	return par.NewChild(TensorGridType, name...).(*TensorGrid)
+func NewTensorGrid(parent ki.Ki, name ...string) *TensorGrid {
+	return parent.NewChild(TensorGridType, name...).(*TensorGrid)
 }
 
 // KiType returns the [*gti.Type] of [TensorGrid]

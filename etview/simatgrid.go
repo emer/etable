@@ -5,6 +5,7 @@
 package etview
 
 import (
+	"cogentcore.org/core/colors"
 	"cogentcore.org/core/mat32"
 	"cogentcore.org/core/paint"
 	"cogentcore.org/core/styles"
@@ -102,9 +103,9 @@ func (tg *SimMatGrid) MinSize() mat32.Vec2 {
 	ctxtsz := tg.colMaxSz.X / float32(tg.colMinBlank+1)
 	txtsz := mat32.Max(rtxtsz, ctxtsz)
 
-	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
-	rowEx = tg.rowNGps
-	colEx = tg.colNGps
+	rows, cols, _, _ := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
+	rowEx := tg.rowNGps
+	colEx := tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 	max := float32(mat32.Max(frw, fcl))
@@ -115,14 +116,13 @@ func (tg *SimMatGrid) MinSize() mat32.Vec2 {
 	return mat32.V2(tg.rowMaxSz.X+LabelSpace+gsz*float32(cols), tg.colMaxSz.Y+LabelSpace+gsz*float32(rows))
 }
 
-func (tg *SimMatGrid) RenderSimMat() {
+func (tg *SimMatGrid) Render() {
 	if tg.SimMat == nil || tg.SimMat.Mat.Len() == 0 {
 		return
 	}
 	tg.EnsureColorMap()
 	tg.UpdateRange()
-	pc, _ := tg.RenderLock()
-	defer tg.RenderUnlock()
+	pc := &tg.Scene.PaintContext
 
 	pos := tg.Geom.Pos.Content
 	sz := tg.Geom.Size.Actual.Content
@@ -135,9 +135,9 @@ func (tg *SimMatGrid) RenderSimMat() {
 
 	tsr := tg.SimMat.Mat
 
-	rows, cols, rowEx, colEx := etensor.Prjn2DShape(tsr.ShapeObj(), tg.Disp.OddRow)
-	rowEx = tg.rowNGps
-	colEx = tg.colNGps
+	rows, cols, _, _ := etensor.Prjn2DShape(tsr.ShapeObj(), tg.Disp.OddRow)
+	rowEx := tg.rowNGps
+	colEx := tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
 	tsz := mat32.V2(fcl, frw)
@@ -225,7 +225,7 @@ func (tg *SimMatGrid) RenderSimMat() {
 			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
-			pc.FillBoxColor(pr, ssz, clr)
+			pc.FillBox(pr, ssz, colors.C(clr))
 			if len(xlb) == 0 {
 				prvxblk = true
 			}
@@ -233,13 +233,5 @@ func (tg *SimMatGrid) RenderSimMat() {
 		if len(ylb) == 0 {
 			prvyblk = true
 		}
-	}
-}
-
-func (tg *SimMatGrid) Render() {
-	if tg.PushBounds() {
-		tg.RenderSimMat()
-		tg.RenderChildren()
-		tg.PopBounds()
 	}
 }

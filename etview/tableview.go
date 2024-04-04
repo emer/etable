@@ -124,7 +124,7 @@ func (tv *TableView) StyleValueWidget(w gi.Widget, s *styles.Style, row, col int
 		hw = max(float32(tv.ColMaxWidths[col]), hw)
 	}
 	hv := units.Ch(hw)
-	s.Min.X.Val = max(s.Min.X.Val, hv.Convert(s.Min.X.Un, &s.UnitContext).Val)
+	s.Min.X.Value = max(s.Min.X.Value, hv.Convert(s.Min.X.Unit, &s.UnitContext).Value)
 	s.SetTextWrap(false)
 }
 
@@ -137,7 +137,7 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 
 	tv.SetSliceBase()
 	tv.Table = etable.NewIdxView(et)
-	tv.This().(giv.SliceViewer).UpdtSliceSize()
+	tv.This().(giv.SliceViewer).UpdateSliceSize()
 	tv.Update()
 	return tv
 }
@@ -147,7 +147,7 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 func (tv *TableView) GoUpdateView() {
 	tv.AsyncLock()
 	tv.Table.Sequential()
-	tv.ScrollToIdxNoUpdt(tv.SliceSize - 1)
+	tv.ScrollToIndexNoUpdate(tv.SliceSize - 1)
 	tv.UpdateWidgets()
 	tv.NeedsLayout()
 	tv.AsyncUnlock()
@@ -162,21 +162,21 @@ func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 
 	tv.Table = ix.Clone() // always copy
 
-	tv.This().(giv.SliceViewer).UpdtSliceSize()
+	tv.This().(giv.SliceViewer).UpdateSliceSize()
 	tv.SetFlag(false, giv.SliceViewConfigured)
 	tv.StartIndex = 0
 	tv.VisRows = tv.MinRows
 	if !tv.IsReadOnly() {
 		tv.SelectedIndex = -1
 	}
-	tv.ResetSelectedIdxs()
+	tv.ResetSelectedIndexs()
 	tv.SetFlag(false, giv.SliceViewSelectMode)
 	tv.ConfigIter = 0
 	tv.Update()
 	return tv
 }
 
-func (tv *TableView) UpdtSliceSize() int {
+func (tv *TableView) UpdateSliceSize() int {
 	tv.Table.DeleteInvalid() // table could have changed
 	tv.SliceSize = tv.Table.Len()
 	tv.NCols = tv.Table.Table.NumCols()
@@ -285,7 +285,7 @@ func (tv *TableView) ConfigRows() {
 		return
 	}
 
-	tv.This().(giv.SliceViewer).UpdtSliceSize()
+	tv.This().(giv.SliceViewer).UpdateSliceSize()
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 	nWidg := nWidgPerRow * tv.VisRows
@@ -412,7 +412,7 @@ func (tv *TableView) UpdateWidgets() {
 	tv.ViewMuLock()
 	defer tv.ViewMuUnlock()
 
-	tv.This().(giv.SliceViewer).UpdtSliceSize()
+	tv.This().(giv.SliceViewer).UpdateSliceSize()
 
 	nWidgPerRow, idxOff := tv.RowWidgetNs()
 
@@ -423,10 +423,10 @@ func (tv *TableView) UpdateWidgets() {
 		scrollTo = tv.SelectedIndex
 	}
 	if scrollTo >= 0 {
-		tv.ScrollToIdx(scrollTo)
+		tv.ScrollToIndex(scrollTo)
 	}
 
-	tv.UpdateStartIdx()
+	tv.UpdateStartIndex()
 	for i := 0; i < tv.VisRows; i++ {
 		i := i
 		ridx := i * nWidgPerRow
@@ -552,27 +552,26 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 func (tv *TableView) SliceNewAt(idx int) {
 	tv.ViewMuLock()
 
-	tv.SliceNewAtSel(idx)
+	tv.SliceNewAtSelect(idx)
 
 	tv.Table.InsertRows(idx, 1)
 
-	tv.SelectIdxAction(idx, events.SelectOne)
+	tv.SelectIndexAction(idx, events.SelectOne)
 	tv.ViewMuUnlock()
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateWidgets()
-	tv.IdxGrabFocus(idx)
+	tv.IndexGrabFocus(idx)
 	tv.NeedsLayout()
 }
 
-// SliceDeleteAt deletes element at given index from slice -- doUpdt means
-// call UpdateSliceGrid to update display
+// SliceDeleteAt deletes element at given index from slice
 func (tv *TableView) SliceDeleteAt(idx int) {
 	if idx < 0 || idx >= tv.SliceSize {
 		return
 	}
 	tv.ViewMuLock()
 
-	tv.SliceDeleteAtSel(idx)
+	tv.SliceDeleteAtSelect(idx)
 
 	tv.Table.DeleteRows(idx, 1)
 
