@@ -169,7 +169,7 @@ func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
 	if !tv.IsReadOnly() {
 		tv.SelectedIndex = -1
 	}
-	tv.ResetSelectedIndexs()
+	tv.ResetSelectedIndexes()
 	tv.SetFlag(false, giv.SliceViewSelectMode)
 	tv.ConfigIter = 0
 	tv.Update()
