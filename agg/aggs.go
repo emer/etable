@@ -72,81 +72,81 @@ func AggsName(ag Aggs) string {
 	return strings.TrimPrefix(ag.String(), "Agg")
 }
 
-// AggIdx returns aggregate according to given agg type applied
-// to all non-Null, non-NaN elements in given IdxView indexed view of
+// AggIndex returns aggregate according to given agg type applied
+// to all non-Null, non-NaN elements in given IndexView indexed view of
 // an etable.Table, for given column index.
 // valid names are: Count, Sum, Var, Std, Sem, VarPop, StdPop, SemPop,
 // Min, Max, SumSq, 25%, 1Q, Median, 50%, 2Q, 75%, 3Q (case insensitive)
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func AggIdx(ix *etable.IdxView, colIdx int, ag Aggs) []float64 {
+func AggIndex(ix *etable.IndexView, colIndex int, ag Aggs) []float64 {
 	switch ag {
 	case AggCount:
-		return CountIdx(ix, colIdx)
+		return CountIndex(ix, colIndex)
 	case AggSum:
-		return SumIdx(ix, colIdx)
+		return SumIndex(ix, colIndex)
 	case AggProd:
-		return ProdIdx(ix, colIdx)
+		return ProdIndex(ix, colIndex)
 	case AggMin:
-		return MinIdx(ix, colIdx)
+		return MinIndex(ix, colIndex)
 	case AggMax:
-		return MaxIdx(ix, colIdx)
+		return MaxIndex(ix, colIndex)
 	case AggMean:
-		return MeanIdx(ix, colIdx)
+		return MeanIndex(ix, colIndex)
 	case AggVar:
-		return VarIdx(ix, colIdx)
+		return VarIndex(ix, colIndex)
 	case AggStd:
-		return StdIdx(ix, colIdx)
+		return StdIndex(ix, colIndex)
 	case AggSem:
-		return SemIdx(ix, colIdx)
+		return SemIndex(ix, colIndex)
 	case AggVarPop:
-		return VarPopIdx(ix, colIdx)
+		return VarPopIndex(ix, colIndex)
 	case AggStdPop:
-		return StdPopIdx(ix, colIdx)
+		return StdPopIndex(ix, colIndex)
 	case AggSemPop:
-		return SemPopIdx(ix, colIdx)
+		return SemPopIndex(ix, colIndex)
 	case AggQ1:
-		return Q1Idx(ix, colIdx)
+		return Q1Index(ix, colIndex)
 	case AggMedian:
-		return MedianIdx(ix, colIdx)
+		return MedianIndex(ix, colIndex)
 	case AggQ3:
-		return Q3Idx(ix, colIdx)
+		return Q3Index(ix, colIndex)
 	case AggSumSq:
-		return SumSqIdx(ix, colIdx)
+		return SumSqIndex(ix, colIndex)
 	}
 	return nil
 }
 
 // Agg returns aggregate according to given agg type applied
-// to all non-Null, non-NaN elements in given IdxView indexed view of
+// to all non-Null, non-NaN elements in given IndexView indexed view of
 // an etable.Table, for given column name.
 // valid names are: Count, Sum, Var, Std, Sem, VarPop, StdPop, SemPop,
 // Min, Max, SumSq (case insensitive)
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func Agg(ix *etable.IdxView, colNm string, ag Aggs) []float64 {
-	colIdx := ix.Table.ColIdx(colNm)
-	if colIdx == -1 {
+func Agg(ix *etable.IndexView, colNm string, ag Aggs) []float64 {
+	colIndex := ix.Table.ColIndex(colNm)
+	if colIndex == -1 {
 		return nil
 	}
-	return AggIdx(ix, colIdx, ag)
+	return AggIndex(ix, colIndex, ag)
 }
 
 // AggTry returns aggregate according to given agg type applied
-// to all non-Null, non-NaN elements in given IdxView indexed view of
+// to all non-Null, non-NaN elements in given IndexView indexed view of
 // an etable.Table, for given column name.
 // valid names are: Count, Sum, Var, Std, Sem, VarPop, StdPop, SemPop,
 // Min, Max, SumSq (case insensitive)
 // If col name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func AggTry(ix *etable.IdxView, colNm string, ag Aggs) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxTry(colNm)
+func AggTry(ix *etable.IndexView, colNm string, ag Aggs) ([]float64, error) {
+	colIndex, err := ix.Table.ColIndexTry(colNm)
 	if err != nil {
 		return nil, err
 	}
-	rv := AggIdx(ix, colIdx, ag)
+	rv := AggIndex(ix, colIndex, ag)
 	if rv == nil {
 		return nil, fmt.Errorf("etable agg.AggTry: agg type: %v not recognized", ag)
 	}

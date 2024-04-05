@@ -12,9 +12,9 @@ The tensor columns can be individually converted to / from arrow.Tensors and con
 
 Native support is provided for basic CSV, TSV I/O, including the C++ emergent standard TSV format with full type information in the first row column headers.
 
-The `etable.IdxView` is an indexed view into a Table, which is used for all data-processing operations such as Sort, Filter, Split (group), and for aggregating data as in a pivot-table.
+The `etable.IndexView` is an indexed view into a Table, which is used for all data-processing operations such as Sort, Filter, Split (group), and for aggregating data as in a pivot-table.
 
-See [agg](https://github.com/goki/etable/v2/tree/master/agg) package for aggregation functions that operate on the `IdxView` to perform standard aggregation operations such as Sum, Mean, etc, and [split](https://github.com/goki/etable/v2/tree/master/split) for pivot table support.
+See [agg](https://github.com/goki/etable/v2/tree/master/agg) package for aggregation functions that operate on the `IndexView` to perform standard aggregation operations such as Sum, Mean, etc, and [split](https://github.com/goki/etable/v2/tree/master/split) for pivot table support.
 
 Other relevant examples of DataTable-like structures:
 * https://github.com/apache/arrow/tree/master/go/arrow Table

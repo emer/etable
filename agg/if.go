@@ -12,13 +12,13 @@ type IfFunc func(idx int, val float64) bool
 ///////////////////////////////////////////////////
 //   CountIf
 
-// CountIfIdx returns the count of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// CountIfIndex returns the count of true return values for given IfFunc on
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func CountIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
-	return ix.AggCol(colIdx, 0, func(idx int, val float64, agg float64) float64 {
+func CountIfIndex(ix *etable.IndexView, colIndex int, iffun IfFunc) []float64 {
+	return ix.AggCol(colIndex, 0, func(idx int, val float64, agg float64) float64 {
 		if iffun(idx, val) {
 			return agg + 1
 		}
@@ -27,47 +27,47 @@ func CountIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
 }
 
 // CountIf returns the count of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func CountIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
-	colIdx := ix.Table.ColIdx(colNm)
-	if colIdx == -1 {
+func CountIf(ix *etable.IndexView, colNm string, iffun IfFunc) []float64 {
+	colIndex := ix.Table.ColIndex(colNm)
+	if colIndex == -1 {
 		return nil
 	}
-	return CountIfIdx(ix, colIdx, iffun)
+	return CountIfIndex(ix, colIndex, iffun)
 }
 
 // CountIfTry returns the count of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func CountIfTry(ix *etable.IdxView, colNm string, iffun IfFunc) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxTry(colNm)
+func CountIfTry(ix *etable.IndexView, colNm string, iffun IfFunc) ([]float64, error) {
+	colIndex, err := ix.Table.ColIndexTry(colNm)
 	if err != nil {
 		return nil, err
 	}
-	return CountIfIdx(ix, colIdx, iffun), nil
+	return CountIfIndex(ix, colIndex, iffun), nil
 }
 
 ///////////////////////////////////////////////////
 //   PropIf
 
-// PropIfIdx returns the proportion (0-1) of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// PropIfIndex returns the proportion (0-1) of true return values for given IfFunc on
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func PropIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
-	cnt := CountIdx(ix, colIdx)
+func PropIfIndex(ix *etable.IndexView, colIndex int, iffun IfFunc) []float64 {
+	cnt := CountIndex(ix, colIndex)
 	if cnt == nil {
 		return nil
 	}
-	pif := CountIfIdx(ix, colIdx, iffun)
+	pif := CountIfIndex(ix, colIndex, iffun)
 	for i := range pif {
 		if cnt[i] > 0 {
 			pif[i] /= cnt[i]
@@ -77,47 +77,47 @@ func PropIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
 }
 
 // PropIf returns the proportion (0-1) of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func PropIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
-	colIdx := ix.Table.ColIdx(colNm)
-	if colIdx == -1 {
+func PropIf(ix *etable.IndexView, colNm string, iffun IfFunc) []float64 {
+	colIndex := ix.Table.ColIndex(colNm)
+	if colIndex == -1 {
 		return nil
 	}
-	return PropIfIdx(ix, colIdx, iffun)
+	return PropIfIndex(ix, colIndex, iffun)
 }
 
 // PropIfTry returns the proportion (0-1) of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func PropIfTry(ix *etable.IdxView, colNm string, iffun IfFunc) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxTry(colNm)
+func PropIfTry(ix *etable.IndexView, colNm string, iffun IfFunc) ([]float64, error) {
+	colIndex, err := ix.Table.ColIndexTry(colNm)
 	if err != nil {
 		return nil, err
 	}
-	return PropIfIdx(ix, colIdx, iffun), nil
+	return PropIfIndex(ix, colIndex, iffun), nil
 }
 
 ///////////////////////////////////////////////////
 //   PctIf
 
-// PctIfIdx returns the percentage (0-100) of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// PctIfIndex returns the percentage (0-100) of true return values for given IfFunc on
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column index.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func PctIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
-	cnt := CountIdx(ix, colIdx)
+func PctIfIndex(ix *etable.IndexView, colIndex int, iffun IfFunc) []float64 {
+	cnt := CountIndex(ix, colIndex)
 	if cnt == nil {
 		return nil
 	}
-	pif := CountIfIdx(ix, colIdx, iffun)
+	pif := CountIfIndex(ix, colIndex, iffun)
 	for i := range pif {
 		if cnt[i] > 0 {
 			pif[i] /= cnt[i]
@@ -127,29 +127,29 @@ func PctIfIdx(ix *etable.IdxView, colIdx int, iffun IfFunc) []float64 {
 }
 
 // PctIf returns the percentage (0-100) of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column name.
 // If name not found, nil is returned -- use Try version for error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func PctIf(ix *etable.IdxView, colNm string, iffun IfFunc) []float64 {
-	colIdx := ix.Table.ColIdx(colNm)
-	if colIdx == -1 {
+func PctIf(ix *etable.IndexView, colNm string, iffun IfFunc) []float64 {
+	colIndex := ix.Table.ColIndex(colNm)
+	if colIndex == -1 {
 		return nil
 	}
-	return PctIfIdx(ix, colIdx, iffun)
+	return PctIfIndex(ix, colIndex, iffun)
 }
 
 // PctIfTry returns the percentage (0-100) of true return values for given IfFunc on
-// non-Null, non-NaN elements in given IdxView indexed view of an
+// non-Null, non-NaN elements in given IndexView indexed view of an
 // etable.Table, for given column name.
 // If name not found, returns error message.
 // Return value is size of each column cell -- 1 for scalar 1D columns
 // and N for higher-dimensional columns.
-func PctIfTry(ix *etable.IdxView, colNm string, iffun IfFunc) ([]float64, error) {
-	colIdx, err := ix.Table.ColIdxTry(colNm)
+func PctIfTry(ix *etable.IndexView, colNm string, iffun IfFunc) ([]float64, error) {
+	colIndex, err := ix.Table.ColIndexTry(colNm)
 	if err != nil {
 		return nil, err
 	}
-	return PctIfIdx(ix, colIdx, iffun), nil
+	return PctIfIndex(ix, colIndex, iffun), nil
 }

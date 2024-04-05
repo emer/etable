@@ -22,7 +22,7 @@ type AvgMax32 struct {
 	Sum float32
 
 	// index of max item
-	MaxIdx int32
+	MaxIndex int32
 
 	// number of items in sum
 	N int32
@@ -36,7 +36,7 @@ func (am *AvgMax32) Init() {
 	am.Sum = 0
 	am.N = 0
 	am.Max = -MaxFloat32
-	am.MaxIdx = -1
+	am.MaxIndex = -1
 }
 
 // UpdateVal updates stats from given value
@@ -45,17 +45,17 @@ func (am *AvgMax32) UpdateVal(val float32, idx int32) {
 	am.N++
 	if val > am.Max {
 		am.Max = val
-		am.MaxIdx = idx
+		am.MaxIndex = idx
 	}
 }
 
 // UpdateFromOther updates these values from other AvgMax32 values
-func (am *AvgMax32) UpdateFromOther(oSum, oMax float32, oN, oMaxIdx int32) {
+func (am *AvgMax32) UpdateFromOther(oSum, oMax float32, oN, oMaxIndex int32) {
 	am.Sum += oSum
 	am.N += oN
 	if oMax > am.Max {
 		am.Max = oMax
-		am.MaxIdx = oMaxIdx
+		am.MaxIndex = oMaxIndex
 	}
 }
 
@@ -72,17 +72,17 @@ func (am *AvgMax32) CalcAvg() {
 //gosl: end minmax
 
 func (am *AvgMax32) String() string {
-	return fmt.Sprintf("{Avg: %g, Max: %g, Sum: %g, MaxIdx: %d, N: %d}", am.Avg, am.Max, am.Sum, am.MaxIdx, am.N)
+	return fmt.Sprintf("{Avg: %g, Max: %g, Sum: %g, MaxIndex: %d, N: %d}", am.Avg, am.Max, am.Sum, am.MaxIndex, am.N)
 }
 
 // UpdateFrom updates these values from other AvgMax32 values
 func (am *AvgMax32) UpdateFrom(oth *AvgMax32) {
-	am.UpdateFromOther(oth.Sum, oth.Max, oth.N, oth.MaxIdx)
+	am.UpdateFromOther(oth.Sum, oth.Max, oth.N, oth.MaxIndex)
 	am.Sum += oth.Sum
 	am.N += oth.N
 	if oth.Max > am.Max {
 		am.Max = oth.Max
-		am.MaxIdx = oth.MaxIdx
+		am.MaxIndex = oth.MaxIndex
 	}
 }
 
@@ -103,7 +103,7 @@ type AvgMax64 struct {
 	Sum float64
 
 	// index of max item
-	MaxIdx int32
+	MaxIndex int32
 
 	// number of items in sum
 	N int32
@@ -115,7 +115,7 @@ func (am *AvgMax64) Init() {
 	am.Sum = 0
 	am.N = 0
 	am.Max = -MaxFloat64
-	am.MaxIdx = -1
+	am.MaxIndex = -1
 }
 
 // UpdateVal updates stats from given value
@@ -124,7 +124,7 @@ func (am *AvgMax64) UpdateVal(val float64, idx int) {
 	am.N++
 	if val > am.Max {
 		am.Max = val
-		am.MaxIdx = int32(idx)
+		am.MaxIndex = int32(idx)
 	}
 }
 
@@ -144,7 +144,7 @@ func (am *AvgMax64) UpdateFrom(oth *AvgMax64) {
 	am.N += oth.N
 	if oth.Max > am.Max {
 		am.Max = oth.Max
-		am.MaxIdx = oth.MaxIdx
+		am.MaxIndex = oth.MaxIndex
 	}
 }
 
@@ -152,7 +152,7 @@ func (am *AvgMax64) UpdateFrom(oth *AvgMax64) {
 func (am *AvgMax64) CopyFrom(oth *AvgMax64) {
 	am.Avg = oth.Avg
 	am.Max = oth.Max
-	am.MaxIdx = oth.MaxIdx
+	am.MaxIndex = oth.MaxIndex
 	am.Sum = oth.Sum
 	am.N = oth.N
 }

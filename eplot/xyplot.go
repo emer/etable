@@ -52,7 +52,7 @@ func (pl *Plot2D) GenPlotXY() {
 	var lsplit *etable.Splits
 	nleg := 1
 	if pl.Params.LegendCol != "" {
-		_, err = pl.Table.Table.ColIdxTry(pl.Params.LegendCol)
+		_, err = pl.Table.Table.ColIndexTry(pl.Params.LegendCol)
 		if err != nil {
 			slog.Error("eplot.LegendCol", "err", err.Error())
 		} else {
@@ -73,7 +73,7 @@ func (pl *Plot2D) GenPlotXY() {
 			strCols = append(strCols, cp)
 			continue
 		}
-		if cp.TensorIdx < 0 {
+		if cp.TensorIndex < 0 {
 			yc := pl.Table.Table.ColByName(cp.Col)
 			_, sz := yc.RowCellSize()
 			nys += sz
@@ -112,8 +112,8 @@ func (pl *Plot2D) GenPlotXY() {
 			stRow := 0
 			for bi, edRow := range xbreaks {
 				nidx := 1
-				stidx := cp.TensorIdx
-				if cp.TensorIdx < 0 { // do all
+				stidx := cp.TensorIndex
+				if cp.TensorIndex < 0 { // do all
 					yc := pl.Table.Table.ColByName(cp.Col)
 					_, sz := yc.RowCellSize()
 					nidx = sz
@@ -122,8 +122,8 @@ func (pl *Plot2D) GenPlotXY() {
 				for ii := 0; ii < nidx; ii++ {
 					idx := stidx + ii
 					tix := lview.Clone()
-					tix.Idxs = tix.Idxs[stRow:edRow]
-					xy, _ := NewTableXYName(tix, xi, xp.TensorIdx, cp.Col, idx, cp.Range)
+					tix.Indexes = tix.Indexes[stRow:edRow]
+					xy, _ := NewTableXYName(tix, xi, xp.TensorIndex, cp.Col, idx, cp.Range)
 					if xy == nil {
 						continue
 					}
@@ -170,7 +170,7 @@ func (pl *Plot2D) GenPlotXY() {
 						}
 					}
 					if cp.ErrCol != "" {
-						ec := pl.Table.Table.ColIdx(cp.ErrCol)
+						ec := pl.Table.Table.ColIndex(cp.ErrCol)
 						if ec >= 0 {
 							xy.ErrCol = ec
 							eb, _ := plotter.NewYErrorBars(xy)
@@ -186,10 +186,10 @@ func (pl *Plot2D) GenPlotXY() {
 	}
 	if firstXY != nil && len(strCols) > 0 {
 		for _, cp := range strCols {
-			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx, firstXY.YRange)
+			xy, _ := NewTableXYName(xview, xi, xp.TensorIndex, cp.Col, cp.TensorIndex, firstXY.YRange)
 			xy.LblCol = xy.YCol
 			xy.YCol = firstXY.YCol
-			xy.YIdx = firstXY.YIdx
+			xy.YIndex = firstXY.YIndex
 			lbls, _ := plotter.NewLabels(xy)
 			if lbls != nil {
 				plt.Add(lbls)
@@ -202,7 +202,7 @@ func (pl *Plot2D) GenPlotXY() {
 	if xc.DataType() == etensor.STRING {
 		xcs := xc.(*etensor.String)
 		vals := make([]string, pl.Table.Len())
-		for i, dx := range pl.Table.Idxs {
+		for i, dx := range pl.Table.Indexes {
 			vals[i] = xcs.Values[dx]
 		}
 		plt.NominalX(vals...)

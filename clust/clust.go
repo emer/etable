@@ -19,7 +19,7 @@ import (
 type Node struct {
 
 	// index into original distance matrix -- only valid for for terminal leaves
-	Idx int
+	Index int
 
 	// distance for this node -- how far apart were all the kids from each other when this node was created -- is 0 for leaf nodes
 	Dist float64
@@ -42,7 +42,7 @@ func (nn *Node) IsLeaf() bool {
 // Sprint prints to string
 func (nn *Node) Sprint(smat *simat.SimMat, depth int) string {
 	if nn.IsLeaf() {
-		return smat.Rows[nn.Idx] + " "
+		return smat.Rows[nn.Index] + " "
 	}
 	sv := fmt.Sprintf("\n%v%v: ", indent.Tabs(depth), nn.Dist)
 	for _, kn := range nn.Kids {
@@ -51,14 +51,14 @@ func (nn *Node) Sprint(smat *simat.SimMat, depth int) string {
 	return sv
 }
 
-// Idxs collects all the indexes in this node
-func (nn *Node) Idxs(ix []int, ctr *int) {
+// Indexes collects all the indexes in this node
+func (nn *Node) Indexes(ix []int, ctr *int) {
 	if nn.IsLeaf() {
-		ix[*ctr] = nn.Idx
+		ix[*ctr] = nn.Index
 		(*ctr)++
 	} else {
 		for _, kn := range nn.Kids {
-			kn.Idxs(ix, ctr)
+			kn.Indexes(ix, ctr)
 		}
 	}
 }
@@ -96,7 +96,7 @@ func GlomInit(ntot int) *Node {
 	root := &Node{}
 	root.Kids = make([]*Node, ntot)
 	for i := 0; i < ntot; i++ {
-		root.Kids[i] = &Node{Idx: i}
+		root.Kids[i] = &Node{Index: i}
 	}
 	return root
 }
@@ -117,12 +117,12 @@ func GlomClust(root *Node, smat *simat.SimMat, dfunc DistFunc) *Node {
 		mval := math.MaxFloat64
 		for ai, ka := range root.Kids {
 			actr := 0
-			ka.Idxs(aidx, &actr)
+			ka.Indexes(aidx, &actr)
 			aix := aidx[0:actr]
 			for bi := 0; bi < ai; bi++ {
 				kb := root.Kids[bi]
 				bctr := 0
-				kb.Idxs(bidx, &bctr)
+				kb.Indexes(bidx, &bctr)
 				bix := bidx[0:bctr]
 				dv := dfunc(aix, bix, ntot, maxd, smatf)
 				if dv < mval {

@@ -16,7 +16,7 @@ import (
 // which will be normalized to sum to 1 (error returned if sum = 0)
 // names are optional names for each split (e.g., Train, Test) which will be
 // used to label the Values of the resulting Splits.
-func Permuted(ix *etable.IdxView, probs []float64, names []string) (*etable.Splits, error) {
+func Permuted(ix *etable.IndexView, probs []float64, names []string) (*etable.Splits, error) {
 	if ix == nil || ix.Len() == 0 {
 		return nil, fmt.Errorf("split.Random table is nil / empty")
 	}
@@ -56,7 +56,7 @@ func Permuted(ix *etable.IdxView, probs []float64, names []string) (*etable.Spli
 		} else {
 			nm = fmt.Sprintf("p=%v", probs[i]/sum)
 		}
-		spl.New(ix.Table, []string{nm}, perm.Idxs[cum:cum+n]...)
+		spl.New(ix.Table, []string{nm}, perm.Indexes[cum:cum+n]...)
 		cum += n
 	}
 	return spl, nil

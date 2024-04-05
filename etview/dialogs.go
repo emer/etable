@@ -24,9 +24,9 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	dlg.Data = tsr
 
 	frame := dlg.Frame()
-	_, prIdx := dlg.PromptWidget(frame)
+	_, prIndex := dlg.PromptWidget(frame)
 
-	sv := frame.InsertNewChild(KiT_TensorView, prIdx+1, "tensor-view").(*TensorView)
+	sv := frame.InsertNewChild(KiT_TensorView, prIndex+1, "tensor-view").(*TensorView)
 	sv.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
 	if opts.Inactive {
 		sv.SetInactive()
@@ -59,7 +59,7 @@ func TensorGridDialog(ctx gi.Widget, tsr etensor.Tensor, title string) {
 
 // TableViewDialog is for editing an etable.Table using a TableView.
 // gopy:interface=handle
-func TableViewDialog(ctx gi.Widget, ix *etable.IdxView, title string) {
+func TableViewDialog(ctx gi.Widget, ix *etable.IndexView, title string) {
 	d := gi.NewBody()
 	if title != "" {
 		d.SetTitle(title)

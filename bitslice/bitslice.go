@@ -13,8 +13,8 @@ import "fmt"
 // when 0 then prior byte is all full and a new one must be added for append.
 type Slice []byte
 
-// BitIdx returns the byte, bit index of given bit index
-func BitIdx(idx int) (byte int, bit uint32) {
+// BitIndex returns the byte, bit index of given bit index
+func BitIndex(idx int) (byte int, bit uint32) {
 	return idx / 8, uint32(idx % 8)
 }
 
@@ -22,7 +22,7 @@ func BitIdx(idx int) (byte int, bit uint32) {
 // *bits* (rounds up 1 for both).
 // also reserves first byte for extra bits value
 func Make(ln, cp int) Slice {
-	by, bi := BitIdx(ln)
+	by, bi := BitIndex(ln)
 	bln := by
 	if bi != 0 {
 		bln++
@@ -59,7 +59,7 @@ func (bs *Slice) Cap() int {
 
 // SetLen sets the length of the slice, copying values if a new allocation is required
 func (bs *Slice) SetLen(ln int) {
-	by, bi := BitIdx(ln)
+	by, bi := BitIndex(ln)
 	bln := by
 	if bi != 0 {
 		bln++
@@ -77,7 +77,7 @@ func (bs *Slice) SetLen(ln int) {
 
 // Set sets value of given bit index -- no extra range checking is performed -- will panic if out of range
 func (bs *Slice) Set(idx int, val bool) {
-	by, bi := BitIdx(idx)
+	by, bi := BitIndex(idx)
 	if val {
 		(*bs)[by+1] |= 1 << bi
 	} else {
@@ -87,7 +87,7 @@ func (bs *Slice) Set(idx int, val bool) {
 
 // Index returns bit value at given bit index
 func (bs *Slice) Index(idx int) bool {
-	by, bi := BitIdx(idx)
+	by, bi := BitIndex(idx)
 	return ((*bs)[by+1] & (1 << bi)) != 0
 }
 

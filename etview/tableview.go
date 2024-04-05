@@ -32,7 +32,7 @@ type TableView struct {
 	giv.SliceViewBase
 
 	// the idx view of the table that we're a view of
-	Table *etable.IdxView `set:"-"`
+	Table *etable.IndexView `set:"-"`
 
 	// overall display options for tensor display
 	TsrDisp TensorDisp
@@ -47,7 +47,7 @@ type TableView struct {
 	NCols int `edit:"-"`
 
 	// current sort index
-	SortIdx int
+	SortIndex int
 
 	// whether current sort order is descending
 	SortDesc bool
@@ -76,7 +76,7 @@ func (tv *TableView) OnInit() {
 
 func (tv *TableView) SetStyles() {
 	tv.SliceViewBase.SetStyles() // handles all the basics
-	tv.SortIdx = -1
+	tv.SortIndex = -1
 	tv.TsrDisp.Defaults()
 	tv.ColTsrDisp = make(map[int]*TensorDisp)
 	tv.ColTsrBlank = make(map[int]*etensor.Float64)
@@ -101,7 +101,7 @@ func (tv *TableView) SetStyles() {
 			w.Style(func(s *styles.Style) {
 				if hdr, ok := w.(*gi.Button); ok {
 					fli := hdr.Prop("field-index").(int)
-					if fli == tv.SortIdx {
+					if fli == tv.SortIndex {
 						if tv.SortDesc {
 							hdr.SetIcon(icons.KeyboardArrowDown)
 						} else {
@@ -117,7 +117,7 @@ func (tv *TableView) SetStyles() {
 // StyleValueWidget performs additional value widget styling
 func (tv *TableView) StyleValueWidget(w gi.Widget, s *styles.Style, row, col int) {
 	hw := float32(tv.HeaderWidths[col])
-	if col == tv.SortIdx {
+	if col == tv.SortIndex {
 		hw += 6
 	}
 	if len(tv.ColMaxWidths) > col {
@@ -128,7 +128,7 @@ func (tv *TableView) StyleValueWidget(w gi.Widget, s *styles.Style, row, col int
 	s.SetTextWrap(false)
 }
 
-// SetTable sets the source table that we are viewing, using a sequential IdxView
+// SetTable sets the source table that we are viewing, using a sequential IndexView
 // and then configures the display
 func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	if et == nil {
@@ -136,7 +136,7 @@ func (tv *TableView) SetTable(et *etable.Table) *TableView {
 	}
 
 	tv.SetSliceBase()
-	tv.Table = etable.NewIdxView(et)
+	tv.Table = etable.NewIndexView(et)
 	tv.This().(giv.SliceViewer).UpdateSliceSize()
 	tv.Update()
 	return tv
@@ -153,9 +153,9 @@ func (tv *TableView) GoUpdateView() {
 	tv.AsyncUnlock()
 }
 
-// SetTableView sets the source IdxView of a table (using a copy so original is not modified)
+// SetTableView sets the source IndexView of a table (using a copy so original is not modified)
 // and then configures the display
-func (tv *TableView) SetTableView(ix *etable.IdxView) *TableView {
+func (tv *TableView) SetTableView(ix *etable.IndexView) *TableView {
 	if ix == nil {
 		return tv
 	}
@@ -234,7 +234,7 @@ func (tv *TableView) ConfigHeader() {
 		hdr.SetText(field)
 		hdr.SetProp("field-index", fli)
 		tv.HeaderWidths[fli] = len(field)
-		if fli == tv.SortIdx {
+		if fli == tv.SortIndex {
 			if tv.SortDesc {
 				hdr.SetIcon(icons.KeyboardArrowDown)
 			} else {
@@ -337,8 +337,8 @@ func (tv *TableView) ConfigRows() {
 						npv := laser.NonPtrValue(vv.Val())
 						sv := laser.ToString(npv.Interface())
 						si := tv.StartIndex + i
-						if si < len(tv.Table.Idxs) {
-							tv.Table.Table.SetCellStringIdx(fli, tv.Table.Idxs[si], sv)
+						if si < len(tv.Table.Indexes) {
+							tv.Table.Table.SetCellStringIndex(fli, tv.Table.Indexes[si], sv)
 						}
 					})
 				}
@@ -352,8 +352,8 @@ func (tv *TableView) ConfigRows() {
 							npv := laser.NonPtrValue(vv.Val())
 							fv := grr.Log1(laser.ToFloat(npv.Interface()))
 							si := tv.StartIndex + i
-							if si < len(tv.Table.Idxs) {
-								tv.Table.Table.SetCellFloatIdx(fli, tv.Table.Idxs[si], fv)
+							if si < len(tv.Table.Indexes) {
+								tv.Table.Table.SetCellFloatIndex(fli, tv.Table.Indexes[si], fv)
 							}
 						})
 					}
@@ -385,7 +385,7 @@ func (tv *TableView) ConfigRows() {
 			if isstr && i == 0 && tv.SliceSize > 0 {
 				tv.ColMaxWidths[fli] = 0
 				mxw := 0
-				for _, ixi := range tv.Table.Idxs {
+				for _, ixi := range tv.Table.Indexes {
 					if ixi >= 0 {
 						sval := stsr.Values[ixi]
 						mxw = max(mxw, len(sval))
@@ -432,8 +432,8 @@ func (tv *TableView) UpdateWidgets() {
 		ridx := i * nWidgPerRow
 		si := tv.StartIndex + i // slice idx
 		ixi := -1
-		if si < len(tv.Table.Idxs) {
-			ixi = tv.Table.Idxs[si]
+		if si < len(tv.Table.Indexes) {
+			ixi = tv.Table.Indexes[si]
 		}
 		invis := si >= tv.SliceSize
 
@@ -480,7 +480,7 @@ func (tv *TableView) UpdateWidgets() {
 					var cell etensor.Tensor
 					cell = tv.ColTensorBlank(fli, col)
 					if ixi >= 0 {
-						cell = tv.Table.Table.CellTensorIdx(fli, ixi)
+						cell = tv.Table.Table.CellTensorIndex(fli, ixi)
 					}
 					vv.SetSoloValue(reflect.ValueOf(cell))
 					tgw := w.This().(*TensorGrid)
@@ -583,7 +583,7 @@ func (tv *TableView) SliceDeleteAt(idx int) {
 
 // SortSliceAction sorts the slice for given field index -- toggles ascending
 // vs. descending if already sorting on this dimension
-func (tv *TableView) SortSliceAction(fldIdx int) {
+func (tv *TableView) SortSliceAction(fldIndex int) {
 	sgh := tv.SliceHeader()
 	_, idxOff := tv.RowWidgetNs()
 
@@ -592,8 +592,8 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 	for fli := 0; fli < tv.NCols; fli++ {
 		hdr := sgh.Child(idxOff + fli).(*gi.Button)
 		hdr.SetType(gi.ButtonAction)
-		if fli == fldIdx {
-			if tv.SortIdx == fli {
+		if fli == fldIndex {
+			if tv.SortIndex == fli {
 				tv.SortDesc = !tv.SortDesc
 				ascending = !tv.SortDesc
 			} else {
@@ -609,21 +609,21 @@ func (tv *TableView) SortSliceAction(fldIdx int) {
 		}
 	}
 
-	tv.SortIdx = fldIdx
-	if fldIdx == -1 {
-		tv.Table.SortIdxs()
+	tv.SortIndex = fldIndex
+	if fldIndex == -1 {
+		tv.Table.SortIndexes()
 	} else {
-		tv.Table.SortCol(tv.SortIdx, !tv.SortDesc)
+		tv.Table.SortCol(tv.SortIndex, !tv.SortDesc)
 	}
 	tv.Update() // requires full update due to sort button icon
 }
 
 // TensorDispAction allows user to select tensor display options for column
 // pass -1 for global params for the entire table
-func (tv *TableView) TensorDispAction(fldIdx int) {
+func (tv *TableView) TensorDispAction(fldIndex int) {
 	ctd := &tv.TsrDisp
-	if fldIdx >= 0 {
-		ctd = tv.SetColTensorDisp(fldIdx)
+	if fldIndex >= 0 {
+		ctd = tv.SetColTensorDisp(fldIndex)
 	}
 	d := gi.NewBody().AddTitle("Tensor Grid Display Options")
 	giv.NewStructView(d).SetStruct(ctd)
@@ -642,8 +642,8 @@ func (tv *TableView) StyleRow(w gi.Widget, idx, fidx int) {
 // SortFieldName returns the name of the field being sorted, along with :up or
 // :down depending on descending
 func (tv *TableView) SortFieldName() string {
-	if tv.SortIdx >= 0 && tv.SortIdx < tv.NCols {
-		nm := tv.Table.Table.ColNames[tv.SortIdx]
+	if tv.SortIndex >= 0 && tv.SortIndex < tv.NCols {
+		nm := tv.Table.Table.ColNames[tv.SortIndex]
 		if tv.SortDesc {
 			nm += ":down"
 		} else {
@@ -667,7 +667,7 @@ func (tv *TableView) SetSortFieldName(nm string) {
 		if fld == spnm[0] {
 			got = true
 			// fmt.Println("sorting on:", fld.Name, fli, "from:", nm)
-			tv.SortIdx = fli
+			tv.SortIndex = fli
 		}
 	}
 	if len(spnm) == 2 {
@@ -781,18 +781,18 @@ func (tv *TableView) MimeDataType() string {
 
 // CopySelToMime copies selected rows to mime data
 func (tv *TableView) CopySelToMime() mimedata.Mimes {
-	nitms := len(tv.SelectedIdxs)
+	nitms := len(tv.SelectedIndexes)
 	if nitms == 0 {
 		return nil
 	}
-	ix := &etable.IdxView{}
+	ix := &etable.IndexView{}
 	ix.Table = tv.Table.Table
-	idx := tv.SelectedIdxsList(false) // ascending
+	idx := tv.SelectedIndexesList(false) // ascending
 	iidx := make([]int, len(idx))
 	for i, di := range idx {
-		iidx[i] = tv.Table.Idxs[di]
+		iidx[i] = tv.Table.Indexes[di]
 	}
-	ix.Idxs = iidx
+	ix.Indexes = iidx
 	var b bytes.Buffer
 	ix.WriteCSV(&b, etable.Tab, etable.Headers)
 	md := mimedata.NewTextBytes(b.Bytes())
@@ -826,15 +826,15 @@ func (tv *TableView) PasteAssign(md mimedata.Mimes, idx int) {
 		return
 	}
 	updt := tv.UpdateStart()
-	tv.Table.Table.ReadCSVRow(recs[1], tv.Table.Idxs[idx])
+	tv.Table.Table.ReadCSVRow(recs[1], tv.Table.Indexes[idx])
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	tv.UpdateEnd(updt)
 }
 
-// PasteAtIdx inserts object(s) from mime data at (before) given slice index
+// PasteAtIndex inserts object(s) from mime data at (before) given slice index
 // adds to end of table
-func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
+func (tv *TableView) PasteAtIndex(md mimedata.Mimes, idx int) {
 	recs := tv.FromMimeData(md)
 	nr := len(recs) - 1
 	if nr <= 0 {
@@ -846,20 +846,20 @@ func (tv *TableView) PasteAtIdx(md mimedata.Mimes, idx int) {
 	tv.Table.InsertRows(idx, nr)
 	for ri := 0; ri < nr; ri++ {
 		rec := recs[1+ri]
-		rw := tv.Table.Idxs[idx+ri]
+		rw := tv.Table.Indexes[idx+ri]
 		tv.Table.Table.ReadCSVRow(rec, rw)
 	}
 	tv.SetChanged()
 	tv.This().(giv.SliceViewer).UpdateSliceGrid()
 	tv.UpdateEnd(updt)
-	tv.SelectIdxAction(idx, events.SelectOne)
+	tv.SelectIndexAction(idx, events.SelectOne)
 }
 
 func (tv *TableView) ItemCtxtMenu(idx int) {
 	var men gi.Menu
 	tv.StdCtxtMenu(&men, idx)
 	if len(men) > 0 {
-		pos := tv.IdxPos(idx)
+		pos := tv.IndexPos(idx)
 		gi.PopupMenu(men, pos.X, pos.Y, tv.ViewportSafe(), tv.Nm+"-menu")
 	}
 }

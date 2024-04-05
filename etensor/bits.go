@@ -173,9 +173,9 @@ func (tsr *Bits) SubSpaceTry(offs []int) (Tensor, error) {
 }
 
 // Range is not applicable to Bits tensor
-func (tsr *Bits) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Bits) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	return
 }
 

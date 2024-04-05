@@ -145,28 +145,28 @@ func (sh *Shape) Dim(i int) int { return sh.Shp[i] }
 // DimName returns the name of given dimension.
 func (sh *Shape) DimName(i int) string { return sh.Nms[i] }
 
-// DimIdxByNameTry returns the index of the given dimension name.
+// DimIndexByNameTry returns the index of the given dimension name.
 // and an error if name not found.
-func (sh *Shape) DimIdxByNameTry(name string) (int, error) {
+func (sh *Shape) DimIndexByNameTry(name string) (int, error) {
 	for i, nm := range sh.Nms {
 		if nm == name {
 			return i, nil
 		}
 	}
-	return -1, fmt.Errorf("etensor.Shape:DimIdxByNameTry -- dimension name not found: %s", name)
+	return -1, fmt.Errorf("etensor.Shape:DimIndexByNameTry -- dimension name not found: %s", name)
 }
 
-// DimIdxByName returns the index of the given dimension name.
+// DimIndexByName returns the index of the given dimension name.
 // returns -1 if not found.
-func (sh *Shape) DimIdxByName(name string) int {
-	idx, _ := sh.DimIdxByNameTry(name)
+func (sh *Shape) DimIndexByName(name string) int {
+	idx, _ := sh.DimIndexByNameTry(name)
 	return idx
 }
 
 // DimByName returns the size of given dimension, specified by name.
-// will crash if name not found -- use DimIdxByNameTry if not sure.
+// will crash if name not found -- use DimIndexByNameTry if not sure.
 func (sh *Shape) DimByName(name string) int {
-	return sh.Dim(sh.DimIdxByName(name))
+	return sh.Dim(sh.DimIndexByName(name))
 }
 
 // IsContiguous returns true if shape is either row or column major
@@ -174,8 +174,8 @@ func (sh *Shape) IsContiguous() bool {
 	return sh.IsRowMajor() || sh.IsColMajor()
 }
 
-// IdxIsValid() returns true if given index is valid (within ranges for all dimensions)
-func (sh *Shape) IdxIsValid(idx []int) bool {
+// IndexIsValid() returns true if given index is valid (within ranges for all dimensions)
+func (sh *Shape) IndexIsValid(idx []int) bool {
 	if len(idx) != sh.NumDims() {
 		return false
 	}
@@ -256,7 +256,7 @@ func (sh *Shape) Offset(index []int) int {
 func (sh *Shape) OffsetByName(names []string, index []int) int {
 	oidx := CopyInts(index)
 	for i, nm := range names {
-		idx := sh.DimIdxByName(nm)
+		idx := sh.DimIndexByName(nm)
 		oidx[idx] = index[i]
 	}
 	return sh.Offset(oidx)

@@ -18,13 +18,13 @@ func TestPermuted(t *testing.T) {
 		{"Input", etensor.FLOAT32, []int{5, 5}, []string{"Y", "X"}},
 		{"Output", etensor.FLOAT32, []int{5, 5}, []string{"Y", "X"}},
 	}, 25)
-	ix := etable.NewIdxView(dt)
+	ix := etable.NewIndexView(dt)
 	spl, err := Permuted(ix, []float64{.5, .5}, nil)
 	if err != nil {
 		t.Error(err)
 	}
 	for i, sp := range spl.Splits {
-		fmt.Printf("split: %v name: %v len: %v idxs: %v\n", i, spl.Values[i], len(sp.Idxs), sp.Idxs)
+		fmt.Printf("split: %v name: %v len: %v idxs: %v\n", i, spl.Values[i], len(sp.Indexes), sp.Indexes)
 	}
 
 	spl, err = Permuted(ix, []float64{.25, .5, .25}, []string{"test", "train", "validate"})
@@ -32,6 +32,6 @@ func TestPermuted(t *testing.T) {
 		t.Error(err)
 	}
 	for i, sp := range spl.Splits {
-		fmt.Printf("split: %v name: %v len: %v idxs: %v\n", i, spl.Values[i], len(sp.Idxs), sp.Idxs)
+		fmt.Printf("split: %v name: %v len: %v idxs: %v\n", i, spl.Values[i], len(sp.Indexes), sp.Indexes)
 	}
 }

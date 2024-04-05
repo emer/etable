@@ -182,21 +182,21 @@ func (tsr *Int64) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Int64) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Int64) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -745,21 +745,21 @@ func (tsr *Uint64) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Uint64) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Uint64) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -1305,21 +1305,21 @@ func (tsr *Int32) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Int32) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Int32) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -1868,21 +1868,21 @@ func (tsr *Uint32) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Uint32) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Uint32) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -2431,21 +2431,21 @@ func (tsr *Float32) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Float32) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Float32) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -2991,21 +2991,21 @@ func (tsr *Int16) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Int16) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Int16) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -3554,21 +3554,21 @@ func (tsr *Uint16) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Uint16) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Uint16) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -4114,21 +4114,21 @@ func (tsr *Int8) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Int8) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Int8) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return
@@ -4674,21 +4674,21 @@ func (tsr *Uint8) SetStringRowCell(row, cell int, val string) {
 // Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 // This is needed for display and is thus in the core api in optimized form
 // Other math operations can be done using gonum/floats package.
-func (tsr *Uint8) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *Uint8) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	for j, vl := range tsr.Values {
 		fv := float64(vl)
 		if math.IsNaN(fv) {
 			continue
 		}
-		if fv < min || minIdx < 0 {
+		if fv < min || minIndex < 0 {
 			min = fv
-			minIdx = j
+			minIndex = j
 		}
-		if fv > max || maxIdx < 0 {
+		if fv > max || maxIndex < 0 {
 			max = fv
-			maxIdx = j
+			maxIndex = j
 		}
 	}
 	return

@@ -81,7 +81,7 @@ func (dt *Table) SaveCSV(filename gi.Filename, delim Delims, headers bool) error
 // If headers = true then generate C++ emergent-tyle column headers.
 // These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
-func (ix *IdxView) SaveCSV(filename gi.Filename, delim Delims, headers bool) error { //gti:add
+func (ix *IndexView) SaveCSV(filename gi.Filename, delim Delims, headers bool) error { //gti:add
 	fp, err := os.Create(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -131,14 +131,14 @@ func (dt *Table) OpenFS(fsys fs.FS, filename string, delim Delims) error {
 // information for tensor dimensionality.
 // If the table DOES have existing columns, then those are used robustly
 // for whatever information fits from each row of the file.
-func (ix *IdxView) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
+func (ix *IndexView) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
 	err := ix.Table.OpenCSV(filename, delim)
 	ix.Sequential()
 	return err
 }
 
-// OpenFS is the version of [IdxView.OpenCSV] that uses an [fs.FS] filesystem.
-func (ix *IdxView) OpenFS(fsys fs.FS, filename string, delim Delims) error {
+// OpenFS is the version of [IndexView.OpenCSV] that uses an [fs.FS] filesystem.
+func (ix *IndexView) OpenFS(fsys fs.FS, filename string, delim Delims) error {
 	err := ix.Table.OpenFS(fsys, filename, delim)
 	ix.Sequential()
 	return err
@@ -421,7 +421,7 @@ func (dt *Table) WriteCSV(w io.Writer, delim Delims, headers bool) error {
 // If headers = true then generate C++ emergent-style column headers.
 // These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
-func (ix *IdxView) WriteCSV(w io.Writer, delim Delims, headers bool) error {
+func (ix *IndexView) WriteCSV(w io.Writer, delim Delims, headers bool) error {
 	ncol := 0
 	var err error
 	if headers {
@@ -435,7 +435,7 @@ func (ix *IdxView) WriteCSV(w io.Writer, delim Delims, headers bool) error {
 	cw.Comma = delim.Rune()
 	nrow := ix.Len()
 	for ri := 0; ri < nrow; ri++ {
-		err = ix.Table.WriteCSVRowWriter(cw, ix.Idxs[ri], ncol)
+		err = ix.Table.WriteCSVRowWriter(cw, ix.Indexes[ri], ncol)
 		if err != nil {
 			log.Println(err)
 			return err

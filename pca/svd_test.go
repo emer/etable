@@ -37,7 +37,7 @@ func TestSVDIris(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	ix := etable.NewIdxView(dt)
+	ix := etable.NewIndexView(dt)
 	pc := &SVD{}
 	pc.Init()
 	pc.Kind = mat.SVDFull

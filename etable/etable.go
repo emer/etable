@@ -78,16 +78,16 @@ func (dt *Table) ColByName(name string) etensor.Tensor {
 
 // ColByNameTry returns the tensor at given column name, if not found, returns error
 func (dt *Table) ColByNameTry(name string) (etensor.Tensor, error) {
-	i, err := dt.ColIdxTry(name)
+	i, err := dt.ColIndexTry(name)
 	if err != nil {
 		return nil, err
 	}
 	return dt.Cols[i], nil
 }
 
-// ColIdx returns the index of the given column name.
+// ColIndex returns the index of the given column name.
 // returns -1 if name not found -- see Try version for error message.
-func (dt *Table) ColIdx(name string) int {
+func (dt *Table) ColIndex(name string) int {
 	i, ok := dt.ColNameMap[name]
 	if !ok {
 		return -1
@@ -95,41 +95,41 @@ func (dt *Table) ColIdx(name string) int {
 	return i
 }
 
-// ColIdxTry returns the index of the given column name,
+// ColIndexTry returns the index of the given column name,
 // along with an error if not found.
-func (dt *Table) ColIdxTry(name string) (int, error) {
+func (dt *Table) ColIndexTry(name string) (int, error) {
 	i, ok := dt.ColNameMap[name]
 	if !ok {
-		return 0, fmt.Errorf("etable.Table ColIdx: column named: %v not found", name)
+		return 0, fmt.Errorf("etable.Table ColIndex: column named: %v not found", name)
 	}
 	return i, nil
 }
 
-// ColIdxsByNames returns the indexes of the given column names.
+// ColIndexesByNames returns the indexes of the given column names.
 // idxs have -1 if name not found -- see Try version for error message.
-func (dt *Table) ColIdxsByNames(names []string) []int {
+func (dt *Table) ColIndexesByNames(names []string) []int {
 	nc := len(names)
 	if nc == 0 {
 		return nil
 	}
 	cidx := make([]int, nc)
 	for i, cn := range names {
-		cidx[i] = dt.ColIdx(cn)
+		cidx[i] = dt.ColIndex(cn)
 	}
 	return cidx
 }
 
-// ColsIdxsByNamesTry returns the indexes of the given column names,
+// ColsIndexesByNamesTry returns the indexes of the given column names,
 // along with an error if any not found.
-func (dt *Table) ColIdxsByNamesTry(names []string) ([]int, error) {
+func (dt *Table) ColIndexesByNamesTry(names []string) ([]int, error) {
 	nc := len(names)
 	if nc == 0 {
-		return nil, fmt.Errorf("etable.Table ColsByNamesIdxs: no column names provided")
+		return nil, fmt.Errorf("etable.Table ColsByNamesIndexes: no column names provided")
 	}
 	cidx := make([]int, nc)
 	var err error
 	for i, cn := range names {
-		cidx[i], err = dt.ColIdxTry(cn)
+		cidx[i], err = dt.ColIndexTry(cn)
 		if err != nil {
 			return nil, err
 		}
@@ -172,16 +172,16 @@ func (dt *Table) AddCol(tsr etensor.Tensor, name string) error {
 
 // DeleteColName deletes column of given name.
 func (dt *Table) DeleteColName(name string) error {
-	ci, err := dt.ColIdxTry(name)
+	ci, err := dt.ColIndexTry(name)
 	if err != nil {
 		return err
 	}
-	dt.DeleteColIdx(ci)
+	dt.DeleteColIndex(ci)
 	return nil
 }
 
-// DeleteColIdx deletes column of given index
-func (dt *Table) DeleteColIdx(idx int) {
+// DeleteColIndex deletes column of given index
+func (dt *Table) DeleteColIndex(idx int) {
 	dt.Cols = append(dt.Cols[:idx], dt.Cols[idx+1:]...)
 	dt.ColNames = append(dt.ColNames[:idx], dt.ColNames[idx+1:]...)
 	dt.UpdateColNameMap()
@@ -282,7 +282,7 @@ func (dt *Table) AppendRows(dt2 *Table) {
 	strow := dt.NumRows()
 	for iCol := range dt.Cols {
 		colName := dt.ColName(iCol)
-		if dt2.ColIdx(colName) != -1 {
+		if dt2.ColIndex(colName) != -1 {
 			if !shared {
 				shared = true
 				dt.AddRows(dt2.NumRows())
@@ -334,12 +334,12 @@ const (
 	UseCase = false
 )
 
-// RowsByStringIdx returns the list of rows that have given
+// RowsByStringIndex returns the list of rows that have given
 // string value in given column index.
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
 // Use named args for greater clarity.
-func (dt *Table) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bool) []int {
-	col := dt.Cols[colIdx]
+func (dt *Table) RowsByStringIndex(colIndex int, str string, contains, ignoreCase bool) []int {
+	col := dt.Cols[colIndex]
 	lowstr := strings.ToLower(str)
 	var idxs []int
 	for i := 0; i < dt.Rows; i++ {
@@ -367,11 +367,11 @@ func (dt *Table) RowsByStringIdx(colIdx int, str string, contains, ignoreCase bo
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
 // Use named args for greater clarity.
 func (dt *Table) RowsByString(colNm string, str string, contains, ignoreCase bool) []int {
-	ci := dt.ColIdx(colNm)
+	ci := dt.ColIndex(colNm)
 	if ci < 0 {
 		return nil
 	}
-	return dt.RowsByStringIdx(ci, str, contains, ignoreCase)
+	return dt.RowsByStringIndex(ci, str, contains, ignoreCase)
 }
 
 // RowsByStringTry returns the list of rows that have given
@@ -379,20 +379,20 @@ func (dt *Table) RowsByString(colNm string, str string, contains, ignoreCase boo
 // if contains, only checks if row contains string; if ignoreCase, ignores case.
 // Use named args for greater clarity.
 func (dt *Table) RowsByStringTry(colNm string, str string, contains, ignoreCase bool) ([]int, error) {
-	ci, err := dt.ColIdxTry(colNm)
+	ci, err := dt.ColIndexTry(colNm)
 	if err != nil {
 		return nil, err
 	}
-	return dt.RowsByStringIdx(ci, str, contains, ignoreCase), nil
+	return dt.RowsByStringIndex(ci, str, contains, ignoreCase), nil
 }
 
 //////////////////////////////////////////////////////////////////////////////////////
 //  Cell convenience access methods
 
-// CellFloatIdx returns the float64 value of cell at given column, row index
+// CellFloatIndex returns the float64 value of cell at given column, row index
 // for columns that have 1-dimensional tensors.
 // Returns NaN if column is not a 1-dimensional tensor or row not valid.
-func (dt *Table) CellFloatIdx(col, row int) float64 {
+func (dt *Table) CellFloatIndex(col, row int) float64 {
 	if !dt.IsValidRow(row) {
 		return math.NaN()
 	}
@@ -437,10 +437,10 @@ func (dt *Table) CellFloatTry(colNm string, row int) (float64, error) {
 	return ct.FloatVal1D(row), nil
 }
 
-// CellStringIdx returns the string value of cell at given column, row index
+// CellStringIndex returns the string value of cell at given column, row index
 // for columns that have 1-dimensional tensors.
 // Returns "" if column is not a 1-dimensional tensor or row not valid.
-func (dt *Table) CellStringIdx(col, row int) string {
+func (dt *Table) CellStringIndex(col, row int) string {
 	if !dt.IsValidRow(row) {
 		return ""
 	}
@@ -485,12 +485,12 @@ func (dt *Table) CellStringTry(colNm string, row int) (string, error) {
 	return ct.StringVal1D(row), nil
 }
 
-// CellTensorIdx returns the tensor SubSpace for given column, row index
+// CellTensorIndex returns the tensor SubSpace for given column, row index
 // for columns that have higher-dimensional tensors so each row is
 // represented by an n-1 dimensional tensor, with the outer dimension
 // being the row number.  Returns nil if column is a 1-dimensional
 // tensor or there is any error from the etensor.Tensor.SubSpace call.
-func (dt *Table) CellTensorIdx(col, row int) etensor.Tensor {
+func (dt *Table) CellTensorIndex(col, row int) etensor.Tensor {
 	if !dt.IsValidRow(row) {
 		return nil
 	}
@@ -591,9 +591,9 @@ func (dt *Table) CellTensorFloat1DTry(colNm string, row int, idx int) (float64, 
 /////////////////////////////////////////////////////////////////////////////////////
 //  Set
 
-// SetCellFloatIdx sets the float64 value of cell at given column, row index
+// SetCellFloatIndex sets the float64 value of cell at given column, row index
 // for columns that have 1-dimensional tensors.  Returns true if set.
-func (dt *Table) SetCellFloatIdx(col, row int, val float64) bool {
+func (dt *Table) SetCellFloatIndex(col, row int, val float64) bool {
 	if !dt.IsValidRow(row) {
 		return false
 	}
@@ -640,9 +640,9 @@ func (dt *Table) SetCellFloatTry(colNm string, row int, val float64) error {
 	return nil
 }
 
-// SetCellStringIdx sets the string value of cell at given column, row index
+// SetCellStringIndex sets the string value of cell at given column, row index
 // for columns that have 1-dimensional tensors.  Returns true if set.
-func (dt *Table) SetCellStringIdx(col, row int, val string) bool {
+func (dt *Table) SetCellStringIndex(col, row int, val string) bool {
 	if !dt.IsValidRow(row) {
 		return false
 	}
@@ -689,9 +689,9 @@ func (dt *Table) SetCellStringTry(colNm string, row int, val string) error {
 	return nil
 }
 
-// SetCellTensorIdx sets the tensor value of cell at given column, row index
+// SetCellTensorIndex sets the tensor value of cell at given column, row index
 // for columns that have n-dimensional tensors.  Returns true if set.
-func (dt *Table) SetCellTensorIdx(col, row int, val etensor.Tensor) bool {
+func (dt *Table) SetCellTensorIndex(col, row int, val etensor.Tensor) bool {
 	if !dt.IsValidRow(row) {
 		return false
 	}
@@ -717,11 +717,11 @@ func (dt *Table) SetCellTensor(colNm string, row int, val etensor.Tensor) bool {
 	if !dt.IsValidRow(row) {
 		return false
 	}
-	ci := dt.ColIdx(colNm)
+	ci := dt.ColIndex(colNm)
 	if ci < 0 {
 		return false
 	}
-	return dt.SetCellTensorIdx(ci, row, val)
+	return dt.SetCellTensorIndex(ci, row, val)
 }
 
 // SetCellTensorTry sets the string value of cell at given column (by name), row index
@@ -731,11 +731,11 @@ func (dt *Table) SetCellTensorTry(colNm string, row int, val etensor.Tensor) err
 	if err := dt.IsValidRowTry(row); err != nil {
 		return err
 	}
-	ci, err := dt.ColIdxTry(colNm)
+	ci, err := dt.ColIndexTry(colNm)
 	if err != nil {
 		return err
 	}
-	dt.SetCellTensorIdx(ci, row, val)
+	dt.SetCellTensorIndex(ci, row, val)
 	return nil
 }
 

@@ -13,7 +13,7 @@ import (
 )
 
 // CovarTableCol generates a covariance matrix from given column name
-// in given IdxView of an etable.Table, and given metric function
+// in given IndexView of an etable.Table, and given metric function
 // (typically Covariance or Correlation -- use Covar if vars have similar
 // overall scaling, which is typical in neural network models, and use
 // Correl if they are on very different scales -- Correl effectively rescales).
@@ -22,7 +22,7 @@ import (
 // cell co-varies in its value with each other cell across the rows of the table.
 // This is the input to the PCA eigenvalue decomposition of the resulting
 // covariance matrix.
-func CovarTableCol(cmat etensor.Tensor, ix *etable.IdxView, colNm string, mfun metric.Func64) error {
+func CovarTableCol(cmat etensor.Tensor, ix *etable.IndexView, colNm string, mfun metric.Func64) error {
 	col, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err
@@ -139,12 +139,12 @@ func CovarTensor(cmat etensor.Tensor, tsr etensor.Tensor, mfun metric.Func64) er
 
 // TableColRowsVec extracts row-wise vector from given cell index into vec.
 // vec must be of size ix.Len() -- number of rows
-func TableColRowsVec(vec []float64, ix *etable.IdxView, col etensor.Tensor, cidx int) {
+func TableColRowsVec(vec []float64, ix *etable.IndexView, col etensor.Tensor, cidx int) {
 	rows := ix.Len()
 	ln := col.Len()
 	sz := ln / col.Dim(0) // size of cell
 	for ri := 0; ri < rows; ri++ {
-		coff := ix.Idxs[ri]*sz + cidx
+		coff := ix.Indexes[ri]*sz + cidx
 		vec[ri] = col.FloatVal1D(coff)
 	}
 }
@@ -162,7 +162,7 @@ func TensorRowsVec(vec []float64, tsr etensor.Tensor, cidx int) {
 }
 
 // CovarTableColStd generates a covariance matrix from given column name
-// in given IdxView of an etable.Table, and given metric function
+// in given IndexView of an etable.Table, and given metric function
 // (typically Covariance or Correlation -- use Covar if vars have similar
 // overall scaling, which is typical in neural network models, and use
 // Correl if they are on very different scales -- Correl effectively rescales).
@@ -172,7 +172,7 @@ func TensorRowsVec(vec []float64, tsr etensor.Tensor, cidx int) {
 // This is the input to the PCA eigenvalue decomposition of the resulting
 // covariance matrix.
 // This Std version is usable e.g., in Python where the func cannot be passed.
-func CovarTableColStd(cmat etensor.Tensor, ix *etable.IdxView, colNm string, met metric.StdMetrics) error {
+func CovarTableColStd(cmat etensor.Tensor, ix *etable.IndexView, colNm string, met metric.StdMetrics) error {
 	return CovarTableCol(cmat, ix, colNm, metric.StdFunc64(met))
 }
 

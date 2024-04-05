@@ -3,11 +3,11 @@
 // license that can be found in the LICENSE file.
 
 /*
-Package agg provides aggregation functions operating on IdxView indexed views
+Package agg provides aggregation functions operating on IndexView indexed views
 of etable.Table data, along with standard AggFunc functions that can be used
 at any level of aggregation from etensor on up.
 
-The main functions use names to specify columns, and *Idx and *Try versions
+The main functions use names to specify columns, and *Index and *Try versions
 are available that operate on column indexes and return errors, respectively.
 
 See tsragg package for functions that operate directly on a etensor.Tensor

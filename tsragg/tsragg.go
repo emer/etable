@@ -5,7 +5,7 @@
 /*
 Package tsragg provides aggregation functions (Sum, Mean, etc) that
 operate directly on etensor.Tensor data.  See also agg package that
-operates on an IdxView of an etable.Table column.
+operates on an IndexView of an etable.Table column.
 */
 package tsragg
 

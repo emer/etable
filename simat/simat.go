@@ -35,19 +35,19 @@ func (smat *SimMat) Init() {
 }
 
 // TableColStd generates a similarity / distance matrix from given column name
-// in given IdxView of an etable.Table, and given standard metric function.
+// in given IndexView of an etable.Table, and given standard metric function.
 // if labNm is not empty, uses given column name for labels, which if blankRepeat
 // is true are filtered so that any sequentially repeated labels are blank.
 // This Std version is usable e.g., in Python where the func cannot be passed.
-func (smat *SimMat) TableColStd(ix *etable.IdxView, colNm, labNm string, blankRepeat bool, met metric.StdMetrics) error {
+func (smat *SimMat) TableColStd(ix *etable.IndexView, colNm, labNm string, blankRepeat bool, met metric.StdMetrics) error {
 	return smat.TableCol(ix, colNm, labNm, blankRepeat, metric.StdFunc64(met))
 }
 
 // TableCol generates a similarity / distance matrix from given column name
-// in given IdxView of an etable.Table, and given metric function.
+// in given IndexView of an etable.Table, and given metric function.
 // if labNm is not empty, uses given column name for labels, which if blankRepeat
 // is true are filtered so that any sequentially repeated labels are blank.
-func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, blankRepeat bool, mfun metric.Func64) error {
+func (smat *SimMat) TableCol(ix *etable.IndexView, colNm, labNm string, blankRepeat bool, mfun metric.Func64) error {
 	col, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err
@@ -72,12 +72,12 @@ func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, blankRepea
 	brdim := []int{0}
 	sdim := []int{0, 0}
 	for ai := 0; ai < rows; ai++ {
-		ardim[0] = ix.Idxs[ai]
+		ardim[0] = ix.Indexes[ai]
 		sdim[0] = ai
 		ar := col.SubSpace(ardim)
 		ar.Floats(&av)
 		for bi := 0; bi <= ai; bi++ { // lower diag
-			brdim[0] = ix.Idxs[bi]
+			brdim[0] = ix.Indexes[bi]
 			sdim[1] = bi
 			br := col.SubSpace(brdim)
 			br.Floats(&bv)
@@ -118,7 +118,7 @@ func (smat *SimMat) TableCol(ix *etable.IdxView, colNm, labNm string, blankRepea
 	smat.Rows = make([]string, rows)
 	last := ""
 	for r := 0; r < rows; r++ {
-		lbl := lc.StringVal1D(ix.Idxs[r])
+		lbl := lc.StringVal1D(ix.Indexes[r])
 		if blankRepeat && lbl == last {
 			continue
 		}

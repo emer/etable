@@ -168,9 +168,9 @@ func (tsr *String) SetStringRowCell(row, cell int, val string) {
 }
 
 // Range is not applicable to String tensor
-func (tsr *String) Range() (min, max float64, minIdx, maxIdx int) {
-	minIdx = -1
-	maxIdx = -1
+func (tsr *String) Range() (min, max float64, minIndex, maxIndex int) {
+	minIndex = -1
+	maxIndex = -1
 	return
 }
 
@@ -433,7 +433,7 @@ func (tsr *String) String() string {
 		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
 		b.WriteString(fmt.Sprintf("%v: ", rc))
 		for c := 0; c < cols; c++ {
-			idx := Prjn2DIdx(&tsr.Shape, oddRow, r, c)
+			idx := Prjn2DIndex(&tsr.Shape, oddRow, r, c)
 			vl := tsr.Values[idx]
 			b.WriteString(fmt.Sprintf("%s, ", vl))
 		}

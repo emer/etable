@@ -46,7 +46,7 @@ func (pca *PCA) Init() {
 // This is the input to the PCA eigenvalue decomposition of the resulting
 // covariance matrix, which extracts the eigenvectors as directions with maximal
 // variance in this matrix.
-func (pca *PCA) TableCol(ix *etable.IdxView, colNm string, mfun metric.Func64) error {
+func (pca *PCA) TableCol(ix *etable.IndexView, colNm string, mfun metric.Func64) error {
 	if pca.Covar == nil {
 		pca.Init()
 	}
@@ -95,7 +95,7 @@ func (pca *PCA) Tensor(tsr etensor.Tensor, mfun metric.Func64) error {
 // covariance matrix, which extracts the eigenvectors as directions with maximal
 // variance in this matrix.
 // This Std version is usable e.g., in Python where the func cannot be passed.
-func (pca *PCA) TableColStd(ix *etable.IdxView, colNm string, met metric.StdMetrics) error {
+func (pca *PCA) TableColStd(ix *etable.IndexView, colNm string, met metric.StdMetrics) error {
 	return pca.TableCol(ix, colNm, metric.StdFunc64(met))
 }
 
@@ -143,10 +143,10 @@ func (pca *PCA) PCA() error {
 	return nil
 }
 
-// ProjectCol projects values from the given colNm of given table (via IdxView)
+// ProjectCol projects values from the given colNm of given table (via IndexView)
 // onto the idx'th eigenvector (0 = largest eigenvalue, 1 = next, etc).
 // Must have already called PCA() method.
-func (pca *PCA) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, idx int) error {
+func (pca *PCA) ProjectCol(vals *[]float64, ix *etable.IndexView, colNm string, idx int) error {
 	col, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err
@@ -175,7 +175,7 @@ func (pca *PCA) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, id
 	rdim := []int{0}
 	for row := 0; row < rows; row++ {
 		sum := 0.0
-		rdim[0] = ix.Idxs[row]
+		rdim[0] = ix.Indexes[row]
 		rt := col.SubSpace(rdim)
 		for ci := 0; ci < sz; ci++ {
 			sum += cvec[ci] * rt.FloatVal1D(ci)
@@ -185,11 +185,11 @@ func (pca *PCA) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, id
 	return nil
 }
 
-// ProjectColToTable projects values from the given colNm of given table (via IdxView)
+// ProjectColToTable projects values from the given colNm of given table (via IndexView)
 // onto the given set of eigenvectors (idxs, 0 = largest eigenvalue, 1 = next, etc),
 // and stores results along with labels from column labNm into results table.
 // Must have already called PCA() method.
-func (pca *PCA) ProjectColToTable(prjns *etable.Table, ix *etable.IdxView, colNm, labNm string, idxs []int) error {
+func (pca *PCA) ProjectColToTable(prjns *etable.Table, ix *etable.IndexView, colNm, labNm string, idxs []int) error {
 	_, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err

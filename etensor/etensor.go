@@ -191,7 +191,7 @@ type Tensor interface {
 	// Range returns the min, max (and associated indexes, -1 = no values) for the tensor.
 	// This is needed for display and is thus in the core api in optimized form
 	// Other math operations can be done using gonum/floats package.
-	Range() (min, max float64, minIdx, maxIdx int)
+	Range() (min, max float64, minIndex, maxIndex int)
 
 	// Agg applies given aggregation function to each element in the tensor
 	// (automatically skips IsNull and NaN elements), using float64 conversions of the values.

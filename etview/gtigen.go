@@ -54,7 +54,7 @@ func (t *SimMatGrid) SetDisp(v TensorDisp) *SimMatGrid { t.Disp = v; return t }
 func (t *SimMatGrid) SetColorMap(v *colormap.Map) *SimMatGrid { t.ColorMap = v; return t }
 
 // TableViewType is the [gti.Type] for [TableView]
-var TableViewType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TableView", IDName: "table-view", Doc: "etview.TableView provides a GUI interface for etable.Table's", Embeds: []gti.Field{{Name: "SliceViewBase"}}, Fields: []gti.Field{{Name: "Table", Doc: "the idx view of the table that we're a view of"}, {Name: "TsrDisp", Doc: "overall display options for tensor display"}, {Name: "ColTsrDisp", Doc: "per column tensor display params"}, {Name: "ColTsrBlank", Doc: "per column blank tensor values"}, {Name: "NCols", Doc: "number of columns in table (as of last update)"}, {Name: "SortIdx", Doc: "current sort index"}, {Name: "SortDesc", Doc: "whether current sort order is descending"}, {Name: "HeaderWidths", Doc: "HeaderWidths has number of characters in each header, per visfields"}, {Name: "ColMaxWidths", Doc: "ColMaxWidths records maximum width in chars of string type fields"}, {Name: "BlankString", Doc: "\tblank values for out-of-range rows"}, {Name: "BlankFloat"}}, Instance: &TableView{}})
+var TableViewType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etview.TableView", IDName: "table-view", Doc: "etview.TableView provides a GUI interface for etable.Table's", Embeds: []gti.Field{{Name: "SliceViewBase"}}, Fields: []gti.Field{{Name: "Table", Doc: "the idx view of the table that we're a view of"}, {Name: "TsrDisp", Doc: "overall display options for tensor display"}, {Name: "ColTsrDisp", Doc: "per column tensor display params"}, {Name: "ColTsrBlank", Doc: "per column blank tensor values"}, {Name: "NCols", Doc: "number of columns in table (as of last update)"}, {Name: "SortIndex", Doc: "current sort index"}, {Name: "SortDesc", Doc: "whether current sort order is descending"}, {Name: "HeaderWidths", Doc: "HeaderWidths has number of characters in each header, per visfields"}, {Name: "ColMaxWidths", Doc: "ColMaxWidths records maximum width in chars of string type fields"}, {Name: "BlankString", Doc: "\tblank values for out-of-range rows"}, {Name: "BlankFloat"}}, Instance: &TableView{}})
 
 // NewTableView adds a new [TableView] with the given name to the given parent:
 // etview.TableView provides a GUI interface for etable.Table's
@@ -87,9 +87,9 @@ func (t *TableView) SetColTsrBlank(v map[int]*etensor.Float64) *TableView {
 // number of columns in table (as of last update)
 func (t *TableView) SetNCols(v int) *TableView { t.NCols = v; return t }
 
-// SetSortIdx sets the [TableView.SortIdx]:
+// SetSortIndex sets the [TableView.SortIndex]:
 // current sort index
-func (t *TableView) SetSortIdx(v int) *TableView { t.SortIdx = v; return t }
+func (t *TableView) SetSortIndex(v int) *TableView { t.SortIndex = v; return t }
 
 // SetSortDesc sets the [TableView.SortDesc]:
 // whether current sort order is descending

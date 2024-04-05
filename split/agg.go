@@ -11,13 +11,13 @@ import (
 	"github.com/emer/etable/v2/etable"
 )
 
-// AggIdx performs aggregation using given standard aggregation function across
+// AggIndex performs aggregation using given standard aggregation function across
 // all splits, and returns the SplitAgg container of the results, which are also
 // stored in the Splits.  Column is specified by index.
-func AggIdx(spl *etable.Splits, colIdx int, aggTyp agg.Aggs) *etable.SplitAgg {
-	ag := spl.AddAgg(agg.AggsName(aggTyp), colIdx)
+func AggIndex(spl *etable.Splits, colIndex int, aggTyp agg.Aggs) *etable.SplitAgg {
+	ag := spl.AddAgg(agg.AggsName(aggTyp), colIndex)
 	for _, sp := range spl.Splits {
-		agv := agg.AggIdx(sp, colIdx, aggTyp)
+		agv := agg.AggIndex(sp, colIndex, aggTyp)
 		ag.Aggs = append(ag.Aggs, agv)
 	}
 	return ag
@@ -31,7 +31,7 @@ func Agg(spl *etable.Splits, colNm string, aggTyp agg.Aggs) *etable.SplitAgg {
 	if dt == nil {
 		return nil
 	}
-	return AggIdx(spl, dt.ColIdx(colNm), aggTyp)
+	return AggIndex(spl, dt.ColIndex(colNm), aggTyp)
 }
 
 // AggTry performs aggregation using given standard aggregation function across
@@ -42,11 +42,11 @@ func AggTry(spl *etable.Splits, colNm string, aggTyp agg.Aggs) (*etable.SplitAgg
 	if dt == nil {
 		return nil, fmt.Errorf("split.AggTry: No splits to aggregate over")
 	}
-	colIdx, err := dt.ColIdxTry(colNm)
+	colIndex, err := dt.ColIndexTry(colNm)
 	if err != nil {
 		return nil, err
 	}
-	return AggIdx(spl, colIdx, aggTyp), nil
+	return AggIndex(spl, colIndex, aggTyp), nil
 }
 
 // AggAllNumericCols performs aggregation using given standard aggregation function across
@@ -57,27 +57,27 @@ func AggAllNumericCols(spl *etable.Splits, aggTyp agg.Aggs) {
 		if !cl.DataType().IsNumeric() {
 			continue
 		}
-		AggIdx(spl, ci, aggTyp)
+		AggIndex(spl, ci, aggTyp)
 	}
 }
 
 ///////////////////////////////////////////////////
 //   Desc
 
-// DescIdx performs aggregation using standard aggregation functions across
+// DescIndex performs aggregation using standard aggregation functions across
 // all splits, and stores results in the Splits.  Column is specified by index.
-func DescIdx(spl *etable.Splits, colIdx int) {
+func DescIndex(spl *etable.Splits, colIndex int) {
 	dt := spl.Table()
 	if dt == nil {
 		return
 	}
-	col := dt.Cols[colIdx]
+	col := dt.Cols[colIndex]
 	allAggs := agg.DescAggs
 	if col.NumDims() > 1 { // nd cannot do qiles
 		allAggs = agg.DescAggsND
 	}
 	for _, ag := range allAggs {
-		AggIdx(spl, colIdx, ag)
+		AggIndex(spl, colIndex, ag)
 	}
 }
 
@@ -89,7 +89,7 @@ func Desc(spl *etable.Splits, colNm string) {
 	if dt == nil {
 		return
 	}
-	DescIdx(spl, dt.ColIdx(colNm))
+	DescIndex(spl, dt.ColIndex(colNm))
 }
 
 // DescTry performs aggregation using standard aggregation functions across
@@ -100,10 +100,10 @@ func DescTry(spl *etable.Splits, colNm string) error {
 	if dt == nil {
 		return fmt.Errorf("split.DescTry: No splits to aggregate over")
 	}
-	colIdx, err := dt.ColIdxTry(colNm)
+	colIndex, err := dt.ColIndexTry(colNm)
 	if err != nil {
 		return err
 	}
-	DescIdx(spl, colIdx)
+	DescIndex(spl, colIndex)
 	return nil
 }

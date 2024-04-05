@@ -36,7 +36,7 @@ type Plot2D struct { //gti:add
 	gi.Layout
 
 	// the idxview of the table that we're plotting
-	Table *etable.IdxView `set:"-"`
+	Table *etable.IndexView `set:"-"`
 
 	// the overall plot parameters
 	Params PlotParams
@@ -93,14 +93,14 @@ func (pl *Plot2D) OnAdd() {
 
 // SetTable sets the table to view and updates view
 func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
-	pl.Table = etable.NewIdxView(tab)
+	pl.Table = etable.NewIndexView(tab)
 	pl.DeleteCols()
 	pl.Update()
 	return pl
 }
 
 // SetTableView sets the idxview of table to view and updates view
-func (pl *Plot2D) SetTableView(tab *etable.IdxView) *Plot2D {
+func (pl *Plot2D) SetTableView(tab *etable.IndexView) *Plot2D {
 	pl.Table = tab
 	pl.DeleteCols()
 	pl.Update()
@@ -227,7 +227,7 @@ func (pl *Plot2D) XLabel() string {
 	return "X"
 }
 
-// GoUpdatePlot updates the display based on current IdxView into table.
+// GoUpdatePlot updates the display based on current IndexView into table.
 // this version can be called from go routines.
 func (pl *Plot2D) GoUpdatePlot() {
 	if pl == nil || pl.This() == nil {
@@ -243,7 +243,7 @@ func (pl *Plot2D) GoUpdatePlot() {
 	pl.Scene.NeedsRender()
 }
 
-// UpdatePlot updates the display based on current IdxView into table.
+// UpdatePlot updates the display based on current IndexView into table.
 // This version can only be called within main goroutine for
 // window eventloop -- use GoUpdateUplot for other-goroutine updates.
 func (pl *Plot2D) UpdatePlot() {
@@ -277,7 +277,7 @@ func (pl *Plot2D) GenPlot() {
 		pl.InPlot = false
 		return
 	}
-	lsti := pl.Table.Idxs[pl.Table.Len()-1]
+	lsti := pl.Table.Indexes[pl.Table.Len()-1]
 	if lsti >= pl.Table.Table.Rows { // out of date
 		pl.Table.Sequential()
 	}
@@ -299,8 +299,8 @@ func (pl *Plot2D) GenPlot() {
 
 // PlotXAxis processes the XAxis and returns its index and any breaks to insert
 // based on negative X axis traversals or NaN values.  xbreaks always ends in last row.
-func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview *etable.IdxView, xbreaks []int, err error) {
-	xi, err = ixvw.Table.ColIdxTry(pl.Params.XAxisCol)
+func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IndexView) (xi int, xview *etable.IndexView, xbreaks []int, err error) {
+	xi, err = ixvw.Table.ColIndexTry(pl.Params.XAxisCol)
 	if err != nil {
 		log.Println("eplot.PlotXAxis: " + err.Error())
 		return
@@ -320,9 +320,9 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 	}
 	if xc.NumDims() > 1 {
 		sz = xc.Len() / xc.Dim(0)
-		if xp.TensorIdx > sz || xp.TensorIdx < 0 {
-			log.Printf("eplot.PlotXAxis: TensorIdx invalid -- reset to 0")
-			xp.TensorIdx = 0
+		if xp.TensorIndex > sz || xp.TensorIndex < 0 {
+			log.Printf("eplot.PlotXAxis: TensorIndex invalid -- reset to 0")
+			xp.TensorIndex = 0
 		}
 	}
 	if lim {
@@ -333,7 +333,7 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 			}
 			var xv float64
 			if xc.NumDims() > 1 {
-				xv = xc.FloatValRowCell(row, xp.TensorIdx)
+				xv = xc.FloatValRowCell(row, xp.TensorIndex)
 			} else {
 				xv = xc.FloatVal1D(row)
 			}
@@ -352,10 +352,10 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IdxView) (xi int, xview
 	}
 	lastx := -math.MaxFloat64
 	for row := 0; row < xview.Len(); row++ {
-		trow := xview.Idxs[row] // true table row
+		trow := xview.Indexes[row] // true table row
 		var xv float64
 		if xc.NumDims() > 1 {
-			xv = xc.FloatValRowCell(trow, xp.TensorIdx)
+			xv = xc.FloatValRowCell(trow, xp.TensorIndex)
 		} else {
 			xv = xc.FloatVal1D(trow)
 		}

@@ -44,7 +44,7 @@ func (pl *Plot2D) GenPlotBar() {
 	var lsplit *etable.Splits
 	nleg := 1
 	if pl.Params.LegendCol != "" {
-		_, err = pl.Table.Table.ColIdxTry(pl.Params.LegendCol)
+		_, err = pl.Table.Table.ColIndexTry(pl.Params.LegendCol)
 		if err != nil {
 			log.Println("eplot.LegendCol: " + err.Error())
 		} else {
@@ -65,7 +65,7 @@ func (pl *Plot2D) GenPlotBar() {
 			strCols = append(strCols, cp)
 			continue
 		}
-		if cp.TensorIdx < 0 {
+		if cp.TensorIndex < 0 {
 			yc := pl.Table.Table.ColByName(cp.Col)
 			_, sz := yc.RowCellSize()
 			nys += sz
@@ -108,8 +108,8 @@ func (pl *Plot2D) GenPlotBar() {
 				lview = lsplit.Splits[li]
 			}
 			nidx := 1
-			stidx := cp.TensorIdx
-			if cp.TensorIdx < 0 { // do all
+			stidx := cp.TensorIndex
+			if cp.TensorIndex < 0 { // do all
 				yc := pl.Table.Table.ColByName(cp.Col)
 				_, sz := yc.RowCellSize()
 				nidx = sz
@@ -117,7 +117,7 @@ func (pl *Plot2D) GenPlotBar() {
 			}
 			for ii := 0; ii < nidx; ii++ {
 				idx := stidx + ii
-				xy, _ := NewTableXYName(lview, xi, xp.TensorIdx, cp.Col, idx, cp.Range)
+				xy, _ := NewTableXYName(lview, xi, xp.TensorIndex, cp.Col, idx, cp.Range)
 				if xy == nil {
 					continue
 				}
@@ -140,7 +140,7 @@ func (pl *Plot2D) GenPlotBar() {
 				}
 				ec := -1
 				if cp.ErrCol != "" {
-					ec = pl.Table.Table.ColIdx(cp.ErrCol)
+					ec = pl.Table.Table.ColIndex(cp.ErrCol)
 				}
 				var bar *ErrBarChart
 				if ec >= 0 {
@@ -177,16 +177,16 @@ func (pl *Plot2D) GenPlotBar() {
 		firstXY.Table = xview
 		n := xview.Len()
 		for _, cp := range strCols {
-			xy, _ := NewTableXYName(xview, xi, xp.TensorIdx, cp.Col, cp.TensorIdx, firstXY.YRange)
+			xy, _ := NewTableXYName(xview, xi, xp.TensorIndex, cp.Col, cp.TensorIndex, firstXY.YRange)
 			xy.LblCol = xy.YCol
 			xy.YCol = firstXY.YCol
-			xy.YIdx = firstXY.YIdx
+			xy.YIndex = firstXY.YIndex
 
 			xyl := plotter.XYLabels{}
 			xyl.XYs = make(plotter.XYs, n)
 			xyl.Labels = make([]string, n)
 
-			for i := range xview.Idxs {
+			for i := range xview.Indexes {
 				y := firstXY.Value(i)
 				x := float64(mid + (i%maxx)*stride)
 				xyl.XYs[i] = plotter.XY{x, y}
@@ -202,7 +202,7 @@ func (pl *Plot2D) GenPlotBar() {
 	netn := pl.Table.Len() * stride
 	xc := pl.Table.Table.Cols[xi]
 	vals := make([]string, netn)
-	for i, dx := range pl.Table.Idxs {
+	for i, dx := range pl.Table.Indexes {
 		pi := mid + i*stride
 		if pi < netn && dx < xc.Len() {
 			vals[pi] = xc.StringVal1D(dx)

@@ -207,7 +207,7 @@ type ColParams struct { //gti:add
 	Lbl string `label:"Label"`
 
 	// if column has n-dimensional tensor cells in each row, this is the index within each cell to plot -- use -1 to plot *all* indexes as separate lines
-	TensorIdx int
+	TensorIndex int
 
 	// specifies a column containing error bars for this column
 	ErrCol string
@@ -303,9 +303,9 @@ func (cp *ColParams) FmMetaMap(meta map[string]string) {
 	if lb, has := MetaMapLower(meta, cp.Col+":ErrCol"); has {
 		cp.ErrCol = lb
 	}
-	if vl, has := MetaMapLower(meta, cp.Col+":TensorIdx"); has {
+	if vl, has := MetaMapLower(meta, cp.Col+":TensorIndex"); has {
 		iv, _ := laser.ToInt(vl)
-		cp.TensorIdx = int(iv)
+		cp.TensorIndex = int(iv)
 	}
 }
 

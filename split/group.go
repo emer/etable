@@ -13,18 +13,18 @@ import (
 
 // All returns a single "split" with all of the rows in given view
 // useful for leveraging the aggregation management functions in splits
-func All(ix *etable.IdxView) *etable.Splits {
+func All(ix *etable.IndexView) *etable.Splits {
 	spl := &etable.Splits{}
 	spl.Levels = []string{"All"}
-	spl.New(ix.Table, []string{"All"}, ix.Idxs...)
+	spl.New(ix.Table, []string{"All"}, ix.Indexes...)
 	return spl
 }
 
-// GroupByIdx returns a new Splits set based on the groups of values
+// GroupByIndex returns a new Splits set based on the groups of values
 // across the given set of column indexes.
 // Uses a stable sort on columns, so ordering of other dimensions is preserved.
-func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
-	nc := len(colIdxs)
+func GroupByIndex(ix *etable.IndexView, colIndexes []int) *etable.Splits {
+	nc := len(colIndexes)
 	if nc == 0 || ix.Table == nil {
 		return nil
 	}
@@ -34,17 +34,17 @@ func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 	}
 	spl := &etable.Splits{}
 	spl.Levels = make([]string, nc)
-	for i, ci := range colIdxs {
+	for i, ci := range colIndexes {
 		spl.Levels[i] = ix.Table.ColNames[ci]
 	}
 	srt := ix.Clone()
-	srt.SortStableCols(colIdxs, true) // important for consistency
+	srt.SortStableCols(colIndexes, true) // important for consistency
 	lstVals := make([]string, nc)
 	curVals := make([]string, nc)
-	var curIx *etable.IdxView
-	for _, rw := range srt.Idxs {
+	var curIx *etable.IndexView
+	for _, rw := range srt.Indexes {
 		diff := false
-		for i, ci := range colIdxs {
+		for i, ci := range colIndexes {
 			cl := ix.Table.Cols[ci]
 			cv := cl.StringVal1D(rw)
 			curVals[i] = cv
@@ -65,19 +65,19 @@ func GroupByIdx(ix *etable.IdxView, colIdxs []int) *etable.Splits {
 // GroupBy returns a new Splits set based on the groups of values
 // across the given set of column names (see Try for version with error)
 // Uses a stable sort on columns, so ordering of other dimensions is preserved.
-func GroupBy(ix *etable.IdxView, colNms []string) *etable.Splits {
-	return GroupByIdx(ix, ix.Table.ColIdxsByNames(colNms))
+func GroupBy(ix *etable.IndexView, colNms []string) *etable.Splits {
+	return GroupByIndex(ix, ix.Table.ColIndexesByNames(colNms))
 }
 
 // GroupByTry returns a new Splits set based on the groups of values
 // across the given set of column names.  returns error for bad column names.
 // Uses a stable sort on columns, so ordering of other dimensions is preserved.
-func GroupByTry(ix *etable.IdxView, colNms []string) (*etable.Splits, error) {
-	cidx, err := ix.Table.ColIdxsByNamesTry(colNms)
+func GroupByTry(ix *etable.IndexView, colNms []string) (*etable.Splits, error) {
+	cidx, err := ix.Table.ColIndexesByNamesTry(colNms)
 	if err != nil {
 		return nil, err
 	}
-	return GroupByIdx(ix, cidx), nil
+	return GroupByIndex(ix, cidx), nil
 }
 
 // GroupByFunc returns a new Splits set based on the given function
@@ -85,7 +85,7 @@ func GroupByTry(ix *etable.IdxView, colNms []string) (*etable.Splits, error) {
 // The function should always return the same number of values -- if
 // it doesn't behavior is undefined.
 // Uses a stable sort on columns, so ordering of other dimensions is preserved.
-func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits {
+func GroupByFunc(ix *etable.IndexView, fun func(row int) []string) *etable.Splits {
 	if ix.Table == nil {
 		return nil
 	}
@@ -93,7 +93,7 @@ func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits 
 	// save function values
 	funvals := make(map[int][]string, ix.Len())
 	nv := 0 // number of valeus
-	for _, rw := range ix.Idxs {
+	for _, rw := range ix.Indexes {
 		sv := fun(rw)
 		if nv == 0 {
 			nv = len(sv)
@@ -118,8 +118,8 @@ func GroupByFunc(ix *etable.IdxView, fun func(row int) []string) *etable.Splits 
 	// now do our usual grouping operation
 	spl := &etable.Splits{}
 	lstVals := make([]string, nv)
-	var curIx *etable.IdxView
-	for _, rw := range srt.Idxs {
+	var curIx *etable.IndexView
+	for _, rw := range srt.Indexes {
 		curVals := funvals[rw]
 		diff := (curIx == nil)
 		if !diff {

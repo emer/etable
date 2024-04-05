@@ -33,29 +33,29 @@ func (nn *Node) Plot(pt *etable.Table, smat *simat.SimMat) {
 	row := pt.Rows
 	if nn.IsLeaf() {
 		pt.SetNumRows(row + 1)
-		pt.SetCellFloatIdx(0, row, nn.ParDist)
-		pt.SetCellFloatIdx(1, row, nn.Y)
-		if len(smat.Rows) > nn.Idx {
-			pt.SetCellStringIdx(2, row, smat.Rows[nn.Idx])
+		pt.SetCellFloatIndex(0, row, nn.ParDist)
+		pt.SetCellFloatIndex(1, row, nn.Y)
+		if len(smat.Rows) > nn.Index {
+			pt.SetCellStringIndex(2, row, smat.Rows[nn.Index])
 		}
 	} else {
 		for _, kn := range nn.Kids {
 			pt.SetNumRows(row + 2)
-			pt.SetCellFloatIdx(0, row, nn.ParDist)
-			pt.SetCellFloatIdx(1, row, kn.Y)
+			pt.SetCellFloatIndex(0, row, nn.ParDist)
+			pt.SetCellFloatIndex(1, row, kn.Y)
 			row++
-			pt.SetCellFloatIdx(0, row, nn.ParDist+nn.Dist)
-			pt.SetCellFloatIdx(1, row, kn.Y)
+			pt.SetCellFloatIndex(0, row, nn.ParDist+nn.Dist)
+			pt.SetCellFloatIndex(1, row, kn.Y)
 			kn.Plot(pt, smat)
 			row = pt.Rows
 			pt.SetNumRows(row + 1)
-			pt.SetCellFloatIdx(0, row, nn.ParDist)
-			pt.SetCellFloatIdx(1, row, kn.Y)
+			pt.SetCellFloatIndex(0, row, nn.ParDist)
+			pt.SetCellFloatIndex(1, row, kn.Y)
 			row++
 		}
 		pt.SetNumRows(row + 1)
-		pt.SetCellFloatIdx(0, row, nn.ParDist)
-		pt.SetCellFloatIdx(1, row, nn.Y)
+		pt.SetCellFloatIndex(0, row, nn.ParDist)
+		pt.SetCellFloatIndex(1, row, nn.Y)
 	}
 }
 

@@ -57,7 +57,7 @@ func (svd *SVD) Init() {
 // This is the input to the SVD eigenvalue decomposition of the resulting
 // covariance matrix, which extracts the eigenvectors as directions with maximal
 // variance in this matrix.
-func (svd *SVD) TableCol(ix *etable.IdxView, colNm string, mfun metric.Func64) error {
+func (svd *SVD) TableCol(ix *etable.IndexView, colNm string, mfun metric.Func64) error {
 	if svd.Covar == nil {
 		svd.Init()
 	}
@@ -106,7 +106,7 @@ func (svd *SVD) Tensor(tsr etensor.Tensor, mfun metric.Func64) error {
 // covariance matrix, which extracts the eigenvectors as directions with maximal
 // variance in this matrix.
 // This Std version is usable e.g., in Python where the func cannot be passed.
-func (svd *SVD) TableColStd(ix *etable.IdxView, colNm string, met metric.StdMetrics) error {
+func (svd *SVD) TableColStd(ix *etable.IndexView, colNm string, met metric.StdMetrics) error {
 	return svd.TableCol(ix, colNm, metric.StdFunc64(met))
 }
 
@@ -157,10 +157,10 @@ func (svd *SVD) SVD() error {
 	return nil
 }
 
-// ProjectCol projects values from the given colNm of given table (via IdxView)
+// ProjectCol projects values from the given colNm of given table (via IndexView)
 // onto the idx'th eigenvector (0 = largest eigenvalue, 1 = next, etc).
 // Must have already called SVD() method.
-func (svd *SVD) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, idx int) error {
+func (svd *SVD) ProjectCol(vals *[]float64, ix *etable.IndexView, colNm string, idx int) error {
 	col, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err
@@ -189,7 +189,7 @@ func (svd *SVD) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, id
 	rdim := []int{0}
 	for row := 0; row < rows; row++ {
 		sum := 0.0
-		rdim[0] = ix.Idxs[row]
+		rdim[0] = ix.Indexes[row]
 		rt := col.SubSpace(rdim)
 		for ci := 0; ci < sz; ci++ {
 			sum += cvec[ci] * rt.FloatVal1D(ci)
@@ -199,11 +199,11 @@ func (svd *SVD) ProjectCol(vals *[]float64, ix *etable.IdxView, colNm string, id
 	return nil
 }
 
-// ProjectColToTable projects values from the given colNm of given table (via IdxView)
+// ProjectColToTable projects values from the given colNm of given table (via IndexView)
 // onto the given set of eigenvectors (idxs, 0 = largest eigenvalue, 1 = next, etc),
 // and stores results along with labels from column labNm into results table.
 // Must have already called SVD() method.
-func (svd *SVD) ProjectColToTable(prjns *etable.Table, ix *etable.IdxView, colNm, labNm string, idxs []int) error {
+func (svd *SVD) ProjectColToTable(prjns *etable.Table, ix *etable.IndexView, colNm, labNm string, idxs []int) error {
 	_, err := ix.Table.ColByNameTry(colNm)
 	if err != nil {
 		return err
