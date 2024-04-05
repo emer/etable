@@ -4,7 +4,7 @@ Docs: [GoDoc](https://pkg.go.dev/github.com/goki/etable/v2/etview)
 
 `etview` provides GUI Views of `etable.Table` and `etensor.Tensor` structures using the [GoGi](https://cogentcore.org/core/gi) View framework, as GoGi Widgets.
 
-Add this to `import` to get these views to be registered with the GoGi ValueView system:
+Add this to `import` to get these views to be registered with the Cogent Core Value system:
 
 ```Go
 	_ "github.com/goki/etable/v2/etview" // include to get gui views
