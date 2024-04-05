@@ -60,7 +60,7 @@ func CovarTableCol(cmat etensor.Tensor, ix *etable.IndexView, colNm string, mfun
 		for bi := ai + 1; bi < sz; bi++ { // upper diag
 			fdim[0] = bi
 			sdim[1] = bi
-			cv := cmat.FloatVal(fdim)
+			cv := cmat.FloatValue(fdim)
 			cmat.SetFloat(sdim, cv)
 		}
 	}
@@ -121,7 +121,7 @@ func CovarTensor(cmat etensor.Tensor, tsr etensor.Tensor, mfun metric.Func64) er
 		for bi := ai + 1; bi < sz; bi++ { // upper diag
 			fdim[0] = bi
 			sdim[1] = bi
-			cv := cmat.FloatVal(fdim)
+			cv := cmat.FloatValue(fdim)
 			cmat.SetFloat(sdim, cv)
 		}
 	}
@@ -145,7 +145,7 @@ func TableColRowsVec(vec []float64, ix *etable.IndexView, col etensor.Tensor, ci
 	sz := ln / col.Dim(0) // size of cell
 	for ri := 0; ri < rows; ri++ {
 		coff := ix.Indexes[ri]*sz + cidx
-		vec[ri] = col.FloatVal1D(coff)
+		vec[ri] = col.FloatValue1D(coff)
 	}
 }
 
@@ -157,7 +157,7 @@ func TensorRowsVec(vec []float64, tsr etensor.Tensor, cidx int) {
 	sz := ln / rows
 	for ri := 0; ri < rows; ri++ {
 		coff := ri*sz + cidx
-		vec[ri] = tsr.FloatVal1D(coff)
+		vec[ri] = tsr.FloatValue1D(coff)
 	}
 }
 

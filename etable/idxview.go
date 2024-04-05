@@ -154,17 +154,17 @@ func (ix *IndexView) SortCol(colIndex int, ascending bool) {
 	if cl.DataType() == etensor.STRING {
 		ix.Sort(func(et *Table, i, j int) bool {
 			if ascending {
-				return cl.StringVal1D(i) < cl.StringVal1D(j)
+				return cl.StringValue1D(i) < cl.StringValue1D(j)
 			} else {
-				return cl.StringVal1D(i) > cl.StringVal1D(j)
+				return cl.StringValue1D(i) > cl.StringValue1D(j)
 			}
 		})
 	} else {
 		ix.Sort(func(et *Table, i, j int) bool {
 			if ascending {
-				return cl.FloatVal1D(i) < cl.FloatVal1D(j)
+				return cl.FloatValue1D(i) < cl.FloatValue1D(j)
 			} else {
-				return cl.FloatVal1D(i) > cl.FloatVal1D(j)
+				return cl.FloatValue1D(i) > cl.FloatValue1D(j)
 			}
 		})
 	}
@@ -201,29 +201,29 @@ func (ix *IndexView) SortCols(colIndexes []int, ascending bool) {
 			cl := ix.Table.Cols[ci]
 			if cl.DataType() == etensor.STRING {
 				if ascending {
-					if cl.StringVal1D(i) < cl.StringVal1D(j) {
+					if cl.StringValue1D(i) < cl.StringValue1D(j) {
 						return true
-					} else if cl.StringVal1D(i) > cl.StringVal1D(j) {
+					} else if cl.StringValue1D(i) > cl.StringValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				} else {
-					if cl.StringVal1D(i) > cl.StringVal1D(j) {
+					if cl.StringValue1D(i) > cl.StringValue1D(j) {
 						return true
-					} else if cl.StringVal1D(i) < cl.StringVal1D(j) {
+					} else if cl.StringValue1D(i) < cl.StringValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				}
 			} else {
 				if ascending {
-					if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+					if cl.FloatValue1D(i) < cl.FloatValue1D(j) {
 						return true
-					} else if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
+					} else if cl.FloatValue1D(i) > cl.FloatValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				} else {
-					if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
+					if cl.FloatValue1D(i) > cl.FloatValue1D(j) {
 						return true
-					} else if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+					} else if cl.FloatValue1D(i) < cl.FloatValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				}
@@ -268,17 +268,17 @@ func (ix *IndexView) SortStableCol(colIndex int, ascending bool) {
 	if cl.DataType() == etensor.STRING {
 		ix.SortStable(func(et *Table, i, j int) bool {
 			if ascending {
-				return cl.StringVal1D(i) < cl.StringVal1D(j)
+				return cl.StringValue1D(i) < cl.StringValue1D(j)
 			} else {
-				return cl.StringVal1D(i) > cl.StringVal1D(j)
+				return cl.StringValue1D(i) > cl.StringValue1D(j)
 			}
 		})
 	} else {
 		ix.SortStable(func(et *Table, i, j int) bool {
 			if ascending {
-				return cl.FloatVal1D(i) < cl.FloatVal1D(j)
+				return cl.FloatValue1D(i) < cl.FloatValue1D(j)
 			} else {
-				return cl.FloatVal1D(i) > cl.FloatVal1D(j)
+				return cl.FloatValue1D(i) > cl.FloatValue1D(j)
 			}
 		})
 	}
@@ -315,29 +315,29 @@ func (ix *IndexView) SortStableCols(colIndexes []int, ascending bool) {
 			cl := ix.Table.Cols[ci]
 			if cl.DataType() == etensor.STRING {
 				if ascending {
-					if cl.StringVal1D(i) < cl.StringVal1D(j) {
+					if cl.StringValue1D(i) < cl.StringValue1D(j) {
 						return true
-					} else if cl.StringVal1D(i) > cl.StringVal1D(j) {
+					} else if cl.StringValue1D(i) > cl.StringValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				} else {
-					if cl.StringVal1D(i) > cl.StringVal1D(j) {
+					if cl.StringValue1D(i) > cl.StringValue1D(j) {
 						return true
-					} else if cl.StringVal1D(i) < cl.StringVal1D(j) {
+					} else if cl.StringValue1D(i) < cl.StringValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				}
 			} else {
 				if ascending {
-					if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+					if cl.FloatValue1D(i) < cl.FloatValue1D(j) {
 						return true
-					} else if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
+					} else if cl.FloatValue1D(i) > cl.FloatValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				} else {
-					if cl.FloatVal1D(i) > cl.FloatVal1D(j) {
+					if cl.FloatValue1D(i) > cl.FloatValue1D(j) {
 						return true
-					} else if cl.FloatVal1D(i) < cl.FloatVal1D(j) {
+					} else if cl.FloatValue1D(i) < cl.FloatValue1D(j) {
 						return false
 					} // if equal, fallthrough to next col
 				}
@@ -386,7 +386,7 @@ func (ix *IndexView) FilterCol(colIndex int, str string, exclude, contains, igno
 	col := ix.Table.Cols[colIndex]
 	lowstr := strings.ToLower(str)
 	ix.Filter(func(et *Table, row int) bool {
-		val := col.StringVal1D(row)
+		val := col.StringValue1D(row)
 		has := false
 		switch {
 		case contains && ignoreCase:
@@ -439,7 +439,7 @@ func (ix *IndexView) AggCol(colIndex int, ini float64, fun etensor.AggFunc) []fl
 	}
 	if csz == 1 {
 		for _, srw := range ix.Indexes {
-			val := cl.FloatVal1D(srw)
+			val := cl.FloatValue1D(srw)
 			if !cl.IsNull1D(srw) && !math.IsNaN(val) {
 				ag[0] = fun(srw, val, ag[0])
 			}
@@ -448,7 +448,7 @@ func (ix *IndexView) AggCol(colIndex int, ini float64, fun etensor.AggFunc) []fl
 		for _, srw := range ix.Indexes {
 			si := srw * csz
 			for j := range ag {
-				val := cl.FloatVal1D(si + j)
+				val := cl.FloatValue1D(si + j)
 				if !cl.IsNull1D(si+j) && !math.IsNaN(val) {
 					ag[j] = fun(si+j, val, ag[j])
 				}
@@ -507,7 +507,7 @@ func (ix *IndexView) RowsByStringIndex(colIndex int, str string, contains, ignor
 	lowstr := strings.ToLower(str)
 	var idxs []int
 	for idx, srw := range ix.Indexes {
-		val := col.StringVal1D(srw)
+		val := col.StringValue1D(srw)
 		has := false
 		switch {
 		case contains && ignoreCase:

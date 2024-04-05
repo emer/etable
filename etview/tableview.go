@@ -472,7 +472,7 @@ func (tv *TableView) UpdateWidgets() {
 				if col.NumDims() == 1 {
 					fval := 0.0
 					if ixi >= 0 {
-						fval = col.FloatVal1D(ixi)
+						fval = col.FloatValue1D(ixi)
 					}
 					vv.SetSoloValue(reflect.ValueOf(&fval))
 				} else {

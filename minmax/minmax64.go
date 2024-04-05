@@ -88,18 +88,18 @@ func (mr *F64) FitValInRange(val float64) bool {
 
 // NormVal normalizes value to 0-1 unit range relative to current Min / Max range
 // Clips the value within Min-Max range first.
-func (mr *F64) NormVal(val float64) float64 {
-	return (mr.ClipVal(val) - mr.Min) * mr.Scale()
+func (mr *F64) NormValue(val float64) float64 {
+	return (mr.ClipValue(val) - mr.Min) * mr.Scale()
 }
 
 // ProjVal projects a 0-1 normalized unit value into current Min / Max range (inverse of NormVal)
-func (mr *F64) ProjVal(val float64) float64 {
+func (mr *F64) ProjValue(val float64) float64 {
 	return mr.Min + (val * mr.Range())
 }
 
 // ClipVal clips given value within Min / Max range
 // Note: a NaN will remain as a NaN
-func (mr *F64) ClipVal(val float64) float64 {
+func (mr *F64) ClipValue(val float64) float64 {
 	if val < mr.Min {
 		return mr.Min
 	}
@@ -111,14 +111,14 @@ func (mr *F64) ClipVal(val float64) float64 {
 
 // ClipNormVal clips then normalizes given value within 0-1
 // Note: a NaN will remain as a NaN
-func (mr *F64) ClipNormVal(val float64) float64 {
+func (mr *F64) ClipNormValue(val float64) float64 {
 	if val < mr.Min {
 		return 0
 	}
 	if val > mr.Max {
 		return 1
 	}
-	return mr.NormVal(val)
+	return mr.NormValue(val)
 }
 
 // FitInRange adjusts our Min, Max to fit within those of other F64

@@ -490,9 +490,9 @@ func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, ncol int) error {
 		if nd == 1 {
 			vl := ""
 			if prec <= 0 || tsr.DataType() == etensor.STRING {
-				vl = tsr.StringVal1D(row)
+				vl = tsr.StringValue1D(row)
 			} else {
-				vl = strconv.FormatFloat(tsr.FloatVal1D(row), 'g', prec, 64)
+				vl = strconv.FormatFloat(tsr.FloatValue1D(row), 'g', prec, 64)
 			}
 			if len(rec) <= rc {
 				rec = append(rec, vl)
@@ -506,9 +506,9 @@ func (dt *Table) WriteCSVRowWriter(cw *csv.Writer, row int, ncol int) error {
 			for ti := 0; ti < tc; ti++ {
 				vl := ""
 				if prec <= 0 || tsr.DataType() == etensor.STRING {
-					vl = tsr.StringVal1D(row*tc + ti)
+					vl = tsr.StringValue1D(row*tc + ti)
 				} else {
-					vl = strconv.FormatFloat(tsr.FloatVal1D(row*tc+ti), 'g', prec, 64)
+					vl = strconv.FormatFloat(tsr.FloatValue1D(row*tc+ti), 'g', prec, 64)
 				}
 				if len(rec) <= rc {
 					rec = append(rec, vl)

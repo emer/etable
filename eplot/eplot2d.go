@@ -333,9 +333,9 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IndexView) (xi int, xvi
 			}
 			var xv float64
 			if xc.NumDims() > 1 {
-				xv = xc.FloatValRowCell(row, xp.TensorIndex)
+				xv = xc.FloatValueRowCell(row, xp.TensorIndex)
 			} else {
-				xv = xc.FloatVal1D(row)
+				xv = xc.FloatValue1D(row)
 			}
 			if xp.Range.FixMin && xv < xp.Range.Min {
 				return false
@@ -355,9 +355,9 @@ func (pl *Plot2D) PlotXAxis(plt *plot.Plot, ixvw *etable.IndexView) (xi int, xvi
 		trow := xview.Indexes[row] // true table row
 		var xv float64
 		if xc.NumDims() > 1 {
-			xv = xc.FloatValRowCell(trow, xp.TensorIndex)
+			xv = xc.FloatValueRowCell(trow, xp.TensorIndex)
 		} else {
-			xv = xc.FloatVal1D(trow)
+			xv = xc.FloatValue1D(trow)
 		}
 		if xv < lastx {
 			xbreaks = append(xbreaks, row)

@@ -119,10 +119,10 @@ func (tsr *Int) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Int) FloatVal(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Int) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int(val) }
 
-func (tsr *Int) StringVal(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *Int) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
 func (tsr *Int) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -130,10 +130,10 @@ func (tsr *Int) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Int) FloatVal1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Int) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Int) SetFloat1D(off int, val float64) { tsr.Values[off] = int(val) }
 
-func (tsr *Int) FloatValRowCell(row, cell int) float64 {
+func (tsr *Int) FloatValueRowCell(row, cell int) float64 {
 	_, sz := tsr.RowCellSize()
 	return float64(tsr.Values[row*sz+cell])
 }
@@ -161,14 +161,14 @@ func (tsr *Int) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Int) StringVal1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Int) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
 func (tsr *Int) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int(fv)
 	}
 }
 
-func (tsr *Int) StringValRowCell(row, cell int) string {
+func (tsr *Int) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
 	return laser.ToString(tsr.Values[row*sz+cell])
 }
@@ -280,7 +280,7 @@ func (tsr *Int) CopyFrom(frm Tensor) {
 	}
 	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
-		tsr.Values[i] = int(frm.FloatVal1D(i))
+		tsr.Values[i] = int(frm.FloatValue1D(i))
 		if frm.IsNull1D(i) {
 			tsr.SetNull1D(i, true)
 		}
@@ -309,7 +309,7 @@ func (tsr *Int) CopyCellsFrom(frm Tensor, to, start, n int) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		tsr.Values[to+i] = int(frm.FloatVal1D(start + i))
+		tsr.Values[to+i] = int(frm.FloatValue1D(start + i))
 		if frm.IsNull1D(start + i) {
 			tsr.SetNull1D(to+i, true)
 		}
@@ -440,7 +440,7 @@ func (tsr *Int) String() string {
 				break
 			}
 		}
-		str += tsr.StringVal1D(i) + " "
+		str += tsr.StringValue1D(i) + " "
 	}
 	str += "\n"
 	return str
@@ -503,12 +503,12 @@ func (tsr *Int) At(i, j int) float64 {
 		log.Println("etensor Dims gonum Matrix call made on Tensor with dims < 2")
 		return 0
 	} else if nd == 2 {
-		return tsr.FloatVal([]int{i, j})
+		return tsr.FloatValue([]int{i, j})
 	} else {
 		ix := make([]int, nd)
 		ix[nd-2] = i
 		ix[nd-1] = j
-		return tsr.FloatVal(ix)
+		return tsr.FloatValue(ix)
 	}
 }
 

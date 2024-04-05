@@ -46,7 +46,7 @@ func GroupByIndex(ix *etable.IndexView, colIndexes []int) *etable.Splits {
 		diff := false
 		for i, ci := range colIndexes {
 			cl := ix.Table.Cols[ci]
-			cv := cl.StringVal1D(rw)
+			cv := cl.StringValue1D(rw)
 			curVals[i] = cv
 			if cv != lstVals[i] {
 				diff = true

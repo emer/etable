@@ -343,7 +343,7 @@ func (dt *Table) RowsByStringIndex(colIndex int, str string, contains, ignoreCas
 	lowstr := strings.ToLower(str)
 	var idxs []int
 	for i := 0; i < dt.Rows; i++ {
-		val := col.StringVal1D(i)
+		val := col.StringValue1D(i)
 		has := false
 		switch {
 		case contains && ignoreCase:
@@ -400,7 +400,7 @@ func (dt *Table) CellFloatIndex(col, row int) float64 {
 	if ct.NumDims() != 1 {
 		return math.NaN()
 	}
-	return ct.FloatVal1D(row)
+	return ct.FloatValue1D(row)
 }
 
 // CellFloat returns the float64 value of cell at given column (by name), row index
@@ -417,7 +417,7 @@ func (dt *Table) CellFloat(colNm string, row int) float64 {
 	if ct.NumDims() != 1 {
 		return math.NaN()
 	}
-	return ct.FloatVal1D(row)
+	return ct.FloatValue1D(row)
 }
 
 // CellFloatTry returns the float64 value of cell at given column (by name), row index
@@ -434,7 +434,7 @@ func (dt *Table) CellFloatTry(colNm string, row int) (float64, error) {
 	if ct.NumDims() != 1 {
 		return math.NaN(), fmt.Errorf("etable.Table: CellFloatTry called on column named: %v which is not 1-dimensional", colNm)
 	}
-	return ct.FloatVal1D(row), nil
+	return ct.FloatValue1D(row), nil
 }
 
 // CellStringIndex returns the string value of cell at given column, row index
@@ -448,7 +448,7 @@ func (dt *Table) CellStringIndex(col, row int) string {
 	if ct.NumDims() != 1 {
 		return ""
 	}
-	return ct.StringVal1D(row)
+	return ct.StringValue1D(row)
 }
 
 // CellString returns the string value of cell at given column (by name), row index
@@ -465,7 +465,7 @@ func (dt *Table) CellString(colNm string, row int) string {
 	if ct.NumDims() != 1 {
 		return ""
 	}
-	return ct.StringVal1D(row)
+	return ct.StringValue1D(row)
 }
 
 // CellStringTry returns the string value of cell at given column (by name), row index
@@ -482,7 +482,7 @@ func (dt *Table) CellStringTry(colNm string, row int) (string, error) {
 	if ct.NumDims() != 1 {
 		return "", fmt.Errorf("etable.Table: CellStringTry called on column named: %v which is not 1-dimensional", colNm)
 	}
-	return ct.StringVal1D(row), nil
+	return ct.StringValue1D(row), nil
 }
 
 // CellTensorIndex returns the tensor SubSpace for given column, row index
@@ -561,7 +561,7 @@ func (dt *Table) CellTensorFloat1D(colNm string, row int, idx int) float64 {
 		return 0
 	}
 	off := row*sz + idx
-	return ct.FloatVal1D(off)
+	return ct.FloatValue1D(off)
 }
 
 // CellTensorFloat1DTry returns the float value of a Tensor cell's cell at given
@@ -585,7 +585,7 @@ func (dt *Table) CellTensorFloat1DTry(colNm string, row int, idx int) (float64, 
 		return 0, fmt.Errorf("etable.Table: CellTensorFloat1DTry index out of range for cell size")
 	}
 	off := row*sz + idx
-	return ct.FloatVal1D(off), nil
+	return ct.FloatValue1D(off), nil
 }
 
 /////////////////////////////////////////////////////////////////////////////////////
@@ -701,11 +701,11 @@ func (dt *Table) SetCellTensorIndex(col, row int, val etensor.Tensor) bool {
 	sz := min(csz, val.Len())
 	if ct.DataType() == etensor.STRING {
 		for j := 0; j < sz; j++ {
-			ct.SetString1D(st+j, val.StringVal1D(j))
+			ct.SetString1D(st+j, val.StringValue1D(j))
 		}
 	} else {
 		for j := 0; j < sz; j++ {
-			ct.SetFloat1D(st+j, val.FloatVal1D(j))
+			ct.SetFloat1D(st+j, val.FloatValue1D(j))
 		}
 	}
 	return true
@@ -797,9 +797,9 @@ func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpR
 	_, sz := ct.RowCellSize()
 	if sz == 1 {
 		if ct.DataType() == etensor.STRING {
-			ct.SetString1D(row, cpct.StringVal1D(cpRow))
+			ct.SetString1D(row, cpct.StringValue1D(cpRow))
 		} else {
-			ct.SetFloat1D(row, cpct.FloatVal1D(cpRow))
+			ct.SetFloat1D(row, cpct.FloatValue1D(cpRow))
 		}
 	} else {
 		_, cpsz := cpct.RowCellSize()
@@ -808,11 +808,11 @@ func (dt *Table) CopyCell(colNm string, row int, cpt *Table, cpColNm string, cpR
 		msz := min(sz, cpsz)
 		if ct.DataType() == etensor.STRING {
 			for j := 0; j < msz; j++ {
-				ct.SetString1D(st+j, cpct.StringVal1D(cst+j))
+				ct.SetString1D(st+j, cpct.StringValue1D(cst+j))
 			}
 		} else {
 			for j := 0; j < msz; j++ {
-				ct.SetFloat1D(st+j, cpct.FloatVal1D(cst+j))
+				ct.SetFloat1D(st+j, cpct.FloatValue1D(cst+j))
 			}
 		}
 	}

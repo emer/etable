@@ -40,7 +40,7 @@ func (am *AvgMax32) Init() {
 }
 
 // UpdateVal updates stats from given value
-func (am *AvgMax32) UpdateVal(val float32, idx int32) {
+func (am *AvgMax32) UpdateValue(val float32, idx int32) {
 	am.Sum += val
 	am.N++
 	if val > am.Max {
@@ -119,7 +119,7 @@ func (am *AvgMax64) Init() {
 }
 
 // UpdateVal updates stats from given value
-func (am *AvgMax64) UpdateVal(val float64, idx int) {
+func (am *AvgMax64) UpdateValue(val float64, idx int) {
 	am.Sum += val
 	am.N++
 	if val > am.Max {

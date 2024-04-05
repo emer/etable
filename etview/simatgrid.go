@@ -221,7 +221,7 @@ func (tg *SimMatGrid) Render() {
 			if !tg.Disp.TopZero {
 				ey = (rows - 1) - y
 			}
-			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
+			val := etensor.Prjn2DValue(tsr, tg.Disp.OddRow, ey, x)
 			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)

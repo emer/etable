@@ -132,10 +132,10 @@ func (txy *TableXY) TRowValue(row int) float64 {
 	case yc.NumDims() > 1:
 		_, sz := yc.RowCellSize()
 		if txy.YIndex < sz && txy.YIndex >= 0 {
-			y = yc.FloatValRowCell(row, txy.YIndex)
+			y = yc.FloatValueRowCell(row, txy.YIndex)
 		}
 	default:
-		y = yc.FloatVal1D(row)
+		y = yc.FloatValue1D(row)
 		if yc.IsNull1D(row) {
 			y = math.NaN()
 		}
@@ -157,10 +157,10 @@ func (txy *TableXY) Value(row int) float64 {
 	case yc.NumDims() > 1:
 		_, sz := yc.RowCellSize()
 		if txy.YIndex < sz && txy.YIndex >= 0 {
-			y = yc.FloatValRowCell(trow, txy.YIndex)
+			y = yc.FloatValueRowCell(trow, txy.YIndex)
 		}
 	default:
-		y = yc.FloatVal1D(trow)
+		y = yc.FloatValue1D(trow)
 		if yc.IsNull1D(trow) {
 			y = math.NaN()
 		}
@@ -181,10 +181,10 @@ func (txy *TableXY) TRowXValue(row int) float64 {
 	case xc.NumDims() > 1:
 		_, sz := xc.RowCellSize()
 		if txy.XIndex < sz && txy.XIndex >= 0 {
-			x = xc.FloatValRowCell(row, txy.XIndex)
+			x = xc.FloatValueRowCell(row, txy.XIndex)
 		}
 	default:
-		x = xc.FloatVal1D(row)
+		x = xc.FloatValue1D(row)
 		if xc.IsNull1D(row) {
 			x = math.NaN()
 		}
@@ -206,10 +206,10 @@ func (txy *TableXY) XValue(row int) float64 {
 	case xc.NumDims() > 1:
 		_, sz := xc.RowCellSize()
 		if txy.XIndex < sz && txy.XIndex >= 0 {
-			x = xc.FloatValRowCell(trow, txy.XIndex)
+			x = xc.FloatValueRowCell(trow, txy.XIndex)
 		}
 	default:
-		x = xc.FloatVal1D(trow)
+		x = xc.FloatValue1D(trow)
 		if xc.IsNull1D(trow) {
 			x = math.NaN()
 		}
@@ -233,7 +233,7 @@ func (txy *TableXY) Label(row int) string {
 		return ""
 	}
 	trow := txy.Table.Indexes[row] // true table row
-	return txy.Table.Table.Cols[txy.LblCol].StringVal1D(trow)
+	return txy.Table.Table.Cols[txy.LblCol].StringValue1D(trow)
 }
 
 // YError returns a error bars using ploter.YErrorer interface
@@ -250,10 +250,10 @@ func (txy *TableXY) YError(row int) (float64, float64) {
 	case ec.NumDims() > 1:
 		_, sz := ec.RowCellSize()
 		if txy.YIndex < sz && txy.YIndex >= 0 {
-			eval = ec.FloatValRowCell(trow, txy.YIndex)
+			eval = ec.FloatValueRowCell(trow, txy.YIndex)
 		}
 	default:
-		eval = ec.FloatVal1D(trow)
+		eval = ec.FloatValue1D(trow)
 	}
 	return -eval, eval
 }

@@ -110,7 +110,7 @@ func Float64ToString(val float64) string {
 	return strconv.FormatFloat(val, 'g', -1, 64)
 }
 
-func (tsr *String) FloatVal(i []int) float64 {
+func (tsr *String) FloatValue(i []int) float64 {
 	j := tsr.Offset(i)
 	return StringToFloat64(tsr.Values[j])
 }
@@ -120,10 +120,10 @@ func (tsr *String) SetFloat(i []int, val float64) {
 	tsr.Values[j] = Float64ToString(val)
 }
 
-func (tsr *String) StringVal(i []int) string      { j := tsr.Offset(i); return tsr.Values[j] }
+func (tsr *String) StringValue(i []int) string    { j := tsr.Offset(i); return tsr.Values[j] }
 func (tsr *String) SetString(i []int, val string) { j := tsr.Offset(i); tsr.Values[j] = val }
 
-func (tsr *String) FloatVal1D(off int) float64 {
+func (tsr *String) FloatValue1D(off int) float64 {
 	return StringToFloat64(tsr.Values[off])
 }
 
@@ -131,7 +131,7 @@ func (tsr *String) SetFloat1D(off int, val float64) {
 	tsr.Values[off] = Float64ToString(val)
 }
 
-func (tsr *String) FloatValRowCell(row, cell int) float64 {
+func (tsr *String) FloatValueRowCell(row, cell int) float64 {
 	_, sz := tsr.RowCellSize()
 	return StringToFloat64(tsr.Values[row*sz+cell])
 }
@@ -155,10 +155,10 @@ func (tsr *String) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *String) StringVal1D(off int) string      { return tsr.Values[off] }
+func (tsr *String) StringValue1D(off int) string    { return tsr.Values[off] }
 func (tsr *String) SetString1D(off int, val string) { tsr.Values[off] = val }
 
-func (tsr *String) StringValRowCell(row, cell int) string {
+func (tsr *String) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
 	return tsr.Values[row*sz+cell]
 }
@@ -253,7 +253,7 @@ func (tsr *String) CopyFrom(frm Tensor) {
 	}
 	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
-		tsr.Values[i] = frm.StringVal1D(i)
+		tsr.Values[i] = frm.StringValue1D(i)
 		if frm.IsNull1D(i) {
 			tsr.SetNull1D(i, true)
 		}
@@ -282,7 +282,7 @@ func (tsr *String) CopyCellsFrom(frm Tensor, to, start, n int) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		tsr.Values[to+i] = frm.StringVal1D(start + i)
+		tsr.Values[to+i] = frm.StringValue1D(start + i)
 		if frm.IsNull1D(start + i) {
 			tsr.SetNull1D(to+i, true)
 		}

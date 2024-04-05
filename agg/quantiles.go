@@ -43,13 +43,13 @@ func QuantilesIndex(ix *etable.IndexView, colIndex int, qs []float64) []float64 
 		lwi := math.Floor(qi)
 		lwii := int(lwi)
 		if lwii >= sz {
-			val = col.FloatVal1D(six.Indexes[sz])
+			val = col.FloatValue1D(six.Indexes[sz])
 		} else if lwii < 0 {
-			val = col.FloatVal1D(six.Indexes[0])
+			val = col.FloatValue1D(six.Indexes[0])
 		} else {
 			phi := qi - lwi
-			lwv := col.FloatVal1D(six.Indexes[lwii])
-			hiv := col.FloatVal1D(six.Indexes[lwii+1])
+			lwv := col.FloatValue1D(six.Indexes[lwii])
+			hiv := col.FloatValue1D(six.Indexes[lwii+1])
 			val = (1-phi)*lwv + phi*hiv
 		}
 		rvs[i] = val

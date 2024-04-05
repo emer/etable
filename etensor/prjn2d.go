@@ -220,9 +220,9 @@ func Prjn2DCoords(shp *Shape, oddRow bool, row, col int) (rowCoords, colCoords [
 // can either be multipliexed across the row or column, given the oddRow arg.
 // Even multiples of inner-most dimensions are assumed to be row, then column.
 // RowMajor and ColMajor layouts are handled appropriately.
-func Prjn2DVal(tsr Tensor, oddRow bool, row, col int) float64 {
+func Prjn2DValue(tsr Tensor, oddRow bool, row, col int) float64 {
 	idx := Prjn2DIndex(tsr.ShapeObj(), oddRow, row, col)
-	return tsr.FloatVal1D(idx)
+	return tsr.FloatValue1D(idx)
 }
 
 // Prjn2DSet sets a float64 value at given row, col coords for a 2D projection

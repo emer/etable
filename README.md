@@ -122,7 +122,7 @@ or:
 ```Go
 nmcl := et.ColByName("Name") // nmcl is an etensor of the Name column, cached
 ix.Sort(func(t *Table, i, j int) bool {
-	return nmcl.StringVal1D(i) < nmcl.StringVal1D(j)
+	return nmcl.StringValue1D(i) < nmcl.StringValue1D(j)
 })
 ```
 
@@ -133,7 +133,7 @@ nmcl := et.ColByName("Name") // column we're filtering on
 ix.Filter(func(t *Table, row int) bool {
 	// filter return value is for what to *keep* (=true), not exclude
 	// here we keep any row with a name that contains the string "in"
-	return strings.Contains(nmcl.StringVal1D(row), "in")
+	return strings.Contains(nmcl.StringValue1D(row), "in")
 })
 ```
 

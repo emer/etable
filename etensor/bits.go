@@ -88,7 +88,7 @@ func BoolToFloat64(bv bool) float64 {
 	}
 }
 
-func (tsr *Bits) FloatVal(i []int) float64 {
+func (tsr *Bits) FloatValue(i []int) float64 {
 	j := tsr.Offset(i)
 	return BoolToFloat64(tsr.Values.Index(j))
 }
@@ -97,7 +97,7 @@ func (tsr *Bits) SetFloat(i []int, val float64) {
 	tsr.Values.Set(j, Float64ToBool(val))
 }
 
-func (tsr *Bits) StringVal(i []int) string {
+func (tsr *Bits) StringValue(i []int) string {
 	j := tsr.Offset(i)
 	return laser.ToString(tsr.Values.Index(j))
 }
@@ -109,14 +109,14 @@ func (tsr *Bits) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Bits) FloatVal1D(off int) float64 {
+func (tsr *Bits) FloatValue1D(off int) float64 {
 	return BoolToFloat64(tsr.Values.Index(off))
 }
 func (tsr *Bits) SetFloat1D(off int, val float64) {
 	tsr.Values.Set(off, Float64ToBool(val))
 }
 
-func (tsr *Bits) FloatValRowCell(row, cell int) float64 {
+func (tsr *Bits) FloatValueRowCell(row, cell int) float64 {
 	_, sz := tsr.RowCellSize()
 	return BoolToFloat64(tsr.Values.Index(row*sz + cell))
 }
@@ -141,7 +141,7 @@ func (tsr *Bits) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Bits) StringVal1D(off int) string {
+func (tsr *Bits) StringValue1D(off int) string {
 	return laser.ToString(tsr.Values.Index(off))
 }
 
@@ -151,7 +151,7 @@ func (tsr *Bits) SetString1D(off int, val string) {
 	}
 }
 
-func (tsr *Bits) StringValRowCell(row, cell int) string {
+func (tsr *Bits) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
 	return laser.ToString(tsr.Values.Index(row*sz + cell))
 }
@@ -241,7 +241,7 @@ func (tsr *Bits) CopyFrom(frm Tensor) {
 	}
 	sz := min(len(tsr.Values), frm.Len())
 	for i := 0; i < sz; i++ {
-		tsr.Values.Set(i, Float64ToBool(frm.FloatVal1D(i)))
+		tsr.Values.Set(i, Float64ToBool(frm.FloatValue1D(i)))
 	}
 }
 
@@ -264,7 +264,7 @@ func (tsr *Bits) CopyCellsFrom(frm Tensor, to, start, n int) {
 		return
 	}
 	for i := 0; i < n; i++ {
-		tsr.Values.Set(to+i, Float64ToBool(frm.FloatVal1D(start+i)))
+		tsr.Values.Set(to+i, Float64ToBool(frm.FloatValue1D(start+i)))
 	}
 }
 
@@ -331,7 +331,7 @@ func (tsr *Bits) String() string {
 		rc, _ := Prjn2DCoords(&tsr.Shape, oddRow, r, 0)
 		b.WriteString(fmt.Sprintf("%v: ", rc))
 		for c := 0; c < cols; c++ {
-			vl := Prjn2DVal(tsr, oddRow, r, c)
+			vl := Prjn2DValue(tsr, oddRow, r, c)
 			b.WriteString(fmt.Sprintf("%g ", vl))
 		}
 		b.WriteString("\n")

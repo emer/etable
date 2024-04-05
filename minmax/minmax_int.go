@@ -95,17 +95,17 @@ func (mr *Int) FitValInRange(val int) bool {
 
 // NormVal normalizes value to 0-1 unit range relative to current Min / Max range
 // Clips the value within Min-Max range first.
-func (mr *Int) NormVal(val int) float32 {
-	return float32(mr.ClipVal(val)-mr.Min) * mr.Scale()
+func (mr *Int) NormValue(val int) float32 {
+	return float32(mr.ClipValue(val)-mr.Min) * mr.Scale()
 }
 
 // ProjVal projects a 0-1 normalized unit value into current Min / Max range (inverse of NormVal)
-func (mr *Int) ProjVal(val float32) float32 {
+func (mr *Int) ProjValue(val float32) float32 {
 	return float32(mr.Min) + (val * float32(mr.Range()))
 }
 
 // ClipVal clips given value within Min / Max rangee
-func (mr *Int) ClipVal(val int) int {
+func (mr *Int) ClipValue(val int) int {
 	if val < mr.Min {
 		return mr.Min
 	}
@@ -116,12 +116,12 @@ func (mr *Int) ClipVal(val int) int {
 }
 
 // ClipNormVal clips then normalizes given value within 0-1
-func (mr *Int) ClipNormVal(val int) float32 {
+func (mr *Int) ClipNormValue(val int) float32 {
 	if val < mr.Min {
 		return 0
 	}
 	if val > mr.Max {
 		return 1
 	}
-	return mr.NormVal(val)
+	return mr.NormValue(val)
 }

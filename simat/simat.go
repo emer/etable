@@ -94,7 +94,7 @@ func (smat *SimMat) TableCol(ix *etable.IndexView, colNm, labNm string, blankRep
 		for bi := ai + 1; bi < rows; bi++ { // upper diag
 			fdim[0] = bi
 			sdim[1] = bi
-			sv := sm.FloatVal(fdim)
+			sv := sm.FloatValue(fdim)
 			sm.SetFloat(sdim, sv)
 		}
 	}
@@ -118,7 +118,7 @@ func (smat *SimMat) TableCol(ix *etable.IndexView, colNm, labNm string, blankRep
 	smat.Rows = make([]string, rows)
 	last := ""
 	for r := 0; r < rows; r++ {
-		lbl := lc.StringVal1D(ix.Indexes[r])
+		lbl := lc.StringValue1D(ix.Indexes[r])
 		if blankRepeat && lbl == last {
 			continue
 		}

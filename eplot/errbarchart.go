@@ -137,9 +137,9 @@ func (b *ErrBarChart) StackOn(on *ErrBarChart) {
 
 // Plot implements the plot.Plotter interface.
 func (b *ErrBarChart) Plot(c draw.Canvas, plt *plot.Plot) {
-	trCat, trVal := plt.Transforms(&c)
+	trCat, trValue := plt.Transforms(&c)
 	if b.Horizontal {
-		trCat, trVal = trVal, trCat
+		trCat, trValue = trValue, trCat
 	}
 
 	for i, ht := range b.Values {
@@ -157,8 +157,8 @@ func (b *ErrBarChart) Plot(c draw.Canvas, plt *plot.Plot) {
 		catMin := trCat(cat - b.Width/2)
 		catMax := trCat(cat + b.Width/2)
 		bottom := b.stackedOn.BarHeight(i) // nil safe
-		valMin := trVal(bottom)
-		valMax := trVal(bottom + ht)
+		valMin := trValue(bottom)
+		valMax := trValue(bottom + ht)
 
 		var pts []vg.Point
 		var poly []vg.Point
@@ -193,7 +193,7 @@ func (b *ErrBarChart) Plot(c draw.Canvas, plt *plot.Plot) {
 
 		if i < len(b.Errors) {
 			errval := b.Errors[i]
-			eVal := trVal(bottom + ht + math.Abs(errval))
+			eVal := trValue(bottom + ht + math.Abs(errval))
 			if !b.Horizontal {
 				bar := c.ClipLinesY([]vg.Point{{catVal, valMax}, {catVal, eVal}})
 				c.StrokeLines(b.LineStyle, bar...)

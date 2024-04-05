@@ -57,7 +57,7 @@ func Tensor(smat etensor.Tensor, a etensor.Tensor, mfun metric.Func64) error {
 		for bi := ai + 1; bi < rows; bi++ { // upper diag
 			fdim[0] = bi
 			sdim[1] = bi
-			sv := smat.FloatVal(fdim)
+			sv := smat.FloatValue(fdim)
 			smat.SetFloat(sdim, sv)
 		}
 	}

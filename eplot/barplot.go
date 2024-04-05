@@ -205,7 +205,7 @@ func (pl *Plot2D) GenPlotBar() {
 	for i, dx := range pl.Table.Indexes {
 		pi := mid + i*stride
 		if pi < netn && dx < xc.Len() {
-			vals[pi] = xc.StringVal1D(dx)
+			vals[pi] = xc.StringValue1D(dx)
 		}
 	}
 	plt.NominalX(vals...)

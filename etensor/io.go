@@ -68,9 +68,9 @@ func WriteCSV(tsr Tensor, w io.Writer, delim rune) error {
 		for ci := 0; ci < nin; ci++ {
 			idx := ri*nin + ci
 			if str {
-				rec[ci] = tsr.StringVal1D(idx)
+				rec[ci] = tsr.StringValue1D(idx)
 			} else {
-				rec[ci] = strconv.FormatFloat(tsr.FloatVal1D(idx), 'g', prec, 64)
+				rec[ci] = strconv.FormatFloat(tsr.FloatValue1D(idx), 'g', prec, 64)
 			}
 		}
 		err := cw.Write(rec)

@@ -192,7 +192,7 @@ func (svd *SVD) ProjectCol(vals *[]float64, ix *etable.IndexView, colNm string, 
 		rdim[0] = ix.Indexes[row]
 		rt := col.SubSpace(rdim)
 		for ci := 0; ci < sz; ci++ {
-			sum += cvec[ci] * rt.FloatVal1D(ci)
+			sum += cvec[ci] * rt.FloatValue1D(ci)
 		}
 		(*vals)[row] = sum
 	}
@@ -233,7 +233,7 @@ func (svd *SVD) ProjectColToTable(prjns *etable.Table, ix *etable.IndexView, col
 		if err == nil {
 			plcol := prjns.Cols[0]
 			for row := 0; row < rows; row++ {
-				plcol.SetString1D(row, lcol.StringVal1D(row))
+				plcol.SetString1D(row, lcol.StringValue1D(row))
 			}
 		}
 	}

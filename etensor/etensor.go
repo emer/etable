@@ -119,26 +119,26 @@ type Tensor interface {
 	// Generic accessor routines support Float (float64) or String, either full dimensional or 1D
 
 	// FloatVal returns the value of given index as a float64
-	FloatVal(i []int) float64
+	FloatValue(i []int) float64
 
 	// SetFloat sets the value of given index as a float64
 	SetFloat(i []int, val float64)
 
 	// StringVal returns the value of given index as a string
-	StringVal(i []int) string
+	StringValue(i []int) string
 
 	// SetString sets the value of given index as a string
 	SetString(i []int, val string)
 
-	// FloatVal1D returns the value of given 1-dimensional index (0-Len()-1) as a float64
-	FloatVal1D(i int) float64
+	// FloatValue1D returns the value of given 1-dimensional index (0-Len()-1) as a float64
+	FloatValue1D(i int) float64
 
 	// SetFloat1D sets the value of given 1-dimensional index (0-Len()-1) as a float64
 	SetFloat1D(i int, val float64)
 
-	// FloatValRowCell returns the value at given row and cell, where row is outer-most dim,
+	// FloatValueRowCell returns the value at given row and cell, where row is outer-most dim,
 	// and cell is 1D index into remaining inner dims -- for etable.Table columns
-	FloatValRowCell(row, cell int) float64
+	FloatValueRowCell(row, cell int) float64
 
 	// SetFloatRowCell sets the value at given row and cell, where row is outer-most dim,
 	// and cell is 1D index into remaining inner dims -- for etable.Table columns
@@ -153,15 +153,15 @@ type Tensor interface {
 	// SetFloats sets tensor values from a []float64 slice (copies values).
 	SetFloats(vals []float64)
 
-	// StringVal1D returns the value of given 1-dimensional index (0-Len()-1) as a string
-	StringVal1D(i int) string
+	// StringValue1D returns the value of given 1-dimensional index (0-Len()-1) as a string
+	StringValue1D(i int) string
 
 	// SetString1D sets the value of given 1-dimensional index (0-Len()-1) as a string
 	SetString1D(i int, val string)
 
-	// StringValRowCell returns the value at given row and cell, where row is outer-most dim,
+	// StringValueRowCell returns the value at given row and cell, where row is outer-most dim,
 	// and cell is 1D index into remaining inner dims -- for etable.Table columns
-	StringValRowCell(row, cell int) string
+	StringValueRowCell(row, cell int) string
 
 	// SetStringRowCell sets the value at given row and cell, where row is outer-most dim,
 	// and cell is 1D index into remaining inner dims -- for etable.Table columns

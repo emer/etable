@@ -284,7 +284,7 @@ func (tg *TensorGrid) Color(val float64) (norm float64, clr color.Color) {
 	if tg.ColorMap.Indexed {
 		clr = tg.ColorMap.MapIndex(int(val))
 	} else {
-		norm = tg.Disp.Range.ClipNormVal(val)
+		norm = tg.Disp.Range.ClipNormValue(val)
 		clr = tg.ColorMap.Map(float32(norm))
 	}
 	return
@@ -348,11 +348,11 @@ func (tg *TensorGrid) Render() {
 				case outclr:
 					var r, g, b, a float64
 					a = 1
-					r = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{0, y, x}))
-					g = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{1, y, x}))
-					b = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{2, y, x}))
+					r = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{0, y, x}))
+					g = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{1, y, x}))
+					b = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{2, y, x}))
 					if nclr > 3 {
-						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{3, y, x}))
+						a = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{3, y, x}))
 					}
 					cr := mat32.V2(float32(x), float32(ey))
 					pr := pos.Add(cr.Mul(gsz))
@@ -361,18 +361,18 @@ func (tg *TensorGrid) Render() {
 				case nclr > 1:
 					var r, g, b, a float64
 					a = 1
-					r = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 0}))
-					g = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 1}))
-					b = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 2}))
+					r = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{y, x, 0}))
+					g = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{y, x, 1}))
+					b = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{y, x, 2}))
 					if nclr > 3 {
-						a = tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x, 3}))
+						a = tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{y, x, 3}))
 					}
 					cr := mat32.V2(float32(x), float32(ey))
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color = colors.C(colors.FromFloat64(r, g, b, a))
 					pc.FillBox(pr, gsz, pc.StrokeStyle.Color)
 				default:
-					val := tg.Disp.Range.ClipNormVal(tsr.FloatVal([]int{y, x}))
+					val := tg.Disp.Range.ClipNormValue(tsr.FloatValue([]int{y, x}))
 					cr := mat32.V2(float32(x), float32(ey))
 					pr := pos.Add(cr.Mul(gsz))
 					pc.StrokeStyle.Color = colors.C(colors.FromFloat64(val, val, val, 1))
@@ -405,7 +405,7 @@ func (tg *TensorGrid) Render() {
 			if !tg.Disp.TopZero {
 				ey = (rows - 1) - y
 			}
-			val := etensor.Prjn2DVal(tsr, tg.Disp.OddRow, ey, x)
+			val := etensor.Prjn2DValue(tsr, tg.Disp.OddRow, ey, x)
 			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
