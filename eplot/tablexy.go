@@ -92,12 +92,12 @@ func (txy *TableXY) Validate() error {
 			return errors.New("eplot.TableXY Y TensorIndex invalid -- reset to 0")
 		}
 	}
-	txy.FilterVals()
+	txy.FilterValues()
 	return nil
 }
 
-// FilterVals removes items with NaN values, and out of Y range
-func (txy *TableXY) FilterVals() {
+// FilterValues removes items with NaN values, and out of Y range
+func (txy *TableXY) FilterValues() {
 	txy.Table.Filter(func(et *etable.Table, row int) bool {
 		xv := txy.TRowXValue(row)
 		yv := txy.TRowValue(row)

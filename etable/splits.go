@@ -237,23 +237,23 @@ func (spl *Splits) ExtractLevels(levels []int) (*Splits, error) {
 	spl.Aggs = aggs
 	ss.SortOrder(levels)
 	// now just do the grouping by levels values
-	lstVals := make([]string, nlv)
-	curVals := make([]string, nlv)
+	lstValues := make([]string, nlv)
+	curValues := make([]string, nlv)
 	var curIx *IndexView
 	nsp := len(ss.Splits)
 	for si := nsp - 1; si >= 0; si-- {
 		diff := false
 		for li := range levels {
 			vl := ss.Values[si][levels[li]]
-			curVals[li] = vl
-			if vl != lstVals[li] {
+			curValues[li] = vl
+			if vl != lstValues[li] {
 				diff = true
 			}
 		}
 		if diff || curIx == nil {
 			curIx = ss.Splits[si]
-			copy(lstVals, curVals)
-			ss.Values[si] = slices.Clone(curVals)
+			copy(lstValues, curValues)
+			ss.Values[si] = slices.Clone(curValues)
 		} else {
 			curIx.Indexes = append(curIx.Indexes, ss.Splits[si].Indexes...) // absorb
 			ss.Delete(si)

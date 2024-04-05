@@ -39,22 +39,22 @@ func GroupByIndex(ix *etable.IndexView, colIndexes []int) *etable.Splits {
 	}
 	srt := ix.Clone()
 	srt.SortStableCols(colIndexes, true) // important for consistency
-	lstVals := make([]string, nc)
-	curVals := make([]string, nc)
+	lstValues := make([]string, nc)
+	curValues := make([]string, nc)
 	var curIx *etable.IndexView
 	for _, rw := range srt.Indexes {
 		diff := false
 		for i, ci := range colIndexes {
 			cl := ix.Table.Cols[ci]
 			cv := cl.StringValue1D(rw)
-			curVals[i] = cv
-			if cv != lstVals[i] {
+			curValues[i] = cv
+			if cv != lstValues[i] {
 				diff = true
 			}
 		}
 		if diff || curIx == nil {
-			curIx = spl.New(ix.Table, curVals, rw)
-			copy(lstVals, curVals)
+			curIx = spl.New(ix.Table, curValues, rw)
+			copy(lstValues, curValues)
 		} else {
 			curIx.AddIndex(rw)
 		}
@@ -117,22 +117,22 @@ func GroupByFunc(ix *etable.IndexView, fun func(row int) []string) *etable.Split
 
 	// now do our usual grouping operation
 	spl := &etable.Splits{}
-	lstVals := make([]string, nv)
+	lstValues := make([]string, nv)
 	var curIx *etable.IndexView
 	for _, rw := range srt.Indexes {
-		curVals := funvals[rw]
+		curValues := funvals[rw]
 		diff := (curIx == nil)
 		if !diff {
 			for fi := 0; fi < nv; fi++ {
-				if lstVals[fi] != curVals[fi] {
+				if lstValues[fi] != curValues[fi] {
 					diff = true
 					break
 				}
 			}
 		}
 		if diff {
-			curIx = spl.New(ix.Table, curVals, rw)
-			copy(lstVals, curVals)
+			curIx = spl.New(ix.Table, curValues, rw)
+			copy(lstValues, curValues)
 		} else {
 			curIx.AddIndex(rw)
 		}

@@ -12,12 +12,12 @@ import (
 
 func TestAdd4DCol(t *testing.T) {
 	dt := Table{}
-	err := dt.AddCol(etensor.NewFloat32([]int{1, 11, 1, 16}, nil, nil), "Vals")
+	err := dt.AddCol(etensor.NewFloat32([]int{1, 11, 1, 16}, nil, nil), "Values")
 	if err != nil {
 		t.Error(err)
 	}
 
-	col := dt.ColByName("Vals")
+	col := dt.ColByName("Values")
 	if col.NumDims() != 4 {
 		t.Errorf("Add4DCol: # of dims != 4\n")
 	}
