@@ -376,7 +376,7 @@ func (pl *Plot2D) Config() {
 
 // ConfigPlot configures the overall view widget
 func (pl *Plot2D) ConfigPlot() {
-	pl.Params.FmMeta(pl.Table.Table)
+	pl.Params.FromMeta(pl.Table.Table)
 	if !pl.HasChildren() {
 		fr := gi.NewFrame(pl, "cols")
 		fr.Style(func(s *styles.Style) {
@@ -439,7 +439,7 @@ func (pl *Plot2D) ColsListUpdate() {
 		} else {
 			cp.IsString = false
 		}
-		cp.FmMetaMap(pl.Table.Table.MetaData)
+		cp.FromMetaMap(pl.Table.Table.MetaData)
 		inc := 1
 		if cn == pl.Params.XAxisCol || tcol.DataType() == etensor.INT || tcol.DataType() == etensor.INT64 || tcol.DataType() == etensor.STRING {
 			inc = 0
@@ -450,10 +450,10 @@ func (pl *Plot2D) ColsListUpdate() {
 	}
 }
 
-// ColsFmMetaMap updates all the column settings from given meta map
-func (pl *Plot2D) ColsFmMetaMap(meta map[string]string) {
+// ColsFromMetaMap updates all the column settings from given meta map
+func (pl *Plot2D) ColsFromMetaMap(meta map[string]string) {
 	for _, cp := range pl.Cols {
-		cp.FmMetaMap(meta)
+		cp.FromMetaMap(meta)
 	}
 }
 

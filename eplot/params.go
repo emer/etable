@@ -97,9 +97,9 @@ func (pp *PlotParams) CopyFrom(fr *PlotParams) {
 	pp.Plot = pl
 }
 
-// FmMeta sets plot params from meta data
-func (pp *PlotParams) FmMeta(dt *etable.Table) {
-	pp.FmMetaMap(dt.MetaData)
+// FromMeta sets plot params from meta data
+func (pp *PlotParams) FromMeta(dt *etable.Table) {
+	pp.FromMetaMap(dt.MetaData)
 }
 
 // MetaMapLower tries meta data access by lower-case version of key too
@@ -112,8 +112,8 @@ func MetaMapLower(meta map[string]string, key string) (string, bool) {
 	return vl, has
 }
 
-// FmMetaMap sets plot params from meta data map
-func (pp *PlotParams) FmMetaMap(meta map[string]string) {
+// FromMetaMap sets plot params from meta data map
+func (pp *PlotParams) FromMetaMap(meta map[string]string) {
 	if typ, has := MetaMapLower(meta, "Type"); has {
 		pp.Type.SetString(typ)
 	}
@@ -247,8 +247,8 @@ func (cp *ColParams) Label() string {
 	return cp.Col
 }
 
-// FmMetaMap sets plot params from meta data map
-func (cp *ColParams) FmMetaMap(meta map[string]string) {
+// FromMetaMap sets plot params from meta data map
+func (cp *ColParams) FromMetaMap(meta map[string]string) {
 	if op, has := MetaMapLower(meta, cp.Col+":On"); has {
 		if op == "+" || op == "true" || op == "" {
 			cp.On = true

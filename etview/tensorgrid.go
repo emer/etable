@@ -98,8 +98,8 @@ func (td *TensorDisp) Defaults() {
 	}
 }
 
-// FmMeta sets display options from Tensor meta-data
-func (td *TensorDisp) FmMeta(tsr etensor.Tensor) {
+// FromMeta sets display options from Tensor meta-data
+func (td *TensorDisp) FromMeta(tsr etensor.Tensor) {
 	if op, has := tsr.MetaData("top-zero"); has {
 		if op == "+" || op == "true" {
 			td.TopZero = true
@@ -204,7 +204,7 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) *TensorGrid {
 	}
 	tg.Tensor = tsr
 	if tg.Tensor != nil {
-		tg.Disp.FmMeta(tg.Tensor)
+		tg.Disp.FromMeta(tg.Tensor)
 	}
 	tg.Update()
 	return tg

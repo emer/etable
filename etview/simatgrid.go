@@ -45,7 +45,7 @@ func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) *SimMatGrid {
 	tg.SimMat = smat
 	tg.Tensor = smat.Mat
 	if tg.Tensor != nil {
-		tg.Disp.FmMeta(tg.Tensor)
+		tg.Disp.FromMeta(tg.Tensor)
 	}
 	tg.Update()
 	return tg

@@ -541,7 +541,7 @@ func (tv *TableView) SetColTensorDisp(col int) *TensorDisp {
 	*ctd = tv.TsrDisp
 	if tv.Table != nil {
 		cl := tv.Table.Table.Cols[col]
-		ctd.FmMeta(cl)
+		ctd.FromMeta(cl)
 	}
 	tv.ColTsrDisp[col] = ctd
 	return ctd
