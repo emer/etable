@@ -5,15 +5,15 @@
 package eplot
 
 import (
-	"cogentcore.org/core/gi"
-	"cogentcore.org/core/giv"
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/icons"
-	"cogentcore.org/core/laser"
+	"cogentcore.org/core/reflectx"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/views"
 )
 
 func init() {
-	giv.AddValue(Plot2D{}, func() giv.Value {
+	views.AddValue(Plot2D{}, func() views.Value {
 		return &Plot2DValue{}
 	})
 }
@@ -23,20 +23,20 @@ func init() {
 
 // Plot2DValue presents a button that pulls up the Plot2D in a dialog
 type Plot2DValue struct {
-	giv.ValueBase[*gi.Button]
+	views.ValueBase[*core.Button]
 }
 
 func (v *Plot2DValue) Config() {
-	v.Widget.SetType(gi.ButtonTonal).SetIcon(icons.Edit)
-	giv.ConfigDialogWidget(v, true)
+	v.Widget.SetType(core.ButtonTonal).SetIcon(icons.Edit)
+	views.ConfigDialogWidget(v, true)
 }
 
 func (v *Plot2DValue) Update() {
-	npv := laser.NonPtrValue(v.Value)
+	npv := reflectx.NonPtrValue(v.Value)
 	if !v.Value.IsValid() || v.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
 		v.Widget.SetText("nil")
 	} else {
-		opv := laser.OnePtrUnderlyingValue(v.Value)
+		opv := reflectx.OnePtrUnderlyingValue(v.Value)
 		plot := opv.Interface().(*Plot2D)
 		if plot != nil && plot.Table != nil && plot.Table.Table != nil {
 			if nm, has := plot.Table.Table.MetaData["name"]; has {
@@ -50,8 +50,8 @@ func (v *Plot2DValue) Update() {
 	}
 }
 
-func (v *Plot2DValue) ConfigDialog(d *gi.Body) (bool, func()) {
-	opv := laser.OnePtrUnderlyingValue(v.Value)
+func (v *Plot2DValue) ConfigDialog(d *core.Body) (bool, func()) {
+	opv := reflectx.OnePtrUnderlyingValue(v.Value)
 	plot := opv.Interface().(*Plot2D)
 	if plot == nil || plot.Table == nil {
 		return false, nil

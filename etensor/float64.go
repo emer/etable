@@ -12,7 +12,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cogentcore.org/core/laser"
+	"cogentcore.org/core/reflectx"
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
@@ -122,7 +122,7 @@ func (tsr *Float64) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Val
 
 func (tsr *Float64) StringValue(i []int) string {
 	j := tsr.Offset(i)
-	return laser.ToString(tsr.Values[j])
+	return reflectx.ToString(tsr.Values[j])
 }
 func (tsr *Float64) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -157,7 +157,7 @@ func (tsr *Float64) SetFloats(vals []float64) {
 	copy(tsr.Values, vals) // diff: blit from values directly
 }
 
-func (tsr *Float64) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Float64) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Float64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = float64(fv)
@@ -166,7 +166,7 @@ func (tsr *Float64) SetString1D(off int, val string) {
 
 func (tsr *Float64) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Float64) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -409,7 +409,7 @@ func (tsr *Float64) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Float64) Label() string {
 	return fmt.Sprintf("Float64: %s", tsr.Shape.String())
 }

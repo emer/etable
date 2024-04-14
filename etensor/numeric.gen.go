@@ -14,7 +14,7 @@ import (
 	"strconv"
 	"strings"
 
-	"cogentcore.org/core/laser"
+	"cogentcore.org/core/reflectx"
 	"github.com/apache/arrow/go/arrow/array"
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
@@ -119,10 +119,13 @@ func (tsr *Int64) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Int64) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Int64) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int64) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int64(val) }
 
-func (tsr *Int64) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *Int64) StringValue(i []int) string {
+	j := tsr.Offset(i)
+	return reflectx.ToString(tsr.Values[j])
+}
 func (tsr *Int64) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -130,7 +133,7 @@ func (tsr *Int64) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Int64) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Int64) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Int64) SetFloat1D(off int, val float64) { tsr.Values[off] = int64(val) }
 
 func (tsr *Int64) FloatValueRowCell(row, cell int) float64 {
@@ -161,7 +164,7 @@ func (tsr *Int64) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Int64) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Int64) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Int64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int64(fv)
@@ -170,7 +173,7 @@ func (tsr *Int64) SetString1D(off int, val string) {
 
 func (tsr *Int64) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int64) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -413,7 +416,7 @@ func (tsr *Int64) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Int64) Label() string {
 	return fmt.Sprintf("Int64: %s", tsr.Shape.String())
 }
@@ -679,12 +682,12 @@ func (tsr *Uint64) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Uint64) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Uint64) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint64) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint64(val) }
 
 func (tsr *Uint64) StringValue(i []int) string {
 	j := tsr.Offset(i)
-	return laser.ToString(tsr.Values[j])
+	return reflectx.ToString(tsr.Values[j])
 }
 func (tsr *Uint64) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -693,7 +696,7 @@ func (tsr *Uint64) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Uint64) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Uint64) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Uint64) SetFloat1D(off int, val float64) { tsr.Values[off] = uint64(val) }
 
 func (tsr *Uint64) FloatValueRowCell(row, cell int) float64 {
@@ -724,7 +727,7 @@ func (tsr *Uint64) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Uint64) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Uint64) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Uint64) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint64(fv)
@@ -733,7 +736,7 @@ func (tsr *Uint64) SetString1D(off int, val string) {
 
 func (tsr *Uint64) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint64) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -976,7 +979,7 @@ func (tsr *Uint64) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Uint64) Label() string {
 	return fmt.Sprintf("Uint64: %s", tsr.Shape.String())
 }
@@ -1242,10 +1245,13 @@ func (tsr *Int32) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Int32) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Int32) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int32) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int32(val) }
 
-func (tsr *Int32) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *Int32) StringValue(i []int) string {
+	j := tsr.Offset(i)
+	return reflectx.ToString(tsr.Values[j])
+}
 func (tsr *Int32) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -1253,7 +1259,7 @@ func (tsr *Int32) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Int32) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Int32) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Int32) SetFloat1D(off int, val float64) { tsr.Values[off] = int32(val) }
 
 func (tsr *Int32) FloatValueRowCell(row, cell int) float64 {
@@ -1284,7 +1290,7 @@ func (tsr *Int32) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Int32) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Int32) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Int32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int32(fv)
@@ -1293,7 +1299,7 @@ func (tsr *Int32) SetString1D(off int, val string) {
 
 func (tsr *Int32) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int32) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1536,7 +1542,7 @@ func (tsr *Int32) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Int32) Label() string {
 	return fmt.Sprintf("Int32: %s", tsr.Shape.String())
 }
@@ -1802,12 +1808,12 @@ func (tsr *Uint32) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Uint32) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Uint32) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint32) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint32(val) }
 
 func (tsr *Uint32) StringValue(i []int) string {
 	j := tsr.Offset(i)
-	return laser.ToString(tsr.Values[j])
+	return reflectx.ToString(tsr.Values[j])
 }
 func (tsr *Uint32) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -1816,7 +1822,7 @@ func (tsr *Uint32) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Uint32) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Uint32) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Uint32) SetFloat1D(off int, val float64) { tsr.Values[off] = uint32(val) }
 
 func (tsr *Uint32) FloatValueRowCell(row, cell int) float64 {
@@ -1847,7 +1853,7 @@ func (tsr *Uint32) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Uint32) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Uint32) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Uint32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint32(fv)
@@ -1856,7 +1862,7 @@ func (tsr *Uint32) SetString1D(off int, val string) {
 
 func (tsr *Uint32) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint32) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2099,7 +2105,7 @@ func (tsr *Uint32) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Uint32) Label() string {
 	return fmt.Sprintf("Uint32: %s", tsr.Shape.String())
 }
@@ -2365,12 +2371,12 @@ func (tsr *Float32) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Float32) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Float32) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Float32) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = float32(val) }
 
 func (tsr *Float32) StringValue(i []int) string {
 	j := tsr.Offset(i)
-	return laser.ToString(tsr.Values[j])
+	return reflectx.ToString(tsr.Values[j])
 }
 func (tsr *Float32) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2379,7 +2385,7 @@ func (tsr *Float32) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Float32) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Float32) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Float32) SetFloat1D(off int, val float64) { tsr.Values[off] = float32(val) }
 
 func (tsr *Float32) FloatValueRowCell(row, cell int) float64 {
@@ -2410,7 +2416,7 @@ func (tsr *Float32) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Float32) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Float32) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Float32) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = float32(fv)
@@ -2419,7 +2425,7 @@ func (tsr *Float32) SetString1D(off int, val string) {
 
 func (tsr *Float32) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Float32) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -2662,7 +2668,7 @@ func (tsr *Float32) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Float32) Label() string {
 	return fmt.Sprintf("Float32: %s", tsr.Shape.String())
 }
@@ -2928,10 +2934,13 @@ func (tsr *Int16) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Int16) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Int16) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int16) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int16(val) }
 
-func (tsr *Int16) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *Int16) StringValue(i []int) string {
+	j := tsr.Offset(i)
+	return reflectx.ToString(tsr.Values[j])
+}
 func (tsr *Int16) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -2939,7 +2948,7 @@ func (tsr *Int16) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Int16) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Int16) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Int16) SetFloat1D(off int, val float64) { tsr.Values[off] = int16(val) }
 
 func (tsr *Int16) FloatValueRowCell(row, cell int) float64 {
@@ -2970,7 +2979,7 @@ func (tsr *Int16) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Int16) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Int16) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Int16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int16(fv)
@@ -2979,7 +2988,7 @@ func (tsr *Int16) SetString1D(off int, val string) {
 
 func (tsr *Int16) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int16) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -3222,7 +3231,7 @@ func (tsr *Int16) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Int16) Label() string {
 	return fmt.Sprintf("Int16: %s", tsr.Shape.String())
 }
@@ -3488,12 +3497,12 @@ func (tsr *Uint16) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Uint16) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Uint16) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint16) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint16(val) }
 
 func (tsr *Uint16) StringValue(i []int) string {
 	j := tsr.Offset(i)
-	return laser.ToString(tsr.Values[j])
+	return reflectx.ToString(tsr.Values[j])
 }
 func (tsr *Uint16) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -3502,7 +3511,7 @@ func (tsr *Uint16) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Uint16) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Uint16) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Uint16) SetFloat1D(off int, val float64) { tsr.Values[off] = uint16(val) }
 
 func (tsr *Uint16) FloatValueRowCell(row, cell int) float64 {
@@ -3533,7 +3542,7 @@ func (tsr *Uint16) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Uint16) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Uint16) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Uint16) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint16(fv)
@@ -3542,7 +3551,7 @@ func (tsr *Uint16) SetString1D(off int, val string) {
 
 func (tsr *Uint16) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint16) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -3785,7 +3794,7 @@ func (tsr *Uint16) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Uint16) Label() string {
 	return fmt.Sprintf("Uint16: %s", tsr.Shape.String())
 }
@@ -4051,10 +4060,13 @@ func (tsr *Int8) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Int8) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Int8) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Int8) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = int8(val) }
 
-func (tsr *Int8) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *Int8) StringValue(i []int) string {
+	j := tsr.Offset(i)
+	return reflectx.ToString(tsr.Values[j])
+}
 func (tsr *Int8) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -4062,7 +4074,7 @@ func (tsr *Int8) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Int8) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Int8) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Int8) SetFloat1D(off int, val float64) { tsr.Values[off] = int8(val) }
 
 func (tsr *Int8) FloatValueRowCell(row, cell int) float64 {
@@ -4093,7 +4105,7 @@ func (tsr *Int8) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Int8) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Int8) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Int8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = int8(fv)
@@ -4102,7 +4114,7 @@ func (tsr *Int8) SetString1D(off int, val string) {
 
 func (tsr *Int8) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Int8) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -4345,7 +4357,7 @@ func (tsr *Int8) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Int8) Label() string {
 	return fmt.Sprintf("Int8: %s", tsr.Shape.String())
 }
@@ -4611,10 +4623,13 @@ func (tsr *Uint8) SetNull1D(i int, nul bool) {
 	tsr.Nulls.Set(i, nul)
 }
 
-func (tsr *Uint8) FloatValue(i []int) float64      { j := tsr.Offset(i); return float64(tsr.Values[j]) }
+func (tsr *Uint8) FloatValue(i []int) float64    { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *Uint8) SetFloat(i []int, val float64) { j := tsr.Offset(i); tsr.Values[j] = uint8(val) }
 
-func (tsr *Uint8) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *Uint8) StringValue(i []int) string {
+	j := tsr.Offset(i)
+	return reflectx.ToString(tsr.Values[j])
+}
 func (tsr *Uint8) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i)
@@ -4622,7 +4637,7 @@ func (tsr *Uint8) SetString(i []int, val string) {
 	}
 }
 
-func (tsr *Uint8) FloatValue1D(off int) float64      { return float64(tsr.Values[off]) }
+func (tsr *Uint8) FloatValue1D(off int) float64    { return float64(tsr.Values[off]) }
 func (tsr *Uint8) SetFloat1D(off int, val float64) { tsr.Values[off] = uint8(val) }
 
 func (tsr *Uint8) FloatValueRowCell(row, cell int) float64 {
@@ -4653,7 +4668,7 @@ func (tsr *Uint8) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *Uint8) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *Uint8) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *Uint8) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = uint8(fv)
@@ -4662,7 +4677,7 @@ func (tsr *Uint8) SetString1D(off int, val string) {
 
 func (tsr *Uint8) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *Uint8) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -4905,7 +4920,7 @@ func (tsr *Uint8) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Uint8) Label() string {
 	return fmt.Sprintf("Uint8: %s", tsr.Shape.String())
 }

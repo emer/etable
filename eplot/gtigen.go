@@ -3,9 +3,8 @@
 package eplot
 
 import (
-	"cogentcore.org/core/gi"
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/gti"
-	"cogentcore.org/core/ki"
 )
 
 // Plot2DType is the [gti.Type] for [Plot2D]
@@ -13,7 +12,7 @@ var Plot2DType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/eplot.Pl
 
 // NewPlot2D adds a new [Plot2D] with the given name to the given parent:
 // Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data
-func NewPlot2D(par ki.Ki, name ...string) *Plot2D {
+func NewPlot2D(par tree.Ki, name ...string) *Plot2D {
 	return par.NewChild(Plot2DType, name...).(*Plot2D)
 }
 
@@ -21,7 +20,7 @@ func NewPlot2D(par ki.Ki, name ...string) *Plot2D {
 func (t *Plot2D) KiType() *gti.Type { return Plot2DType }
 
 // New returns a new [*Plot2D] value
-func (t *Plot2D) New() ki.Ki { return &Plot2D{} }
+func (t *Plot2D) New() tree.Ki { return &Plot2D{} }
 
 // SetParams sets the [Plot2D.Params]:
 // the overall plot parameters
@@ -36,11 +35,11 @@ func (t *Plot2D) SetConfigPlotFunc(v func()) *Plot2D { t.ConfigPlotFunc = v; ret
 
 // SetSVGFile sets the [Plot2D.SVGFile]:
 // current svg file
-func (t *Plot2D) SetSVGFile(v gi.Filename) *Plot2D { t.SVGFile = v; return t }
+func (t *Plot2D) SetSVGFile(v core.Filename) *Plot2D { t.SVGFile = v; return t }
 
 // SetDataFile sets the [Plot2D.DataFile]:
 // current csv data file
-func (t *Plot2D) SetDataFile(v gi.Filename) *Plot2D { t.DataFile = v; return t }
+func (t *Plot2D) SetDataFile(v core.Filename) *Plot2D { t.DataFile = v; return t }
 
 // SetTooltip sets the [Plot2D.Tooltip]
 func (t *Plot2D) SetTooltip(v string) *Plot2D { t.Tooltip = v; return t }

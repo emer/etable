@@ -41,7 +41,7 @@ def TestCB(recv, send, sig, data):
     TheSim.vp.SetNeedsFullRender()
 
 
-class Sim(pygiv.ClassViewObj):
+class Sim(pyviews.ClassViewObj):
     """
     Sim encapsulates the entire simulation model, and we define all the
     functionality as methods on this struct.  This structure keeps all relevant
@@ -199,12 +199,12 @@ class Sim(pygiv.ClassViewObj):
         width = 1600
         height = 1200
 
-        gi.SetAppName("pyet")
-        gi.SetAppAbout(
-            'testing of converting etable data between Go and Python. See <a href="https://goki.dev/etable/v2/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>'
+        core.SetAppName("pyet")
+        core.SetAppAbout(
+            'testing of converting etable data between Go and Python. See <a href="https://gotree.dev/etable/v2/blob/master/examples/pyet/README.md">README.md on GitHub</a>.</p>'
         )
 
-        win = gi.NewMainWindow("pyet", "PyEt Testing", width, height)
+        win = core.NewMainWindow("pyet", "PyEt Testing", width, height)
         ss.Win = win
 
         vp = win.WinViewport2D()
@@ -213,11 +213,11 @@ class Sim(pygiv.ClassViewObj):
 
         mfr = win.SetMainFrame()
 
-        tbar = gi.AddNewToolBar(mfr, "tbar")
+        tbar = core.AddNewToolBar(mfr, "tbar")
         tbar.SetStretchMaxWidth()
         ss.ToolBar = tbar
 
-        split = gi.AddNewSplitView(mfr, "split")
+        split = core.AddNewSplitView(mfr, "split")
         split.Dim = math32.X
         split.SetStretchMax()
 
@@ -225,7 +225,7 @@ class Sim(pygiv.ClassViewObj):
         cv.AddFrame(split)
         cv.Config()
 
-        tv = gi.AddNewTabView(split, "tv")
+        tv = core.AddNewTabView(split, "tv")
 
         tabv = etview.TableView()
         tv.AddTab(tabv, "Pats")
@@ -236,20 +236,20 @@ class Sim(pygiv.ClassViewObj):
         recv = win.This()
 
         tbar.AddAction(
-            gi.ActOpts(Label="Test", Icon="update", Tooltip="run the test."),
+            core.ActOpts(Label="Test", Icon="update", Tooltip="run the test."),
             recv,
             TestCB,
         )
 
         # main menu
-        appnm = gi.AppName()
+        appnm = core.AppName()
         mmen = win.MainMenu
         mmen.ConfigMenus(go.Slice_string([appnm, "File", "Edit", "Window"]))
 
-        amen = gi.Action(win.MainMenu.ChildByName(appnm, 0))
+        amen = core.Action(win.MainMenu.ChildByName(appnm, 0))
         amen.Menu.AddAppMenu(win)
 
-        emen = gi.Action(win.MainMenu.ChildByName("Edit", 1))
+        emen = core.Action(win.MainMenu.ChildByName("Edit", 1))
         emen.Menu.AddCopyCutPaste(win)
 
         win.MainMenuUpdated()

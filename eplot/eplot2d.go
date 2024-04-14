@@ -16,14 +16,13 @@ import (
 	"strings"
 
 	"cogentcore.org/core/colors"
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
-	"cogentcore.org/core/gi"
-	"cogentcore.org/core/giv"
 	"cogentcore.org/core/icons"
-	"cogentcore.org/core/ki"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/states"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/views"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/etview"
@@ -33,7 +32,7 @@ import (
 
 // Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data
 type Plot2D struct { //gti:add
-	gi.Layout
+	core.Layout
 
 	// the idxview of the table that we're plotting
 	Table *etable.IndexView `set:"-"`
@@ -54,16 +53,16 @@ type Plot2D struct { //gti:add
 	ConfigPlotFunc func() `json:"-" xml:"-"`
 
 	// current svg file
-	SVGFile gi.Filename
+	SVGFile core.Filename
 
 	// current csv data file
-	DataFile gi.Filename
+	DataFile core.Filename
 
 	// currently doing a plot
 	InPlot bool `set:"-" edit:"-" json:"-" xml:"-"`
 }
 
-func (pl *Plot2D) CopyFieldsFrom(frm ki.Ki) {
+func (pl *Plot2D) CopyFieldsFrom(frm tree.Ki) {
 	fr := frm.(*Plot2D)
 	pl.Layout.CopyFieldsFrom(&fr.Layout)
 	pl.Params.CopyFrom(&fr.Params)
@@ -155,7 +154,7 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 }
 
 // SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
-func (pl *Plot2D) SaveSVG(fname gi.Filename) { //gti:add
+func (pl *Plot2D) SaveSVG(fname core.Filename) { //gti:add
 	pl.Update()
 	sv := pl.SVGPlot()
 	SaveSVGView(string(fname), pl.Plot, sv, 2)
@@ -163,29 +162,29 @@ func (pl *Plot2D) SaveSVG(fname gi.Filename) { //gti:add
 }
 
 // SavePNG saves the current plot to a png, capturing current render
-func (pl *Plot2D) SavePNG(fname gi.Filename) { //gti:add
+func (pl *Plot2D) SavePNG(fname core.Filename) { //gti:add
 	sv := pl.SVGPlot()
 	sv.SavePNG(fname)
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
-func (pl *Plot2D) SaveCSV(fname gi.Filename, delim etable.Delims) { //gti:add
+func (pl *Plot2D) SaveCSV(fname core.Filename, delim etable.Delims) { //gti:add
 	pl.Table.SaveCSV(fname, delim, etable.Headers)
 	pl.DataFile = fname
 }
 
 // SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save
 // Any extension is removed and appropriate extensions are added
-func (pl *Plot2D) SaveAll(fname gi.Filename) { //gti:add
+func (pl *Plot2D) SaveAll(fname core.Filename) { //gti:add
 	fn := string(fname)
 	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
-	pl.SaveCSV(gi.Filename(fn+".tsv"), etable.Tab)
-	pl.SavePNG(gi.Filename(fn + ".png"))
-	pl.SaveSVG(gi.Filename(fn + ".svg"))
+	pl.SaveCSV(core.Filename(fn+".tsv"), etable.Tab)
+	pl.SavePNG(core.Filename(fn + ".png"))
+	pl.SaveSVG(core.Filename(fn + ".svg"))
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
-func (pl *Plot2D) OpenCSV(filename gi.Filename, delim etable.Delims) { //gti:add
+func (pl *Plot2D) OpenCSV(filename core.Filename, delim etable.Delims) { //gti:add
 	pl.Table.Table.OpenCSV(filename, delim)
 	pl.DataFile = filename
 	pl.Update()
@@ -193,7 +192,7 @@ func (pl *Plot2D) OpenCSV(filename gi.Filename, delim etable.Delims) { //gti:add
 
 // OpenFS opens the Table data from a csv (comma-separated values) file (or any delim)
 // from the given filesystem.
-func (pl *Plot2D) OpenFS(fsys fs.FS, filename gi.Filename, delim etable.Delims) {
+func (pl *Plot2D) OpenFS(fsys fs.FS, filename core.Filename, delim etable.Delims) {
 	pl.Table.Table.OpenFS(fsys, string(filename), delim)
 	pl.DataFile = filename
 	pl.Update()
@@ -378,14 +377,14 @@ func (pl *Plot2D) Config() {
 func (pl *Plot2D) ConfigPlot() {
 	pl.Params.FromMeta(pl.Table.Table)
 	if !pl.HasChildren() {
-		fr := gi.NewFrame(pl, "cols")
+		fr := core.NewFrame(pl, "cols")
 		fr.Style(func(s *styles.Style) {
 			s.Direction = styles.Column
 			s.Grow.Set(0, 1)
 			s.Overflow.Y = styles.OverflowAuto
 			s.Background = colors.C(colors.Scheme.SurfaceContainerLow)
 		})
-		pt := gi.NewSVG(pl, "plot")
+		pt := core.NewSVG(pl, "plot")
 		pt.Style(func(s *styles.Style) {
 			s.Grow.Set(1, 1)
 		})
@@ -406,12 +405,12 @@ func (pl *Plot2D) DeleteCols() {
 	}
 }
 
-func (pl *Plot2D) ColsLay() *gi.Frame {
-	return pl.ChildByName("cols", 0).(*gi.Frame)
+func (pl *Plot2D) ColsLay() *core.Frame {
+	return pl.ChildByName("cols", 0).(*core.Frame)
 }
 
-func (pl *Plot2D) SVGPlot() *gi.SVG {
-	return pl.ChildByName("plot", 1).(*gi.SVG)
+func (pl *Plot2D) SVGPlot() *core.SVG {
+	return pl.ChildByName("plot", 1).(*core.SVG)
 }
 
 const PlotColsHeaderN = 2
@@ -466,8 +465,8 @@ func (pl *Plot2D) ColsUpdate() {
 		}
 		ci := i - PlotColsHeaderN
 		cp := pl.Cols[ci]
-		cl := cli.(*gi.Layout)
-		sw := cl.Child(0).(*gi.Switch)
+		cl := cli.(*core.Layout)
+		sw := cl.Child(0).(*core.Switch)
 		if sw.StateIs(states.Checked) != cp.On {
 			sw.SetChecked(cp.On)
 			sw.NeedsRender()
@@ -488,8 +487,8 @@ func (pl *Plot2D) SetAllCols(on bool) {
 			continue
 		}
 		cp.On = on
-		cl := cli.(*gi.Layout)
-		sw := cl.Child(0).(*gi.Switch)
+		cl := cli.(*core.Layout)
+		sw := cl.Child(0).(*core.Switch)
 		sw.SetChecked(cp.On)
 	}
 	pl.UpdatePlot()
@@ -512,8 +511,8 @@ func (pl *Plot2D) SetColsByName(nameContains string, on bool) { //gti:add
 			continue
 		}
 		cp.On = on
-		cl := cli.(*gi.Layout)
-		sw := cl.Child(0).(*gi.Switch)
+		cl := cli.(*core.Layout)
+		sw := cl.Child(0).(*core.Switch)
 		sw.SetChecked(cp.On)
 	}
 	pl.UpdatePlot()
@@ -532,46 +531,46 @@ func (pl *Plot2D) ColsConfig() {
 	if len(pl.Cols) == 0 {
 		return
 	}
-	sc := gi.NewLayout(vl, "sel-cols")
-	sw := gi.NewSwitch(sc, "on").SetTooltip("Toggle off all columns")
+	sc := core.NewLayout(vl, "sel-cols")
+	sw := core.NewSwitch(sc, "on").SetTooltip("Toggle off all columns")
 	sw.OnChange(func(e events.Event) {
 		sw.SetChecked(false)
 		pl.SetAllCols(false)
 	})
-	gi.NewButton(sc, "col").SetText("Select Cols").SetType(gi.ButtonAction).
+	core.NewButton(sc, "col").SetText("Select Cols").SetType(core.ButtonAction).
 		SetTooltip("click to select columns based on column name").
 		OnClick(func(e events.Event) {
-			giv.CallFunc(pl, pl.SetColsByName)
+			views.CallFunc(pl, pl.SetColsByName)
 		})
-	gi.NewSeparator(vl, "sep")
+	core.NewSeparator(vl, "sep")
 
 	for _, cp := range pl.Cols {
 		cp := cp
 		cp.Plot = pl
-		cl := gi.NewLayout(vl, cp.Col)
+		cl := core.NewLayout(vl, cp.Col)
 		cl.Style(func(s *styles.Style) {
 			s.Direction = styles.Row
 			s.Grow.Set(0, 0)
 		})
-		sw := gi.NewSwitch(cl, "on").SetType(gi.SwitchCheckbox).SetTooltip("toggle plot on")
+		sw := core.NewSwitch(cl, "on").SetType(core.SwitchCheckbox).SetTooltip("toggle plot on")
 		sw.OnChange(func(e events.Event) {
 			cp.On = sw.StateIs(states.Checked)
 			pl.UpdatePlot()
 		})
 		sw.SetState(cp.On, states.Checked)
-		bt := gi.NewButton(cl, "col").SetText(cp.Col).SetType(gi.ButtonAction)
-		bt.SetMenu(func(m *gi.Scene) {
-			gi.NewButton(m, "set-x").SetText("Set X Axis").OnClick(func(e events.Event) {
+		bt := core.NewButton(cl, "col").SetText(cp.Col).SetType(core.ButtonAction)
+		bt.SetMenu(func(m *core.Scene) {
+			core.NewButton(m, "set-x").SetText("Set X Axis").OnClick(func(e events.Event) {
 				pl.Params.XAxisCol = cp.Col
 				pl.UpdatePlot()
 			})
-			gi.NewButton(m, "set-legend").SetText("Set Legend").OnClick(func(e events.Event) {
+			core.NewButton(m, "set-legend").SetText("Set Legend").OnClick(func(e events.Event) {
 				pl.Params.LegendCol = cp.Col
 				pl.UpdatePlot()
 			})
-			gi.NewButton(m, "edit").SetText("Edit").OnClick(func(e events.Event) {
-				d := gi.NewBody().AddTitle("Col Params")
-				giv.NewStructView(d).SetStruct(cp).
+			core.NewButton(m, "edit").SetText("Edit").OnClick(func(e events.Event) {
+				d := core.NewBody().AddTitle("Col Params")
+				views.NewStructView(d).SetStruct(cp).
 					OnChange(func(e events.Event) {
 						pl.UpdatePlot()
 					})
@@ -589,66 +588,66 @@ func (pl *Plot2D) PlotConfig() {
 	sv.SetReadOnly(true)
 }
 
-func (pl *Plot2D) ConfigToolbar(tb *gi.Toolbar) {
+func (pl *Plot2D) ConfigToolbar(tb *core.Toolbar) {
 	if pl.Table == nil || pl.Table.Table == nil {
 		return
 	}
-	gi.NewButton(tb).SetIcon(icons.PanTool).
+	core.NewButton(tb).SetIcon(icons.PanTool).
 		SetTooltip("toggle the ability to zoom and pan the view").OnClick(func(e events.Event) {
 		sv := pl.SVGPlot()
 		sv.SetReadOnly(!sv.IsReadOnly())
 		sv.ApplyStyleUpdate()
 	})
-	gi.NewButton(tb).SetIcon(icons.ArrowForward).
+	core.NewButton(tb).SetIcon(icons.ArrowForward).
 		SetTooltip("turn on select mode for selecting SVG elements").
 		OnClick(func(e events.Event) {
 			fmt.Println("this will select select mode")
 		})
-	gi.NewSeparator(tb)
-	gi.NewButton(tb).SetText("Update").SetIcon(icons.Update).
+	core.NewSeparator(tb)
+	core.NewButton(tb).SetText("Update").SetIcon(icons.Update).
 		SetTooltip("update fully redraws display, reflecting any new settings etc").
 		OnClick(func(e events.Event) {
 			pl.ConfigPlot()
 			pl.UpdatePlot()
 		})
-	gi.NewButton(tb).SetText("Config").SetIcon(icons.Settings).
+	core.NewButton(tb).SetText("Config").SetIcon(icons.Settings).
 		SetTooltip("set parameters that control display (font size etc)").
 		OnClick(func(e events.Event) {
-			d := gi.NewBody().AddTitle(pl.Nm + " Params")
-			giv.NewStructView(d).SetStruct(&pl.Params).
+			d := core.NewBody().AddTitle(pl.Nm + " Params")
+			views.NewStructView(d).SetStruct(&pl.Params).
 				OnChange(func(e events.Event) {
 					pl.UpdatePlot()
 				})
 			d.NewFullDialog(pl).SetNewWindow(true).Run()
 		})
-	gi.NewButton(tb).SetText("Table").SetIcon(icons.Edit).
+	core.NewButton(tb).SetText("Table").SetIcon(icons.Edit).
 		SetTooltip("open a TableView window of the data").
 		OnClick(func(e events.Event) {
-			d := gi.NewBody().AddTitle(pl.Nm + " Data")
+			d := core.NewBody().AddTitle(pl.Nm + " Data")
 			etv := etview.NewTableView(d).SetTable(pl.Table.Table)
 			d.AddAppBar(etv.ConfigToolbar)
 			d.NewFullDialog(pl).Run()
 		})
-	gi.NewSeparator(tb)
+	core.NewSeparator(tb)
 
-	gi.NewButton(tb).SetText("Save").SetIcon(icons.Save).SetMenu(func(m *gi.Scene) {
-		giv.NewFuncButton(m, pl.SaveSVG).SetIcon(icons.Save)
-		giv.NewFuncButton(m, pl.SavePNG).SetIcon(icons.Save)
-		giv.NewFuncButton(m, pl.SaveCSV).SetIcon(icons.Save)
-		gi.NewSeparator(m)
-		giv.NewFuncButton(m, pl.SaveAll).SetIcon(icons.Save)
+	core.NewButton(tb).SetText("Save").SetIcon(icons.Save).SetMenu(func(m *core.Scene) {
+		views.NewFuncButton(m, pl.SaveSVG).SetIcon(icons.Save)
+		views.NewFuncButton(m, pl.SavePNG).SetIcon(icons.Save)
+		views.NewFuncButton(m, pl.SaveCSV).SetIcon(icons.Save)
+		core.NewSeparator(m)
+		views.NewFuncButton(m, pl.SaveAll).SetIcon(icons.Save)
 	})
-	giv.NewFuncButton(tb, pl.OpenCSV).SetIcon(icons.Open)
-	gi.NewSeparator(tb)
-	giv.NewFuncButton(tb, pl.Table.FilterColName).SetText("Filter").SetIcon(icons.FilterAlt)
-	giv.NewFuncButton(tb, pl.Table.Sequential).SetText("Unfilter").SetIcon(icons.FilterAltOff)
+	views.NewFuncButton(tb, pl.OpenCSV).SetIcon(icons.Open)
+	core.NewSeparator(tb)
+	views.NewFuncButton(tb, pl.Table.FilterColName).SetText("Filter").SetIcon(icons.FilterAlt)
+	views.NewFuncButton(tb, pl.Table.Sequential).SetText("Unfilter").SetIcon(icons.FilterAltOff)
 }
 
 // NewSubPlot returns a Plot2D with its own separate Toolbar,
 // suitable for a tab or other element that is not the main plot.
-func NewSubPlot(par gi.Widget, name ...string) *Plot2D {
-	fr := gi.NewFrame(par, name...)
-	tb := gi.NewToolbar(fr, "tbar")
+func NewSubPlot(par core.Widget, name ...string) *Plot2D {
+	fr := core.NewFrame(par, name...)
+	tb := core.NewToolbar(fr, "tbar")
 	pl := NewPlot2D(fr, "plot")
 	fr.Style(func(s *styles.Style) {
 		s.Direction = styles.Column

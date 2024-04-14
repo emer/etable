@@ -5,23 +5,23 @@
 package main
 
 import (
-	"cogentcore.org/core/gi"
+	"cogentcore.org/core/core"
 	"github.com/emer/etable/v2/eplot"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 )
 
 func main() {
-	b := gi.NewBody("Test Plots")
+	b := core.NewBody("Test Plots")
 
-	tv := gi.NewTabs(b)
+	tv := core.NewTabs(b)
 
 	PlotColorSpread(tv)
 
 	b.RunMainWindow()
 }
 
-func PlotColorSpread(tv *gi.Tabs) {
+func PlotColorSpread(tv *core.Tabs) {
 	label := "Color Spread"
 	dt := etable.NewTable(label)
 	dt.SetMetaData("name", label)

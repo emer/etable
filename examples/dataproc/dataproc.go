@@ -9,8 +9,8 @@ import (
 	"fmt"
 	"math"
 
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
-	"cogentcore.org/core/gi"
 	"cogentcore.org/core/icons"
 	"github.com/emer/etable/v2/agg"
 	"github.com/emer/etable/v2/etable"
@@ -104,16 +104,16 @@ func AnalyzePlanets() {
 func main() {
 	AnalyzePlanets()
 
-	b := gi.NewBody("dataproc")
-	tv := gi.NewTabs(b)
+	b := core.NewBody("dataproc")
+	tv := core.NewTabs(b)
 
 	nt := tv.NewTab("Planets Data")
 	tbv := etview.NewTableView(nt).SetTable(Planets)
 	b.AddAppBar(tbv.ConfigToolbar)
-	b.AddAppBar(func(tb *gi.Toolbar) {
-		gi.NewButton(tb).SetText("README").SetIcon(icons.FileMarkdown).
+	b.AddAppBar(func(tb *core.Toolbar) {
+		core.NewButton(tb).SetText("README").SetIcon(icons.FileMarkdown).
 			SetTooltip("open README help file").OnClick(func(e events.Event) {
-			gi.TheApp.OpenURL("https://github.com/emer/etable/blob/master/examples/dataproc/README.md")
+			core.TheApp.OpenURL("https://github.com/emer/etable/blob/master/examples/dataproc/README.md")
 		})
 	})
 

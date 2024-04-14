@@ -5,7 +5,6 @@ package etview
 import (
 	"cogentcore.org/core/colors/colormap"
 	"cogentcore.org/core/gti"
-	"cogentcore.org/core/ki"
 	"cogentcore.org/core/math32"
 	"github.com/emer/etable/v2/etensor"
 )
@@ -16,7 +15,7 @@ var SimMatGridType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etvi
 // NewSimMatGrid adds a new [SimMatGrid] with the given name to the given parent:
 // SimMatGrid is a widget that displays a similarity / distance matrix
 // with tensor values as a grid of colored squares, and labels for rows, cols
-func NewSimMatGrid(parent ki.Ki, name ...string) *SimMatGrid {
+func NewSimMatGrid(parent tree.Ki, name ...string) *SimMatGrid {
 	return parent.NewChild(SimMatGridType, name...).(*SimMatGrid)
 }
 
@@ -24,7 +23,7 @@ func NewSimMatGrid(parent ki.Ki, name ...string) *SimMatGrid {
 func (t *SimMatGrid) KiType() *gti.Type { return SimMatGridType }
 
 // New returns a new [*SimMatGrid] value
-func (t *SimMatGrid) New() ki.Ki { return &SimMatGrid{} }
+func (t *SimMatGrid) New() tree.Ki { return &SimMatGrid{} }
 
 // SetRowMaxSz sets the [SimMatGrid.rowMaxSz]
 func (t *SimMatGrid) SetRowMaxSz(v math32.Vec2) *SimMatGrid { t.rowMaxSz = v; return t }
@@ -58,7 +57,7 @@ var TableViewType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etvie
 
 // NewTableView adds a new [TableView] with the given name to the given parent:
 // etview.TableView provides a GUI interface for etable.Table's
-func NewTableView(parent ki.Ki, name ...string) *TableView {
+func NewTableView(parent tree.Ki, name ...string) *TableView {
 	return parent.NewChild(TableViewType, name...).(*TableView)
 }
 
@@ -66,7 +65,7 @@ func NewTableView(parent ki.Ki, name ...string) *TableView {
 func (t *TableView) KiType() *gti.Type { return TableViewType }
 
 // New returns a new [*TableView] value
-func (t *TableView) New() ki.Ki { return &TableView{} }
+func (t *TableView) New() tree.Ki { return &TableView{} }
 
 // SetTsrDisp sets the [TableView.TsrDisp]:
 // overall display options for tensor display
@@ -134,7 +133,7 @@ var TensorGridType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/etvi
 
 // NewTensorGrid adds a new [TensorGrid] with the given name to the given parent:
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
-func NewTensorGrid(parent ki.Ki, name ...string) *TensorGrid {
+func NewTensorGrid(parent tree.Ki, name ...string) *TensorGrid {
 	return parent.NewChild(TensorGridType, name...).(*TensorGrid)
 }
 
@@ -142,7 +141,7 @@ func NewTensorGrid(parent ki.Ki, name ...string) *TensorGrid {
 func (t *TensorGrid) KiType() *gti.Type { return TensorGridType }
 
 // New returns a new [*TensorGrid] value
-func (t *TensorGrid) New() ki.Ki { return &TensorGrid{} }
+func (t *TensorGrid) New() tree.Ki { return &TensorGrid{} }
 
 // SetDisp sets the [TensorGrid.Disp]:
 // display options

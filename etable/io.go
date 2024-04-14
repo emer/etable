@@ -16,8 +16,8 @@ import (
 	"strconv"
 	"strings"
 
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/errors"
-	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/etensor"
 )
 
@@ -63,7 +63,7 @@ const (
 // If headers = true then generate C++ emergent-tyle column headers.
 // These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
-func (dt *Table) SaveCSV(filename gi.Filename, delim Delims, headers bool) error { //gti:add
+func (dt *Table) SaveCSV(filename core.Filename, delim Delims, headers bool) error { //gti:add
 	fp, err := os.Create(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -81,7 +81,7 @@ func (dt *Table) SaveCSV(filename gi.Filename, delim Delims, headers bool) error
 // If headers = true then generate C++ emergent-tyle column headers.
 // These headers have full configuration information for the tensor
 // columns.  Otherwise, only the data is written.
-func (ix *IndexView) SaveCSV(filename gi.Filename, delim Delims, headers bool) error { //gti:add
+func (ix *IndexView) SaveCSV(filename core.Filename, delim Delims, headers bool) error { //gti:add
 	fp, err := os.Create(string(filename))
 	defer fp.Close()
 	if err != nil {
@@ -103,7 +103,7 @@ func (ix *IndexView) SaveCSV(filename gi.Filename, delim Delims, headers bool) e
 // information for tensor dimensionality.
 // If the table DOES have existing columns, then those are used robustly
 // for whatever information fits from each row of the file.
-func (dt *Table) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
+func (dt *Table) OpenCSV(filename core.Filename, delim Delims) error { //gti:add
 	fp, err := os.Open(string(filename))
 	if err != nil {
 		return errors.Log(err)
@@ -131,7 +131,7 @@ func (dt *Table) OpenFS(fsys fs.FS, filename string, delim Delims) error {
 // information for tensor dimensionality.
 // If the table DOES have existing columns, then those are used robustly
 // for whatever information fits from each row of the file.
-func (ix *IndexView) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
+func (ix *IndexView) OpenCSV(filename core.Filename, delim Delims) error { //gti:add
 	err := ix.Table.OpenCSV(filename, delim)
 	ix.Sequential()
 	return err

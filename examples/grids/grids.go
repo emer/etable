@@ -7,8 +7,8 @@ package main
 import (
 	"embed"
 
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/errors"
-	"cogentcore.org/core/gi"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etview"
 )
@@ -23,9 +23,9 @@ func main() {
 	// todo: meta data for grid size
 	errors.Log(pats.OpenFS(tsv, "random_5x5_25.tsv", etable.Tab))
 
-	b := gi.NewBody("grids")
+	b := core.NewBody("grids")
 
-	tv := gi.NewTabs(b)
+	tv := core.NewTabs(b)
 
 	// nt := tv.NewTab("First")
 	nt := tv.NewTab("Patterns")

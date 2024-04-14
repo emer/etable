@@ -7,7 +7,7 @@ package main
 import (
 	"embed"
 
-	"cogentcore.org/core/gi"
+	"cogentcore.org/core/core"
 	"github.com/emer/etable/v2/eplot"
 	"github.com/emer/etable/v2/etable"
 )
@@ -16,7 +16,7 @@ import (
 var tsv embed.FS
 
 func main() {
-	b := gi.NewBody("plot")
+	b := core.NewBody("plot")
 
 	epc := etable.NewTable("epc")
 	epc.OpenFS(tsv, "ra25epoch.tsv", etable.Tab)

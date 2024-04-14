@@ -11,12 +11,12 @@ import (
 
 	"cogentcore.org/core/colors"
 	"cogentcore.org/core/colors/colormap"
+	"cogentcore.org/core/core"
 	"cogentcore.org/core/events"
-	"cogentcore.org/core/gi"
-	"cogentcore.org/core/giv"
 	"cogentcore.org/core/icons"
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/views"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/minmax"
 )
@@ -45,7 +45,7 @@ type TensorDisp struct { //gti:add
 	MinMax minmax.F64 `view:"inline"`
 
 	// the name of the color map to use in translating values to colors
-	ColorMap giv.ColorMapName
+	ColorMap views.ColorMapName
 
 	// what proportion of grid square should be filled by color block -- 1 = all, .5 = half, etc
 	GridFill float32 `min:"0.1" max:"1" step:"0.1" default:"0.9,1"`
@@ -138,7 +138,7 @@ func (td *TensorDisp) FromMeta(tsr etensor.Tensor) {
 		}
 	}
 	if op, has := tsr.MetaData("colormap"); has {
-		td.ColorMap = giv.ColorMapName(op)
+		td.ColorMap = views.ColorMapName(op)
 	}
 	if op, has := tsr.MetaData("grid-fill"); has {
 		mv, _ := strconv.ParseFloat(op, 32)
@@ -167,7 +167,7 @@ func (td *TensorDisp) FromMeta(tsr etensor.Tensor) {
 
 // TensorGrid is a widget that displays tensor values as a grid of colored squares.
 type TensorGrid struct {
-	gi.WidgetBase
+	core.WidgetBase
 
 	// the tensor that we view
 	Tensor etensor.Tensor `set:"-"`
@@ -213,13 +213,13 @@ func (tg *TensorGrid) SetTensor(tsr etensor.Tensor) *TensorGrid {
 // OpenTensorView pulls up a TensorView of our tensor
 func (tg *TensorGrid) OpenTensorView() {
 	/*
-		dlg := TensorViewDialog(tg.ViewportSafe(), tg.Tensor, giv.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
+		dlg := TensorViewDialog(tg.ViewportSafe(), tg.Tensor, views.DlgOpts{Title: "Edit Tensor", Prompt: "", NoAdd: true, NoDelete: true}, nil, nil)
 		tvk := dlg.Frame().ChildByType(KiT_TensorView, true, 2)
 		if tvk != nil {
 			tv := tvk.(*TensorView)
 			tv.TsrLay = tg.Disp.TensorLayout
 			tv.SetInactiveState(tg.IsInactive())
-			tv.ViewSig.Connect(tg.This(), func(recv, send ki.Ki, sig int64, data interface{}) {
+			tv.ViewSig.Connect(tg.This(), func(recv, send tree.Ki, sig int64, data interface{}) {
 				tgg, _ := recv.Embed(KiT_TensorGrid).(*TensorGrid)
 				tgg.UpdateSig()
 			})
@@ -231,14 +231,14 @@ func (tg *TensorGrid) HandleEvents() {
 	tg.OnDoubleClick(func(e events.Event) {
 		tg.OpenTensorView()
 	})
-	tg.AddContextMenu(func(m *gi.Scene) { // todo: still not getting the context menu event at all
-		giv.NewFuncButton(m, tg.EditSettings).SetIcon(icons.Edit)
+	tg.AddContextMenu(func(m *core.Scene) { // todo: still not getting the context menu event at all
+		views.NewFuncButton(m, tg.EditSettings).SetIcon(icons.Edit)
 	})
 }
 
 func (tg *TensorGrid) EditSettings() { //gti:add
-	d := gi.NewBody().AddTitle("Tensor Grid Display Options")
-	giv.NewStructView(d).SetStruct(&tg.Disp).
+	d := core.NewBody().AddTitle("Tensor Grid Display Options")
+	views.NewStructView(d).SetStruct(&tg.Disp).
 		OnChange(func(e events.Event) {
 			tg.NeedsRender()
 		})

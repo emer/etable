@@ -15,7 +15,7 @@ import (
 	"github.com/apache/arrow/go/arrow/memory"
 	"github.com/apache/arrow/go/arrow/tensor"
 	"github.com/emer/etable/v2/bitslice"
-	"cogentcore.org/core/laser"
+	"cogentcore.org/core/reflectx"
 	"gonum.org/v1/gonum/mat"
 )
 
@@ -121,7 +121,7 @@ func (tsr *{{.Name}}) SetNull1D(i int, nul bool) {
 func (tsr *{{.Name}}) FloatValue(i []int) float64 { j := tsr.Offset(i); return float64(tsr.Values[j]) }
 func (tsr *{{.Name}}) SetFloat(i []int, val float64)  { j := tsr.Offset(i); tsr.Values[j] = {{or .Type}}(val) }
 
-func (tsr *{{.Name}}) StringValue(i []int) string { j := tsr.Offset(i); return laser.ToString(tsr.Values[j]) }
+func (tsr *{{.Name}}) StringValue(i []int) string { j := tsr.Offset(i); return reflectx.ToString(tsr.Values[j]) }
 func (tsr *{{.Name}}) SetString(i []int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		j := tsr.Offset(i);
@@ -160,7 +160,7 @@ func (tsr *{{.Name}}) SetFloats(vals []float64) {
 	}
 }
 
-func (tsr *{{.Name}}) StringValue1D(off int) string { return laser.ToString(tsr.Values[off]) }
+func (tsr *{{.Name}}) StringValue1D(off int) string { return reflectx.ToString(tsr.Values[off]) }
 func (tsr *{{.Name}}) SetString1D(off int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
 		tsr.Values[off] = {{or .Type}}(fv)
@@ -169,7 +169,7 @@ func (tsr *{{.Name}}) SetString1D(off int, val string) {
 
 func (tsr *{{.Name}}) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values[row*sz+cell])
+	return reflectx.ToString(tsr.Values[row*sz+cell])
 }
 func (tsr *{{.Name}}) SetStringRowCell(row, cell int, val string) {
 	if fv, err := strconv.ParseFloat(val, 64); err == nil {
@@ -413,7 +413,7 @@ func (tsr *{{.Name}}) SubSpaceTry(offs []int) (Tensor, error) {
 	return nil, errors.New("SubSpace only valid for RowMajor or ColMajor tensors")
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *{{.Name}}) Label() string {
 	return fmt.Sprintf("{{.Name}}: %s", tsr.Shape.String())
 }

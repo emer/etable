@@ -412,7 +412,7 @@ func (tsr *String) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *String) Label() string {
 	return fmt.Sprintf("String: %s", tsr.Shape.String())
 }

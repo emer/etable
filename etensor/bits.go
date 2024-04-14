@@ -10,7 +10,7 @@ import (
 	"log"
 	"strings"
 
-	"cogentcore.org/core/laser"
+	"cogentcore.org/core/reflectx"
 	"github.com/apache/arrow/go/arrow"
 	"github.com/emer/etable/v2/bitslice"
 	"gonum.org/v1/gonum/mat"
@@ -99,11 +99,11 @@ func (tsr *Bits) SetFloat(i []int, val float64) {
 
 func (tsr *Bits) StringValue(i []int) string {
 	j := tsr.Offset(i)
-	return laser.ToString(tsr.Values.Index(j))
+	return reflectx.ToString(tsr.Values.Index(j))
 }
 
 func (tsr *Bits) SetString(i []int, val string) {
-	if bv, err := laser.ToBool(val); err == nil {
+	if bv, err := reflectx.ToBool(val); err == nil {
 		j := tsr.Offset(i)
 		tsr.Values.Set(j, bv)
 	}
@@ -142,21 +142,21 @@ func (tsr *Bits) SetFloats(vals []float64) {
 }
 
 func (tsr *Bits) StringValue1D(off int) string {
-	return laser.ToString(tsr.Values.Index(off))
+	return reflectx.ToString(tsr.Values.Index(off))
 }
 
 func (tsr *Bits) SetString1D(off int, val string) {
-	if bv, err := laser.ToBool(val); err == nil {
+	if bv, err := reflectx.ToBool(val); err == nil {
 		tsr.Values.Set(off, bv)
 	}
 }
 
 func (tsr *Bits) StringValueRowCell(row, cell int) string {
 	_, sz := tsr.RowCellSize()
-	return laser.ToString(tsr.Values.Index(row*sz + cell))
+	return reflectx.ToString(tsr.Values.Index(row*sz + cell))
 }
 func (tsr *Bits) SetStringRowCell(row, cell int, val string) {
-	if bv, err := laser.ToBool(val); err == nil {
+	if bv, err := reflectx.ToBool(val); err == nil {
 		_, sz := tsr.RowCellSize()
 		tsr.Values.Set(row*sz+cell, bv)
 	}
@@ -310,7 +310,7 @@ func (tsr *Bits) T() mat.Matrix {
 	return mat.Transpose{tsr}
 }
 
-// Label satisfies the gi.Labeler interface for a summary description of the tensor
+// Label satisfies the core.Labeler interface for a summary description of the tensor
 func (tsr *Bits) Label() string {
 	return fmt.Sprintf("Bits: %s", tsr.Shape.String())
 }

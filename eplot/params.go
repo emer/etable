@@ -9,7 +9,7 @@ import (
 	"strings"
 
 	"cogentcore.org/core/gox/option"
-	"cogentcore.org/core/laser"
+	"cogentcore.org/core/reflectx"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/minmax"
 )
@@ -80,7 +80,7 @@ func (pp *PlotParams) Defaults() {
 	}
 }
 
-// Update satisfies the gi.Updater interface and will trigger display update on edits
+// Update satisfies the core.Updater interface and will trigger display update on edits
 func (pp *PlotParams) Update() {
 	if pp.BarWidth > 1 {
 		pp.BarWidth = .8
@@ -132,13 +132,13 @@ func (pp *PlotParams) FromMetaMap(meta map[string]string) {
 		}
 	}
 	if lw, has := MetaMapLower(meta, "LineWidth"); has {
-		pp.LineWidth, _ = laser.ToFloat(lw)
+		pp.LineWidth, _ = reflectx.ToFloat(lw)
 	}
 	if ps, has := MetaMapLower(meta, "PointSize"); has {
-		pp.PointSize, _ = laser.ToFloat(ps)
+		pp.PointSize, _ = reflectx.ToFloat(ps)
 	}
 	if bw, has := MetaMapLower(meta, "BarWidth"); has {
-		pp.BarWidth, _ = laser.ToFloat(bw)
+		pp.BarWidth, _ = reflectx.ToFloat(bw)
 	}
 	if op, has := MetaMapLower(meta, "NegXDraw"); has {
 		if op == "+" || op == "true" {
@@ -148,7 +148,7 @@ func (pp *PlotParams) FromMetaMap(meta map[string]string) {
 		}
 	}
 	if scl, has := MetaMapLower(meta, "Scale"); has {
-		pp.Scale, _ = laser.ToFloat(scl)
+		pp.Scale, _ = reflectx.ToFloat(scl)
 	}
 	if xc, has := MetaMapLower(meta, "XAxisCol"); has {
 		pp.XAxisCol = xc
@@ -157,7 +157,7 @@ func (pp *PlotParams) FromMetaMap(meta map[string]string) {
 		pp.LegendCol = lc
 	}
 	if xrot, has := MetaMapLower(meta, "XAxisRot"); has {
-		pp.XAxisRot, _ = laser.ToFloat(xrot)
+		pp.XAxisRot, _ = reflectx.ToFloat(xrot)
 	}
 	if lb, has := MetaMapLower(meta, "XAxisLabel"); has {
 		pp.XAxisLabel = lb
@@ -226,7 +226,7 @@ func (cp *ColParams) Defaults() {
 	}
 }
 
-// Update satisfies the gi.Updater interface and will trigger display update on edits
+// Update satisfies the core.Updater interface and will trigger display update on edits
 func (cp *ColParams) Update() {
 	if cp.Plot != nil {
 		cp.Plot.Update()
@@ -292,10 +292,10 @@ func (cp *ColParams) FromMetaMap(meta map[string]string) {
 		}
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":Max"); has {
-		cp.Range.Max, _ = laser.ToFloat(vl)
+		cp.Range.Max, _ = reflectx.ToFloat(vl)
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":Min"); has {
-		cp.Range.Min, _ = laser.ToFloat(vl)
+		cp.Range.Min, _ = reflectx.ToFloat(vl)
 	}
 	if lb, has := MetaMapLower(meta, cp.Col+":Label"); has {
 		cp.Lbl = lb
@@ -304,7 +304,7 @@ func (cp *ColParams) FromMetaMap(meta map[string]string) {
 		cp.ErrCol = lb
 	}
 	if vl, has := MetaMapLower(meta, cp.Col+":TensorIndex"); has {
-		iv, _ := laser.ToInt(vl)
+		iv, _ := reflectx.ToInt(vl)
 		cp.TensorIndex = int(iv)
 	}
 }

@@ -12,7 +12,7 @@ import (
 	"sort"
 	"strconv"
 
-	"cogentcore.org/core/gi"
+	"cogentcore.org/core/core"
 	"github.com/emer/etable/v2/agg"
 	"github.com/emer/etable/v2/etable"
 )
@@ -104,7 +104,7 @@ func AvgCat(files []string) {
 	dts := make([]*etable.Table, 0, len(files))
 	for _, fn := range files {
 		dt := &etable.Table{}
-		err := dt.OpenCSV(gi.Filename(fn), etable.Tab)
+		err := dt.OpenCSV(core.Filename(fn), etable.Tab)
 		if err != nil {
 			fmt.Println("Error opening file: ", err)
 			continue
@@ -121,5 +121,5 @@ func AvgCat(files []string) {
 	}
 	avgdt := agg.MeanTables(dts)
 	avgdt.SetMetaData("precision", strconv.Itoa(LogPrec))
-	avgdt.SaveCSV(gi.Filename(Output), etable.Tab, etable.Headers)
+	avgdt.SaveCSV(core.Filename(Output), etable.Tab, etable.Headers)
 }

@@ -10,7 +10,7 @@ import (
 	"log/slog"
 	"os"
 
-	"cogentcore.org/core/gi"
+	"cogentcore.org/core/core"
 	"gonum.org/v1/plot"
 	"gonum.org/v1/plot/vg"
 	"gonum.org/v1/plot/vg/draw"
@@ -24,7 +24,7 @@ import (
 // if called from a different goroutine, it is essential to
 // surround with BlockUpdates on Viewport as this does full
 // damage to the tree.
-func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
+func PlotViewSVG(plt *plot.Plot, svge *core.SVG, scale float64) {
 	sz := svge.Geom.ContentBBox.Size()
 	if sz.X < 10 || sz.Y < 10 || scale == 0 {
 		return
@@ -55,7 +55,7 @@ func PlotViewSVG(plt *plot.Plot, svge *gi.SVG, scale float64) {
 
 // SaveSVGView saves the given gonum Plot exactly as it is rendered given Cogent Core svg editor widget.
 // The scale rescales the default font sizes -- 2-4 recommended.
-func SaveSVGView(fname string, plt *plot.Plot, svge *gi.SVG, scale float64) error {
+func SaveSVGView(fname string, plt *plot.Plot, svge *core.SVG, scale float64) error {
 	sz := svge.Geom.ContentBBox.Size()
 	w := (float64(sz.X) * 72.0) / (scale * 96.0)
 	h := (float64(sz.Y) * 72.0) / (scale * 96.0)
@@ -86,7 +86,7 @@ func SaveSVGView(fname string, plt *plot.Plot, svge *gi.SVG, scale float64) erro
 
 // StringViewSVG shows the given svg string in given Cogent Core svg editor widget
 // Scale to fit your window -- e.g., 2-3 depending on sizes
-func StringViewSVG(svgstr string, svge *gi.SVG, scale float64) {
+func StringViewSVG(svgstr string, svge *core.SVG, scale float64) {
 	var buf bytes.Buffer
 	buf.Write([]byte(svgstr))
 	svge.SVG.ReadXML(&buf)

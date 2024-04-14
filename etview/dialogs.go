@@ -5,7 +5,7 @@
 package etview
 
 import (
-	"cogentcore.org/core/gi"
+	"cogentcore.org/core/core"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/simat"
@@ -16,8 +16,8 @@ import (
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 // gopy:interface=handle
-func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, recv ki.Ki, dlgFunc ki.RecvFunc) *gi.Body {
-	dlg, recyc := gi.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
+func TensorViewDialog(avp *core.Viewport2D, tsr etensor.Tensor, opts views.DlgOpts, recv tree.Ki, dlgFunc tree.RecvFunc) *core.Body {
+	dlg, recyc := core.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
 	if recyc {
 		return dlg
 	}
@@ -27,7 +27,7 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	_, prIndex := dlg.PromptWidget(frame)
 
 	sv := frame.InsertNewChild(KiT_TensorView, prIndex+1, "tensor-view").(*TensorView)
-	sv.Viewport = dlg.Embed(gi.KiT_Viewport2D).(*gi.Viewport2D)
+	sv.Viewport = dlg.Embed(core.KiT_Viewport2D).(*core.Viewport2D)
 	if opts.Inactive {
 		sv.SetInactive()
 	}
@@ -40,7 +40,7 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 	}
 	dlg.UpdateEndNoSig(true)
 	dlg.Open(0, 0, avp, func() {
-		giv.MainMenuView(tsr, dlg.Win, dlg.Win.MainMenu)
+		views.MainMenuView(tsr, dlg.Win, dlg.Win.MainMenu)
 	})
 	return dlg
 }
@@ -48,8 +48,8 @@ func TensorViewDialog(avp *gi.Viewport2D, tsr etensor.Tensor, opts giv.DlgOpts, 
 
 // TensorGridDialog is for viewing a etensor.Tensor using a TensorGrid.
 // gopy:interface=handle
-func TensorGridDialog(ctx gi.Widget, tsr etensor.Tensor, title string) {
-	d := gi.NewBody()
+func TensorGridDialog(ctx core.Widget, tsr etensor.Tensor, title string) {
+	d := core.NewBody()
 	if title != "" {
 		d.SetTitle(title)
 	}
@@ -59,8 +59,8 @@ func TensorGridDialog(ctx gi.Widget, tsr etensor.Tensor, title string) {
 
 // TableViewDialog is for editing an etable.Table using a TableView.
 // gopy:interface=handle
-func TableViewDialog(ctx gi.Widget, ix *etable.IndexView, title string) {
-	d := gi.NewBody()
+func TableViewDialog(ctx core.Widget, ix *etable.IndexView, title string) {
+	d := core.NewBody()
 	if title != "" {
 		d.SetTitle(title)
 	}
@@ -71,8 +71,8 @@ func TableViewDialog(ctx gi.Widget, ix *etable.IndexView, title string) {
 // SimMatGridDialog is for viewing a etensor.Tensor using a SimMatGrid.
 // dialog signals (nil to ignore)
 // gopy:interface=handle
-func SimMatGridDialog(ctx gi.Widget, smat *simat.SimMat, title string) {
-	d := gi.NewBody()
+func SimMatGridDialog(ctx core.Widget, smat *simat.SimMat, title string) {
+	d := core.NewBody()
 	if title != "" {
 		d.SetTitle(title)
 	}
