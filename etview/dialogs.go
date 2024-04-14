@@ -16,7 +16,7 @@ import (
 // optionally connects to given signal receiving object and function for
 // dialog signals (nil to ignore)
 // gopy:interface=handle
-func TensorViewDialog(avp *core.Viewport2D, tsr etensor.Tensor, opts views.DlgOpts, recv tree.Ki, dlgFunc tree.RecvFunc) *core.Body {
+func TensorViewDialog(avp *core.Viewport2D, tsr etensor.Tensor, opts views.DlgOpts, recv tree.Node, dlgFunc tree.RecvFunc) *core.Body {
 	dlg, recyc := core.RecycleStdDialog(tsr, opts.ToGiOpts(), opts.Ok, opts.Cancel)
 	if recyc {
 		return dlg

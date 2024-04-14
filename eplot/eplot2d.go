@@ -22,6 +22,7 @@ import (
 	"cogentcore.org/core/math32"
 	"cogentcore.org/core/states"
 	"cogentcore.org/core/styles"
+	"cogentcore.org/core/tree"
 	"cogentcore.org/core/views"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
@@ -62,7 +63,7 @@ type Plot2D struct { //gti:add
 	InPlot bool `set:"-" edit:"-" json:"-" xml:"-"`
 }
 
-func (pl *Plot2D) CopyFieldsFrom(frm tree.Ki) {
+func (pl *Plot2D) CopyFieldsFrom(frm tree.Node) {
 	fr := frm.(*Plot2D)
 	pl.Layout.CopyFieldsFrom(&fr.Layout)
 	pl.Params.CopyFrom(&fr.Params)

@@ -12,15 +12,15 @@ var Plot2DType = gti.AddType(&gti.Type{Name: "github.com/emer/etable/v2/eplot.Pl
 
 // NewPlot2D adds a new [Plot2D] with the given name to the given parent:
 // Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data
-func NewPlot2D(par tree.Ki, name ...string) *Plot2D {
+func NewPlot2D(par tree.Node, name ...string) *Plot2D {
 	return par.NewChild(Plot2DType, name...).(*Plot2D)
 }
 
-// KiType returns the [*gti.Type] of [Plot2D]
-func (t *Plot2D) KiType() *gti.Type { return Plot2DType }
+// NodeType returns the [*gti.Type] of [Plot2D]
+func (t *Plot2D) NodeType() *gti.Type { return Plot2DType }
 
 // New returns a new [*Plot2D] value
-func (t *Plot2D) New() tree.Ki { return &Plot2D{} }
+func (t *Plot2D) New() tree.Node { return &Plot2D{} }
 
 // SetParams sets the [Plot2D.Params]:
 // the overall plot parameters
