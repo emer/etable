@@ -16,8 +16,8 @@ import (
 	"strconv"
 	"strings"
 
+	"cogentcore.org/core/errors"
 	"cogentcore.org/core/gi"
-	"cogentcore.org/core/grr"
 	"github.com/emer/etable/v2/etensor"
 )
 
@@ -106,7 +106,7 @@ func (ix *IndexView) SaveCSV(filename gi.Filename, delim Delims, headers bool) e
 func (dt *Table) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
 	fp, err := os.Open(string(filename))
 	if err != nil {
-		return grr.Log(err)
+		return errors.Log(err)
 	}
 	defer fp.Close()
 	return dt.ReadCSV(bufio.NewReader(fp), delim)
@@ -116,7 +116,7 @@ func (dt *Table) OpenCSV(filename gi.Filename, delim Delims) error { //gti:add
 func (dt *Table) OpenFS(fsys fs.FS, filename string, delim Delims) error {
 	fp, err := fsys.Open(filename)
 	if err != nil {
-		return grr.Log(err)
+		return errors.Log(err)
 	}
 	defer fp.Close()
 	return dt.ReadCSV(bufio.NewReader(fp), delim)

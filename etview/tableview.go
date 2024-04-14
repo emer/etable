@@ -13,10 +13,10 @@ import (
 	"strconv"
 	"strings"
 
+	"cogentcore.org/core/errors"
 	"cogentcore.org/core/events"
 	"cogentcore.org/core/gi"
 	"cogentcore.org/core/giv"
-	"cogentcore.org/core/grr"
 	"cogentcore.org/core/icons"
 	"cogentcore.org/core/ki"
 	"cogentcore.org/core/laser"
@@ -350,7 +350,7 @@ func (tv *TableView) ConfigRows() {
 						vv.OnChange(func(e events.Event) {
 							tv.SetChanged()
 							npv := laser.NonPtrValue(vv.Val())
-							fv := grr.Log1(laser.ToFloat(npv.Interface()))
+							fv := errors.Log1(laser.ToFloat(npv.Interface()))
 							si := tv.StartIndex + i
 							if si < len(tv.Table.Indexes) {
 								tv.Table.Table.SetCellFloatIndex(fli, tv.Table.Indexes[si], fv)

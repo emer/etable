@@ -10,7 +10,7 @@ import (
 	"math"
 
 	"cogentcore.org/core/colors"
-	"cogentcore.org/core/grr"
+	"cogentcore.org/core/errors"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/split"
@@ -56,7 +56,7 @@ func (pl *Plot2D) GenPlotXY() {
 		if err != nil {
 			slog.Error("eplot.LegendCol", "err", err.Error())
 		} else {
-			grr.Log(xview.SortStableColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending))
+			errors.Log(xview.SortStableColNames([]string{pl.Params.LegendCol, xp.Col}, etable.Ascending))
 			lsplit = split.GroupBy(xview, []string{pl.Params.LegendCol})
 			nleg = max(lsplit.Len(), 1)
 		}

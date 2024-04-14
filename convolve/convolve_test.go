@@ -7,7 +7,7 @@ package convolve
 import (
 	"testing"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 )
 
 func TestConv32(t *testing.T) {
@@ -23,7 +23,7 @@ func TestConv32(t *testing.T) {
 	khalf := (len(kern) - 1) / 2
 	for i := range src {
 		if i >= khalf && i < (sz-1-khalf) {
-			err := mat32.Abs(src[i] - float32(i))
+			err := math32.Abs(src[i] - float32(i))
 			if err > 1.0e-7 {
 				t.Errorf("error: %d:\t%g\t->\t%g\n", i, src[i], dest[i])
 			}

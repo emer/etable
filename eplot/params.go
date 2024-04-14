@@ -8,7 +8,7 @@ import (
 	"image/color"
 	"strings"
 
-	"cogentcore.org/core/glop/option"
+	"cogentcore.org/core/gox/option"
 	"cogentcore.org/core/laser"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/minmax"

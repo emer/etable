@@ -6,7 +6,7 @@ import (
 	"cogentcore.org/core/colors/colormap"
 	"cogentcore.org/core/gti"
 	"cogentcore.org/core/ki"
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 	"github.com/emer/etable/v2/etensor"
 )
 
@@ -27,7 +27,7 @@ func (t *SimMatGrid) KiType() *gti.Type { return SimMatGridType }
 func (t *SimMatGrid) New() ki.Ki { return &SimMatGrid{} }
 
 // SetRowMaxSz sets the [SimMatGrid.rowMaxSz]
-func (t *SimMatGrid) SetRowMaxSz(v mat32.Vec2) *SimMatGrid { t.rowMaxSz = v; return t }
+func (t *SimMatGrid) SetRowMaxSz(v math32.Vec2) *SimMatGrid { t.rowMaxSz = v; return t }
 
 // SetRowMinBlank sets the [SimMatGrid.rowMinBlank]
 func (t *SimMatGrid) SetRowMinBlank(v int) *SimMatGrid { t.rowMinBlank = v; return t }
@@ -36,7 +36,7 @@ func (t *SimMatGrid) SetRowMinBlank(v int) *SimMatGrid { t.rowMinBlank = v; retu
 func (t *SimMatGrid) SetRowNGps(v int) *SimMatGrid { t.rowNGps = v; return t }
 
 // SetColMaxSz sets the [SimMatGrid.colMaxSz]
-func (t *SimMatGrid) SetColMaxSz(v mat32.Vec2) *SimMatGrid { t.colMaxSz = v; return t }
+func (t *SimMatGrid) SetColMaxSz(v math32.Vec2) *SimMatGrid { t.colMaxSz = v; return t }
 
 // SetColMinBlank sets the [SimMatGrid.colMinBlank]
 func (t *SimMatGrid) SetColMinBlank(v int) *SimMatGrid { t.colMinBlank = v; return t }

@@ -6,7 +6,7 @@ package etview
 
 import (
 	"cogentcore.org/core/colors"
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/paint"
 	"cogentcore.org/core/styles"
 	"github.com/emer/etable/v2/etensor"
@@ -23,12 +23,12 @@ type SimMatGrid struct { //gti:add
 	// the similarity / distance matrix
 	SimMat *simat.SimMat `set:"-"`
 
-	rowMaxSz    mat32.Vec2 // maximum label size
-	rowMinBlank int        // minimum number of blank rows
-	rowNGps     int        // number of groups in row (non-blank after blank)
-	colMaxSz    mat32.Vec2 // maximum label size
-	colMinBlank int        // minimum number of blank cols
-	colNGps     int        // number of groups in col (non-blank after blank)
+	rowMaxSz    math32.Vec2 // maximum label size
+	rowMinBlank int         // minimum number of blank rows
+	rowNGps     int         // number of groups in row (non-blank after blank)
+	colMaxSz    math32.Vec2 // maximum label size
+	colMinBlank int         // minimum number of blank cols
+	colNGps     int         // number of groups in col (non-blank after blank)
 }
 
 // Defaults sets defaults for values that are at nonsensical initial values
@@ -51,7 +51,7 @@ func (tg *SimMatGrid) SetSimMat(smat *simat.SimMat) *SimMatGrid {
 	return tg
 }
 
-func (tg *SimMatGrid) SizeLabel(lbs []string, col bool) (minBlank, ngps int, sz mat32.Vec2) {
+func (tg *SimMatGrid) SizeLabel(lbs []string, col bool) (minBlank, ngps int, sz math32.Vec2) {
 	mx := 0
 	mxi := 0
 	minBlank = len(lbs)
@@ -93,7 +93,7 @@ func (tg *SimMatGrid) SizeLabel(lbs []string, col bool) (minBlank, ngps int, sz 
 	return minBlank, ngps, tr.Size
 }
 
-func (tg *SimMatGrid) MinSize() mat32.Vec2 {
+func (tg *SimMatGrid) MinSize() math32.Vec2 {
 	tg.rowMinBlank, tg.rowNGps, tg.rowMaxSz = tg.SizeLabel(tg.SimMat.Rows, false)
 	tg.colMinBlank, tg.colNGps, tg.colMaxSz = tg.SizeLabel(tg.SimMat.Cols, true)
 
@@ -101,19 +101,19 @@ func (tg *SimMatGrid) MinSize() mat32.Vec2 {
 
 	rtxtsz := tg.rowMaxSz.Y / float32(tg.rowMinBlank+1)
 	ctxtsz := tg.colMaxSz.X / float32(tg.colMinBlank+1)
-	txtsz := mat32.Max(rtxtsz, ctxtsz)
+	txtsz := math32.Max(rtxtsz, ctxtsz)
 
 	rows, cols, _, _ := etensor.Prjn2DShape(tg.Tensor.ShapeObj(), tg.Disp.OddRow)
 	rowEx := tg.rowNGps
 	colEx := tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-	max := float32(mat32.Max(frw, fcl))
+	max := float32(math32.Max(frw, fcl))
 	gsz := tg.Disp.TotPrefSize / max
-	gsz = mat32.Max(gsz, tg.Disp.GridMinSize)
-	gsz = mat32.Max(gsz, txtsz)
-	gsz = mat32.Min(gsz, tg.Disp.GridMaxSize)
-	return mat32.V2(tg.rowMaxSz.X+LabelSpace+gsz*float32(cols), tg.colMaxSz.Y+LabelSpace+gsz*float32(rows))
+	gsz = math32.Max(gsz, tg.Disp.GridMinSize)
+	gsz = math32.Max(gsz, txtsz)
+	gsz = math32.Min(gsz, tg.Disp.GridMaxSize)
+	return math32.V2(tg.rowMaxSz.X+LabelSpace+gsz*float32(cols), tg.colMaxSz.Y+LabelSpace+gsz*float32(rows))
 }
 
 func (tg *SimMatGrid) Render() {
@@ -140,7 +140,7 @@ func (tg *SimMatGrid) Render() {
 	colEx := tg.colNGps
 	frw := float32(rows) + float32(rowEx)*tg.Disp.DimExtra // extra spacing
 	fcl := float32(cols) + float32(colEx)*tg.Disp.DimExtra // extra spacing
-	tsz := mat32.V2(fcl, frw)
+	tsz := math32.V2(fcl, frw)
 	gsz := effsz.Div(tsz)
 
 	// Render Rows
@@ -167,7 +167,7 @@ func (tg *SimMatGrid) Render() {
 		yex := float32(ygp) * tg.Disp.DimExtra
 		tr.SetString(lb, fr, &tg.Styles.UnitContext, &txsty, true, 0, 0)
 		tr.LayoutStdLR(&txsty, fr, &tg.Styles.UnitContext, tg.rowMaxSz)
-		cr := mat32.V2(0, float32(y)+yex)
+		cr := math32.V2(0, float32(y)+yex)
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(pc, pr)
 	}
@@ -191,7 +191,7 @@ func (tg *SimMatGrid) Render() {
 		}
 		xex := float32(xgp) * tg.Disp.DimExtra
 		tr.SetStringRot90(lb, fr, &tg.Styles.UnitContext, &tg.Styles.Text, true, 0)
-		cr := mat32.V2(float32(x)+xex, 0)
+		cr := math32.V2(float32(x)+xex, 0)
 		pr := epos.Add(cr.Mul(gsz))
 		tr.Render(pc, pr)
 	}
@@ -222,7 +222,7 @@ func (tg *SimMatGrid) Render() {
 				ey = (rows - 1) - y
 			}
 			val := etensor.Prjn2DValue(tsr, tg.Disp.OddRow, ey, x)
-			cr := mat32.V2(float32(x)+xex, float32(y)+yex)
+			cr := math32.V2(float32(x)+xex, float32(y)+yex)
 			pr := pos.Add(cr.Mul(gsz))
 			_, clr := tg.Color(val)
 			pc.FillBox(pr, ssz, colors.C(clr))

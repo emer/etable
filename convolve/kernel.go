@@ -7,7 +7,7 @@ package convolve
 import (
 	"math"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 )
 
 // GaussianKernel32 returns a normalized gaussian kernel for smoothing
@@ -22,7 +22,7 @@ func GaussianKernel32(khalf int, sigma float32) []float32 {
 	var sum float32
 	for i := 0; i < ksz; i++ {
 		x := sigdiv * float32(i-khalf)
-		kv := mat32.Exp(-0.5 * x * x)
+		kv := math32.Exp(-0.5 * x * x)
 		kern[i] = kv
 		sum += kv
 	}

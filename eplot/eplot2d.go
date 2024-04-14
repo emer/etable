@@ -21,7 +21,7 @@ import (
 	"cogentcore.org/core/giv"
 	"cogentcore.org/core/icons"
 	"cogentcore.org/core/ki"
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 	"cogentcore.org/core/states"
 	"cogentcore.org/core/styles"
 	"github.com/emer/etable/v2/etable"
@@ -585,7 +585,7 @@ func (pl *Plot2D) ColsConfig() {
 func (pl *Plot2D) PlotConfig() {
 	sv := pl.SVGPlot()
 	sv.SVG.Scale = 1
-	sv.SVG.Translate = mat32.Vec2{}
+	sv.SVG.Translate = math32.Vec2{}
 	sv.SetReadOnly(true)
 }
 

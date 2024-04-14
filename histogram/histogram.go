@@ -5,7 +5,7 @@
 package histogram
 
 import (
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 )
@@ -52,7 +52,7 @@ func F64Table(dt *etable.Table, vals []float64, nBins int, min, max float64) {
 	inc := (max - min) / float64(nBins)
 	vls := dt.Cols[0].(*etensor.Float64).Values
 	for i := 0; i < nBins; i++ {
-		vls[i] = mat32.Truncate64(min+float64(i)*inc, 4)
+		vls[i] = math32.Truncate64(min+float64(i)*inc, 4)
 	}
 }
 
@@ -101,6 +101,6 @@ func F32Table(dt *etable.Table, vals []float32, nBins int, min, max float32) {
 	inc := (max - min) / float32(nBins)
 	vls := dt.Cols[0].(*etensor.Float32).Values
 	for i := 0; i < nBins; i++ {
-		vls[i] = mat32.Truncate(min+float32(i)*inc, 4)
+		vls[i] = math32.Truncate(min+float32(i)*inc, 4)
 	}
 }

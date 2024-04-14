@@ -7,7 +7,7 @@ package norm
 import (
 	"math"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 )
 
 ///////////////////////////////////////////
@@ -18,7 +18,7 @@ import (
 func N32(a []float32) float32 {
 	n := 0
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
 		n++
@@ -47,7 +47,7 @@ func N64(a []float64) float64 {
 func Sum32(a []float32) float32 {
 	s := float32(0)
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
 		s += av
@@ -77,7 +77,7 @@ func Mean32(a []float32) float32 {
 	s := float32(0)
 	n := 0
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
 		s += av
@@ -116,7 +116,7 @@ func Var32(a []float32) float32 {
 	n := 0
 	s := float32(0)
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
 		dv := av - mean
@@ -153,7 +153,7 @@ func Var64(a []float64) float64 {
 
 // Std32 returns the sample standard deviation of non-NaN elements in vector.
 func Std32(a []float32) float32 {
-	return mat32.Sqrt(Var32(a))
+	return math32.Sqrt(Var32(a))
 }
 
 // Std64 returns the sample standard deviation of non-NaN elements in vector.
@@ -169,10 +169,10 @@ func Std64(a []float64) float64 {
 func Max32(a []float32) float32 {
 	m := float32(-math.MaxFloat32)
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
-		m = mat32.Max(m, av)
+		m = math32.Max(m, av)
 	}
 	return m
 }
@@ -183,7 +183,7 @@ func MaxIndex32(a []float32) (float32, int) {
 	m := float32(-math.MaxFloat32)
 	mi := -1
 	for i, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
 		if av > m {
@@ -232,10 +232,10 @@ func MaxIndex64(a []float64) (float64, int) {
 func MaxAbs32(a []float32) float32 {
 	m := float32(0)
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
-		m = mat32.Max(m, mat32.Abs(av))
+		m = math32.Max(m, math32.Abs(av))
 	}
 	return m
 }
@@ -261,10 +261,10 @@ func MaxAbs64(a []float64) float64 {
 func Min32(a []float32) float32 {
 	m := float32(math.MaxFloat32)
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
-		m = mat32.Min(m, av)
+		m = math32.Min(m, av)
 	}
 	return m
 }
@@ -275,7 +275,7 @@ func MinIndex32(a []float32) (float32, int) {
 	m := float32(math.MaxFloat32)
 	mi := -1
 	for i, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
 		if av < m {
@@ -324,10 +324,10 @@ func MinIndex64(a []float64) (float64, int) {
 func MinAbs32(a []float32) float32 {
 	m := float32(math.MaxFloat32)
 	for _, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
-		m = mat32.Min(m, mat32.Abs(av))
+		m = math32.Min(m, math32.Abs(av))
 	}
 	return m
 }

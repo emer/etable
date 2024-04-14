@@ -9,7 +9,7 @@ import (
 	"math"
 	"math/rand"
 
-	"cogentcore.org/core/glop/indent"
+	"cogentcore.org/core/gox/indent"
 	"github.com/emer/etable/v2/etensor"
 	"github.com/emer/etable/v2/norm"
 	"github.com/emer/etable/v2/simat"

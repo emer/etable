@@ -7,17 +7,17 @@ package norm
 import (
 	"math"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 	"github.com/emer/etable/v2/etensor"
 )
 
 // Abs32 applies the Abs function to each element in given slice
 func Abs32(a []float32) {
 	for i, av := range a {
-		if mat32.IsNaN(av) {
+		if math32.IsNaN(av) {
 			continue
 		}
-		a[i] = mat32.Abs(av)
+		a[i] = math32.Abs(av)
 	}
 }
 

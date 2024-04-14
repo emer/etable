@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 )
 
 ///////////////////////////////////////////
@@ -22,10 +22,10 @@ func Abs32(a, b []float32) float32 {
 	ss := float32(0)
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		ss += mat32.Abs(av - bv)
+		ss += math32.Abs(av - bv)
 	}
 	return ss
 }
@@ -60,7 +60,7 @@ func Hamming32(a, b []float32) float32 {
 	ss := float32(0)
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
 		if av != bv {

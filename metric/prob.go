@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 )
 
 ///////////////////////////////////////////
@@ -22,17 +22,17 @@ func CrossEntropy32(a, b []float32) float32 {
 	ss := float32(0)
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		bv = mat32.Max(bv, 0.000001)
-		bv = mat32.Min(bv, 0.999999)
+		bv = math32.Max(bv, 0.000001)
+		bv = math32.Min(bv, 0.999999)
 		if av >= 1.0 {
-			ss += -mat32.Log(bv)
+			ss += -math32.Log(bv)
 		} else if av <= 0.0 {
-			ss += -mat32.Log(1.0 - bv)
+			ss += -math32.Log(1.0 - bv)
 		} else {
-			ss += av*mat32.Log(av/bv) + (1-av)*mat32.Log((1-av)/(1-bv))
+			ss += av*math32.Log(av/bv) + (1-av)*math32.Log((1-av)/(1-bv))
 		}
 	}
 	return ss

@@ -7,7 +7,7 @@ package metric
 import (
 	"math"
 
-	"cogentcore.org/core/mat32"
+	"cogentcore.org/core/math32"
 	"github.com/emer/etable/v2/norm"
 )
 
@@ -24,7 +24,7 @@ func SumSquares32(a, b []float32) float32 {
 	n := len(a)
 	if n < 2 {
 		if n == 1 {
-			return mat32.Abs(a[0] - b[0])
+			return math32.Abs(a[0] - b[0])
 		}
 		return 0
 	}
@@ -34,10 +34,10 @@ func SumSquares32(a, b []float32) float32 {
 	)
 	for i, av := range a {
 		bv := b[i]
-		if av == bv || mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		absxi := mat32.Abs(av - bv)
+		absxi := math32.Abs(av - bv)
 		if scale < absxi {
 			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
 			scale = absxi
@@ -45,8 +45,8 @@ func SumSquares32(a, b []float32) float32 {
 			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
 		}
 	}
-	if mat32.IsInf(scale, 1) {
-		return mat32.Inf(1)
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
 	}
 	return scale * scale * sumSquares
 }
@@ -103,7 +103,7 @@ func SumSquaresBinTol32(a, b []float32) float32 {
 	n := len(a)
 	if n < 2 {
 		if n == 1 {
-			return mat32.Abs(a[0] - b[0])
+			return math32.Abs(a[0] - b[0])
 		}
 		return 0
 	}
@@ -113,10 +113,10 @@ func SumSquaresBinTol32(a, b []float32) float32 {
 	)
 	for i, av := range a {
 		bv := b[i]
-		if av == bv || mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		absxi := mat32.Abs(av - bv)
+		absxi := math32.Abs(av - bv)
 		if absxi < 0.5 {
 			continue
 		}
@@ -127,8 +127,8 @@ func SumSquaresBinTol32(a, b []float32) float32 {
 			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
 		}
 	}
-	if mat32.IsInf(scale, 1) {
-		return mat32.Inf(1)
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
 	}
 	return scale * scale * sumSquares
 }
@@ -189,7 +189,7 @@ func Euclidean32(a, b []float32) float32 {
 	n := len(a)
 	if n < 2 {
 		if n == 1 {
-			return mat32.Abs(a[0] - b[0])
+			return math32.Abs(a[0] - b[0])
 		}
 		return 0
 	}
@@ -199,10 +199,10 @@ func Euclidean32(a, b []float32) float32 {
 	)
 	for i, av := range a {
 		bv := b[i]
-		if av == bv || mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		absxi := mat32.Abs(av - bv)
+		absxi := math32.Abs(av - bv)
 		if scale < absxi {
 			sumSquares = 1 + sumSquares*(scale/absxi)*(scale/absxi)
 			scale = absxi
@@ -210,10 +210,10 @@ func Euclidean32(a, b []float32) float32 {
 			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
 		}
 	}
-	if mat32.IsInf(scale, 1) {
-		return mat32.Inf(1)
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
 	}
-	return scale * mat32.Sqrt(sumSquares)
+	return scale * math32.Sqrt(sumSquares)
 }
 
 // Euclidean64 computes the square-root of sum-of-squares distance
@@ -270,7 +270,7 @@ func EuclideanBinTol32(a, b []float32) float32 {
 	n := len(a)
 	if n < 2 {
 		if n == 1 {
-			return mat32.Abs(a[0] - b[0])
+			return math32.Abs(a[0] - b[0])
 		}
 		return 0
 	}
@@ -280,10 +280,10 @@ func EuclideanBinTol32(a, b []float32) float32 {
 	)
 	for i, av := range a {
 		bv := b[i]
-		if av == bv || mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if av == bv || math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
-		absxi := mat32.Abs(av - bv)
+		absxi := math32.Abs(av - bv)
 		if absxi < 0.5 {
 			continue
 		}
@@ -294,10 +294,10 @@ func EuclideanBinTol32(a, b []float32) float32 {
 			sumSquares = sumSquares + (absxi/scale)*(absxi/scale)
 		}
 	}
-	if mat32.IsInf(scale, 1) {
-		return mat32.Inf(1)
+	if math32.IsInf(scale, 1) {
+		return math32.Inf(1)
 	}
-	return scale * mat32.Sqrt(sumSquares)
+	return scale * math32.Sqrt(sumSquares)
 }
 
 // EuclideanBinTol64 computes the square-root of sum-of-squares distance
@@ -359,7 +359,7 @@ func Covariance32(a, b []float32) float32 {
 	n := 0
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
 		ss += (av - am) * (bv - bm)
@@ -416,7 +416,7 @@ func Correlation32(a, b []float32) float32 {
 	var avar, bvar float32
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
 		ad := av - am
@@ -425,7 +425,7 @@ func Correlation32(a, b []float32) float32 {
 		avar += ad * ad // within
 		bvar += bd * bd
 	}
-	vp := mat32.Sqrt(avar * bvar)
+	vp := math32.Sqrt(avar * bvar)
 	if vp > 0 {
 		ss /= vp
 	}
@@ -477,7 +477,7 @@ func InnerProduct32(a, b []float32) float32 {
 	ss := float32(0)
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
 		ss += av * bv
@@ -521,14 +521,14 @@ func Cosine32(a, b []float32) float32 {
 	var ass, bss float32
 	for i, av := range a {
 		bv := b[i]
-		if mat32.IsNaN(av) || mat32.IsNaN(bv) {
+		if math32.IsNaN(av) || math32.IsNaN(bv) {
 			continue
 		}
 		ss += av * bv  // between
 		ass += av * av // within
 		bss += bv * bv
 	}
-	vp := mat32.Sqrt(ass * bss)
+	vp := math32.Sqrt(ass * bss)
 	if vp > 0 {
 		ss /= vp
 	}

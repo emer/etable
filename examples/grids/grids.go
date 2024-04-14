@@ -7,8 +7,8 @@ package main
 import (
 	"embed"
 
+	"cogentcore.org/core/errors"
 	"cogentcore.org/core/gi"
-	"cogentcore.org/core/grr"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etview"
 )
@@ -21,7 +21,7 @@ func main() {
 	pats.SetMetaData("name", "TrainPats")
 	pats.SetMetaData("desc", "Training patterns")
 	// todo: meta data for grid size
-	grr.Log(pats.OpenFS(tsv, "random_5x5_25.tsv", etable.Tab))
+	errors.Log(pats.OpenFS(tsv, "random_5x5_25.tsv", etable.Tab))
 
 	b := gi.NewBody("grids")
 
