@@ -22,6 +22,7 @@ import (
 	"cogentcore.org/core/styles"
 	"cogentcore.org/core/tree"
 	"cogentcore.org/core/units"
+	"cogentcore.org/core/views"
 	"github.com/emer/etable/v2/etable"
 	"github.com/emer/etable/v2/etensor"
 )
@@ -99,7 +100,7 @@ func (tv *TableView) SetStyles() {
 		if w.Parent().PathFrom(tv) == "header" {
 			w.Style(func(s *styles.Style) {
 				if hdr, ok := w.(*core.Button); ok {
-					fli := hdr.Prop("field-index").(int)
+					fli := hdr.Property("field-index").(int)
 					if fli == tv.SortIndex {
 						if tv.SortDesc {
 							hdr.SetIcon(icons.KeyboardArrowDown)
@@ -231,7 +232,7 @@ func (tv *TableView) ConfigHeader() {
 		hdr := sgh.Child(idxOff + fli).(*core.Button)
 		hdr.SetType(core.ButtonMenu)
 		hdr.SetText(field)
-		hdr.SetProp("field-index", fli)
+		hdr.SetProperty("field-index", fli)
 		tv.HeaderWidths[fli] = len(field)
 		if fli == tv.SortIndex {
 			if tv.SortDesc {
@@ -310,7 +311,7 @@ func (tv *TableView) ConfigRows() {
 				e.SetHandled()
 				tv.UpdateSelectRow(i, e.SelectMode())
 			})
-			idxlab.SetProp(views.SliceViewRowProp, i)
+			idxlab.SetProperty(views.SliceViewRowProperty, i)
 		}
 
 		vpath := tv.ViewPath + "[" + sitxt + "]"
@@ -333,7 +334,7 @@ func (tv *TableView) ConfigRows() {
 				if !tv.IsReadOnly() {
 					vv.OnChange(func(e events.Event) {
 						tv.SetChanged()
-						npv := reflectx.NonPtrValue(vv.Val())
+						npv := reflectx.NonPointerValue(vv.Val())
 						sv := reflectx.ToString(npv.Interface())
 						si := tv.StartIndex + i
 						if si < len(tv.Table.Indexes) {
@@ -348,7 +349,7 @@ func (tv *TableView) ConfigRows() {
 					if !tv.IsReadOnly() {
 						vv.OnChange(func(e events.Event) {
 							tv.SetChanged()
-							npv := reflectx.NonPtrValue(vv.Val())
+							npv := reflectx.NonPointerValue(vv.Val())
 							fv := errors.Log1(reflectx.ToFloat(npv.Interface()))
 							si := tv.StartIndex + i
 							if si < len(tv.Table.Indexes) {
@@ -373,8 +374,8 @@ func (tv *TableView) ConfigRows() {
 			w := tree.NewOfType(vtyp).(core.Widget)
 			sg.SetChild(w, cidx, valnm)
 			views.Config(vv, w)
-			w.SetProp(views.SliceViewRowProp, i)
-			w.SetProp(views.SliceViewColProp, fli)
+			w.SetProperty(views.SliceViewRowProperty, i)
+			w.SetProperty(views.SliceViewColProperty, fli)
 			if col.NumDims() > 1 {
 				tgw := w.This().(*TensorGrid)
 				tgw.Style(func(s *styles.Style) {

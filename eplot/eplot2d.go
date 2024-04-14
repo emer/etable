@@ -584,7 +584,7 @@ func (pl *Plot2D) ColsConfig() {
 func (pl *Plot2D) PlotConfig() {
 	sv := pl.SVGPlot()
 	sv.SVG.Scale = 1
-	sv.SVG.Translate = math32.Vec2{}
+	sv.SVG.Translate = math32.Vector2{}
 	sv.SetReadOnly(true)
 }
 

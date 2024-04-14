@@ -20,7 +20,7 @@ import (
 func DivNorm32(a []float32, nfunc Func32) {
 	nv := nfunc(a)
 	if nv != 0 {
-		MultVec32(a, 1/nv)
+		MultVector32(a, 1/nv)
 	}
 }
 
@@ -40,7 +40,7 @@ func DivNorm64(a []float64, nfunc Func64) {
 // i.e., it subtracts norm computed by given function from each element.
 func SubNorm32(a []float32, nfunc Func32) {
 	nv := nfunc(a)
-	AddVec32(a, -nv)
+	AddVector32(a, -nv)
 }
 
 // SubNorm64 does subtractive normalization by given norm function
@@ -83,8 +83,8 @@ func Unit64(a []float64) {
 ///////////////////////////////////////////
 //  MultVec
 
-// MultVec32 multiplies vector elements by scalar
-func MultVec32(a []float32, val float32) {
+// MultVector32 multiplies vector elements by scalar
+func MultVector32(a []float32, val float32) {
 	for i, av := range a {
 		if math32.IsNaN(av) {
 			continue
@@ -106,8 +106,8 @@ func MultVec64(a []float64, val float64) {
 ///////////////////////////////////////////
 //  AddVec
 
-// AddVec32 adds scalar to vector
-func AddVec32(a []float32, val float32) {
+// AddVector32 adds scalar to vector
+func AddVector32(a []float32, val float32) {
 	for i, av := range a {
 		if math32.IsNaN(av) {
 			continue

@@ -26,7 +26,7 @@ func (t *SimMatGrid) KiType() *gti.Type { return SimMatGridType }
 func (t *SimMatGrid) New() tree.Ki { return &SimMatGrid{} }
 
 // SetRowMaxSz sets the [SimMatGrid.rowMaxSz]
-func (t *SimMatGrid) SetRowMaxSz(v math32.Vec2) *SimMatGrid { t.rowMaxSz = v; return t }
+func (t *SimMatGrid) SetRowMaxSz(v math32.Vector2) *SimMatGrid { t.rowMaxSz = v; return t }
 
 // SetRowMinBlank sets the [SimMatGrid.rowMinBlank]
 func (t *SimMatGrid) SetRowMinBlank(v int) *SimMatGrid { t.rowMinBlank = v; return t }
@@ -35,7 +35,7 @@ func (t *SimMatGrid) SetRowMinBlank(v int) *SimMatGrid { t.rowMinBlank = v; retu
 func (t *SimMatGrid) SetRowNGps(v int) *SimMatGrid { t.rowNGps = v; return t }
 
 // SetColMaxSz sets the [SimMatGrid.colMaxSz]
-func (t *SimMatGrid) SetColMaxSz(v math32.Vec2) *SimMatGrid { t.colMaxSz = v; return t }
+func (t *SimMatGrid) SetColMaxSz(v math32.Vector2) *SimMatGrid { t.colMaxSz = v; return t }
 
 // SetColMinBlank sets the [SimMatGrid.colMinBlank]
 func (t *SimMatGrid) SetColMinBlank(v int) *SimMatGrid { t.colMinBlank = v; return t }

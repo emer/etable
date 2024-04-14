@@ -32,11 +32,11 @@ func (v *Plot2DValue) Config() {
 }
 
 func (v *Plot2DValue) Update() {
-	npv := reflectx.NonPtrValue(v.Value)
+	npv := reflectx.NonPointerValue(v.Value)
 	if !v.Value.IsValid() || v.Value.IsZero() || !npv.IsValid() || npv.IsZero() {
 		v.Widget.SetText("nil")
 	} else {
-		opv := reflectx.OnePtrUnderlyingValue(v.Value)
+		opv := reflectx.OnePointerUnderlyingValue(v.Value)
 		plot := opv.Interface().(*Plot2D)
 		if plot != nil && plot.Table != nil && plot.Table.Table != nil {
 			if nm, has := plot.Table.Table.MetaData["name"]; has {
@@ -51,7 +51,7 @@ func (v *Plot2DValue) Update() {
 }
 
 func (v *Plot2DValue) ConfigDialog(d *core.Body) (bool, func()) {
-	opv := reflectx.OnePtrUnderlyingValue(v.Value)
+	opv := reflectx.OnePointerUnderlyingValue(v.Value)
 	plot := opv.Interface().(*Plot2D)
 	if plot == nil || plot.Table == nil {
 		return false, nil
