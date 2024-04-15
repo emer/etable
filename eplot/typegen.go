@@ -3,10 +3,47 @@
 package eplot
 
 import (
+	"cogentcore.org/core/core"
+	"cogentcore.org/core/tree"
 	"cogentcore.org/core/types"
 )
 
-var _ = types.AddType(&types.Type{Name: "github.com/emer/etable/v2/eplot.Plot2D", IDName: "plot2-d", Doc: "Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Methods: []types.Method{{Name: "SaveSVG", Doc: "SaveSVG saves the plot to an svg -- first updates to ensure that plot is current", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname"}}, {Name: "SavePNG", Doc: "SavePNG saves the current plot to a png, capturing current render", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname"}}, {Name: "SaveCSV", Doc: "SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname", "delim"}}, {Name: "SaveAll", Doc: "SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save\nAny extension is removed and appropriate extensions are added", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname"}}, {Name: "OpenCSV", Doc: "OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"filename", "delim"}}, {Name: "SetColsByName", Doc: "SetColsByName turns cols On or Off if their name contains given string", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"nameContains", "on"}}}, Embeds: []types.Field{{Name: "Layout"}}, Fields: []types.Field{{Name: "Table", Doc: "the idxview of the table that we're plotting"}, {Name: "Params", Doc: "the overall plot parameters"}, {Name: "Cols", Doc: "the parameters for each column of the table"}, {Name: "Plot", Doc: "the gonum plot that actually does the plotting -- always save the last one generated"}, {Name: "ConfigPlotFunc", Doc: "ConfigPlotFunc is a function to call to configure [Plot2D.Plot], the gonum plot that\nactually does the plotting. It is called after [Plot] is generated, and properties\nof [Plot] can be modified in it. Properties of [Plot] should not be modified outside\nof this function, as doing so will have no effect."}, {Name: "SVGFile", Doc: "current svg file"}, {Name: "DataFile", Doc: "current csv data file"}, {Name: "InPlot", Doc: "currently doing a plot"}}})
+// Plot2DType is the [types.Type] for [Plot2D]
+var Plot2DType = types.AddType(&types.Type{Name: "github.com/emer/etable/v2/eplot.Plot2D", IDName: "plot2-d", Doc: "Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Methods: []types.Method{{Name: "SaveSVG", Doc: "SaveSVG saves the plot to an svg -- first updates to ensure that plot is current", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname"}}, {Name: "SavePNG", Doc: "SavePNG saves the current plot to a png, capturing current render", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname"}}, {Name: "SaveCSV", Doc: "SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname", "delim"}}, {Name: "SaveAll", Doc: "SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save\nAny extension is removed and appropriate extensions are added", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"fname"}}, {Name: "OpenCSV", Doc: "OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"filename", "delim"}}, {Name: "SetColsByName", Doc: "SetColsByName turns cols On or Off if their name contains given string", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Args: []string{"nameContains", "on"}}}, Embeds: []types.Field{{Name: "Layout"}}, Fields: []types.Field{{Name: "Table", Doc: "the idxview of the table that we're plotting"}, {Name: "Params", Doc: "the overall plot parameters"}, {Name: "Cols", Doc: "the parameters for each column of the table"}, {Name: "Plot", Doc: "the gonum plot that actually does the plotting -- always save the last one generated"}, {Name: "ConfigPlotFunc", Doc: "ConfigPlotFunc is a function to call to configure [Plot2D.Plot], the gonum plot that\nactually does the plotting. It is called after [Plot] is generated, and properties\nof [Plot] can be modified in it. Properties of [Plot] should not be modified outside\nof this function, as doing so will have no effect."}, {Name: "SVGFile", Doc: "current svg file"}, {Name: "DataFile", Doc: "current csv data file"}, {Name: "InPlot", Doc: "currently doing a plot"}}, Instance: &Plot2D{}})
+
+// NewPlot2D adds a new [Plot2D] with the given name to the given parent:
+// Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data
+func NewPlot2D(parent tree.Node, name ...string) *Plot2D {
+	return parent.NewChild(Plot2DType, name...).(*Plot2D)
+}
+
+// NodeType returns the [*types.Type] of [Plot2D]
+func (t *Plot2D) NodeType() *types.Type { return Plot2DType }
+
+// New returns a new [*Plot2D] value
+func (t *Plot2D) New() tree.Node { return &Plot2D{} }
+
+// SetParams sets the [Plot2D.Params]:
+// the overall plot parameters
+func (t *Plot2D) SetParams(v PlotParams) *Plot2D { t.Params = v; return t }
+
+// SetConfigPlotFunc sets the [Plot2D.ConfigPlotFunc]:
+// ConfigPlotFunc is a function to call to configure [Plot2D.Plot], the gonum plot that
+// actually does the plotting. It is called after [Plot] is generated, and properties
+// of [Plot] can be modified in it. Properties of [Plot] should not be modified outside
+// of this function, as doing so will have no effect.
+func (t *Plot2D) SetConfigPlotFunc(v func()) *Plot2D { t.ConfigPlotFunc = v; return t }
+
+// SetSVGFile sets the [Plot2D.SVGFile]:
+// current svg file
+func (t *Plot2D) SetSVGFile(v core.Filename) *Plot2D { t.SVGFile = v; return t }
+
+// SetDataFile sets the [Plot2D.DataFile]:
+// current csv data file
+func (t *Plot2D) SetDataFile(v core.Filename) *Plot2D { t.DataFile = v; return t }
+
+// SetTooltip sets the [Plot2D.Tooltip]
+func (t *Plot2D) SetTooltip(v string) *Plot2D { t.Tooltip = v; return t }
 
 var _ = types.AddType(&types.Type{Name: "github.com/emer/etable/v2/eplot.PlotParams", IDName: "plot-params", Doc: "PlotParams are parameters for overall plot", Directives: []types.Directive{{Tool: "types", Directive: "add"}}, Fields: []types.Field{{Name: "Title", Doc: "optional title at top of plot"}, {Name: "Type", Doc: "type of plot to generate.  For a Bar plot, items are plotted ordinally by row and the XAxis is optional"}, {Name: "Lines", Doc: "whether to plot lines"}, {Name: "Points", Doc: "whether to plot points with symbols"}, {Name: "LineWidth", Doc: "width of lines"}, {Name: "PointSize", Doc: "size of points"}, {Name: "PointShape", Doc: "the shape used to draw points"}, {Name: "BarWidth", Doc: "width of bars for bar plot, as fraction of available space (1 = no gaps)"}, {Name: "NegXDraw", Doc: "draw lines that connect points with a negative X-axis direction -- otherwise these are treated as breaks between repeated series and not drawn"}, {Name: "Scale", Doc: "overall scaling factor -- the larger the number, the larger the fonts are relative to the graph"}, {Name: "XAxisCol", Doc: "what column to use for the common X axis -- if empty or not found, the row number is used.  This optional for Bar plots -- if present and LegendCol is also present, then an extra space will be put between X values."}, {Name: "LegendCol", Doc: "optional column for adding a separate colored / styled line or bar according to this value -- acts just like a separate Y variable, crossed with Y variables"}, {Name: "XAxisRot", Doc: "rotation of the X Axis labels, in degrees"}, {Name: "XAxisLabel", Doc: "optional label to use for XAxis instead of column name"}, {Name: "YAxisLabel", Doc: "optional label to use for YAxis -- if empty, first column name is used"}, {Name: "Plot", Doc: "our plot, for update method"}}})
 
