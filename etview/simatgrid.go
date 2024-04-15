@@ -17,7 +17,7 @@ const LabelSpace = float32(8)
 
 // SimMatGrid is a widget that displays a similarity / distance matrix
 // with tensor values as a grid of colored squares, and labels for rows, cols
-type SimMatGrid struct { //gti:add
+type SimMatGrid struct { //types:add
 	TensorGrid
 
 	// the similarity / distance matrix

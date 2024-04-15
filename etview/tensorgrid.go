@@ -22,7 +22,7 @@ import (
 )
 
 // TensorLayout are layout options for displaying tensors
-type TensorLayout struct { //gti:add
+type TensorLayout struct { //types:add
 
 	// even-numbered dimensions are displayed as Y*X rectangles -- this determines along which dimension to display any remaining odd dimension: OddRow = true = organize vertically along row dimension, false = organize horizontally across column dimension
 	OddRow bool
@@ -35,7 +35,7 @@ type TensorLayout struct { //gti:add
 }
 
 // TensorDisp are options for displaying tensors
-type TensorDisp struct { //gti:add
+type TensorDisp struct { //types:add
 	TensorLayout
 
 	// range to plot
@@ -236,7 +236,7 @@ func (tg *TensorGrid) HandleEvents() {
 	})
 }
 
-func (tg *TensorGrid) EditSettings() { //gti:add
+func (tg *TensorGrid) EditSettings() { //types:add
 	d := core.NewBody().AddTitle("Tensor Grid Display Options")
 	views.NewStructView(d).SetStruct(&tg.Disp).
 		OnChange(func(e events.Event) {

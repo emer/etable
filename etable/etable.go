@@ -17,7 +17,7 @@ import (
 
 // etable.Table is the emer DataTable structure, containing columns of etensor tensors.
 // All tensors MUST have RowMajor stride layout!
-type Table struct { //gti:add
+type Table struct { //types:add
 
 	// columns of data, as etensor.Tensor tensors
 	Cols []etensor.Tensor `view:"no-inline"`
@@ -196,13 +196,13 @@ func (dt *Table) DeleteAll() {
 }
 
 // AddRows adds n rows to each of the columns
-func (dt *Table) AddRows(n int) { //gti:add
+func (dt *Table) AddRows(n int) { //types:add
 	dt.SetNumRows(dt.Rows + n)
 }
 
 // SetNumRows sets the number of rows in the table, across all columns
 // if rows = 0 then effective number of rows in tensors is 1, as this dim cannot be 0
-func (dt *Table) SetNumRows(rows int) { //gti:add
+func (dt *Table) SetNumRows(rows int) { //types:add
 	dt.Rows = rows // can be 0
 	rows = max(1, rows)
 	for _, tsr := range dt.Cols {

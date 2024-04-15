@@ -32,7 +32,7 @@ import (
 )
 
 // Plot2D is a Cogent Core Widget that provides a 2D plot of selected columns of etable data
-type Plot2D struct { //gti:add
+type Plot2D struct { //types:add
 	core.Layout
 
 	// the idxview of the table that we're plotting
@@ -155,7 +155,7 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 }
 
 // SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
-func (pl *Plot2D) SaveSVG(fname core.Filename) { //gti:add
+func (pl *Plot2D) SaveSVG(fname core.Filename) { //types:add
 	pl.Update()
 	sv := pl.SVGPlot()
 	SaveSVGView(string(fname), pl.Plot, sv, 2)
@@ -163,20 +163,20 @@ func (pl *Plot2D) SaveSVG(fname core.Filename) { //gti:add
 }
 
 // SavePNG saves the current plot to a png, capturing current render
-func (pl *Plot2D) SavePNG(fname core.Filename) { //gti:add
+func (pl *Plot2D) SavePNG(fname core.Filename) { //types:add
 	sv := pl.SVGPlot()
 	sv.SavePNG(fname)
 }
 
 // SaveCSV saves the Table data to a csv (comma-separated values) file with headers (any delim)
-func (pl *Plot2D) SaveCSV(fname core.Filename, delim etable.Delims) { //gti:add
+func (pl *Plot2D) SaveCSV(fname core.Filename, delim etable.Delims) { //types:add
 	pl.Table.SaveCSV(fname, delim, etable.Headers)
 	pl.DataFile = fname
 }
 
 // SaveAll saves the current plot to a png, svg, and the data to a tsv -- full save
 // Any extension is removed and appropriate extensions are added
-func (pl *Plot2D) SaveAll(fname core.Filename) { //gti:add
+func (pl *Plot2D) SaveAll(fname core.Filename) { //types:add
 	fn := string(fname)
 	fn = strings.TrimSuffix(fn, filepath.Ext(fn))
 	pl.SaveCSV(core.Filename(fn+".tsv"), etable.Tab)
@@ -185,7 +185,7 @@ func (pl *Plot2D) SaveAll(fname core.Filename) { //gti:add
 }
 
 // OpenCSV opens the Table data from a csv (comma-separated values) file (or any delim)
-func (pl *Plot2D) OpenCSV(filename core.Filename, delim etable.Delims) { //gti:add
+func (pl *Plot2D) OpenCSV(filename core.Filename, delim etable.Delims) { //types:add
 	pl.Table.Table.OpenCSV(filename, delim)
 	pl.DataFile = filename
 	pl.Update()
@@ -497,7 +497,7 @@ func (pl *Plot2D) SetAllCols(on bool) {
 }
 
 // SetColsByName turns cols On or Off if their name contains given string
-func (pl *Plot2D) SetColsByName(nameContains string, on bool) { //gti:add
+func (pl *Plot2D) SetColsByName(nameContains string, on bool) { //types:add
 	vl := pl.ColsLay()
 	for i, cli := range *vl.Children() {
 		if i < PlotColsHeaderN {

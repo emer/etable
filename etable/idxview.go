@@ -35,7 +35,7 @@ type FilterFunc func(et *Table, row int) bool
 // indexed order, call the NewTable method.
 // IndexView views on a table can also be organized together as Splits
 // of the table rows, e.g., by grouping values along a given column.
-type IndexView struct { //gti:add
+type IndexView struct { //types:add
 
 	// Table that we are an indexed view onto
 	Table *Table
@@ -76,7 +76,7 @@ func (ix *IndexView) DeleteInvalid() {
 }
 
 // Sequential sets indexes to sequential row-wise indexes into table
-func (ix *IndexView) Sequential() { //gti:add
+func (ix *IndexView) Sequential() { //types:add
 	if ix.Table == nil || ix.Table.Rows <= 0 {
 		ix.Indexes = nil
 		return
@@ -136,7 +136,7 @@ const (
 // given column name, using either ascending or descending order.
 // Only valid for 1-dimensional columns.
 // Returns error if column name not found.
-func (ix *IndexView) SortColName(colNm string, ascending bool) error { //gti:add
+func (ix *IndexView) SortColName(colNm string, ascending bool) error { //types:add
 	ci, err := ix.Table.ColIndexTry(colNm)
 	if err != nil {
 		log.Println(err)
@@ -366,7 +366,7 @@ func (ix *IndexView) Filter(filterFunc func(et *Table, row int) bool) {
 // Use named args for greater clarity.
 // Only valid for 1-dimensional columns.
 // Returns error if column name not found.
-func (ix *IndexView) FilterColName(colNm string, str string, exclude, contains, ignoreCase bool) error { //gti:add
+func (ix *IndexView) FilterColName(colNm string, str string, exclude, contains, ignoreCase bool) error { //types:add
 	ci, err := ix.Table.ColIndexTry(colNm)
 	if err != nil {
 		log.Println(err)
@@ -472,7 +472,7 @@ func (ix *IndexView) CopyFrom(oix *IndexView) {
 }
 
 // AddRows adds n rows to end of underlying Table, and to the indexes in this view
-func (ix *IndexView) AddRows(n int) { //gti:add
+func (ix *IndexView) AddRows(n int) { //types:add
 	stidx := ix.Table.Rows
 	ix.Table.SetNumRows(stidx + n)
 	for i := stidx; i < stidx+n; i++ {

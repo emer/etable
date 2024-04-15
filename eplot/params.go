@@ -15,7 +15,7 @@ import (
 )
 
 // PlotParams are parameters for overall plot
-type PlotParams struct { //gti:add
+type PlotParams struct { //types:add
 
 	// optional title at top of plot
 	Title string
@@ -168,7 +168,7 @@ func (pp *PlotParams) FromMetaMap(meta map[string]string) {
 }
 
 // ColParams are parameters for plotting one column of data
-type ColParams struct { //gti:add
+type ColParams struct { //types:add
 
 	// whether to plot this column
 	On bool
