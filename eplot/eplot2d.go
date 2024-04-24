@@ -627,7 +627,7 @@ func (pl *Plot2D) ConfigToolbar(tb *core.Toolbar) {
 			d := core.NewBody().AddTitle(pl.Nm + " Data")
 			etv := etview.NewTableView(d).SetTable(pl.Table.Table)
 			d.AddAppBar(etv.ConfigToolbar)
-			d.NewFullDialog(pl).Run()
+			d.NewFullDialog(pl).SetNewWindow(true).Run()
 		})
 	core.NewSeparator(tb)
 
