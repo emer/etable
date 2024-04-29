@@ -95,7 +95,7 @@ func (pl *Plot2D) OnAdd() {
 func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
 	pl.Table = etable.NewIndexView(tab)
 	pl.DeleteCols()
-	pl.Update()
+	pl.UpdatePlot()
 	return pl
 }
 
@@ -103,7 +103,7 @@ func (pl *Plot2D) SetTable(tab *etable.Table) *Plot2D {
 func (pl *Plot2D) SetTableView(tab *etable.IndexView) *Plot2D {
 	pl.Table = tab
 	pl.DeleteCols()
-	pl.Update()
+	pl.UpdatePlot()
 	return pl
 }
 
@@ -156,7 +156,7 @@ func (pl *Plot2D) SetColParams(colNm string, on bool, fixMin bool, min float64, 
 
 // SaveSVG saves the plot to an svg -- first updates to ensure that plot is current
 func (pl *Plot2D) SaveSVG(fname core.Filename) { //types:add
-	pl.Update()
+	pl.UpdatePlot()
 	sv := pl.SVGPlot()
 	SaveSVGView(string(fname), pl.Plot, sv, 2)
 	pl.SVGFile = fname
@@ -188,7 +188,7 @@ func (pl *Plot2D) SaveAll(fname core.Filename) { //types:add
 func (pl *Plot2D) OpenCSV(filename core.Filename, delim etable.Delims) { //types:add
 	pl.Table.Table.OpenCSV(filename, delim)
 	pl.DataFile = filename
-	pl.Update()
+	pl.UpdatePlot()
 }
 
 // OpenFS opens the Table data from a csv (comma-separated values) file (or any delim)
@@ -196,7 +196,7 @@ func (pl *Plot2D) OpenCSV(filename core.Filename, delim etable.Delims) { //types
 func (pl *Plot2D) OpenFS(fsys fs.FS, filename core.Filename, delim etable.Delims) {
 	pl.Table.Table.OpenFS(fsys, string(filename), delim)
 	pl.DataFile = filename
-	pl.Update()
+	pl.UpdatePlot()
 }
 
 // YLabel returns the Y-axis label
@@ -573,7 +573,7 @@ func (pl *Plot2D) ColsConfig() {
 				d := core.NewBody().AddTitle("Col Params")
 				views.NewStructView(d).SetStruct(cp).
 					OnChange(func(e events.Event) {
-						pl.UpdatePlot()
+						pl.GoUpdatePlot() // new window, needs go
 					})
 				d.NewFullDialog(pl).SetNewWindow(true).Run()
 			})
@@ -617,7 +617,7 @@ func (pl *Plot2D) ConfigToolbar(tb *core.Toolbar) {
 			d := core.NewBody().AddTitle(pl.Nm + " Params")
 			views.NewStructView(d).SetStruct(&pl.Params).
 				OnChange(func(e events.Event) {
-					pl.UpdatePlot()
+					pl.GoUpdatePlot() // new window, needs go
 				})
 			d.NewFullDialog(pl).SetNewWindow(true).Run()
 		})
