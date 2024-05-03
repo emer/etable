@@ -1,6 +1,6 @@
 # etable: data table structure in Go
 
-**IMPORTANT UPDATE:** [Cogent Core](https://github.com/cogentcore/core) now has an improved version of etable, in its [tensor](https://github.com/cogentcore/core/tree/main/tensor) package and associated sub-packages.  This version will not be further maintained or developed.  The v1 version is still needed for the v1 version of emergent.
+**IMPORTANT UPDATE:** [Cogent Core](https://github.com/cogentcore/core) now has an improved version of etable in its [tensor](https://github.com/cogentcore/core/tree/main/tensor) package and associated sub-packages.  This version will not be further maintained or developed.  The v1 version is still needed for the v1 version of emergent.
 
 [![Go Report Card](https://goreportcard.com/badge/github.com/goki/etable/v2)](https://goreportcard.com/report/github.com/goki/etable/v2)
 [![Go Reference](https://pkg.go.dev/badge/github.com/goki/etable/v2.svg)](https://pkg.go.dev/github.com/goki/etable/v2)
